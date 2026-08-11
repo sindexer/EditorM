@@ -1,0 +1,102 @@
+Phase 0E-R3 final verification
+Date: 2026-08-11
+Baseline: visual_authoring_engine_phase0e_r2_review_2026-08-11.zip
+Baseline bytes: 48176877
+Baseline SHA-256: 2292fb079d4a5b6da4bedcd3f026277a6b2c6ae372193616112e1b2766ff2bb1
+
+FINAL REQUIRED TOOLCHAIN COMMANDS
+
+PASS
+powershell -NoProfile -ExecutionPolicy Bypass -File tools/cargo.ps1 fmt --all -- --check
+Exit code: 0
+
+PASS
+powershell -NoProfile -ExecutionPolicy Bypass -File tools/cargo.ps1 clippy --workspace --all-targets -- -D warnings
+Exit code: 0
+
+PASS
+powershell -NoProfile -ExecutionPolicy Bypass -File tools/cargo.ps1 build --workspace --all-targets
+Exit code: 0
+
+PASS
+powershell -NoProfile -ExecutionPolicy Bypass -File tools/cargo.ps1 test --workspace --all-targets
+Exit code: 0
+Rust all-target result: 178 passed, 0 failed, 0 ignored across 24 result records.
+Raw output: docs/verification/PHASE_0E_R3_RUST_TEST_OUTPUT.txt
+
+DEDICATED RELEASE AND RUNTIME EVIDENCE
+
+PASS native release runtime 70-case matrix
+cargo test --release -p visual_authoring_runtime --test phase0e_r3_matrix -- --nocapture
+1 passed, 0 failed, 0 ignored
+Raw output: docs/verification/PHASE_0E_R3_NATIVE_STRUCTURAL_OUTPUT.txt
+
+PASS native EngineHost 70-case matrix
+cargo test --release -p visual_authoring_wasm_bridge phase0e_r3_native_engine_host_complexity_matrix -- --nocapture
+1 passed, 0 failed, 0 ignored
+Raw output: docs/verification/PHASE_0E_R3_NATIVE_ENGINE_HOST_OUTPUT.txt
+
+PASS actual direct WASM 70-case matrix
+npm.cmd run test:direct-wasm:r3
+WebAssembly.Module=true; WebAssembly.Instance=true; glue instance=true; native binary used=false.
+k=1000 Group median=12.7018 ms (limit 25 ms).
+k=3000/k=300 Group median ratio=9.43584 (limit 15).
+Raw output: docs/verification/PHASE_0E_R3_ACTUAL_DIRECT_WASM_OUTPUT.txt
+
+PASS React ProjectionStore 70-case matrix
+npm.cmd run test:react:r3
+1 passed, 0 failed
+Raw output: docs/verification/PHASE_0E_R3_REACT_MATRIX_OUTPUT.txt
+
+PASS actual Chrome Worker/WASM/UI proof
+npm.cmd run test:browser:r3
+1 browser assertion passed, 0 failed.
+Chrome/151.0.7922.76; NVIDIA GeForce GTX 970; heartbeat=639.
+70 matrix entries; 55 thresholds; 38/38 browser checks; pixel readback PASS.
+Console errors=0; GPU validation errors=0; maximum fallback=0.
+Captured at 2026-08-11T08:45:28.884Z.
+Raw output: docs/verification/PHASE_0E_R3_BROWSER_CONSOLE.txt
+Proof: docs/verification/PHASE_0E_R3_BROWSER_PROOF.json
+
+PASS R2 release boundary recheck after benchmark-protocol correction
+cargo test --release -p visual_authoring_runtime --test phase0e_r2_bounded -- --nocapture
+1 passed, 0 failed, 0 ignored.
+loaded_ungroup 100K/10K: median time ratio=1.11579; work ratio=1.20652.
+Raw output: docs/verification/PHASE_0E_R3_R2_RELEASE_RECHECK_OUTPUT.txt
+
+PASS npm.cmd test
+7 passed, 0 failed.
+
+PASS npm.cmd run build
+TypeScript build and Vite production build succeeded.
+
+PASS targeted failure atomicity
+1 passed, 0 failed, 0 ignored.
+Raw output: docs/verification/PHASE_0E_R3_FAILURE_ATOMICITY_OUTPUT.txt
+
+PASS targeted adversarial sequence balance
+1 passed, 0 failed, 0 ignored.
+Raw output: docs/verification/PHASE_0E_R3_ADVERSARIAL_SEQUENCE_OUTPUT.txt
+
+PASS targeted restoration v2 and v1 migration
+2 passed, 0 failed, 0 ignored.
+Raw output: docs/verification/PHASE_0E_R3_RESTORATION_OUTPUT.txt
+
+INCIDENTS PRESERVED
+
+- The first npm invocation used npm.ps1 and was blocked by the local ExecutionPolicy before Node launched. The correct npm.cmd invocation then ran. Failure file preserved.
+- Native structural pre-fix threshold/order failures are preserved.
+- The first React matrix exposed N-ratio and worker-RPC issues; a later direct-detach attempt still exceeded the N ratio. Both failures are preserved.
+- The first final format check found one rustfmt-only line wrap; cargo fmt was applied and the required check was rerun successfully.
+- The first Rust all-target run exposed the legacy R2 loaded_ungroup benchmark's cold-cache/no-warmup measurement. The failure is preserved. The measurement protocol was corrected without changing its thresholds, the dedicated release benchmark passed, and final all-target passed.
+- No failed output or stored JSON was presented as a successful fresh execution.
+
+PRESERVATION
+
+Prior Phase 0D/0E/R1/R2 docs and evidence changed: 0.
+Authoritative files byte-identical: 19/19.
+Authoritative SHA256SUMS: 18/18.
+Deleted baseline files: 0.
+Phase 1 started: false.
+
+FINAL_STATUS=PASS

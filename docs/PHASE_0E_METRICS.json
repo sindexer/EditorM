@@ -1,0 +1,58 @@
+{
+  "all_passed": true,
+  "captured_at_utc": "unix-seconds:1786328973",
+  "checks": {
+    "actual_wgpu_device": true,
+    "gpu_validation_errors_zero": true,
+    "group_one_history_entry": true,
+    "group_undo_redo_exact": true,
+    "group_ungroup_round_trip_exact": true,
+    "hundred_k_single_leaf_bounded": true,
+    "ten_k_single_leaf_bounded": true,
+    "ungroup_one_history_entry": true,
+    "ungroup_undo_redo_exact": true
+  },
+  "grouping": {
+    "group_history_depth": 1,
+    "group_ms": 0.1076,
+    "round_trip_exact": true,
+    "stable_group_node_id": "00000000-0000-0000-e000-000000000000",
+    "ungroup_history_depth": 2,
+    "ungroup_ms": 0.0234
+  },
+  "hundred_k": {
+    "initial_instance_upload_bytes": 6291456,
+    "load_ms": 1080.4151,
+    "single_leaf": {
+      "dirty_items": 1,
+      "document_nodes_scanned": 1,
+      "full_render_model_scans": 0,
+      "instance_upload_bytes": 48,
+      "order_nodes_visited": 0,
+      "render_items_cloned": 0,
+      "wall_ms": 0.0438
+    }
+  },
+  "phase": "0E",
+  "renderer": {
+    "actual_wgpu": true,
+    "adapter": "NVIDIA GeForce GTX 970",
+    "backend": "Vulkan",
+    "device_type": "DiscreteGpu",
+    "driver": "NVIDIA",
+    "driver_info": "581.57"
+  },
+  "ten_k": {
+    "initial_instance_upload_bytes": 786432,
+    "load_ms": 90.23960000000001,
+    "single_leaf": {
+      "dirty_items": 1,
+      "document_nodes_scanned": 1,
+      "full_render_model_scans": 0,
+      "instance_upload_bytes": 48,
+      "order_nodes_visited": 0,
+      "render_items_cloned": 0,
+      "wall_ms": 0.1111
+    }
+  }
+}

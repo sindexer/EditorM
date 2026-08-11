@@ -1,0 +1,105 @@
+{
+  "phase": "0E-R3",
+  "generated_at_utc": "2026-08-11T09:20:00Z",
+  "baseline": {
+    "archive": "visual_authoring_engine_phase0e_r2_review_2026-08-11.zip",
+    "bytes": 48176877,
+    "sha256": "2292fb079d4a5b6da4bedcd3f026277a6b2c6ae372193616112e1b2766ff2bb1"
+  },
+  "matrix": {
+    "node_counts": [10000, 100000],
+    "selection_counts": [3, 30, 100, 300, 1000, 3000, 10000],
+    "patterns": ["contiguous_front", "contiguous_middle", "uniform", "random_seed_0x5eed", "multiple_runs"],
+    "operations": ["group", "ungroup", "undo", "redo"],
+    "warmups": 10,
+    "measured_iterations": 30,
+    "combinations_per_layer": 70
+  },
+  "work_formula": "max(entries_examined, rank_order_comparisons) + entries_copied + entries_moved_or_shifted + sequence_nodes_allocated + ceil(allocated_bytes / 8) + tree_rebalances + full_sequence_scans + full_sequence_copies + dense_index_rewrites + fallback_or_rebuild_count",
+  "thresholds": {
+    "maximum_work_per_k_3000_over_30": 2.0,
+    "maximum_tenfold_k_work_ratio": 15.0,
+    "maximum_100k_over_10k_work_ratio": 1.35,
+    "actual_wasm_k1000_group_median_ms": 25.0,
+    "actual_wasm_k3000_over_k300_group_median_ratio": 15.0,
+    "full_scans_copies_dense_rewrites_fallbacks": 0
+  },
+  "layers": {
+    "native_release_runtime": {
+      "matrix_entries": 70,
+      "thresholds_checked": 55,
+      "maximum_work_per_k": 1.0205836271053663,
+      "maximum_tenfold_k_work_ratio": 10.503708780133838,
+      "maximum_100k_over_10k_work_ratio": 1.2342577324353896,
+      "all_passed": true,
+      "evidence": "docs/verification/PHASE_0E_R3_NATIVE_STRUCTURAL_OUTPUT.txt"
+    },
+    "native_engine_host": {
+      "matrix_entries": 70,
+      "thresholds_checked": 55,
+      "maximum_work_per_k": 1.0205836271053663,
+      "maximum_tenfold_k_work_ratio": 10.503708780133838,
+      "maximum_100k_over_10k_work_ratio": 1.2342577324353896,
+      "all_passed": true,
+      "evidence": "docs/verification/PHASE_0E_R3_NATIVE_ENGINE_HOST_OUTPUT.txt"
+    },
+    "actual_direct_wasm": {
+      "matrix_entries": 70,
+      "thresholds_checked": 57,
+      "maximum_work_per_k": 1.0239626082991338,
+      "maximum_tenfold_k_work_ratio": 10.589220032066397,
+      "maximum_100k_over_10k_work_ratio": 1.276936180291133,
+      "k1000_group_median_ms": 12.701799999980722,
+      "k3000_over_k300_group_median_ratio": 9.435844495805787,
+      "wasm_sha256": "bbad837fbe7be3d21733d2318a596adec7798c45ef6fb300b54665672cd99367",
+      "wasm_bytes": 1229366,
+      "webassembly_module_created": true,
+      "webassembly_instance_created": true,
+      "glue_instance_created": true,
+      "native_binary_used": false,
+      "all_passed": true,
+      "evidence": "docs/verification/PHASE_0E_R3_ACTUAL_DIRECT_WASM_OUTPUT.txt"
+    },
+    "react_projection_store": {
+      "matrix_entries": 70,
+      "thresholds_checked": 55,
+      "maximum_work_per_k": 0.28350792988313855,
+      "maximum_tenfold_k_work_ratio": 9.82928158726698,
+      "maximum_100k_over_10k_work_ratio": 1.3469533978511823,
+      "all_passed": true,
+      "evidence": "docs/verification/PHASE_0E_R3_REACT_MATRIX_OUTPUT.txt"
+    },
+    "actual_chrome_worker_wasm_ui": {
+      "matrix_entries": 70,
+      "thresholds_checked": 55,
+      "maximum_work_per_k": 0.525866738894908,
+      "maximum_tenfold_k_work_ratio": 10.359755093979393,
+      "maximum_100k_over_10k_work_ratio": 1.2985428791956108,
+      "captured_at_utc": "2026-08-11T08:45:28.884Z",
+      "browser": "Chrome/151.0.7922.76",
+      "gpu": "NVIDIA GeForce GTX 970",
+      "driver": "32.0.15.8157",
+      "heartbeat": 639,
+      "checks_passed": "38/38",
+      "console_errors": 0,
+      "gpu_validation_errors": 0,
+      "maximum_fallback_rebuild_count": 0,
+      "pixel_readback_passed": true,
+      "all_passed": true,
+      "evidence": "docs/verification/PHASE_0E_R3_BROWSER_PROOF.json"
+    }
+  },
+  "targeted_correctness": {
+    "failure_atomicity": "1 passed, 0 failed, 0 ignored",
+    "adversarial_sequence_balance": "1 passed, 0 failed, 0 ignored",
+    "restoration_v2_and_v1_migration": "2 passed, 0 failed, 0 ignored",
+    "rust_workspace_all_targets": "178 passed, 0 failed, 0 ignored",
+    "react_unit": "7 passed, 0 failed",
+    "react_r3_matrix": "1 passed, 0 failed",
+    "actual_browser_assertion": "1 passed, 0 failed"
+  },
+  "prior_docs_or_evidence_changed": 0,
+  "authoritative_files_byte_identical": "19/19",
+  "authoritative_sha256sums_passed": "18/18",
+  "phase1_started": false
+}

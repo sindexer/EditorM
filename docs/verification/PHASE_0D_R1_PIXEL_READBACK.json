@@ -1,0 +1,193 @@
+{
+  "captured_at_utc": "2026-08-09T16:06:31.517Z",
+  "expected": {
+    "rectangle": [
+      51,
+      148,
+      245
+    ],
+    "ellipse": [
+      245,
+      115,
+      64
+    ],
+    "background": [
+      9,
+      14,
+      20
+    ]
+  },
+  "samples": {
+    "rectangle_inside": {
+      "world": [
+        -100,
+        -20
+      ],
+      "viewport": [
+        172.29268292682923,
+        202.28048780487802
+      ],
+      "x": 172.29268292682923,
+      "y": 202.28048780487802,
+      "physical_x": 172,
+      "physical_y": 202,
+      "format": "bgra8unorm",
+      "rgba": [
+        51,
+        148,
+        245,
+        255
+      ]
+    },
+    "ellipse_center": {
+      "world": [
+        160,
+        40
+      ],
+      "viewport": [
+        745.5609756097562,
+        334.5731707317073
+      ],
+      "x": 745.5609756097562,
+      "y": 334.5731707317073,
+      "physical_x": 745,
+      "physical_y": 334,
+      "format": "bgra8unorm",
+      "rgba": [
+        245,
+        115,
+        64,
+        255
+      ]
+    },
+    "ellipse_aabb_corner": {
+      "world": [
+        245,
+        -45
+      ],
+      "viewport": [
+        932.9756097560976,
+        147.15853658536585
+      ],
+      "x": 932.9756097560976,
+      "y": 147.15853658536585,
+      "physical_x": 932,
+      "physical_y": 147,
+      "format": "bgra8unorm",
+      "rgba": [
+        9,
+        14,
+        20,
+        255
+      ]
+    },
+    "overlap_initial": {
+      "world": [
+        78,
+        40
+      ],
+      "viewport": [
+        564.7609756097561,
+        334.5731707317073
+      ],
+      "x": 564.7609756097561,
+      "y": 334.5731707317073,
+      "physical_x": 564,
+      "physical_y": 334,
+      "format": "bgra8unorm",
+      "rgba": [
+        245,
+        115,
+        64,
+        255
+      ]
+    },
+    "overlap_reordered": {
+      "world": [
+        78,
+        40
+      ],
+      "viewport": [
+        564.7609756097561,
+        334.5731707317073
+      ],
+      "x": 564.7609756097561,
+      "y": 334.5731707317073,
+      "physical_x": 564,
+      "physical_y": 334,
+      "format": "bgra8unorm",
+      "rgba": [
+        51,
+        148,
+        245,
+        255
+      ]
+    },
+    "overlap_undo": {
+      "world": [
+        78,
+        40
+      ],
+      "viewport": [
+        564.7609756097561,
+        334.5731707317073
+      ],
+      "x": 564.7609756097561,
+      "y": 334.5731707317073,
+      "physical_x": 564,
+      "physical_y": 334,
+      "format": "bgra8unorm",
+      "rgba": [
+        245,
+        115,
+        64,
+        255
+      ]
+    },
+    "overlap_redo": {
+      "world": [
+        78,
+        40
+      ],
+      "viewport": [
+        564.7609756097561,
+        334.5731707317073
+      ],
+      "x": 564.7609756097561,
+      "y": 334.5731707317073,
+      "physical_x": 564,
+      "physical_y": 334,
+      "format": "bgra8unorm",
+      "rgba": [
+        51,
+        148,
+        245,
+        255
+      ]
+    },
+    "offscreen_center": {
+      "x": 492,
+      "y": 301.5,
+      "physical_x": 492,
+      "physical_y": 301,
+      "format": "bgra8unorm",
+      "rgba": [
+        9,
+        14,
+        20,
+        255
+      ]
+    }
+  },
+  "assertions": {
+    "rectangle_inside_is_rectangle_color": true,
+    "ellipse_center_is_ellipse_color": true,
+    "ellipse_aabb_corner_is_background": true,
+    "overlap_initial_topmost_is_ellipse": true,
+    "overlap_reorder_topmost_is_rectangle": true,
+    "overlap_undo_restores_ellipse": true,
+    "overlap_redo_restores_rectangle": true,
+    "offscreen_object_pixel_is_background": true
+  },
+  "all_passed": true
+}

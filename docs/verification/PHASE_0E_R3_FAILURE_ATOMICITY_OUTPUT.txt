@@ -1,0 +1,11 @@
+﻿    Blocking waiting for file lock on build directory
+   Compiling visual_authoring_runtime v0.1.0 (C:\Users\thdwl\Documents\Codex\WebEditor\crates\runtime)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 13.57s
+     Running tests\phase0e_r3_atomicity.rs (target\debug\deps\phase0e_r3_atomicity-7f31f69e4f3e7886.exe)
+
+running 1 test
+PHASE0E_R3_ATOMICITY_JSON={"all_passed":true,"document_semantic_unchanged":true,"duplicate_node_id":"typed_error","history_unchanged":true,"invalid_public_node_spec":"typed_error","render_unchanged":true,"revision_unchanged":true,"scene_unchanged":true,"selection_unchanged":true,"sequence_diagnostics_unchanged":true}
+test invalid_public_specs_and_duplicate_ids_leave_every_runtime_plane_unchanged ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+

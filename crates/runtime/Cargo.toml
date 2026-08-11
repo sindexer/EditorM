@@ -1,0 +1,34 @@
+[package]
+name = "visual_authoring_runtime"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[features]
+default = ["native-wgpu"]
+native-wgpu = ["dep:pollster", "dep:visual_authoring_renderer_wgpu"]
+
+[[bin]]
+name = "phase0d_proof"
+path = "src/bin/phase0d_proof.rs"
+required-features = ["native-wgpu"]
+
+[[bin]]
+name = "phase0d_r1_proof"
+path = "src/bin/phase0d_r1_proof.rs"
+required-features = ["native-wgpu"]
+[dependencies]
+pollster = { workspace = true, optional = true }
+serde_json.workspace = true
+thiserror.workspace = true
+uuid.workspace = true
+visual_authoring_core_math = { path = "../core_math" }
+visual_authoring_document = { path = "../document" }
+visual_authoring_render_model = { path = "../render_model" }
+visual_authoring_renderer_wgpu = { path = "../renderer_wgpu", optional = true }
+visual_authoring_scene = { path = "../scene" }
+
+[dev-dependencies]
+visual_authoring_document = { path = "../document", features = ["test-support"] }
+visual_authoring_serialization = { path = "../serialization" }

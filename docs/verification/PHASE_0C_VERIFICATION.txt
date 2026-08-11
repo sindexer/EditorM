@@ -1,0 +1,22 @@
+Phase 0C verification raw output
+started=2026-08-09T23:26:05.3971495+09:00
+finished=2026-08-09T23:26:17.2635446+09:00
+command=powershell -NoProfile -ExecutionPolicy Bypass -File tools/cargo.ps1 run --release -p visual_authoring_runtime --bin phase0c_proof -- --metrics-json docs/PHASE_0C_METRICS.json
+exit_code=0
+
+   Compiling visual_authoring_document v0.1.0 (C:\Users\thdwl\Documents\Codex\WebEditor\crates\document)
+   Compiling visual_authoring_spatial v0.1.0 (C:\Users\thdwl\Documents\Codex\WebEditor\crates\spatial)
+   Compiling visual_authoring_scene v0.1.0 (C:\Users\thdwl\Documents\Codex\WebEditor\crates\scene)
+   Compiling visual_authoring_render_model v0.1.0 (C:\Users\thdwl\Documents\Codex\WebEditor\crates\render_model)
+   Compiling visual_authoring_renderer_wgpu v0.1.0 (C:\Users\thdwl\Documents\Codex\WebEditor\crates\renderer_wgpu)
+   Compiling visual_authoring_runtime v0.1.0 (C:\Users\thdwl\Documents\Codex\WebEditor\crates\runtime)
+    Finished `release` profile [optimized] target(s) in 8.80s
+     Running `target\release\phase0c_proof.exe --metrics-json C:\Users\thdwl\Documents\Codex\WebEditor\docs\PHASE_0C_METRICS.json`
+Phase 0C release proof
+metrics_json=C:\Users\thdwl\Documents\Codex\WebEditor\docs\PHASE_0C_METRICS.json
+BENCH-A total_nodes=1001
+BENCH-B total_nodes=10001 visited=2 world_recomputed=1 bounds_recomputed=1 spatial_updates=1 full_rebuilds=0
+BENCH-C total_nodes=100001 candidates=1 exact_tests=1
+BENCH-D total_nodes=10001 visited=10001 full_rebuilds=1
+revisions document=2 scene=2
+all_passed=true

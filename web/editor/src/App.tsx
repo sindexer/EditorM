@@ -1,0 +1,1141 @@
+import {
+  Box,
+  ChevronDown,
+  ChevronRight,
+  Circle,
+  Code2,
+  Eye,
+  EyeOff,
+  Focus,
+  Group,
+  Hand,
+  Lock,
+  MousePointer2,
+  PanelLeftClose,
+  PanelRightClose,
+  Redo2,
+  RotateCw,
+  Scan,
+  Square,
+  Ungroup,
+  Undo2,
+  Unlock,
+  X,
+  type LucideIcon,
+} from "lucide-react";
+import {
+  type CSSProperties,
+  type KeyboardEvent as ReactKeyboardEvent,
+  type PointerEvent as ReactPointerEvent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import { EngineClient, EngineFailure } from "./engine";
+import type { StoredProjectionNode } from "./engine";
+import type { EngineResponse, ProjectionNode } from "./types";
+
+declare global {
+  interface Window {
+    __PHASE0E_PROOF__?: Record<string, unknown>;
+    __phase0eState?: Record<string, unknown>;
+    __phase0eReadPixel?: (x: number, y: number) => Promise<unknown>;
+    __phase0eSend?: (type: string, payload?: Record<string, unknown>) => Promise<EngineResponse>;
+    __phase0eR2Counters?: () => Record<string, number>;
+    __phase0eR2Order?: (start: number, count: number) => string[];
+  }
+}
+
+type Tool = "select" | "hand" | "rectangle" | "ellipse";
+type FsmState =
+  | "Idle"
+  | "Hovering"
+  | "Selecting"
+  | "Moving"
+  | "Resizing"
+  | "Rotating"
+  | "Panning"
+  | "CreatingRectangle"
+  | "CreatingEllipse"
+  | "NestedEditing";
+
+type Interaction = {
+  pointerId: number;
+  kind: "move" | "resize" | "rotate" | "pan" | "create";
+  start: [number, number];
+  last: [number, number];
+  nodeId?: string;
+  nodeKind?: "rectangle" | "ellipse";
+  matrix?: [number, number, number, number, number, number];
+  geometry?: { width: number; height: number };
+  created?: boolean;
+  panPending?: [number, number];
+};
+
+const tools: Array<{ id: Tool; label: string; shortcut: string; icon: LucideIcon }> = [
+  { id: "select", label: "Select", shortcut: "V", icon: MousePointer2 },
+  { id: "hand", label: "Hand", shortcut: "H", icon: Hand },
+  { id: "rectangle", label: "Rectangle", shortcut: "R", icon: Square },
+  { id: "ellipse", label: "Ellipse", shortcut: "O", icon: Circle },
+];
+
+function IconButton({
+  icon: Icon,
+  label,
+  active = false,
+  disabled = false,
+  onClick,
+  testId,
+}: {
+  icon: LucideIcon;
+  label: string;
+  active?: boolean;
+  disabled?: boolean;
+  onClick?: () => void;
+  testId?: string;
+}) {
+  return (
+    <button
+      type="button"
+      className={`icon-button${active ? " is-active" : ""}`}
+      aria-label={label}
+      aria-pressed={active || undefined}
+      title={label}
+      disabled={disabled}
+      onClick={onClick}
+      data-testid={testId}
+    >
+      <Icon aria-hidden="true" size={18} strokeWidth={1.8} />
+    </button>
+  );
+}
+
+function PanelHeader({ title, action }: { title: string; action?: React.ReactNode }) {
+  return (
+    <div className="panel-header">
+      <h2>{title}</h2>
+      {action}
+    </div>
+  );
+}
+
+function proofProjectionNode(node: StoredProjectionNode | undefined) {
+  if (!node) return null;
+  const { children, ...semantic } = node;
+  return {
+    ...semantic,
+    children: children.slice(0, Math.min(children.length, 64)),
+    child_count: children.length,
+  };
+}
+
+function kindIcon(kind: ProjectionNode["kind"]): LucideIcon {
+  if (kind === "ellipse") return Circle;
+  if (kind === "group" || kind === "frame" || kind === "document") return Group;
+  return Square;
+}
+
+function LayersPanel({
+  engine,
+  response,
+  version,
+  onError,
+  editRoot,
+  setEditRoot,
+}: {
+  engine: EngineClient;
+  response: EngineResponse | null;
+  version: number;
+  onError: (error: unknown) => void;
+  editRoot: string | null;
+  setEditRoot: (id: string | null) => void;
+}) {
+  const rowHeight = 28;
+  const viewportHeight = 420;
+  const [scrollTop, setScrollTop] = useState(0);
+  const [expanded, setExpanded] = useState<Set<string>>(() => new Set());
+  const order = engine.projection.order;
+  const largeFlatProjection = order.length > 5000 && !editRoot;
+  const visibleOrder = useMemo(() => {
+    const result: Array<{ id: string; depth: number }> = [];
+    if (largeFlatProjection) return result;
+    const nodes = engine.projection.nodes;
+    const root = editRoot ?? engine.projection.rootId;
+    if (!root) return result;
+    const stack: Array<{ id: string; depth: number }> = [{ id: root, depth: 0 }];
+    while (stack.length) {
+      const current = stack.pop();
+      if (!current) break;
+      result.push(current);
+      const node = nodes.get(current.id);
+      if (!node) continue;
+      const shouldExpand = current.depth === 0 || expanded.has(current.id);
+      if (shouldExpand) {
+        for (let index = node.children.length - 1; index >= 0; index -= 1) {
+          const child = node.children.at(index);
+          if (child) stack.push({ id: child, depth: current.depth + 1 });
+        }
+      }
+    }
+    engine.projection.counters.layersFlattenedNodesVisited += result.length;
+    return result;
+  }, [engine, engine.projection.hierarchyVersion, editRoot, expanded, largeFlatProjection]);
+  const totalRows = largeFlatProjection ? order.length : visibleOrder.length;
+  const start = Math.max(0, Math.floor(scrollTop / rowHeight) - 5);
+  const count = Math.ceil(viewportHeight / rowHeight) + 10;
+  const mounted = largeFlatProjection
+    ? order.slice(start, start + count).map((id) => {
+        let depth = 0;
+        let current = engine.projection.nodes.get(id)?.parent_id ?? null;
+        while (current) {
+          depth += 1;
+          current = engine.projection.nodes.get(current)?.parent_id ?? null;
+        }
+        return { id, depth };
+      })
+    : visibleOrder.slice(start, start + count);
+  engine.projection.counters.layersFlattenedNodesVisited += mounted.length;
+  engine.projection.counters.mountedRows = mounted.length;
+
+  const select = async (id: string, toggle: boolean) => {
+    try {
+      await engine.send("selection", { target: id, mode: toggle ? "toggle" : "replace" });
+    } catch (error) {
+      onError(error);
+    }
+  };
+
+  const onTreeKeyDown = (event: ReactKeyboardEvent<HTMLDivElement>) => {
+    const current = engine.projection.primary;
+    const index = visibleOrder.findIndex((entry) => entry.id === current);
+    if (event.key === "ArrowDown" && index < visibleOrder.length - 1) {
+      event.preventDefault();
+      void select(visibleOrder[index + 1].id, false);
+    } else if (event.key === "ArrowUp" && index > 0) {
+      event.preventDefault();
+      void select(visibleOrder[index - 1].id, false);
+    }
+  };
+
+  return (
+    <section className="panel layers-panel" aria-label="Layers panel">
+      <PanelHeader
+        title="Layers"
+        action={
+          editRoot ? (
+            <button className="text-button compact" onClick={() => setEditRoot(null)}>
+              Exit group
+            </button>
+          ) : undefined
+        }
+      />
+      <div
+        className="layers-viewport"
+        role="tree"
+        aria-label="Document layers"
+        tabIndex={0}
+        onKeyDown={onTreeKeyDown}
+        onScroll={(event) => setScrollTop(event.currentTarget.scrollTop)}
+        style={{ height: viewportHeight }}
+        data-testid="layers-viewport"
+      >
+        <div style={{ height: visibleOrder.length * rowHeight, position: "relative" }}>
+          {mounted.map(({ id, depth }, mountedIndex) => {
+            const node = engine.projection.nodes.get(id);
+            if (!node) return null;
+            const Icon = kindIcon(node.kind);
+            const selected = engine.projection.selection.includes(id);
+            const hasChildren = node.children.length > 0;
+            const top = (start + mountedIndex) * rowHeight;
+            return (
+              <div
+                key={id}
+                className={`tree-row${selected ? " is-selected" : ""}`}
+                style={{ top, height: rowHeight, paddingLeft: 6 + depth * 14 }}
+                role="treeitem"
+                aria-level={depth + 1}
+                aria-selected={selected}
+                aria-expanded={hasChildren ? expanded.has(id) : undefined}
+                onClick={(event) => void select(id, event.shiftKey)}
+                onDoubleClick={() => {
+                  if (node.kind === "group" || node.kind === "frame") setEditRoot(id);
+                }}
+                data-node-id={id}
+              >
+                <button
+                  type="button"
+                  className="tree-disclosure"
+                  aria-label={hasChildren ? `Toggle ${node.name}` : undefined}
+                  disabled={!hasChildren}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    setExpanded((current) => {
+                      const next = new Set(current);
+                      if (next.has(id)) next.delete(id);
+                      else next.add(id);
+                      return next;
+                    });
+                  }}
+                >
+                  {hasChildren ? expanded.has(id) ? <ChevronDown size={14} /> : <ChevronRight size={14} /> : null}
+                </button>
+                <Icon className="tree-kind" size={15} aria-hidden="true" />
+                <span className="tree-name">{node.name}</span>
+                <button
+                  className="tree-state"
+                  aria-label={`${node.visible ? "Hide" : "Show"} ${node.name}`}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    void engine
+                      .send("command", {
+                        command: { kind: "set_visible", node_id: id, visible: !node.visible },
+                      })
+                      .catch(onError);
+                  }}
+                >
+                  {node.visible ? <Eye size={14} /> : <EyeOff size={14} />}
+                </button>
+                <button
+                  className="tree-state"
+                  aria-label={`${node.locked ? "Unlock" : "Lock"} ${node.name}`}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    void engine
+                      .send("command", {
+                        command: { kind: "set_locked", node_id: id, locked: !node.locked },
+                      })
+                      .catch(onError);
+                  }}
+                >
+                  {node.locked ? <Lock size={14} /> : <Unlock size={14} />}
+                </button>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+      <div className="panel-footnote">
+        {totalRows.toLocaleString()} nodes · {mounted.length} mounted
+      </div>
+    </section>
+  );
+}
+
+function NumericField({
+  label,
+  value,
+  unit,
+  disabled,
+  onCommit,
+}: {
+  label: string;
+  value: number;
+  unit?: string;
+  disabled?: boolean;
+  onCommit: (value: number) => void;
+}) {
+  const [draft, setDraft] = useState(String(Number(value.toFixed(3))));
+  const [validationCode, setValidationCode] = useState<string | null>(null);
+  const errorId = "numeric-error-" + label.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+  useEffect(() => {
+    setDraft(String(Number(value.toFixed(3))));
+    setValidationCode(null);
+  }, [value]);
+  const commit = () => {
+    const parsed = Number(draft);
+    if (!Number.isFinite(parsed)) {
+      setValidationCode("numeric_non_finite");
+      return;
+    }
+    setValidationCode(null);
+    onCommit(parsed);
+  };
+  return (
+    <label className={"field numeric-field" + (validationCode ? " invalid" : "")}>
+      <span>{label}</span>
+      <div className="field-control">
+        <input
+          value={draft}
+          inputMode="decimal"
+          disabled={disabled}
+          aria-label={label}
+          aria-invalid={validationCode ? "true" : undefined}
+          aria-describedby={validationCode ? errorId : undefined}
+          data-validation-code={validationCode ?? undefined}
+          onChange={(event) => {
+            setDraft(event.target.value);
+            if (validationCode) setValidationCode(null);
+          }}
+          onBlur={commit}
+          onKeyDown={(event) => {
+            if (event.key === "Enter") event.currentTarget.blur();
+            if (event.key === "Escape") {
+              setDraft(String(Number(value.toFixed(3))));
+              setValidationCode(null);
+              event.currentTarget.blur();
+            }
+          }}
+        />
+        {unit ? <span className="field-suffix">{unit}</span> : null}
+      </div>
+      {validationCode ? <small id={errorId} role="alert">numeric_non_finite: Enter a finite number.</small> : null}
+    </label>
+  );
+}
+
+function Inspector({ engine, version, onError }: { engine: EngineClient; version: number; onError: (error: unknown) => void }) {
+  const node = engine.projection.primary ? engine.projection.nodes.get(engine.projection.primary) : undefined;
+  const matrix = node?.local_transform ?? [1, 0, 0, 1, 0, 0];
+  const rotation = Math.atan2(matrix[2], matrix[0]) * (180 / Math.PI);
+  const setTransform = (next: [number, number, number, number, number, number]) => {
+    if (!node) return;
+    void engine.send("command", { command: { kind: "set_transform", node_id: node.id, matrix: next } }).catch(onError);
+  };
+  const updateRotation = (degrees: number) => {
+    const radians = degrees * (Math.PI / 180);
+    const sx = Math.hypot(matrix[0], matrix[2]);
+    const sy = Math.hypot(matrix[1], matrix[3]);
+    setTransform([Math.cos(radians) * sx, -Math.sin(radians) * sy, Math.sin(radians) * sx, Math.cos(radians) * sy, matrix[4], matrix[5]]);
+  };
+  const setGeometry = (width: number, height: number) => {
+    if (!node || (node.kind !== "rectangle" && node.kind !== "ellipse")) return;
+    void engine
+      .send("command", {
+        command: { kind: "set_geometry", node_id: node.id, shape: node.kind, width, height },
+      })
+      .catch(onError);
+  };
+
+  return (
+    <section className="panel inspector" aria-label="Transform inspector" data-version={version}>
+      <PanelHeader title="Inspector" />
+      {!node || node.kind === "document" ? (
+        <div className="empty-state">
+          <MousePointer2 size={22} aria-hidden="true" />
+          <strong>No editable selection</strong>
+          <span>Select a shape or group on the canvas or in Layers.</span>
+        </div>
+      ) : (
+        <div className="inspector-content">
+          <label className="field field-wide">
+            <span>Name</span>
+            <input
+              key={`${node.id}-${node.name}`}
+              defaultValue={node.name}
+              onBlur={(event) => {
+                if (event.currentTarget.value !== node.name) {
+                  void engine
+                    .send("command", {
+                      command: { kind: "set_name", node_id: node.id, name: event.currentTarget.value },
+                    })
+                    .catch(onError);
+                }
+              }}
+            />
+          </label>
+          <div className="node-summary">
+            <span className="badge">{node.kind}</span>
+            <span className="mono">{node.id.slice(0, 8)}</span>
+          </div>
+          <div className="field-grid">
+            <NumericField label="X" value={matrix[4]} onCommit={(value) => setTransform([matrix[0], matrix[1], matrix[2], matrix[3], value, matrix[5]])} />
+            <NumericField label="Y" value={matrix[5]} onCommit={(value) => setTransform([matrix[0], matrix[1], matrix[2], matrix[3], matrix[4], value])} />
+            <NumericField label="W" value={node.geometry?.width ?? 0} disabled={!node.geometry} onCommit={(value) => setGeometry(value, node.geometry?.height ?? 1)} />
+            <NumericField label="H" value={node.geometry?.height ?? 0} disabled={!node.geometry} onCommit={(value) => setGeometry(node.geometry?.width ?? 1, value)} />
+            <NumericField label="Rotation" value={rotation} unit="°" onCommit={updateRotation} />
+            <NumericField
+              label="Opacity"
+              value={node.opacity * 100}
+              unit="%"
+              onCommit={(value) => void engine.send("command", { command: { kind: "set_opacity", node_id: node.id, opacity: Math.max(0, Math.min(100, value)) / 100 } }).catch(onError)}
+            />
+          </div>
+          <div className="inline-controls">
+            <label className="check-control">
+              <input
+                type="checkbox"
+                checked={node.visible}
+                onChange={() => void engine.send("command", { command: { kind: "set_visible", node_id: node.id, visible: !node.visible } }).catch(onError)}
+              />
+              <span>Visible</span>
+            </label>
+            <label className="check-control">
+              <input
+                type="checkbox"
+                checked={node.locked}
+                onChange={() => void engine.send("command", { command: { kind: "set_locked", node_id: node.id, locked: !node.locked } }).catch(onError)}
+              />
+              <span>Locked</span>
+            </label>
+          </div>
+        </div>
+      )}
+    </section>
+  );
+}
+
+function ComponentShowcase({ onClose }: { onClose: () => void }) {
+  const dialogRef = useRef<HTMLElement>(null);
+  const closeRef = useRef<HTMLButtonElement>(null);
+  const [segment, setSegment] = useState(0);
+  const [tab, setTab] = useState(0);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const segments = ["Design", "Inspect", "Debug"];
+  const tabs = ["Foundations", "Components", "Patterns"];
+
+  useEffect(() => {
+    const previous = document.activeElement as HTMLElement | null;
+    closeRef.current?.focus();
+    return () => previous?.focus();
+  }, []);
+
+  const onDialogKeyDown = (event: ReactKeyboardEvent<HTMLElement>) => {
+    if (event.key === "Escape") {
+      event.preventDefault();
+      onClose();
+      return;
+    }
+    if (event.key !== "Tab") return;
+    const focusable = [...(dialogRef.current?.querySelectorAll<HTMLElement>("button:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex='-1'])") ?? [])];
+    if (focusable.length === 0) return;
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  };
+
+  const moveSegment = (next: number) => {
+    const normalized = (next + segments.length) % segments.length;
+    setSegment(normalized);
+    requestAnimationFrame(() => dialogRef.current?.querySelectorAll<HTMLButtonElement>("[role='radio']")[normalized]?.focus());
+  };
+
+  return (
+    <div className="dialog-backdrop" role="presentation">
+      <section ref={dialogRef} className="showcase" role="dialog" aria-modal="true" aria-labelledby="showcase-title" data-testid="component-showcase" onKeyDown={onDialogKeyDown}>
+        <div className="panel-header">
+          <h2 id="showcase-title">Wanted component showcase</h2>
+          <button ref={closeRef} className="icon-button" aria-label="Close showcase" onClick={onClose}><X size={16} /></button>
+        </div>
+        <div className="showcase-grid">
+          <article>
+            <h3>Buttons and states</h3>
+            <div className="showcase-row">
+              <button className="button primary">Default</button>
+              <button className="button secondary is-hover-demo">Hover</button>
+              <button className="button secondary is-pressed-demo" aria-pressed="true">Pressed</button>
+              <button className="button secondary is-focus-demo">Focus</button>
+              <button className="button secondary" disabled>Disabled</button>
+            </div>
+          </article>
+          <article>
+            <h3>Textfield and Select</h3>
+            <label className="field field-wide"><span>Textfield</span><input placeholder="Enter a value" /></label>
+            <label className="field field-wide invalid"><span>Error</span><input defaultValue="Invalid" aria-invalid="true" aria-describedby="showcase-field-error" /><small id="showcase-field-error">Use a finite value.</small></label>
+            <label className="field field-wide"><span>Select</span><select defaultValue="medium"><option value="small">Small</option><option value="medium">Medium</option><option value="large">Large</option></select></label>
+          </article>
+          <article>
+            <h3>Tabs</h3>
+            <div className="showcase-tabs" role="tablist" aria-label="Showcase sections">
+              {tabs.map((label, index) => <button key={label} role="tab" aria-selected={tab === index} tabIndex={tab === index ? 0 : -1} onClick={() => setTab(index)}>{label}</button>)}
+            </div>
+            <div role="tabpanel" className="showcase-tabpanel">{tabs[tab]} tokens and states</div>
+          </article>
+          <article>
+            <h3>Segmented Control</h3>
+            <div className="segmented" role="radiogroup" aria-label="Example segmented control">
+              {segments.map((label, index) => (
+                <button key={label} role="radio" aria-checked={segment === index} tabIndex={segment === index ? 0 : -1} className={segment === index ? "is-selected" : undefined} onClick={() => setSegment(index)} onKeyDown={(event) => {
+                  if (event.key === "ArrowRight" || event.key === "ArrowDown") { event.preventDefault(); moveSegment(index + 1); }
+                  if (event.key === "ArrowLeft" || event.key === "ArrowUp") { event.preventDefault(); moveSegment(index - 1); }
+                  if (event.key === "Home") { event.preventDefault(); moveSegment(0); }
+                  if (event.key === "End") { event.preventDefault(); moveSegment(segments.length - 1); }
+                }}>{label}</button>
+              ))}
+            </div>
+            <label className="switch-control"><input type="checkbox" defaultChecked role="switch" /><span>Live updates</span></label>
+            <label className="check-control"><input type="checkbox" defaultChecked /><span>Show bounds</span></label>
+          </article>
+          <article>
+            <h3>Menu and Tooltip</h3>
+            <div className="showcase-row">
+              <button aria-haspopup="menu" aria-expanded={menuOpen} onClick={() => setMenuOpen((open) => !open)}>Actions <ChevronDown size={14} /></button>
+              <button aria-describedby="showcase-tooltip">Tooltip target</button>
+              <span id="showcase-tooltip" className="tooltip-sample" role="tooltip">Shortcut <kbd>V</kbd></span>
+            </div>
+            {menuOpen ? <div className="showcase-menu" role="menu"><button role="menuitem">Rename</button><button role="menuitem">Delete</button></div> : null}
+          </article>
+          <article>
+            <h3>Badge and selected state</h3>
+            <div className="showcase-row"><span className="badge primary-badge">Selected</span><span className="badge">Worker ready</span></div>
+          </article>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function DebugPanel({ engine, response, onLoad, onError }: { engine: EngineClient; response: EngineResponse | null; onLoad: (fixture: string) => void; onError: string | null }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <section className={`debug-panel${open ? " is-open" : ""}`} aria-label="Debug panel">
+      <button className="debug-toggle" data-testid="debug-toggle" aria-expanded={open} onClick={() => setOpen((value) => !value)}>
+        <Code2 size={15} /> Debug <ChevronDown size={14} />
+      </button>
+      {open ? (
+        <div className="debug-content" data-testid="debug-content">
+          <div className="fixture-actions">
+            <button onClick={() => onLoad("preview")}>Demo</button>
+            <button data-testid="fixture-10k" onClick={() => onLoad("BENCH-B")}>10k</button>
+            <button data-testid="fixture-100k" onClick={() => onLoad("BENCH-C")}>100k</button>
+          </div>
+          <dl className="metrics-grid">
+            <div><dt>Fixture</dt><dd>{response?.fixture ?? "—"}</dd></div>
+            <div><dt>Doc / Scene / Render</dt><dd>{response ? `${response.revisions.document} / ${response.revisions.scene} / ${response.revisions.render}` : "—"}</dd></div>
+            <div><dt>Nodes / visible</dt><dd>{response ? `${response.metrics.document_nodes?.toLocaleString()} / ${response.culling.visible?.toLocaleString()}` : "—"}</dd></div>
+            <div><dt>Mounted rows</dt><dd>{engine.projection.counters.mountedRows}</dd></div>
+            <div><dt>UI full snapshots</dt><dd>{response?.metrics.ui_full_snapshots ?? 0}</dd></div>
+            <div><dt>UI delta nodes</dt><dd>{response?.metrics.ui_delta_nodes ?? 0}</dd></div>
+            <div><dt>Render clones / scans</dt><dd>{response ? `${response.metrics.render_items_cloned} / ${response.metrics.full_render_model_scans}` : "—"}</dd></div>
+            <div><dt>Dirty / upload</dt><dd>{response ? `${response.render_delta.dirty_slots} / ${response.metrics.instance_upload_bytes} B` : "—"}</dd></div>
+            <div><dt>Pointer raw / sent</dt><dd>{`${engine.projection.counters.pointerRawIntents} / ${engine.projection.counters.pointerRequestsSent}`}</dd></div>
+            <div><dt>Pointer coalesced</dt><dd>{engine.projection.counters.pointerRequestsCoalesced}</dd></div>
+          </dl>
+          {onError ? <div className="error-callout" role="alert">{onError}</div> : null}
+        </div>
+      ) : null}
+    </section>
+  );
+}
+
+export function App() {
+  const engineRef = useRef<EngineClient | null>(null);
+  if (!engineRef.current) engineRef.current = new EngineClient();
+  const engine = engineRef.current;
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const shellRef = useRef<HTMLDivElement>(null);
+  const interaction = useRef<Interaction | null>(null);
+  const dragQueue = useRef<{
+    generation: number;
+    inFlight: boolean;
+    scheduled: { generation: number; run: () => Promise<void> } | null;
+    latest: { generation: number; run: () => Promise<void> } | null;
+  }>({ generation: 0, inFlight: false, scheduled: null, latest: null });
+  const [response, setResponse] = useState<EngineResponse | null>(null);
+  const [version, setVersion] = useState(0);
+  const [heartbeatTick, setHeartbeatTick] = useState(0);
+  const [tool, setTool] = useState<Tool>("select");
+  const [fsm, setFsm] = useState<FsmState>("Idle");
+  const [error, setError] = useState<string | null>(null);
+  const [showcase, setShowcase] = useState(false);
+  const [editRoot, setEditRoot] = useState<string | null>(null);
+  const [ready, setReady] = useState(false);
+
+  const fail = useCallback((reason: unknown) => {
+    const message = reason instanceof Error ? `${"code" in reason ? `${String((reason as EngineFailure).code)}: ` : ""}${reason.message}` : String(reason);
+    setError(message);
+    window.__phase0eState = { ready: false, lastError: message };
+  }, []);
+
+  useEffect(() => engine.subscribe((next) => {
+    setResponse(next);
+    setVersion(engine.projection.version);
+    setError(null);
+    window.__phase0eState = { ready: true, lastError: null };
+  }), [engine]);
+
+  useEffect(() => engine.subscribeActivity(() => {
+    setHeartbeatTick((current) => current + 1);
+  }), [engine]);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    let cancelled = false;
+    window.__phase0eReadPixel = (x, y) => engine.readPixel(x, y);
+    window.__phase0eSend = (type, payload = {}) => engine.send(type, payload);
+    window.__phase0eR2Counters = () => ({ ...engine.projection.counters, orderLength: engine.projection.order.length });
+    window.__phase0eR2Order = (start, count) => engine.projection.viewport(start, count);
+    void engine.initialize(canvas).then((initial) => {
+      if (cancelled) return;
+      setResponse(initial);
+      setVersion(engine.projection.version);
+      setReady(true);
+      document.body.dataset.ready = "true";
+      window.__phase0eState = { ready: true, lastError: null };
+    }).catch(fail);
+    return () => {
+      cancelled = true;
+    };
+  }, [engine, fail]);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas || !ready) return;
+    const observer = new ResizeObserver(([entry]) => {
+      const width = entry.contentRect.width;
+      const height = entry.contentRect.height;
+      if (width > 0 && height > 0) {
+        void engine.send("camera", { camera: { kind: "resize", width, height, dpr: devicePixelRatio } }).catch(fail);
+      }
+    });
+    observer.observe(canvas);
+    return () => observer.disconnect();
+  }, [engine, ready, fail]);
+
+  useEffect(() => {
+    window.__PHASE0E_PROOF__ = engine.proof(response, {
+      fsm,
+      tool,
+      nested_edit_root: editRoot,
+      console_errors: error ? 1 : 0,
+      fallback_rebuild_count: response?.metrics.fallback_rebuild_count ?? 0,
+      gpu_validation_errors: engine.gpuMetrics.validation_errors ?? 0,
+      history: response?.history ?? null,
+      camera: response?.camera ?? null,
+      projection_nodes: engine.projection.nodes.size,
+      projection_schema_version: response?.projection.schema_version ?? null,
+      primary_node: proofProjectionNode(engine.projection.primary ? engine.projection.nodes.get(engine.projection.primary) : undefined),
+      render_delta: response?.render_delta ?? null,
+      render_binary_schema_version: response?.render_binary_schema_version ?? null,
+      resources: response?.resources ?? null,
+      binary: response?.binary ?? null,
+      interaction_active: interaction.current ? { pointer_id: interaction.current.pointerId, kind: interaction.current.kind } : null,
+      interaction_queue: {
+        generation: dragQueue.current.generation,
+        in_flight: dragQueue.current.inFlight,
+        scheduled: Boolean(dragQueue.current.scheduled),
+        latest: Boolean(dragQueue.current.latest),
+      },
+    });
+  }, [engine, response, version, heartbeatTick, fsm, tool, editRoot, error]);
+
+  const currentNode = engine.projection.primary ? engine.projection.nodes.get(engine.projection.primary) : undefined;
+  const worldToViewport = useCallback((point: [number, number]): [number, number] => {
+    const camera = response?.camera;
+    if (!camera) return point;
+    return [
+      (point[0] - camera.center[0]) * camera.zoom + camera.viewport[0] / 2,
+      (point[1] - camera.center[1]) * camera.zoom + camera.viewport[1] / 2,
+    ];
+  }, [response]);
+  const viewportToWorld = useCallback((point: [number, number]): [number, number] => {
+    const camera = response?.camera;
+    if (!camera) return point;
+    return [
+      (point[0] - camera.viewport[0] / 2) / camera.zoom + camera.center[0],
+      (point[1] - camera.viewport[1] / 2) / camera.zoom + camera.center[1],
+    ];
+  }, [response]);
+
+  const scheduleDrag = useCallback((operation: () => Promise<void>) => {
+    engine.projection.counters.pointerRawIntents += 1;
+    const queue = dragQueue.current;
+    const intent = { generation: queue.generation, run: operation };
+    if (queue.inFlight) {
+      if (queue.latest) engine.projection.counters.pointerRequestsCoalesced += 1;
+      queue.latest = intent;
+      return;
+    }
+    queue.inFlight = true;
+    queue.scheduled = intent;
+
+    const scheduleDrain = () => {
+      requestAnimationFrame(() => requestAnimationFrame(() => void drainLatest()));
+    };
+    const drainLatest = async () => {
+      const current = queue.scheduled;
+      queue.scheduled = null;
+      if (!current || current.generation !== queue.generation) {
+        queue.inFlight = false;
+        return;
+      }
+      engine.projection.counters.pointerRequestsSent += 1;
+      try {
+        await current.run();
+      } catch (reason) {
+        if (current.generation === queue.generation) fail(reason);
+      }
+      if (current.generation !== queue.generation) {
+        queue.scheduled = null;
+        queue.latest = null;
+        queue.inFlight = false;
+      } else if (queue.latest) {
+        queue.scheduled = queue.latest;
+        queue.latest = null;
+        scheduleDrain();
+      } else {
+        queue.inFlight = false;
+      }
+    };
+    scheduleDrain();
+  }, [engine, fail]);
+
+  const cancelInteraction = useCallback(async () => {
+    const active = interaction.current;
+    interaction.current = null;
+    const queue = dragQueue.current;
+    queue.generation += 1;
+    queue.scheduled = null;
+    queue.latest = null;
+    while (queue.inFlight) await new Promise((resolve) => setTimeout(resolve, 4));
+    if (active && active.kind !== "pan") await engine.send("rollback_transaction");
+    setFsm(editRoot ? "NestedEditing" : "Idle");
+  }, [engine, editRoot]);
+
+  const pointerPosition = (event: ReactPointerEvent): [number, number] => {
+    const rect = event.currentTarget.getBoundingClientRect();
+    return [event.clientX - rect.left, event.clientY - rect.top];
+  };
+
+  const beginMove = async (
+    pointerId: number,
+    node: StoredProjectionNode,
+    point: [number, number],
+    captureTarget: HTMLDivElement,
+  ) => {
+    if (node.locked) return;
+    await engine.send("begin_transaction");
+    interaction.current = {
+      pointerId,
+      kind: "move",
+      start: point,
+      last: point,
+      nodeId: node.id,
+      matrix: [...node.local_transform],
+    };
+    captureTarget.setPointerCapture(pointerId);
+    setFsm("Moving");
+  };
+
+  const onCanvasPointerDown = async (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (!ready || event.button !== 0) return;
+    const point = pointerPosition(event);
+    const captureTarget = event.currentTarget;
+    const pointerId = event.pointerId;
+    try {
+      if (tool === "hand") {
+        interaction.current = { pointerId: event.pointerId, kind: "pan", start: point, last: point, panPending: [0, 0] };
+        event.currentTarget.setPointerCapture(event.pointerId);
+        setFsm("Panning");
+        return;
+      }
+      if (tool === "rectangle" || tool === "ellipse") {
+        await engine.send("begin_transaction");
+        interaction.current = {
+          pointerId: event.pointerId,
+          kind: "create",
+          start: point,
+          last: point,
+          nodeId: crypto.randomUUID(),
+          nodeKind: tool,
+          created: false,
+        };
+        captureTarget.setPointerCapture(event.pointerId);
+        setFsm(tool === "rectangle" ? "CreatingRectangle" : "CreatingEllipse");
+        return;
+      }
+      setFsm("Selecting");
+      const hit = await engine.send("hit_test", { x: point[0], y: point[1] });
+      const target = (hit.result?.topmost as string | null | undefined) ?? null;
+      if (!target) {
+        await engine.send("selection", { target: null, mode: "clear" });
+        setFsm("Idle");
+        return;
+      }
+      await engine.send("selection", { target, mode: event.shiftKey ? "toggle" : "replace" });
+      const node = engine.projection.nodes.get(target);
+      if (node && !event.shiftKey) await beginMove(pointerId, node, point, captureTarget);
+      else setFsm(editRoot ? "NestedEditing" : "Idle");
+    } catch (reason) {
+      fail(reason);
+      setFsm("Idle");
+    }
+  };
+
+  const onCanvasPointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
+    const active = interaction.current;
+    if (!active || active.pointerId !== event.pointerId) return;
+    const point = pointerPosition(event);
+    if (active.kind === "pan") {
+      const dx = point[0] - active.last[0];
+      const dy = point[1] - active.last[1];
+      active.last = point;
+      const pending = active.panPending ?? [0, 0];
+      pending[0] += dx;
+      pending[1] += dy;
+      active.panPending = pending;
+      scheduleDrag(() => {
+        const accumulated = active.panPending ?? [0, 0];
+        active.panPending = [0, 0];
+        return engine.send("camera", { camera: { kind: "pan", dx: accumulated[0], dy: accumulated[1] } }).then(() => undefined);
+      });
+      return;
+    }
+    if (active.kind === "move" && active.matrix && active.nodeId) {
+      const zoom = response?.camera.zoom ?? 1;
+      const dx = (point[0] - active.start[0]) / zoom;
+      const dy = (point[1] - active.start[1]) / zoom;
+      const next: [number, number, number, number, number, number] = [
+        active.matrix[0], active.matrix[1], active.matrix[2], active.matrix[3], active.matrix[4] + dx, active.matrix[5] + dy,
+      ];
+      scheduleDrag(() => engine.send("update_transaction", { command: { kind: "set_transform", node_id: active.nodeId, matrix: next } }).then(() => undefined));
+      return;
+    }
+    if (active.kind === "create" && active.nodeId && active.nodeKind) {
+      active.last = point;
+      const start = viewportToWorld(active.start);
+      const end = viewportToWorld(point);
+      const x = Math.min(start[0], end[0]);
+      const y = Math.min(start[1], end[1]);
+      const width = Math.max(1, Math.abs(end[0] - start[0]));
+      const height = Math.max(1, Math.abs(end[1] - start[1]));
+      const root = editRoot ?? engine.projection.rootId;
+      if (!root) return;
+      if (!active.created) {
+        active.created = true;
+        scheduleDrag(() => engine.send("update_transaction", {
+          command: {
+            kind: "create_shape", node_id: active.nodeId, parent_id: root,
+            index: engine.projection.nodes.get(root)?.children.length ?? 0,
+            shape: active.nodeKind, name: active.nodeKind === "rectangle" ? "Rectangle" : "Ellipse",
+            x, y, width, height,
+          },
+        }).then(() => undefined));
+      } else {
+        scheduleDrag(async () => {
+          await engine.send("update_transaction", { command: { kind: "set_transform", node_id: active.nodeId, matrix: [1, 0, 0, 1, x, y] } });
+          await engine.send("update_transaction", { command: { kind: "set_geometry", node_id: active.nodeId, shape: active.nodeKind, width, height } });
+        });
+      }
+      return;
+    }
+    if (active.kind === "resize" && active.nodeId && active.geometry) {
+      const zoom = response?.camera.zoom ?? 1;
+      const width = Math.max(1, active.geometry.width + (point[0] - active.start[0]) / zoom);
+      const height = Math.max(1, active.geometry.height + (point[1] - active.start[1]) / zoom);
+      scheduleDrag(() => engine.send("update_transaction", { command: { kind: "set_geometry", node_id: active.nodeId, shape: active.nodeKind, width, height } }).then(() => undefined));
+      return;
+    }
+    if (active.kind === "rotate" && active.nodeId && active.matrix && currentNode?.world_bounds) {
+      const centerWorld: [number, number] = [
+        (currentNode.world_bounds.min[0] + currentNode.world_bounds.max[0]) / 2,
+        (currentNode.world_bounds.min[1] + currentNode.world_bounds.max[1]) / 2,
+      ];
+      const center = worldToViewport(centerWorld);
+      const angle = Math.atan2(point[1] - center[1], point[0] - center[0]) + Math.PI / 2;
+      const sx = Math.hypot(active.matrix[0], active.matrix[2]);
+      const sy = Math.hypot(active.matrix[1], active.matrix[3]);
+      const next: [number, number, number, number, number, number] = [Math.cos(angle) * sx, -Math.sin(angle) * sy, Math.sin(angle) * sx, Math.cos(angle) * sy, active.matrix[4], active.matrix[5]];
+      scheduleDrag(() => engine.send("update_transaction", { command: { kind: "set_transform", node_id: active.nodeId, matrix: next } }).then(() => undefined));
+    }
+  };
+
+  const finishInteraction = async (event: ReactPointerEvent<HTMLDivElement>) => {
+    const active = interaction.current;
+    if (!active || active.pointerId !== event.pointerId) return;
+    interaction.current = null;
+    try {
+      while (dragQueue.current.inFlight) await new Promise((resolve) => setTimeout(resolve, 4));
+      if (active.kind !== "pan") {
+        if (active.kind === "create" && !active.created && active.nodeId && active.nodeKind) {
+          const start = viewportToWorld(active.start);
+          const root = editRoot ?? engine.projection.rootId;
+          if (root) {
+            await engine.send("update_transaction", { command: { kind: "create_shape", node_id: active.nodeId, parent_id: root, index: engine.projection.nodes.get(root)?.children.length ?? 0, shape: active.nodeKind, name: active.nodeKind === "rectangle" ? "Rectangle" : "Ellipse", x: start[0], y: start[1], width: 24, height: 24 } });
+          }
+        }
+        await engine.send("commit_transaction");
+        if (active.kind === "create" && active.nodeId) await engine.send("selection", { target: active.nodeId, mode: "replace" });
+      }
+    } catch (reason) {
+      fail(reason);
+    }
+    setFsm(editRoot ? "NestedEditing" : "Idle");
+    if (active.kind === "create") setTool("select");
+  };
+
+  const beginHandle = async (event: ReactPointerEvent<SVGElement>, kind: "resize" | "rotate") => {
+    if (!currentNode || currentNode.locked || !currentNode.geometry) return;
+    event.stopPropagation();
+    const rect = canvasRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    const point: [number, number] = [event.clientX - rect.left, event.clientY - rect.top];
+    try {
+      await engine.send("begin_transaction");
+      interaction.current = {
+        pointerId: event.pointerId,
+        kind,
+        start: point,
+        last: point,
+        nodeId: currentNode.id,
+        nodeKind: currentNode.kind === "ellipse" ? "ellipse" : "rectangle",
+        matrix: [...currentNode.local_transform],
+        geometry: { ...currentNode.geometry },
+      };
+      shellRef.current?.setPointerCapture(event.pointerId);
+      setFsm(kind === "resize" ? "Resizing" : "Rotating");
+    } catch (reason) {
+      fail(reason);
+    }
+  };
+
+  const onWheel = (event: React.WheelEvent<HTMLDivElement>) => {
+    if (!response) return;
+    const point = pointerPosition(event as unknown as ReactPointerEvent);
+    const zoom = Math.max(0.05, Math.min(64, response.camera.zoom * Math.exp(-event.deltaY * 0.0015)));
+    scheduleDrag(() => engine.send("camera", { camera: { kind: "zoom", x: point[0], y: point[1], zoom } }).then(() => undefined));
+  };
+
+  useEffect(() => {
+    const keydown = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement | null;
+      if (target?.matches("input, textarea, select")) return;
+      const modifier = event.ctrlKey || event.metaKey;
+      if (event.key === "Escape" && interaction.current) {
+        event.preventDefault();
+        void cancelInteraction().catch(fail);
+      } else if (modifier && event.key.toLowerCase() === "z") {
+        event.preventDefault();
+        void engine.send(event.shiftKey ? "redo" : "undo").catch(fail);
+      } else if (modifier && event.key.toLowerCase() === "y") {
+        event.preventDefault();
+        void engine.send("redo").catch(fail);
+      } else if (!modifier) {
+        const shortcut = tools.find((entry) => entry.shortcut.toLowerCase() === event.key.toLowerCase());
+        if (shortcut) setTool(shortcut.id);
+      }
+    };
+    window.addEventListener("keydown", keydown);
+    return () => window.removeEventListener("keydown", keydown);
+  }, [engine, response, editRoot, fail, cancelInteraction]);
+
+  const overlay = useMemo(() => {
+    if (!currentNode?.geometry || !currentNode.world_transform || !response) return null;
+    const [a, b, c, d, tx, ty] = currentNode.world_transform;
+    const corners: Array<[number, number]> = [[0, 0], [currentNode.geometry.width, 0], [currentNode.geometry.width, currentNode.geometry.height], [0, currentNode.geometry.height]];
+    const points = corners.map(([x, y]) => worldToViewport([a * x + b * y + tx, c * x + d * y + ty]));
+    const handle = points[2];
+    const topMid: [number, number] = [(points[0][0] + points[1][0]) / 2, (points[0][1] + points[1][1]) / 2];
+    return { points, handle, rotate: [topMid[0], topMid[1] - 24] as [number, number] };
+  }, [currentNode, response, worldToViewport]);
+
+  const loadFixture = (fixture: string) => {
+    setEditRoot(null);
+    void engine.send("load_fixture", { fixture }).catch(fail);
+  };
+  const groupSelection = async () => {
+    if (engine.projection.selection.length < 2) return;
+    try {
+      const groupId = crypto.randomUUID();
+      await engine.send("command", { command: { kind: "group", group_id: groupId, name: "Group", targets: engine.projection.selection } });
+      await engine.send("selection", { target: groupId, mode: "replace" });
+    } catch (reason) { fail(reason); }
+  };
+  const ungroupSelection = async () => {
+    const node = currentNode;
+    if (!node || node.kind !== "group") return;
+    const first = node.children.at(0);
+    try {
+      await engine.send("command", { command: { kind: "ungroup", node_id: node.id } });
+      if (first) await engine.send("selection", { target: first, mode: "replace" });
+    } catch (reason) { fail(reason); }
+  };
+
+  return (
+    <main className="editor-app" aria-label="Vector Forge editor">
+      <header className="app-bar">
+        <div className="brand"><span className="brand-mark">V</span><strong>Vector Forge</strong><span className="phase-badge">Phase 0E</span></div>
+        <div className="app-actions">
+          <IconButton icon={Undo2} label="Undo (Ctrl+Z)" disabled={!response?.history.undo_depth} onClick={() => void engine.send("undo").catch(fail)} testId="undo" />
+          <IconButton icon={Redo2} label="Redo (Ctrl+Y)" disabled={!response?.history.redo_depth} onClick={() => void engine.send("redo").catch(fail)} testId="redo" />
+          <span className="app-divider" />
+          <button className="button secondary compact" data-testid="group" onClick={() => void groupSelection()} disabled={engine.projection.selection.length < 2}><Group size={15} /> Group</button>
+          <button className="button secondary compact" data-testid="ungroup" onClick={() => void ungroupSelection()} disabled={currentNode?.kind !== "group"}><Ungroup size={15} /> Ungroup</button>
+        </div>
+        <div className="app-actions right">
+          <button className="button secondary compact" data-testid="show-components" onClick={() => setShowcase(true)}>Components</button>
+          <button className="button secondary compact" data-testid="restart-worker" onClick={() => void cancelInteraction().catch(() => undefined).then(() => engine.restartWorker(true)).catch(fail)}>Restart Worker</button>
+          <span className={`status-dot${ready ? " is-ready" : ""}`} aria-hidden="true" />
+          <span className="status-label">{ready ? "Worker + WebGPU" : "Starting…"}</span>
+        </div>
+      </header>
+
+      <div className="workspace">
+        <aside className="left-column">
+          <nav className="tool-rail" aria-label="Editor tools">
+            {tools.map((entry) => (
+              <IconButton key={entry.id} icon={entry.icon} label={`${entry.label} (${entry.shortcut})`} active={tool === entry.id} onClick={() => setTool(entry.id)} testId={`tool-${entry.id}`} />
+            ))}
+          </nav>
+          <LayersPanel engine={engine} response={response} version={version} onError={fail} editRoot={editRoot} setEditRoot={(id) => { setEditRoot(id); setFsm(id ? "NestedEditing" : "Idle"); }} />
+        </aside>
+
+        <section className="canvas-column" aria-label="Canvas workspace">
+          <div className="canvas-toolbar">
+            <span className="tool-state"><MousePointer2 size={14} /> {tool} · {fsm}</span>
+            {editRoot ? <span className="nested-breadcrumb">Root / {engine.projection.nodes.get(editRoot)?.name}</span> : null}
+            <div className="canvas-toolbar-actions">
+              <button onClick={() => void engine.send("camera", { camera: { kind: "fit" } }).catch(fail)}><Scan size={15} /> Fit document</button>
+              <button disabled={!currentNode?.world_bounds} onClick={() => currentNode && void engine.send("camera", { camera: { kind: "fit_selection", node_id: currentNode.id } }).catch(fail)}><Focus size={15} /> Fit selection</button>
+              <span className="zoom-readout">{Math.round((response?.camera.zoom ?? 1) * 100)}%</span>
+            </div>
+          </div>
+          <div
+            ref={shellRef}
+            className={`canvas-shell tool-${tool}`}
+            onPointerDown={(event) => void onCanvasPointerDown(event)}
+            onPointerMove={onCanvasPointerMove}
+            onPointerUp={(event) => void finishInteraction(event)}
+            onPointerCancel={(event) => {
+              void cancelInteraction().catch(fail);
+              if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+                event.currentTarget.releasePointerCapture(event.pointerId);
+              }
+            }}
+            onWheel={onWheel}
+            data-testid="canvas-shell"
+          >
+            <canvas ref={canvasRef} className="webgpu-canvas" aria-label="Actual WebGPU document canvas" tabIndex={0} />
+            <svg className="selection-overlay" aria-hidden="true" data-sequence={response?.engine_sequence ?? 0}>
+              {overlay ? (
+                <g>
+                  <polygon points={overlay.points.map((point) => point.join(",")).join(" ")} className="selection-outline" />
+                  {overlay.points.map((point, index) => <circle key={index} cx={point[0]} cy={point[1]} r="4" className="selection-handle" />)}
+                  <line x1={(overlay.points[0][0] + overlay.points[1][0]) / 2} y1={(overlay.points[0][1] + overlay.points[1][1]) / 2} x2={overlay.rotate[0]} y2={overlay.rotate[1]} className="rotation-stem" />
+                  <circle cx={overlay.handle[0]} cy={overlay.handle[1]} r="10" className="handle-hit" onPointerDown={(event) => void beginHandle(event, "resize")} data-testid="resize-handle" />
+                  <circle cx={overlay.rotate[0]} cy={overlay.rotate[1]} r="10" className="handle-hit rotate-hit" onPointerDown={(event) => void beginHandle(event, "rotate")} data-testid="rotate-handle" />
+                  <circle cx={overlay.rotate[0]} cy={overlay.rotate[1]} r="4" className="selection-handle rotate" />
+                </g>
+              ) : null}
+            </svg>
+            {!ready ? <div className="canvas-loading"><span className="spinner" /> Initializing Worker, WASM, and WebGPU…</div> : null}
+          </div>
+          <DebugPanel engine={engine} response={response} onLoad={loadFixture} onError={error} />
+        </section>
+
+        <aside className="right-column">
+          <Inspector engine={engine} version={version} onError={fail} />
+        </aside>
+      </div>
+
+      <footer className="status-bar">
+        <span>{response?.fixture ?? "—"}</span>
+        <span>{response ? `${response.metrics.document_nodes?.toLocaleString()} nodes` : "Waiting for runtime"}</span>
+        <span>{response ? `GPU ${response.culling.visible?.toLocaleString()} visible` : ""}</span>
+        <span className="status-spacer" />
+        <span>Seq {engine.gpuMetrics.frame_sequence ?? 0}</span>
+        <span>Doc {response?.revisions.document ?? 0}</span>
+        <span>{currentNode ? currentNode.name : "No selection"}</span>
+      </footer>
+      {showcase ? <ComponentShowcase onClose={() => setShowcase(false)} /> : null}
+    </main>
+  );
+}

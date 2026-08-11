@@ -1,0 +1,17 @@
+﻿   Compiling visual_authoring_document v0.1.0 (C:\Users\thdwl\Documents\Codex\WebEditor\crates\document)
+   Compiling visual_authoring_spatial v0.1.0 (C:\Users\thdwl\Documents\Codex\WebEditor\crates\spatial)
+   Compiling visual_authoring_serialization v0.1.0 (C:\Users\thdwl\Documents\Codex\WebEditor\crates\serialization)
+   Compiling visual_authoring_scene v0.1.0 (C:\Users\thdwl\Documents\Codex\WebEditor\crates\scene)
+   Compiling visual_authoring_render_model v0.1.0 (C:\Users\thdwl\Documents\Codex\WebEditor\crates\render_model)
+   Compiling visual_authoring_renderer_wgpu v0.1.0 (C:\Users\thdwl\Documents\Codex\WebEditor\crates\renderer_wgpu)
+   Compiling visual_authoring_runtime v0.1.0 (C:\Users\thdwl\Documents\Codex\WebEditor\crates\runtime)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 14.56s
+     Running tests\phase0e_r3_restoration.rs (target\debug\deps\phase0e_r3_restoration-8040e7349ec74928.exe)
+
+running 2 tests
+PHASE0E_R3_RESTORATION_JSON={"all_passed":true,"deleted_anchor_policy":"surviving anchor, otherwise current group rank","group_reparent_policy":"missing anchors restore at the current group rank","internal_reorder_policy":"current order inside each original run; original run order across runs","schema_version":2}
+test restoration_v2_defines_internal_reorder_reparent_and_missing_anchor_fallback ... ok
+test version_one_restoration_migrates_to_v2_and_restores_exact_order ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+

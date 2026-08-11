@@ -1,0 +1,737 @@
+//! Versioned persistence boundary for visual-authoring documents.
+//!
+//! The JSON schema is intentionally represented by private `Stored*` types
+//! instead of deriving serialization for `Document`. Loading always crosses
+//! `Document::from_snapshot`, so malformed hierarchy data cannot enter the
+//! persistent model.
+
+use std::collections::BTreeMap;
+
+use serde::{Deserialize, Serialize};
+use thiserror::Error;
+use visual_authoring_core_math::{Affine2, Vec2};
+use visual_authoring_document::{
+    Appearance, Document, DocumentError, DocumentSnapshot, Geometry, GroupRestoration,
+    GroupRestorationRun, NodeId, NodeKind, NodeSnapshot, NodeSpec,
+};
+
+pub const DOCUMENT_FORMAT: &str = "visual-authoring-document";
+pub const CURRENT_VERSION: u32 = 1;
+
+#[derive(Debug, Error)]
+pub enum SerializationError {
+    #[error("invalid JSON document: {0}")]
+    Json(#[from] serde_json::Error),
+    #[error("missing or invalid top-level field `{0}`")]
+    InvalidEnvelopeField(&'static str),
+    #[error("unsupported document format `{0}`")]
+    UnsupportedFormat(String),
+    #[error("unsupported document version {0}")]
+    UnsupportedVersion(u64),
+    #[error("document data is invalid: {0}")]
+    InvalidDocument(#[from] DocumentError),
+}
+
+/// Serializes a validated semantic document using the current versioned schema.
+pub fn to_json_pretty(document: &Document) -> Result<String, SerializationError> {
+    document
+        .validate_invariants()
+        .map_err(DocumentError::from)?;
+    let envelope = StoredEnvelopeV1::from_document(document)?;
+    Ok(serde_json::to_string_pretty(&envelope)?)
+}
+
+/// Deserializes and validates a versioned semantic document.
+pub fn from_json(json: &str) -> Result<Document, SerializationError> {
+    let value: serde_json::Value = serde_json::from_str(json)?;
+    let format = value
+        .get("format")
+        .and_then(serde_json::Value::as_str)
+        .ok_or(SerializationError::InvalidEnvelopeField("format"))?;
+    if format != DOCUMENT_FORMAT {
+        return Err(SerializationError::UnsupportedFormat(format.to_owned()));
+    }
+
+    let version = value
+        .get("version")
+        .and_then(serde_json::Value::as_u64)
+        .ok_or(SerializationError::InvalidEnvelopeField("version"))?;
+    match version {
+        1 => serde_json::from_value::<StoredEnvelopeV1>(value)?.into_document(),
+        unsupported => Err(SerializationError::UnsupportedVersion(unsupported)),
+    }
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+struct StoredEnvelopeV1 {
+    format: String,
+    version: u32,
+    document: StoredDocumentV1,
+}
+
+impl StoredEnvelopeV1 {
+    fn from_document(document: &Document) -> Result<Self, SerializationError> {
+        let snapshot = document.snapshot();
+        let nodes = snapshot
+            .nodes
+            .into_iter()
+            .map(StoredNodeV1::try_from)
+            .collect::<Result<Vec<_>, _>>()?;
+        Ok(Self {
+            format: DOCUMENT_FORMAT.to_owned(),
+            version: CURRENT_VERSION,
+            document: StoredDocumentV1 {
+                root_id: snapshot.root_id,
+                nodes,
+            },
+        })
+    }
+
+    fn into_document(self) -> Result<Document, SerializationError> {
+        if self.format != DOCUMENT_FORMAT {
+            return Err(SerializationError::UnsupportedFormat(self.format));
+        }
+        if self.version != CURRENT_VERSION {
+            return Err(SerializationError::UnsupportedVersion(u64::from(
+                self.version,
+            )));
+        }
+
+        let nodes = self
+            .document
+            .nodes
+            .into_iter()
+            .map(StoredNodeV1::into_snapshot)
+            .collect();
+        Ok(Document::from_snapshot(DocumentSnapshot {
+            root_id: self.document.root_id,
+            nodes,
+        })?)
+    }
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+struct StoredDocumentV1 {
+    root_id: NodeId,
+    nodes: Vec<StoredNodeV1>,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+struct StoredNodeV1 {
+    id: NodeId,
+    name: String,
+    kind: StoredNodeKindV1,
+    parent: Option<NodeId>,
+    children: Vec<NodeId>,
+    local_transform: StoredAffine2V1,
+    visible: bool,
+    locked: bool,
+    appearance: StoredAppearanceV1,
+    metadata: BTreeMap<String, String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    internal_group_restoration: Option<StoredGroupRestorationV1>,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+struct StoredGroupRestorationV1 {
+    version: u32,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    entries: Vec<StoredGroupRestorationEntryV1>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    runs: Vec<StoredGroupRestorationRunV2>,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+struct StoredGroupRestorationEntryV1 {
+    child: NodeId,
+    before_anchor: Option<NodeId>,
+    after_anchor: Option<NodeId>,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+struct StoredGroupRestorationRunV2 {
+    children: Vec<NodeId>,
+    before_anchor: Option<NodeId>,
+    after_anchor: Option<NodeId>,
+}
+
+impl From<GroupRestoration> for StoredGroupRestorationV1 {
+    fn from(restoration: GroupRestoration) -> Self {
+        Self {
+            version: restoration.version,
+            entries: Vec::new(),
+            runs: restoration
+                .runs
+                .into_iter()
+                .map(|run| StoredGroupRestorationRunV2 {
+                    children: run.children,
+                    before_anchor: run.before_anchor,
+                    after_anchor: run.after_anchor,
+                })
+                .collect(),
+        }
+    }
+}
+
+impl From<StoredGroupRestorationV1> for GroupRestoration {
+    fn from(restoration: StoredGroupRestorationV1) -> Self {
+        if restoration.version == 1 {
+            let mut runs: Vec<GroupRestorationRun> = Vec::new();
+            for entry in restoration.entries {
+                if let Some(run) = runs.last_mut().filter(|run| {
+                    run.before_anchor == entry.before_anchor
+                        && run.after_anchor == entry.after_anchor
+                }) {
+                    run.children.push(entry.child);
+                } else {
+                    runs.push(GroupRestorationRun {
+                        children: vec![entry.child],
+                        before_anchor: entry.before_anchor,
+                        after_anchor: entry.after_anchor,
+                    });
+                }
+            }
+            Self {
+                version: GroupRestoration::VERSION,
+                runs,
+            }
+        } else {
+            Self {
+                version: restoration.version,
+                runs: restoration
+                    .runs
+                    .into_iter()
+                    .map(|run| GroupRestorationRun {
+                        children: run.children,
+                        before_anchor: run.before_anchor,
+                        after_anchor: run.after_anchor,
+                    })
+                    .collect(),
+            }
+        }
+    }
+}
+
+impl TryFrom<NodeSnapshot> for StoredNodeV1 {
+    type Error = SerializationError;
+
+    fn try_from(snapshot: NodeSnapshot) -> Result<Self, Self::Error> {
+        let kind = StoredNodeKindV1::from_spec(&snapshot.spec)?;
+        Ok(Self {
+            id: snapshot.spec.id,
+            name: snapshot.spec.name,
+            kind,
+            parent: snapshot.parent,
+            children: snapshot.children,
+            local_transform: snapshot.spec.local_transform.into(),
+            visible: snapshot.spec.visible,
+            locked: snapshot.spec.locked,
+            appearance: snapshot.spec.appearance.into(),
+            metadata: snapshot.spec.metadata,
+            internal_group_restoration: snapshot.group_restoration.map(Into::into),
+        })
+    }
+}
+
+impl StoredNodeV1 {
+    fn into_snapshot(self) -> NodeSnapshot {
+        let (kind, geometry) = self.kind.into_domain();
+        NodeSnapshot {
+            spec: NodeSpec {
+                id: self.id,
+                name: self.name,
+                kind,
+                local_transform: self.local_transform.into(),
+                visible: self.visible,
+                locked: self.locked,
+                geometry,
+                appearance: self.appearance.into(),
+                metadata: self.metadata,
+            },
+            parent: self.parent,
+            children: self.children,
+            group_restoration: self.internal_group_restoration.map(Into::into),
+        }
+    }
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+#[serde(tag = "type", rename_all = "snake_case")]
+enum StoredNodeKindV1 {
+    Document,
+    Frame { width: f64, height: f64 },
+    Group,
+    Rectangle { width: f64, height: f64 },
+    Ellipse { width: f64, height: f64 },
+}
+
+impl StoredNodeKindV1 {
+    fn from_spec(spec: &NodeSpec) -> Result<Self, SerializationError> {
+        let invalid = || DocumentError::InvalidGeometry(spec.id).into();
+        match (spec.kind, spec.geometry.as_ref()) {
+            (NodeKind::Document, None) => Ok(Self::Document),
+            (NodeKind::Frame, Some(Geometry::Frame { size })) => Ok(Self::Frame {
+                width: size.x,
+                height: size.y,
+            }),
+            (NodeKind::Group, None) => Ok(Self::Group),
+            (NodeKind::Rectangle, Some(Geometry::Rectangle { size })) => Ok(Self::Rectangle {
+                width: size.x,
+                height: size.y,
+            }),
+            (NodeKind::Ellipse, Some(Geometry::Ellipse { size })) => Ok(Self::Ellipse {
+                width: size.x,
+                height: size.y,
+            }),
+            _ => Err(invalid()),
+        }
+    }
+
+    fn into_domain(self) -> (NodeKind, Option<Geometry>) {
+        match self {
+            Self::Document => (NodeKind::Document, None),
+            Self::Frame { width, height } => (
+                NodeKind::Frame,
+                Some(Geometry::Frame {
+                    size: Vec2::new(width, height),
+                }),
+            ),
+            Self::Group => (NodeKind::Group, None),
+            Self::Rectangle { width, height } => (
+                NodeKind::Rectangle,
+                Some(Geometry::Rectangle {
+                    size: Vec2::new(width, height),
+                }),
+            ),
+            Self::Ellipse { width, height } => (
+                NodeKind::Ellipse,
+                Some(Geometry::Ellipse {
+                    size: Vec2::new(width, height),
+                }),
+            ),
+        }
+    }
+}
+
+#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+struct StoredAffine2V1 {
+    m11: f64,
+    m12: f64,
+    m21: f64,
+    m22: f64,
+    tx: f64,
+    ty: f64,
+}
+
+impl From<Affine2> for StoredAffine2V1 {
+    fn from(transform: Affine2) -> Self {
+        Self {
+            m11: transform.m11,
+            m12: transform.m12,
+            m21: transform.m21,
+            m22: transform.m22,
+            tx: transform.tx,
+            ty: transform.ty,
+        }
+    }
+}
+
+impl From<StoredAffine2V1> for Affine2 {
+    fn from(transform: StoredAffine2V1) -> Self {
+        Self::from_components(
+            transform.m11,
+            transform.m12,
+            transform.m21,
+            transform.m22,
+            transform.tx,
+            transform.ty,
+        )
+    }
+}
+
+#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+struct StoredAppearanceV1 {
+    opacity: f64,
+}
+
+impl From<Appearance> for StoredAppearanceV1 {
+    fn from(appearance: Appearance) -> Self {
+        Self {
+            opacity: appearance.opacity,
+        }
+    }
+}
+
+impl From<StoredAppearanceV1> for Appearance {
+    fn from(appearance: StoredAppearanceV1) -> Self {
+        Self {
+            opacity: appearance.opacity,
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use visual_authoring_document::{Command, HeadlessEditorCore};
+
+    fn sample_document() -> (Document, NodeId, NodeId, NodeId) {
+        let root_id = NodeId::new();
+        let mut root = NodeSpec::document(root_id, "Broadcast package");
+        root.metadata.insert("author".into(), "Codex".into());
+        let document = Document::with_root(root).unwrap();
+        let mut editor = HeadlessEditorCore::new(document).unwrap();
+
+        let frame_id = NodeId::new();
+        let rectangle_id = NodeId::new();
+        let ellipse_id = NodeId::new();
+        editor
+            .dispatch(Command::CreateNode {
+                spec: NodeSpec::frame(frame_id, "Main frame", Vec2::new(1920.0, 1080.0)),
+                parent: root_id,
+                index: 0,
+            })
+            .unwrap();
+        editor
+            .dispatch(Command::CreateNode {
+                spec: NodeSpec::rectangle(rectangle_id, "Background", Vec2::new(1920.0, 1080.0)),
+                parent: frame_id,
+                index: 0,
+            })
+            .unwrap();
+        editor
+            .dispatch(Command::CreateNode {
+                spec: NodeSpec::ellipse(ellipse_id, "Badge", Vec2::new(120.0, 80.0)),
+                parent: frame_id,
+                index: 1,
+            })
+            .unwrap();
+        editor
+            .dispatch(Command::SetLocalTransform {
+                target: ellipse_id,
+                transform: Affine2::translation(Vec2::new(140.0, 90.0))
+                    * Affine2::rotation(0.42)
+                    * Affine2::scale(Vec2::new(-1.2, 0.75)),
+            })
+            .unwrap();
+        (
+            editor.into_document().unwrap(),
+            frame_id,
+            rectangle_id,
+            ellipse_id,
+        )
+    }
+
+    #[test]
+    fn stable_ids_and_semantics_survive_round_trip() {
+        let (document, frame_id, rectangle_id, ellipse_id) = sample_document();
+        let json = to_json_pretty(&document).unwrap();
+        let restored = from_json(&json).unwrap();
+
+        assert_eq!(restored, document);
+        assert!(restored.node(frame_id).is_some());
+        assert!(restored.node(rectangle_id).is_some());
+        assert!(restored.node(ellipse_id).is_some());
+    }
+
+    #[test]
+    fn child_order_persists() {
+        let (document, frame_id, rectangle_id, ellipse_id) = sample_document();
+        let restored = from_json(&to_json_pretty(&document).unwrap()).unwrap();
+        assert_eq!(
+            restored.node(frame_id).unwrap().children(),
+            &[rectangle_id, ellipse_id]
+        );
+    }
+
+    #[test]
+    fn reordered_child_order_persists_after_save_and_load() {
+        let (document, frame_id, rectangle_id, ellipse_id) = sample_document();
+        let mut editor = HeadlessEditorCore::new(document).unwrap();
+        editor
+            .dispatch(Command::Reparent {
+                child: rectangle_id,
+                new_parent: frame_id,
+                index: 1,
+            })
+            .unwrap();
+        assert_eq!(
+            editor.document().node(frame_id).unwrap().children(),
+            &[ellipse_id, rectangle_id]
+        );
+
+        let restored = from_json(&to_json_pretty(editor.document()).unwrap()).unwrap();
+        assert_eq!(
+            restored.node(frame_id).unwrap().children(),
+            &[ellipse_id, rectangle_id]
+        );
+    }
+
+    #[test]
+    fn envelope_is_explicit_and_versioned() {
+        let (document, ..) = sample_document();
+        let value: serde_json::Value =
+            serde_json::from_str(&to_json_pretty(&document).unwrap()).unwrap();
+        assert_eq!(value["format"], DOCUMENT_FORMAT);
+        assert_eq!(value["version"], CURRENT_VERSION);
+        assert!(value["document"]["nodes"].is_array());
+    }
+
+    #[test]
+    fn unsupported_format_and_version_are_rejected() {
+        let (document, ..) = sample_document();
+        let mut value: serde_json::Value =
+            serde_json::from_str(&to_json_pretty(&document).unwrap()).unwrap();
+        value["format"] = "other-format".into();
+        assert!(matches!(
+            from_json(&value.to_string()),
+            Err(SerializationError::UnsupportedFormat(_))
+        ));
+
+        value["format"] = DOCUMENT_FORMAT.into();
+        value["version"] = 99_u64.into();
+        assert!(matches!(
+            from_json(&value.to_string()),
+            Err(SerializationError::UnsupportedVersion(99))
+        ));
+    }
+
+    #[test]
+    fn dangling_parent_data_is_rejected() {
+        let (document, _frame_id, _rectangle_id, ellipse_id) = sample_document();
+        let mut envelope = StoredEnvelopeV1::from_document(&document).unwrap();
+        let ellipse = envelope
+            .document
+            .nodes
+            .iter_mut()
+            .find(|node| node.id == ellipse_id)
+            .unwrap();
+        ellipse.parent = Some(NodeId::new());
+
+        let json = serde_json::to_string(&envelope).unwrap();
+        assert!(matches!(
+            from_json(&json),
+            Err(SerializationError::InvalidDocument(_))
+        ));
+    }
+
+    #[test]
+    fn cyclic_hierarchy_data_is_rejected() {
+        let root_id = NodeId::new();
+        let first_id = NodeId::new();
+        let second_id = NodeId::new();
+        let identity = StoredAffine2V1::from(Affine2::IDENTITY);
+        let appearance = StoredAppearanceV1 { opacity: 1.0 };
+        let node = |id, name: &str, parent, children| StoredNodeV1 {
+            id,
+            name: name.into(),
+            kind: StoredNodeKindV1::Group,
+            parent,
+            children,
+            local_transform: identity,
+            visible: true,
+            locked: false,
+            appearance,
+            metadata: BTreeMap::new(),
+            internal_group_restoration: None,
+        };
+        let envelope = StoredEnvelopeV1 {
+            format: DOCUMENT_FORMAT.into(),
+            version: CURRENT_VERSION,
+            document: StoredDocumentV1 {
+                root_id,
+                nodes: vec![
+                    StoredNodeV1 {
+                        id: root_id,
+                        name: "Root".into(),
+                        kind: StoredNodeKindV1::Document,
+                        parent: None,
+                        children: Vec::new(),
+                        local_transform: identity,
+                        visible: true,
+                        locked: false,
+                        appearance,
+                        metadata: BTreeMap::new(),
+                        internal_group_restoration: None,
+                    },
+                    node(first_id, "First", Some(second_id), vec![second_id]),
+                    node(second_id, "Second", Some(first_id), vec![first_id]),
+                ],
+            },
+        };
+
+        assert!(matches!(
+            from_json(&serde_json::to_string(&envelope).unwrap()),
+            Err(SerializationError::InvalidDocument(
+                DocumentError::Invariant(visual_authoring_document::InvariantViolation::Cycle(_))
+            ))
+        ));
+    }
+
+    #[test]
+    fn duplicate_ids_are_rejected_during_load() {
+        let (document, ..) = sample_document();
+        let mut envelope = StoredEnvelopeV1::from_document(&document).unwrap();
+        let duplicate = StoredNodeV1 {
+            id: envelope.document.nodes[0].id,
+            name: "Duplicate".into(),
+            kind: StoredNodeKindV1::Group,
+            parent: None,
+            children: Vec::new(),
+            local_transform: Affine2::IDENTITY.into(),
+            visible: true,
+            locked: false,
+            appearance: Appearance::default().into(),
+            metadata: BTreeMap::new(),
+            internal_group_restoration: None,
+        };
+        envelope.document.nodes.push(duplicate);
+        assert!(matches!(
+            from_json(&serde_json::to_string(&envelope).unwrap()),
+            Err(SerializationError::InvalidDocument(
+                DocumentError::DuplicateNodeId(_)
+            ))
+        ));
+    }
+
+    #[test]
+    fn save_load_save_is_semantically_and_textually_stable() {
+        let (document, ..) = sample_document();
+        let first = to_json_pretty(&document).unwrap();
+        let second = to_json_pretty(&from_json(&first).unwrap()).unwrap();
+        assert_eq!(second, first);
+    }
+    #[test]
+    fn editor_session_history_selection_and_transaction_are_not_serialized() {
+        let (document, _frame_id, rectangle_id, _ellipse_id) = sample_document();
+        let mut editor = HeadlessEditorCore::new(document).unwrap();
+        editor.select_only(rectangle_id).unwrap();
+        editor
+            .dispatch(Command::SetName {
+                target: rectangle_id,
+                name: "History exists".into(),
+            })
+            .unwrap();
+        editor.begin_transaction().unwrap();
+        editor
+            .update_transaction(Command::SetVisible {
+                target: rectangle_id,
+                visible: false,
+            })
+            .unwrap();
+
+        let value: serde_json::Value =
+            serde_json::from_str(&to_json_pretty(editor.document()).unwrap()).unwrap();
+        assert!(value.get("history").is_none());
+        assert!(value.get("selection").is_none());
+        assert!(value.get("transaction").is_none());
+        assert!(value["document"].get("history").is_none());
+        assert!(value["document"].get("selection").is_none());
+        assert!(value["document"].get("transaction").is_none());
+        assert_eq!(value["version"], CURRENT_VERSION);
+    }
+
+    #[test]
+    fn failed_load_preserves_editor_and_successful_replacement_resets_session_policy() {
+        let (document, _frame_id, rectangle_id, _ellipse_id) = sample_document();
+        let mut editor = HeadlessEditorCore::new(document).unwrap();
+        editor.select_only(rectangle_id).unwrap();
+        editor
+            .dispatch(Command::SetName {
+                target: rectangle_id,
+                name: "Edited".into(),
+            })
+            .unwrap();
+        let before = editor.document().snapshot();
+        let history_before = editor.history_state();
+        let selection_before = editor.selection().clone();
+
+        let invalid = r#"{"format":"visual-authoring-document","version":1,"document":{"root_id":"not-a-uuid","nodes":[]}}"#;
+        assert!(from_json(invalid).is_err());
+        assert_eq!(editor.document().snapshot(), before);
+        assert_eq!(editor.history_state(), history_before);
+        assert_eq!(editor.selection(), &selection_before);
+
+        let replacement = Document::new("Loaded replacement");
+        let loaded = from_json(&to_json_pretty(&replacement).unwrap()).unwrap();
+        editor.replace_document(loaded).unwrap();
+        assert_eq!(
+            editor.history_state(),
+            visual_authoring_document::HistoryState::default()
+        );
+        assert!(editor.selection().is_empty());
+        assert_eq!(
+            editor
+                .document()
+                .node(editor.document().root_id())
+                .unwrap()
+                .name(),
+            "Loaded replacement"
+        );
+    }
+
+    #[test]
+    fn group_restoration_round_trip_survives_sibling_edits_before_ungroup() {
+        let mut editor = HeadlessEditorCore::blank("Phase 0E R2");
+        let root = editor.document().root_id();
+        let mut ids = Vec::new();
+        for name in ["A", "B", "C", "D", "E", "F"] {
+            let id = NodeId::new();
+            editor
+                .dispatch(Command::CreateNode {
+                    spec: NodeSpec::rectangle(id, name, Vec2::new(10.0, 10.0)),
+                    parent: root,
+                    index: ids.len(),
+                })
+                .unwrap();
+            ids.push(id);
+        }
+        let [a, b, c, d, e, f]: [NodeId; 6] = ids.try_into().unwrap();
+        let group = NodeId::new();
+        editor
+            .dispatch(Command::Group {
+                group: NodeSpec::group(group, "Internal restoration"),
+                targets: vec![b, d],
+            })
+            .unwrap();
+        let x = NodeId::new();
+        editor
+            .dispatch(Command::CreateNode {
+                spec: NodeSpec::rectangle(x, "X", Vec2::new(10.0, 10.0)),
+                parent: root,
+                index: 0,
+            })
+            .unwrap();
+        editor
+            .dispatch(Command::DeleteSubtree { target: c })
+            .unwrap();
+        editor
+            .dispatch(Command::Reparent {
+                child: f,
+                new_parent: root,
+                index: 1,
+            })
+            .unwrap();
+
+        let encoded = to_json_pretty(editor.document()).unwrap();
+        assert!(encoded.contains("internal_group_restoration"));
+        assert!(!encoded.contains("__phase0e_r1_group_positions"));
+        let loaded = from_json(&encoded).unwrap();
+        let mut restored = HeadlessEditorCore::new(loaded).unwrap();
+        restored
+            .dispatch(Command::Ungroup { target: group })
+            .unwrap();
+        assert_eq!(
+            restored.document().node(root).unwrap().children(),
+            &[x, f, a, b, d, e]
+        );
+    }
+}

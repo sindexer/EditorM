@@ -1,0 +1,64 @@
+{
+  "all_passed": true,
+  "bench_10k_rectangles": {
+    "batches": 1,
+    "buffer_bytes": 852000,
+    "buffer_count": 3,
+    "culled": 0,
+    "draw_calls": 1,
+    "initial_instance_upload_bytes": 786432,
+    "initial_instance_upload_calls": 1,
+    "spatial_candidates": 10000,
+    "submitted_instances": 10000,
+    "total": 10000,
+    "validation_errors": 0,
+    "visible": 10000
+  },
+  "checks": {
+    "actual_wgpu_device": true,
+    "fallback_rebuild_zero": true,
+    "gpu_validation_errors_zero": true,
+    "offscreen_not_submitted": true,
+    "single_node_no_full_instance_upload": true,
+    "single_node_no_render_rebuild": true,
+    "single_node_no_scene_rebuild": true,
+    "sparse_query_pruned": true,
+    "ten_thousand_one_batch": true,
+    "wide_view_no_query_error": true
+  },
+  "phase": "0D",
+  "protocol_version": 1,
+  "renderer": {
+    "actual_wgpu": true,
+    "adapter": "NVIDIA GeForce GTX 970",
+    "backend": "Vulkan",
+    "device_type": "DiscreteGpu",
+    "driver": "NVIDIA",
+    "driver_info": "581.57",
+    "ellipse_fragment_discard": true,
+    "precision_strategy": "f64-to-f32 validated high/low translation split",
+    "shader_geometry_aware": true
+  },
+  "single_node_update": {
+    "dirty_ranges": 1,
+    "dirty_slots": 1,
+    "draw_calls": 1,
+    "full_instance_buffer_uploads": 0,
+    "instance_upload_bytes": 48,
+    "instance_upload_calls": 1,
+    "render_full_rebuilds": 0,
+    "scene_full_rebuilds": 0,
+    "submitted_instances": 10000
+  },
+  "sparse_100k": {
+    "narrow_candidates": 2,
+    "narrow_culled": 99998,
+    "narrow_submitted": 2,
+    "narrow_visible": 2,
+    "query_too_large": false,
+    "total": 100000,
+    "zoomed_out_candidates": 100000,
+    "zoomed_out_submitted": 100000,
+    "zoomed_out_visible": 100000
+  }
+}

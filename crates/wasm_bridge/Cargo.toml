@@ -1,0 +1,21 @@
+[package]
+name = "visual_authoring_wasm_bridge"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+js-sys.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+wasm-bindgen.workspace = true
+visual_authoring_core_math = { path = "../core_math" }
+visual_authoring_document = { path = "../document" }
+visual_authoring_render_model = { path = "../render_model" }
+visual_authoring_runtime = { path = "../runtime", default-features = false }
+visual_authoring_scene = { path = "../scene" }
+visual_authoring_serialization = { path = "../serialization" }

@@ -1,0 +1,9 @@
+Read the entire attached `visual_authoring_engine_codex_package` before modifying code.
+
+Treat `00_MASTER_INSTRUCTION.md` and `01_ENGINE_ARCHITECTURE_SPEC_V1_1.md` as mandatory architecture constraints. The current authorized implementation scope is ONLY Phase 0A in `05_TASK_PHASE0A.md`.
+
+Important UI requirement for later phases: the included `reference/wanted-design-system/Wanted Design System (Community).fig` is the authoritative visual/component reference. The future editor UI must follow that design system and its components rather than inventing a generic dashboard or substituting another design system. Do not implement the UI yet in Phase 0A.
+
+Architecture correctness is more important than feature count. Do not collapse Document, Scene, Renderer, UI, or future Command boundaries to make the task easier. If an architectural requirement cannot be implemented correctly, document the blocker instead of replacing it with a shortcut.
+
+Implement Phase 0A, run all required tests, create `docs/REVIEW_PACKET_0A.md`, and STOP. Do not begin Phase 0B.

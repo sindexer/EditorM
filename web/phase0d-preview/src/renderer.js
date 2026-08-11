@@ -1,0 +1,471 @@
+import { splitF64 } from "./protocol.js";
+import {
+  DIRTY_STRIDE,
+  INSTANCE_STRIDE,
+  RENDER_BINARY_SCHEMA_VERSION,
+  SHADER_SOURCE,
+} from "./render_contract.js";
+
+
+
+const GPU = globalThis.GPUBufferUsage ?? {};
+const TEXTURE_USAGE = globalThis.GPUTextureUsage ?? {};
+const MAP_MODE = globalThis.GPUMapMode ?? {};
+
+export class RendererFailure extends Error {
+  constructor(code, message) {
+    super(message);
+    this.name = "RendererFailure";
+    this.code = code;
+  }
+}
+
+export class WebGpuRenderer {
+  static async create(canvas) {
+    if (!globalThis.navigator?.gpu) {
+      throw new RendererFailure(
+        "webgpu_unavailable",
+        "WebGPU is unavailable. Gate 0D cannot pass and no Canvas2D fallback is used.",
+      );
+    }
+    const adapter = await navigator.gpu.requestAdapter({ powerPreference: "high-performance" });
+    if (!adapter) {
+      throw new RendererFailure("adapter_unavailable", "No WebGPU adapter was returned");
+    }
+    const device = await adapter.requestDevice({ label: "Phase 0D WebGPU device" });
+    return new WebGpuRenderer(canvas, adapter, device);
+  }
+
+  constructor(canvas, adapter, device) {
+    this.canvas = canvas;
+    this.adapter = adapter;
+    this.device = device;
+    this.queue = device.queue;
+    this.context = canvas.getContext("webgpu");
+    if (!this.context) {
+      throw new RendererFailure("surface_unavailable", "Canvas WebGPU context creation failed");
+    }
+    this.format = navigator.gpu.getPreferredCanvasFormat();
+    this.instanceBuffer = null;
+    this.visibleBuffer = null;
+    this.instanceBufferBytes = 0;
+    this.visibleBufferBytes = 0;
+    this.visibleCount = 0;
+    this.lastDpr = 1;
+    this.validationErrors = 0;
+    this.lastError = null;
+    this.metrics = {
+      draw_calls: 0,
+      batches: 0,
+      submitted_instances: 0,
+      buffer_count: 3,
+      buffer_bytes: 0,
+      upload_calls: 0,
+      frame_upload_bytes: 0,
+      render_submit_ms: 0,
+      frame_ms: 0,
+      validation_errors: 0,
+      frame_sequence: 0,
+      gpu_encode_attempted: 0,
+      gpu_encode_omitted: 0,
+      instance_upload_bytes: 0,
+      visible_slot_upload_bytes: 0,
+      allocation_growth_count: 0,
+    };
+    this.adapterInfo = adapter.info ?? {};
+    this.deviceLabel = device.label || "Phase 0D WebGPU device";
+    this.backend = "browser-webgpu (implementation backend not exposed by Web API)";
+    this.device.lost.then((info) => {
+      this.lastError = {
+        code: "device_lost",
+        message: `${info.reason}: ${info.message}`,
+      };
+      globalThis.dispatchEvent?.(new CustomEvent("phase0d-renderer-error", { detail: this.lastError }));
+    });
+    this.device.addEventListener("uncapturederror", (event) => {
+      this.validationErrors += 1;
+      this.metrics.validation_errors = this.validationErrors;
+      this.lastError = { code: "gpu_validation_error", message: event.error.message };
+    });
+    this.initializePipeline();
+  }
+
+  initializePipeline() {
+    this.device.pushErrorScope("validation");
+    const shader = this.device.createShaderModule({
+      label: "Phase 0D geometry-aware shader",
+      code: SHADER_SOURCE,
+    });
+    this.bindGroupLayout = this.device.createBindGroupLayout({
+      label: "Phase 0D bind group layout",
+      entries: [
+        {
+          binding: 0,
+          visibility: GPUShaderStage.VERTEX,
+          buffer: { type: "read-only-storage" },
+        },
+        {
+          binding: 1,
+          visibility: GPUShaderStage.VERTEX,
+          buffer: { type: "read-only-storage" },
+        },
+        {
+          binding: 2,
+          visibility: GPUShaderStage.VERTEX,
+          buffer: { type: "uniform" },
+        },
+      ],
+    });
+    const layout = this.device.createPipelineLayout({ bindGroupLayouts: [this.bindGroupLayout] });
+    this.pipeline = this.device.createRenderPipeline({
+      label: "Phase 0D instanced rectangle and ellipse pipeline",
+      layout,
+      vertex: { module: shader, entryPoint: "vs_main" },
+      fragment: {
+        module: shader,
+        entryPoint: "fs_main",
+        targets: [
+          {
+            format: this.format,
+            blend: {
+              color: { srcFactor: "src-alpha", dstFactor: "one-minus-src-alpha", operation: "add" },
+              alpha: { srcFactor: "one", dstFactor: "one-minus-src-alpha", operation: "add" },
+            },
+          },
+        ],
+      },
+      primitive: { topology: "triangle-list" },
+    });
+    this.viewBuffer = this.device.createBuffer({
+      label: "Phase 0D view uniform",
+      size: 32,
+      usage: GPU.UNIFORM | GPU.COPY_DST,
+    });
+    this.ensureInstanceBuffer(INSTANCE_STRIDE);
+    this.ensureVisibleBuffer(4);
+    this.configureSurface();
+    this.device.popErrorScope().then((error) => {
+      if (error) {
+        this.validationErrors += 1;
+        this.metrics.validation_errors = this.validationErrors;
+        this.lastError = { code: "pipeline_validation_error", message: error.message };
+      }
+    });
+  }
+
+  capabilities() {
+    return {
+      available: true,
+      adapter: this.adapterInfo.description || this.adapterInfo.architecture || "WebGPU adapter (privacy-redacted)",
+      vendor: this.adapterInfo.vendor || "privacy-redacted",
+      architecture: this.adapterInfo.architecture || "privacy-redacted",
+      device: this.deviceLabel,
+      backend: this.backend,
+      format: this.format,
+    };
+  }
+
+  configureSurface() {
+    try {
+      this.context.configure({
+        device: this.device,
+        format: this.format,
+        alphaMode: "opaque",
+      });
+    } catch (error) {
+      throw new RendererFailure(
+        "surface_configuration_failed",
+        error instanceof Error ? error.message : String(error),
+      );
+    }
+  }
+
+  resize(width, height, dpr) {
+    this.lastDpr = dpr;
+    const physicalWidth = Math.max(1, Math.round(width * dpr));
+    const physicalHeight = Math.max(1, Math.round(height * dpr));
+    if (this.canvas.width !== physicalWidth || this.canvas.height !== physicalHeight) {
+      this.canvas.width = physicalWidth;
+      this.canvas.height = physicalHeight;
+      this.configureSurface();
+    }
+  }
+
+  ensureInstanceBuffer(byteLength) {
+    const required = Math.max(INSTANCE_STRIDE, Math.ceil(byteLength / 4) * 4);
+    if (this.instanceBuffer && this.instanceBufferBytes >= required) return;
+    const previous = this.instanceBuffer;
+    const previousBytes = this.instanceBufferBytes;
+    const next = this.device.createBuffer({
+      label: "Phase 0D instance storage",
+      size: required,
+      usage: GPU.STORAGE | GPU.COPY_DST | GPU.COPY_SRC,
+    });
+    if (previous && previousBytes > 0) {
+      const encoder = this.device.createCommandEncoder({ label: "Phase 0D buffer growth copy" });
+      encoder.copyBufferToBuffer(previous, 0, next, 0, Math.min(previousBytes, required));
+      this.queue.submit([encoder.finish()]);
+      previous.destroy();
+    }
+    this.instanceBuffer = next;
+    this.instanceBufferBytes = required;
+    this.metrics.allocation_growth_count += 1;
+    this.rebuildBindGroup();
+  }
+
+  ensureVisibleBuffer(byteLength) {
+    const required = Math.max(4, Math.ceil(byteLength / 4) * 4);
+    if (this.visibleBuffer && this.visibleBufferBytes >= required) return;
+    this.visibleBuffer?.destroy();
+    this.metrics.allocation_growth_count += 1;
+    this.visibleBuffer = this.device.createBuffer({
+      label: "Phase 0D visible slot storage",
+      size: required,
+      usage: GPU.STORAGE | GPU.COPY_DST,
+    });
+    this.visibleBufferBytes = required;
+    this.rebuildBindGroup();
+  }
+
+  rebuildBindGroup() {
+    if (!this.instanceBuffer || !this.visibleBuffer || !this.viewBuffer || !this.bindGroupLayout) return;
+    this.bindGroup = this.device.createBindGroup({
+      label: "Phase 0D render bind group",
+      layout: this.bindGroupLayout,
+      entries: [
+        { binding: 0, resource: { buffer: this.instanceBuffer } },
+        { binding: 1, resource: { buffer: this.visibleBuffer } },
+        { binding: 2, resource: { buffer: this.viewBuffer } },
+      ],
+    });
+  }
+
+  upload(response, payload) {
+    if (response.render_binary_schema_version !== RENDER_BINARY_SCHEMA_VERSION) {
+      throw new RendererFailure(
+        "render_schema_version_mismatch",
+        "Engine response render schema does not match the browser renderer",
+      );
+    }
+    if (
+      response.resources.instance_stride_bytes !== INSTANCE_STRIDE ||
+      response.resources.dirty_record_stride_bytes !== DIRTY_STRIDE
+    ) {
+      throw new RendererFailure(
+        "render_schema_layout_mismatch",
+        "Engine response binary strides do not match the browser renderer",
+      );
+    }
+    let calls = 0;
+    let bytes = 0;
+    const capacityBytes = Math.max(INSTANCE_STRIDE, response.resources.instance_capacity * INSTANCE_STRIDE);
+    this.ensureInstanceBuffer(capacityBytes);
+
+    if (payload.fullInstances) {
+      const data = new Uint8Array(payload.fullInstances);
+      this.queue.writeBuffer(this.instanceBuffer, 0, data);
+      calls += 1;
+      bytes += data.byteLength;
+    }
+    if (payload.dirtyInstances) {
+      const data = new Uint8Array(payload.dirtyInstances);
+      if (data.byteLength % DIRTY_STRIDE !== 0) {
+        throw new RendererFailure("invalid_render_delta", "Dirty instance payload has an invalid stride");
+      }
+      const view = new DataView(data.buffer, data.byteOffset, data.byteLength);
+      for (let offset = 0; offset < data.byteLength; offset += DIRTY_STRIDE) {
+        const slot = view.getUint32(offset, true);
+        this.queue.writeBuffer(
+          this.instanceBuffer,
+          slot * INSTANCE_STRIDE,
+          new Uint8Array(data.buffer, data.byteOffset + offset + 4, INSTANCE_STRIDE),
+        );
+        calls += 1;
+        bytes += INSTANCE_STRIDE;
+      }
+    }
+    if (payload.removedSlots) {
+      const zero = new Uint8Array(INSTANCE_STRIDE);
+      for (const slot of new Uint32Array(payload.removedSlots)) {
+        this.queue.writeBuffer(this.instanceBuffer, slot * INSTANCE_STRIDE, zero);
+        calls += 1;
+        bytes += INSTANCE_STRIDE;
+      }
+    }
+    if (payload.visibleSlots) {
+      const visible = new Uint32Array(payload.visibleSlots);
+      this.ensureVisibleBuffer(Math.max(4, visible.byteLength));
+      if (visible.byteLength > 0) {
+        this.queue.writeBuffer(this.visibleBuffer, 0, visible);
+        calls += 1;
+        bytes += visible.byteLength;
+      }
+      this.visibleCount = visible.length;
+    }
+
+    const [centerXHigh, centerXLow] = splitF64(response.camera.center[0]);
+    const [centerYHigh, centerYLow] = splitF64(response.camera.center[1]);
+    const view = new Float32Array([
+      centerXHigh,
+      centerYHigh,
+      centerXLow,
+      centerYLow,
+      response.camera.viewport[0],
+      response.camera.viewport[1],
+      response.camera.zoom,
+      0,
+    ]);
+    this.queue.writeBuffer(this.viewBuffer, 0, view);
+    calls += 1;
+    bytes += view.byteLength;
+    this.metrics.upload_calls = calls;
+    this.metrics.frame_upload_bytes = bytes;
+    this.metrics.gpu_encode_attempted = response.metrics.gpu_encode_attempted;
+    this.metrics.gpu_encode_omitted = response.metrics.gpu_encode_omitted;
+    this.metrics.instance_upload_bytes = response.metrics.instance_upload_bytes;
+    this.metrics.visible_slot_upload_bytes = response.metrics.visible_slot_upload_bytes;
+  }
+
+  async render() {
+    const started = performance.now();
+    this.device.pushErrorScope("validation");
+    let textureView;
+    try {
+      textureView = this.context.getCurrentTexture().createView();
+    } catch (error) {
+      this.configureSurface();
+      try {
+        textureView = this.context.getCurrentTexture().createView();
+      } catch (secondError) {
+        throw new RendererFailure(
+          "surface_lost_or_outdated",
+          secondError instanceof Error ? secondError.message : String(secondError),
+        );
+      }
+    }
+    const encoder = this.device.createCommandEncoder({ label: "Phase 0D frame encoder" });
+    const pass = encoder.beginRenderPass({
+      label: "Phase 0D frame pass",
+      colorAttachments: [
+        {
+          view: textureView,
+          clearValue: { r: 0.035, g: 0.055, b: 0.08, a: 1 },
+          loadOp: "clear",
+          storeOp: "store",
+        },
+      ],
+    });
+    if (this.visibleCount > 0) {
+      pass.setPipeline(this.pipeline);
+      pass.setBindGroup(0, this.bindGroup);
+      pass.draw(6, this.visibleCount);
+    }
+    pass.end();
+    this.queue.submit([encoder.finish()]);
+    const validation = await this.device.popErrorScope();
+    if (validation) {
+      this.validationErrors += 1;
+      this.metrics.validation_errors = this.validationErrors;
+      throw new RendererFailure("gpu_validation_error", validation.message);
+    }
+    this.metrics.draw_calls = this.visibleCount > 0 ? 1 : 0;
+    this.metrics.batches = this.visibleCount > 0 ? 1 : 0;
+    this.metrics.submitted_instances = this.visibleCount;
+    this.metrics.buffer_bytes = this.instanceBufferBytes + this.visibleBufferBytes + 32;
+    this.metrics.render_submit_ms = performance.now() - started;
+    return this.metrics;
+  }
+
+  async readPixel(x, y) {
+    const physicalX = Math.floor(x * this.lastDpr);
+    const physicalY = Math.floor(y * this.lastDpr);
+    if (
+      !Number.isInteger(physicalX) ||
+      !Number.isInteger(physicalY) ||
+      physicalX < 0 ||
+      physicalY < 0 ||
+      physicalX >= this.canvas.width ||
+      physicalY >= this.canvas.height
+    ) {
+      throw new RendererFailure("pixel_out_of_bounds", "Readback pixel is outside the render target");
+    }
+    const texture = this.device.createTexture({
+      label: "Phase 0D-R1 pixel proof target",
+      size: {
+        width: this.canvas.width,
+        height: this.canvas.height,
+        depthOrArrayLayers: 1,
+      },
+      format: this.format,
+      usage: TEXTURE_USAGE.RENDER_ATTACHMENT | TEXTURE_USAGE.COPY_SRC,
+    });
+    const readback = this.device.createBuffer({
+      label: "Phase 0D-R1 pixel proof readback",
+      size: 256,
+      usage: GPU.COPY_DST | GPU.MAP_READ,
+    });
+    this.device.pushErrorScope("validation");
+    const encoder = this.device.createCommandEncoder({
+      label: "Phase 0D-R1 pixel proof encoder",
+    });
+    const pass = encoder.beginRenderPass({
+      label: "Phase 0D-R1 pixel proof pass",
+      colorAttachments: [
+        {
+          view: texture.createView(),
+          clearValue: { r: 0.035, g: 0.055, b: 0.08, a: 1 },
+          loadOp: "clear",
+          storeOp: "store",
+        },
+      ],
+    });
+    if (this.visibleCount > 0) {
+      pass.setPipeline(this.pipeline);
+      pass.setBindGroup(0, this.bindGroup);
+      pass.draw(6, this.visibleCount);
+    }
+    pass.end();
+    encoder.copyTextureToBuffer(
+      {
+        texture,
+        origin: { x: physicalX, y: physicalY, z: 0 },
+      },
+      {
+        buffer: readback,
+        bytesPerRow: 256,
+        rowsPerImage: 1,
+      },
+      {
+        width: 1,
+        height: 1,
+        depthOrArrayLayers: 1,
+      },
+    );
+    this.queue.submit([encoder.finish()]);
+    await readback.mapAsync(MAP_MODE.READ);
+    const raw = new Uint8Array(readback.getMappedRange()).slice(0, 4);
+    readback.unmap();
+    readback.destroy();
+    texture.destroy();
+    const validation = await this.device.popErrorScope();
+    if (validation) {
+      this.validationErrors += 1;
+      this.metrics.validation_errors = this.validationErrors;
+      throw new RendererFailure("gpu_validation_error", validation.message);
+    }
+    const rgba = this.format.startsWith("bgra")
+      ? [raw[2], raw[1], raw[0], raw[3]]
+      : [...raw];
+    return { x, y, physical_x: physicalX, physical_y: physicalY, format: this.format, rgba };
+  }
+
+  async applyEngineFrame(response, payload) {
+    const started = performance.now();
+    this.resize(response.camera.viewport[0], response.camera.viewport[1], response.camera.dpr);
+    this.upload(response, payload);
+    await this.render();
+    this.metrics.frame_ms = performance.now() - started;
+    this.metrics.frame_sequence = response.engine_sequence;
+    return { ...this.metrics };
+  }
+}

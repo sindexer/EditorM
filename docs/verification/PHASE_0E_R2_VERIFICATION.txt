@@ -1,0 +1,578 @@
+Phase 0E-R2 final verification
+generated_at_utc=2026-08-11T03:01:03.5961232Z
+prior_evidence_policy=R2-only outputs; Phase 0D/0D-R1-P1/0E/0E-R1 evidence is not written
+
+=== Rust fmt ===
+working_directory=C:\Users\thdwl\Documents\Codex\WebEditor
+command=powershell -NoProfile -ExecutionPolicy Bypass -File tools/cargo.ps1 fmt --all -- --check
+started_at_utc=2026-08-11T03:01:03.6191216Z
+exit_code=0
+finished_at_utc=2026-08-11T03:01:05.5875895Z
+
+=== Rust clippy ===
+working_directory=C:\Users\thdwl\Documents\Codex\WebEditor
+command=powershell -NoProfile -ExecutionPolicy Bypass -File tools/cargo.ps1 clippy --workspace --all-targets -- -D warnings
+started_at_utc=2026-08-11T03:01:05.6195585Z
+    Checking visual_authoring_runtime v0.1.0 (C:\Users\thdwl\Documents\Codex\WebEditor\crates\runtime)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.90s
+exit_code=0
+finished_at_utc=2026-08-11T03:01:09.0193939Z
+
+=== Rust debug build ===
+working_directory=C:\Users\thdwl\Documents\Codex\WebEditor
+command=powershell -NoProfile -ExecutionPolicy Bypass -File tools/cargo.ps1 build --workspace --all-targets
+started_at_utc=2026-08-11T03:01:09.0294204Z
+   Compiling visual_authoring_runtime v0.1.0 (C:\Users\thdwl\Documents\Codex\WebEditor\crates\runtime)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 3.80s
+exit_code=0
+finished_at_utc=2026-08-11T03:01:13.9499535Z
+
+=== Rust debug all-target tests ===
+working_directory=C:\Users\thdwl\Documents\Codex\WebEditor
+command=powershell -NoProfile -ExecutionPolicy Bypass -File tools/cargo.ps1 test --workspace --all-targets
+started_at_utc=2026-08-11T03:01:13.9610260Z
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.93s
+     Running unittests src\lib.rs (target\debug\deps\visual_authoring_core_math-9cfe84165483be94.exe)
+
+running 12 tests
+test tests::identity_preserves_points_and_vectors ... ok
+test tests::inverse_preserves_valid_large_magnitude_transforms ... ok
+test tests::inverse_rejects_non_finite_determinant_without_panicking ... ok
+test tests::negative_scale_is_invertible ... ok
+test tests::inverse_rejects_non_finite_inverse_translation_without_panicking ... ok
+test tests::rotation_and_scale_compose_in_declared_order ... ok
+test tests::translation_does_not_affect_vectors ... ok
+test tests::transformed_rect_contains_all_transformed_corners ... ok
+test tests::singular_matrices_fail_inversion_safely ... ok
+test tests::uniform_scale_affects_both_axes_equally ... ok
+test tests::finite_inputs_never_produce_a_non_finite_inverse ... ok
+test tests::combined_affine_round_trip_is_stable ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+     Running unittests src\lib.rs (target\debug\deps\visual_authoring_document-0dfc739d62a2bcc4.exe)
+
+running 49 tests
+test change_tests::document_replacement_reports_full_reset_and_clears_history ... ok
+test change_tests::command_outcomes_classify_scene_relevant_and_irrelevant_properties ... ok
+test change_tests::reorder_report_contains_before_after_placement_and_subtree ... ok
+test change_tests::transaction_rollback_reports_reverse_semantic_changes_and_revision ... ok
+test editor::tests::duplicate_create_and_invalid_container_are_atomic ... ok
+test editor::tests::divergent_edit_after_undo_invalidates_redo_branch ... ok
+test editor::tests::document_replacement_clears_history_and_sanitizes_selection_atomically ... ok
+test change_tests::undo_redo_reports_correct_insert_remove_direction_without_exposing_effects ... ok
+test editor::tests::empty_nested_and_history_transaction_policies_are_explicit ... ok
+test editor::tests::delete_undo_restores_complete_subtree_ids_data_and_order ... ok
+test editor::tests::all_command_effects_round_trip_initial_and_final_snapshots ... ok
+test editor::tests::failed_transaction_update_keeps_prior_preview_consistent ... ok
+test editor::tests::every_command_family_reports_typed_errors_without_partial_mutation ... ok
+test editor::tests::failed_world_preserving_command_with_extreme_finite_values_is_atomic ... ok
+test editor::tests::invalid_replacement_and_replacement_during_transaction_preserve_document ... ok
+test editor::tests::locked_descendant_prevents_ancestor_subtree_deletion ... ok
+test editor::tests::locked_nodes_are_selectable_but_edits_follow_explicit_ancestor_policy ... ok
+test editor::tests::non_finite_and_extreme_numeric_commands_never_partially_mutate_or_panic ... ok
+test editor::tests::locked_parent_blocks_create_and_reparent_commands_atomically ... ok
+test editor::tests::one_hundred_twenty_eight_drag_updates_commit_as_one_history_step ... ok
+test editor::tests::revision_overflow_is_typed_and_atomic_across_all_mutation_paths ... ok
+test editor::tests::selection_order_toggle_primary_and_missing_id_policy_are_explicit ... ok
+test editor::tests::same_parent_reorder_undo_and_redo_preserve_exact_child_order ... ok
+test editor::tests::transaction_rollback_restores_exact_semantic_state ... ok
+test editor::tests::typed_commands_cover_all_persistent_mutation_families ... ok
+test editor::tests::world_preserving_reparent_is_exactly_undoable_and_redoable ... ok
+test tests::cycles_are_prevented_without_partial_mutation ... ok
+test tests::attach_detach_and_child_order_are_explicit ... ok
+test tests::delete_semantics_remove_the_complete_subtree ... ok
+test tests::duplicate_ids_are_rejected ... ok
+test tests::ellipse_bounds_avoid_intermediate_square_overflow ... ok
+test tests::failed_world_preserving_reparent_is_atomic ... ok
+test tests::invalid_geometry_is_rejected_at_registration ... ok
+test tests::invariant_checker_catches_deliberately_corrupted_fixture ... ok
+test tests::local_world_local_round_trip_handles_rotation_and_non_uniform_scale ... ok
+test tests::nested_finite_local_transforms_report_composition_overflow ... ok
+test tests::nested_world_transform_uses_parent_times_local ... ok
+test tests::generated_ids_are_unique_and_map_friendly ... ok
+test tests::non_finite_coordinate_results_are_typed_errors ... ok
+test tests::non_finite_rectangle_and_ellipse_bounds_are_typed_errors ... ok
+test tests::non_orthogonal_ellipse_bounds_are_tighter_than_rectangle_bounds ... ok
+test tests::rectangle_and_ellipse_world_bounds_are_geometry_aware ... ok
+test tests::reparent_can_preserve_world_transform ... ok
+test tests::reparent_within_the_same_parent_reorders_children ... ok
+test tests::singular_world_transform_has_recoverable_failure ... ok
+test tests::ten_level_hierarchy_resolves_correctly ... ok
+test order_sequence::tests::rank_insert_remove_match_dense_oracle_without_dense_rewrites ... ok
+test editor::tests::randomized_property_command_sequences_undo_and_redo_exactly ... ok
+test tests::deep_subtree_deletion_is_iterative_and_preserves_siblings ... ok
+
+test result: ok. 49 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.35s
+
+     Running tests\phase0e_group.rs (target\debug\deps\phase0e_group-f05e48091f3a131b.exe)
+
+running 3 tests
+test failed_group_preserves_document_and_history ... ok
+test internal_group_restoration_survives_sibling_insert_delete_and_reorder ... ok
+test group_and_ungroup_are_atomic_single_history_entries ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src\lib.rs (target\debug\deps\visual_authoring_render_model-0a292b70731c3b12.exe)
+
+running 7 tests
+test tests::build_tracks_primitives_by_node_id_with_stable_slots ... ok
+test tests::culling_excludes_offscreen_items_and_wide_view_returns_all ... ok
+test tests::one_transform_change_updates_one_slot_without_full_rebuild ... ok
+test tests::unencodable_translation_is_omitted_and_recovers_same_slot_incrementally ... ok
+test tests::f32_range_geometry_and_linear_transform_are_typed_omissions ... ok
+test tests::deleted_slot_is_reused_without_duplicates ... ok
+test tests::incremental_counters_match_a_scanning_oracle ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running unittests src\lib.rs (target\debug\deps\visual_authoring_renderer_wgpu-54c1762565e06fa8.exe)
+
+running 5 tests
+test tests::dirty_slots_are_coalesced_without_full_buffer_semantics ... ok
+test tests::non_finite_or_unrepresentable_values_fail_at_gpu_boundary ... ok
+test tests::ellipse_and_rectangle_have_distinct_shader_primitive_flags ... ok
+test tests::high_low_translation_split_preserves_large_world_offset ... ok
+test tests::shared_shader_and_binary_schema_match_native_layout ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running unittests src\lib.rs (target\debug\deps\visual_authoring_runtime-f4657b9402ca650c.exe)
+
+running 51 tests
+test tests::camera_fit_bounds_respects_padding ... ok
+test tests::camera_dpr_conversion_is_explicit ... ok
+test tests::camera_pan_moves_world_center_opposite_viewport_delta ... ok
+test tests::camera_resize_and_dpr_validation_preserve_prior_state_on_error ... ok
+test tests::camera_changes_do_not_mutate_document_or_history ... ok
+test tests::camera_world_viewport_round_trip_is_stable ... ok
+test tests::appearance_dirty_is_tracked_without_transform_or_bounds_recompute ... ok
+test tests::camera_culling_changes_visible_set_without_document_scene_or_render_revision ... ok
+test tests::camera_zoom_around_pointer_preserves_world_point ... ok
+test tests::attach_detach_and_reparent_update_attached_and_world_state ... ok
+test tests::delete_undo_redo_restore_scene_and_spatial_entries ... ok
+test tests::ellipse_aabb_corner_is_not_an_exact_hit ... ok
+test tests::failed_rollback_at_revision_limit_keeps_preview_scene_and_render_intact ... ok
+test tests::fresh_scene_rebuild_matches_document_meaning ... ok
+test tests::full_document_replacement_does_not_use_incremental_fallback ... ok
+test tests::geometry_dirty_updates_one_spatial_entry ... ok
+test tests::eight_overlapping_siblings_keep_exact_order_and_hit_test_across_reorder_undo_redo ... ok
+test tests::group_and_frame_keep_own_and_subtree_bounds_distinct ... ok
+test tests::hidden_and_detached_nodes_are_not_hit ... ok
+test tests::invalid_camera_input_and_non_finite_results_are_typed ... ok
+test tests::incremental_transform_matches_fresh_rebuild ... ok
+test tests::invalid_fit_bounds_are_rejected_atomically ... ok
+test tests::irrelevant_properties_trigger_no_derived_or_spatial_work ... ok
+test tests::locked_nodes_remain_hittable ... ok
+test tests::metadata_type_remains_persistent_only ... ok
+test tests::nested_invisible_ancestor_blocks_hits_until_restored ... ok
+test tests::non_finite_derived_world_is_recorded_and_excluded_from_spatial_index ... ok
+test tests::overlapping_nodes_resolve_topmost_from_child_order ... ok
+test tests::rectangle_spatial_query_uses_index_and_document_order ... ok
+test tests::render_delta_is_incremental_and_replacement_is_an_explicit_full_rebuild ... ok
+test tests::reorder_undo_redo_change_topmost_without_dense_scene_reindex ... ok
+test tests::replacement_with_detached_subtree_keeps_records_but_not_index_entries ... ok
+test tests::rotated_non_uniform_negative_scale_ellipse_hits_in_local_space ... ok
+test tests::rotated_non_uniform_negative_scale_rectangle_hits_in_local_space ... ok
+test tests::revision_exhaustion_preserves_document_scene_render_history_and_selection ... ok
+test tests::runtime_scene_camera_and_metrics_are_not_serialized ... ok
+test tests::scene_metrics_revisions_match_after_every_successful_mutation ... ok
+test tests::singular_zero_size_and_extreme_transforms_are_non_hittable_without_panic ... ok
+test tests::transform_dirty_visits_only_target_subtree_and_ancestors ... ok
+test tests::transaction_rollback_restores_scene_exactly ... ok
+test tests::transaction_preview_and_commit_do_not_repeat_scene_work ... ok
+test tests::visibility_dirty_removes_and_restores_descendant_spatial_entries ... ok
+test tests::undo_and_redo_keep_scene_equal_to_rebuild ... ok
+test tests::deterministic_command_sequence_matches_rebuild_oracle ... ok
+test tests::world_preserving_reparent_stays_synchronized ... ok
+test tests::hit_test_reports_index_candidates_and_exact_tests ... ok
+test tests::document_replacement_rebuilds_and_synchronizes_revision ... ok
+test tests::bench_d_deep_hierarchy_build_is_iterative ... ok
+test tests::leaf_bounds_change_does_not_scan_ten_thousand_siblings ... ok
+test tests::bench_b_dirty_proof_meets_structural_thresholds ... ok
+test tests::bench_c_spatial_candidate_proof_avoids_full_scan ... ok
+
+test result: ok. 51 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 36.98s
+
+     Running unittests src\bin\phase0c_proof.rs (target\debug\deps\phase0c_proof-5a03b534e19287b1.exe)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src\bin\phase0d_proof.rs (target\debug\deps\phase0d_proof-bc31566494bbd059.exe)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src\bin\phase0d_r1_proof.rs (target\debug\deps\phase0d_r1_proof-88bd87ae01d5e52e.exe)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src\bin\phase0e_proof.rs (target\debug\deps\phase0e_proof-d3a26e97c66409e4.exe)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\phase0e_r1_structure.rs (target\debug\deps\phase0e_r1_structure-54d7c16c30c28684.exe)
+
+running 2 tests
+test group_ungroup_first_middle_last_are_bounded_at_10k ... ok
+test group_ungroup_first_middle_last_are_bounded_at_100k ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 38.25s
+
+     Running tests\phase0e_r2_bounded.rs (target\debug\deps\phase0e_r2_bounded-f772bb208146999b.exe)
+
+running 1 test
+test native_release_r2_structural_work_is_bounded_at_10k_and_100k has been running for over 60 seconds
+test native_release_r2_structural_work_is_bounded_at_10k_and_100k ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 778.00s
+
+     Running tests\phase0e_r2_order_accuracy.rs (target\debug\deps\phase0e_r2_order_accuracy-f21bd7556ce79832.exe)
+
+running 1 test
+test eight_overlapping_siblings_match_document_scene_hit_order_and_persistence ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests\phase0e_r2_work_probe.rs (target\debug\deps\phase0e_r2_work_probe-49bfed136a54234b.exe)
+
+running 1 test
+test print_phase0e_r2_work_probe ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 35.83s
+
+     Running unittests src\lib.rs (target\debug\deps\visual_authoring_scene-b8e4b1a229cbf685.exe)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src\lib.rs (target\debug\deps\visual_authoring_serialization-e46d61353073f233.exe)
+
+running 12 tests
+test tests::failed_load_preserves_editor_and_successful_replacement_resets_session_policy ... ok
+test tests::cyclic_hierarchy_data_is_rejected ... ok
+test tests::child_order_persists ... ok
+test tests::editor_session_history_selection_and_transaction_are_not_serialized ... ok
+test tests::envelope_is_explicit_and_versioned ... ok
+test tests::dangling_parent_data_is_rejected ... ok
+test tests::reordered_child_order_persists_after_save_and_load ... ok
+test tests::duplicate_ids_are_rejected_during_load ... ok
+test tests::stable_ids_and_semantics_survive_round_trip ... ok
+test tests::save_load_save_is_semantically_and_textually_stable ... ok
+test tests::unsupported_format_and_version_are_rejected ... ok
+test tests::group_restoration_round_trip_survives_sibling_edits_before_ungroup ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests\phase0e_r1_group_positions.rs (target\debug\deps\phase0e_r1_group_positions-898d58a3af9ffb2d.exe)
+
+running 1 test
+test noncontiguous_group_positions_survive_save_load_and_ungroup ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src\lib.rs (target\debug\deps\visual_authoring_spatial-057cc5d9e6afc111.exe)
+
+running 11 tests
+test tests::rebuild_is_atomic_and_clear_empties_all_storage ... ok
+test rtree::tests::mixed_sizes_dense_and_large_geometry_share_one_tree ... ok
+test tests::insert_update_remove_and_count_are_exact ... ok
+test tests::rectangle_query_returns_only_intersecting_aabb_candidates ... ok
+test rtree::tests::non_finite_queries_remain_typed_errors ... ok
+test tests::non_finite_bounds_and_excessive_queries_are_typed_errors ... ok
+test rtree::tests::rebuild_and_mutation_errors_are_atomic ... ok
+test tests::randomized_queries_match_test_only_brute_force_oracle ... ok
+test rtree::tests::extreme_zoom_out_returns_all_visible_entries_without_query_too_large ... ok
+test rtree::tests::repeated_insert_update_remove_matches_brute_force_oracle ... ok
+test rtree::tests::sparse_one_hundred_thousand_fixture_prunes_narrow_query ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.22s
+
+     Running unittests src\lib.rs (target\debug\deps\visual_authoring_wasm_bridge-f626a44993f12773.exe)
+
+running 11 tests
+test tests::camera_changes_visibility_without_changing_any_revision ... ok
+test tests::failed_request_keeps_all_revisions_and_binary_state_unchanged ... ok
+test tests::initialization_returns_correlated_worker_state_and_binary_frame ... ok
+test tests::one_unencodable_item_in_multi_dirty_update_zeroes_only_its_record ... ok
+test tests::protocol_mismatch_is_a_typed_error_without_mutation ... ok
+test tests::command_updates_one_instance_and_undo_restores_through_runtime_history ... ok
+test tests::failed_transaction_rollback_returns_preview_to_original_state ... ok
+test tests::heartbeat_has_monotonic_sequence_and_zero_render_work ... ok
+test tests::unencodable_f64_command_succeeds_with_typed_omission_and_same_slot_recovery ... ok
+test tests::omission_round_trips_through_undo_redo_and_transaction_rollback ... ok
+test tests::phase0e_r2_direct_engine_host_is_bounded_at_10k_and_100k has been running for over 60 seconds
+test tests::phase0e_r2_direct_engine_host_is_bounded_at_10k_and_100k ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 153.00s
+
+     Running tests\phase0e_projection.rs (target\debug\deps\phase0e_projection-5fdbe991f47273d1.exe)
+
+running 3 tests
+test invalid_stable_id_command_preserves_revisions_and_has_no_projection_delta ... ok
+test stable_node_id_command_emits_one_node_ui_delta_and_selection_is_ephemeral ... ok
+test stable_id_group_and_ungroup_are_atomic_protocol_commands ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests\phase0e_r1_projection.rs (target\debug\deps\phase0e_r1_projection-55e924a71803c0cd.exe)
+
+running 1 test
+test hundred_k_group_ungroup_projection_is_versioned_bounded_and_fallback_free ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 55.43s
+
+exit_code=0
+finished_at_utc=2026-08-11T03:20:03.8154235Z
+
+=== Rust doctests ===
+working_directory=C:\Users\thdwl\Documents\Codex\WebEditor
+command=powershell -NoProfile -ExecutionPolicy Bypass -File tools/cargo.ps1 test --doc --workspace
+started_at_utc=2026-08-11T03:20:03.8234207Z
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.93s
+   Doc-tests visual_authoring_core_math
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests visual_authoring_document
+
+running 1 test
+test crates\document\src\editor.rs - editor::HeadlessEditorCore::document (line 229) - compile fail ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.21s
+
+   Doc-tests visual_authoring_render_model
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests visual_authoring_renderer_wgpu
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests visual_authoring_runtime
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests visual_authoring_scene
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests visual_authoring_serialization
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests visual_authoring_spatial
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests visual_authoring_wasm_bridge
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+exit_code=0
+finished_at_utc=2026-08-11T03:20:08.7180447Z
+
+=== Rust release build ===
+working_directory=C:\Users\thdwl\Documents\Codex\WebEditor
+command=powershell -NoProfile -ExecutionPolicy Bypass -File tools/cargo.ps1 build --release --workspace --all-targets
+started_at_utc=2026-08-11T03:20:08.7270388Z
+   Compiling visual_authoring_runtime v0.1.0 (C:\Users\thdwl\Documents\Codex\WebEditor\crates\runtime)
+    Finished `release` profile [optimized] target(s) in 3.68s
+exit_code=0
+finished_at_utc=2026-08-11T03:20:13.4741653Z
+
+=== Rust release WASM build ===
+working_directory=C:\Users\thdwl\Documents\Codex\WebEditor
+command=powershell -NoProfile -ExecutionPolicy Bypass -File tools/cargo.ps1 build --release --target wasm32-unknown-unknown
+started_at_utc=2026-08-11T03:20:13.4821666Z
+    Finished `release` profile [optimized] target(s) in 0.51s
+exit_code=0
+finished_at_utc=2026-08-11T03:20:15.0310443Z
+
+=== WASM bindgen packaging ===
+working_directory=C:\Users\thdwl\Documents\Codex\WebEditor
+command=powershell -NoProfile -ExecutionPolicy Bypass -File tools/build-phase0e-wasm.ps1
+started_at_utc=2026-08-11T03:20:15.0500438Z
+    Finished `release` profile [optimized] target(s) in 0.35s
+wasm=C:\Users\thdwl\Documents\Codex\WebEditor\target\wasm32-unknown-unknown\release\visual_authoring_wasm_bridge.wasm
+web_module=C:\Users\thdwl\Documents\Codex\WebEditor\web\editor\public\pkg
+phase0e_wasm=web/editor/public/pkg
+exit_code=0
+finished_at_utc=2026-08-11T03:20:18.1707272Z
+
+=== Native release structural benchmark ===
+working_directory=C:\Users\thdwl\Documents\Codex\WebEditor
+command=powershell -NoProfile -ExecutionPolicy Bypass -File tools/cargo.ps1 test --release -p visual_authoring_runtime --test phase0e_r2_bounded -- --nocapture
+started_at_utc=2026-08-11T03:20:18.1807538Z
+   Compiling visual_authoring_runtime v0.1.0 (C:\Users\thdwl\Documents\Codex\WebEditor\crates\runtime)
+    Finished `release` profile [optimized] target(s) in 3.36s
+     Running tests\phase0e_r2_bounded.rs (target\release\deps\phase0e_r2_bounded-0e97a6bc01ab86fe.exe)
+
+running 1 test
+test native_release_r2_structural_work_is_bounded_at_10k_and_100k has been running for over 60 seconds
+PHASE0E_R2_NATIVE_JSON={"all_passed":true,"fixtures":[{"measured_iterations":30,"node_count":10000,"operations":{"group":{"allocated_bytes_samples":[240,240,240,240,240,240,240,240,240,240,240,240,240,240,240,240,240,240,240,240,240,240,240,240,240,240,240,240,240,240],"executions_per_timing_sample":8,"max_allocated_bytes":240,"max_work":394,"median_ms":0.018349999999999998,"p95_ms":0.01985,"samples_ms":[0.0181625,0.018349999999999998,0.0177875,0.023587499999999997,0.0184625,0.01985,0.0185625,0.0190625,0.018375000000000002,0.0182625,0.0180875,0.018850000000000002,0.018412500000000002,0.018312500000000002,0.018525,0.018225,0.0182375,0.018274999999999996,0.0181875,0.018525,0.018325,0.018224999999999998,0.019,0.0181125,0.017875,0.018525000000000003,0.01785,0.0184125,0.017912500000000005,0.018537500000000002],"work_samples":[394,394,394,394,394,394,394,394,394,394,394,394,394,394,394,394,394,394,394,394,394,394,394,394,394,394,394,394,394,394]},"load_explicit_full_boundary":{"allocated_bytes_samples":[],"executions_per_timing_sample":1,"max_allocated_bytes":0,"max_work":0,"median_ms":104.3384,"p95_ms":162.3849,"samples_ms":[171.3416,104.7842,95.41919999999999,162.3849,129.2837,115.8234,102.22059999999999,106.8404,109.4406,102.9165,100.3327,97.0846,96.1614,105.0006,94.318,104.3384,101.756,108.193,91.5449,101.5304,97.39250000000001,99.1792,94.6645,125.59429999999999,91.6737,131.9588,111.5822,132.5729,104.2668,111.3164],"work_samples":[]},"loaded_ungroup":{"allocated_bytes_samples":[160,160,160,160,160,160,160,160,160,160,160,160,160,160,160,160,160,160,160,160,160,160,160,160,160,160,160,160,160,160],"executions_per_timing_sample":1,"max_allocated_bytes":160,"max_work":190,"median_ms":0.036399999999999995,"p95_ms":0.0494,"samples_ms":[0.0385,0.0393,0.0361,0.0354,0.0373,0.038099999999999995,0.0384,0.036399999999999995,0.0494,0.045399999999999996,0.0427,0.0462,0.0357,0.0386,0.0382,0.050800000000000005,0.0353,0.0336,0.034499999999999996,0.0348,0.0303,0.030000000000000002,0.0337,0.0326,0.0356,0.0334,0.034,0.0373,0.0419,0.035800000000000005],"work_samples":[190,190,190,190,190,190,190,190,190,190,190,190,190,190,190,190,190,190,190,190,190,190,190,190,190,190,190,190,190,190]},"redo":{"allocated_bytes_samples":[240,240,240,240,240,240,240,240,240,240,240,240,240,240,240,240,240,240,240,240,240,240,240,240,240,240,240,240,240,240],"executions_per_timing_sample":8,"max_allocated_bytes":240,"max_work":309,"median_ms":0.0134,"p95_ms":0.016025,"samples_ms":[0.013900000000000001,0.0134375,0.0132625,0.017212500000000002,0.013437499999999998,0.016025,0.01345,0.013437500000000002,0.0133625,0.014199999999999999,0.0134,0.01335,0.0133875,0.013300000000000001,0.01345,0.0133375,0.013325000000000002,0.013837499999999999,0.0133125,0.013375,0.015375,0.013374999999999998,0.013600000000000001,0.013875,0.013300000000000003,0.01335,0.013262500000000002,0.013300000000000001,0.0133,0.0134],"work_samples":[309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309]},"save_explicit_full_boundary":{"allocated_bytes_samples":[],"executions_per_timing_sample":1,"max_allocated_bytes":0,"max_work":0,"median_ms":38.3464,"p95_ms":62.0544,"samples_ms":[33.8655,34.1252,46.123999999999995,37.3921,35.2019,73.11030000000001,60.0667,43.0042,34.2094,50.7696,42.1182,62.0544,46.4473,47.9623,60.3543,40.7369,36.5714,34.3013,34.013799999999996,35.1902,52.114,50.1418,37.1818,36.011500000000005,35.0345,34.195499999999996,33.696600000000004,33.8283,40.186,38.3464],"work_samples":[]},"sibling_insert_delete_reorder_then_ungroup":{"allocated_bytes_samples":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"executions_per_timing_sample":8,"max_allocated_bytes":0,"max_work":346,"median_ms":0.019075,"p95_ms":0.0517125,"samples_ms":[0.019049999999999997,0.018975000000000002,0.01895,0.018887499999999998,0.018912499999999995,0.019025,0.029287499999999994,0.019524999999999997,0.019025,0.019975,0.019874999999999997,0.020287499999999997,0.019000000000000003,0.0191,0.018925,0.01895,0.019075,0.019049999999999997,0.019074999999999998,0.020050000000000002,0.018962499999999997,0.019062500000000003,0.019200000000000002,0.0204625,0.01905,0.021712500000000003,0.15348749999999997,0.0517125,0.0502375,0.050137499999999995],"work_samples":[346,346,346,346,346,346,346,346,346,346,346,346,346,346,346,346,346,346,346,346,346,346,346,346,346,346,346,346,346,346]},"undo":{"allocated_bytes_samples":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"executions_per_timing_sample":8,"max_allocated_bytes":0,"max_work":233,"median_ms":0.0109375,"p95_ms":0.0116125,"samples_ms":[0.010875000000000001,0.011449999999999998,0.01095,0.015175,0.0109375,0.011237500000000001,0.011075,0.011049999999999999,0.011025,0.0109875,0.010925,0.010924999999999997,0.011037499999999999,0.0109,0.010924999999999999,0.010949999999999998,0.0109125,0.010999999999999998,0.0109375,0.0116125,0.010924999999999997,0.010875000000000001,0.011075,0.0109,0.010874999999999998,0.010925,0.010825000000000001,0.0109,0.010850000000000002,0.0110375],"work_samples":[233,233,233,233,233,233,233,233,233,233,233,233,233,233,233,233,233,233,233,233,233,233,233,233,233,233,233,233,233,233]},"ungroup":{"allocated_bytes_samples":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"executions_per_timing_sample":8,"max_allocated_bytes":0,"max_work":299,"median_ms":0.016512500000000003,"p95_ms":0.017575,"samples_ms":[0.016712499999999998,0.0162625,0.0162,0.0193,0.016612500000000002,0.0175625,0.016375,0.01655,0.016624999999999997,0.016362500000000002,0.016499999999999997,0.016212499999999998,0.016212499999999998,0.0170375,0.0162625,0.016737499999999995,0.0169625,0.016337499999999998,0.0161625,0.0168125,0.016325,0.017374999999999998,0.0173125,0.016349999999999996,0.016512500000000003,0.016649999999999998,0.016112500000000002,0.016212499999999998,0.0161875,0.017575],"work_samples":[299,299,299,299,299,299,299,299,299,299,299,299,299,299,299,299,299,299,299,299,299,299,299,299,299,299,299,299,299,299]}},"structural_executions_per_timing_sample":8,"targets":["00000000-0000-0000-0000-000000000002","00000000-0000-0000-0000-00000000138a","00000000-0000-0000-0000-000000002711"],"warmups":10},{"measured_iterations":30,"node_count":100000,"operations":{"group":{"allocated_bytes_samples":[240,240,240,240,240,240,240,240,240,240,240,240,240,240,240,240,240,240,240,240,240,240,240,240,240,240,240,240,240,240],"executions_per_timing_sample":8,"max_allocated_bytes":240,"max_work":484,"median_ms":0.0252375,"p95_ms":0.028375000000000004,"samples_ms":[0.024325,0.02605,0.027250000000000003,0.028375000000000004,0.0264125,0.023274999999999997,0.0252375,0.025012500000000003,0.023287500000000003,0.02715,0.023575,0.026675,0.0263125,0.0235,0.0230375,0.023887500000000002,0.023075,0.0236625,0.025887499999999997,0.025112499999999996,0.023475,0.025637499999999997,0.026612499999999997,0.027262499999999995,0.025887499999999997,0.023012499999999998,0.023,0.022899999999999997,0.028537499999999997,0.028350000000000004],"work_samples":[484,484,484,484,484,484,484,484,484,484,484,484,484,484,484,484,484,484,484,484,484,484,484,484,484,484,484,484,484,484]},"load_explicit_full_boundary":{"allocated_bytes_samples":[],"executions_per_timing_sample":1,"max_allocated_bytes":0,"max_work":0,"median_ms":1137.3048999999999,"p95_ms":1261.0779,"samples_ms":[1300.0559,1201.1362000000001,1181.5882,1196.6927,1048.237,1235.6614,1136.3702,1261.0779,1094.9146,1186.1098000000002,1107.3420999999998,1148.6508,1166.4568,1144.9758000000002,996.0667,1137.3048999999999,1127.0408,1154.5287,1194.0283,1166.204,1244.5028,1083.9289999999999,1101.5202,1116.3947,1046.9669999999999,1041.6402,1077.747,1063.4688,1058.23,1076.0417],"work_samples":[]},"loaded_ungroup":{"allocated_bytes_samples":[160,160,160,160,160,160,160,160,160,160,160,160,160,160,160,160,160,160,160,160,160,160,160,160,160,160,160,160,160,160],"executions_per_timing_sample":1,"max_allocated_bytes":160,"max_work":239,"median_ms":0.0497,"p95_ms":0.0691,"samples_ms":[0.0517,0.0479,0.0466,0.0472,0.0418,0.0553,0.0453,0.048,0.050800000000000005,0.0994,0.0488,0.0564,0.0497,0.0474,0.0465,0.0511,0.0475,0.0691,0.06430000000000001,0.047,0.0501,0.044700000000000004,0.0532,0.0494,0.0501,0.057800000000000004,0.049,0.0474,0.0507,0.0571],"work_samples":[239,239,239,239,239,239,239,239,239,239,239,239,239,239,239,239,239,239,239,239,239,239,239,239,239,239,239,239,239,239]},"redo":{"allocated_bytes_samples":[240,240,240,240,240,240,240,240,240,240,240,240,240,240,240,240,240,240,240,240,240,240,240,240,240,240,240,240,240,240],"executions_per_timing_sample":8,"max_allocated_bytes":240,"max_work":375,"median_ms":0.0175375,"p95_ms":0.0215625,"samples_ms":[0.0177625,0.017599999999999998,0.0175875,0.0215625,0.018125,0.0174125,0.0176375,0.017487499999999996,0.017425,0.0178875,0.018199999999999997,0.0174625,0.01785,0.01735,0.017225,0.017512499999999997,0.0173125,0.0172125,0.0173875,0.017349999999999997,0.01725,0.0205875,0.017575,0.0175375,0.017499999999999998,0.0171875,0.0177875,0.017312499999999998,0.023437500000000003,0.017662499999999998],"work_samples":[375,375,375,375,375,375,375,375,375,375,375,375,375,375,375,375,375,375,375,375,375,375,375,375,375,375,375,375,375,375]},"save_explicit_full_boundary":{"allocated_bytes_samples":[],"executions_per_timing_sample":1,"max_allocated_bytes":0,"max_work":0,"median_ms":457.3687,"p95_ms":507.34330000000006,"samples_ms":[468.63169999999997,434.8321,439.423,457.3687,488.2573,429.6643,450.5648,466.29350000000005,451.6895,479.72249999999997,460.2754,440.0536,403.6177,518.0460999999999,419.2862,439.27500000000003,507.34330000000006,442.2618,438.8578,440.6809,436.08639999999997,445.9519,501.42589999999996,496.06129999999996,481.2302,494.14950000000005,463.6767,469.77790000000005,473.74719999999996,439.1452],"work_samples":[]},"sibling_insert_delete_reorder_then_ungroup":{"allocated_bytes_samples":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"executions_per_timing_sample":8,"max_allocated_bytes":0,"max_work":448,"median_ms":0.0235625,"p95_ms":0.0277,"samples_ms":[0.0236875,0.023524999999999997,0.023575,0.027212499999999997,0.024437500000000004,0.023525,0.023962499999999998,0.023549999999999998,0.0234625,0.023450000000000006,0.0233875,0.023562500000000004,0.023474999999999996,0.0277,0.026537500000000002,0.0239125,0.023625,0.023774999999999998,0.03819999999999999,0.023725,0.023549999999999998,0.0235625,0.023525,0.0234125,0.0234625,0.0233875,0.023437500000000003,0.023549999999999998,0.0235125,0.0245125],"work_samples":[448,448,448,448,448,448,448,448,448,448,448,448,448,448,448,448,448,448,448,448,448,448,448,448,448,448,448,448,448,448]},"undo":{"allocated_bytes_samples":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"executions_per_timing_sample":8,"max_allocated_bytes":0,"max_work":288,"median_ms":0.015025,"p95_ms":0.019062500000000003,"samples_ms":[0.018625,0.015550000000000001,0.015387500000000002,0.015999999999999997,0.0151625,0.0149625,0.0158625,0.015025000000000002,0.014887500000000001,0.0158625,0.014937500000000001,0.015050000000000001,0.015,0.014862500000000002,0.0148625,0.015,0.0148625,0.0148,0.015300000000000001,0.0148375,0.014862499999999999,0.019062500000000003,0.015500000000000002,0.015725,0.015012500000000002,0.014712499999999998,0.014825000000000001,0.0148,0.019087500000000004,0.015025],"work_samples":[288,288,288,288,288,288,288,288,288,288,288,288,288,288,288,288,288,288,288,288,288,288,288,288,288,288,288,288,288,288]},"ungroup":{"allocated_bytes_samples":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"executions_per_timing_sample":8,"max_allocated_bytes":0,"max_work":371,"median_ms":0.021774999999999996,"p95_ms":0.0276625,"samples_ms":[0.021400000000000002,0.021425,0.0224625,0.0276625,0.021475,0.022387499999999998,0.021487500000000003,0.0236875,0.022224999999999998,0.021962500000000003,0.021549999999999996,0.022412500000000002,0.021437500000000005,0.0212875,0.0219875,0.0229625,0.028512499999999996,0.0211375,0.023425,0.021262499999999997,0.02115,0.024112500000000002,0.021375,0.025512499999999997,0.021462499999999995,0.0212125,0.021387499999999997,0.021774999999999996,0.026750000000000003,0.0214],"work_samples":[371,371,371,371,371,371,371,371,371,371,371,371,371,371,371,371,371,371,371,371,371,371,371,371,371,371,371,371,371,371]}},"structural_executions_per_timing_sample":8,"targets":["00000000-0000-0000-0000-000000000002","00000000-0000-0000-0000-00000000c352","00000000-0000-0000-0000-0000000186a1"],"warmups":10}],"layer":"native-release","phase":"0E-R2","ratios_100k_over_10k":{"group":{"median_time":1.375340599455041,"work_count":1.2284263959390862},"loaded_ungroup":{"median_time":1.3653846153846156,"work_count":1.2578947368421052},"redo":{"median_time":1.3087686567164178,"work_count":1.2135922330097086},"sibling_insert_delete_reorder_then_ungroup":{"median_time":1.2352555701179553,"work_count":1.2947976878612717},"undo":{"median_time":1.3737142857142859,"work_count":1.2360515021459229},"ungroup":{"median_time":1.3186979560938679,"work_count":1.2408026755852843}},"threshold_scope":"bounded structural edits; save/load are explicit full persistence boundaries"}
+test native_release_r2_structural_work_is_bounded_at_10k_and_100k ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 84.22s
+
+exit_code=0
+finished_at_utc=2026-08-11T03:21:47.0010125Z
+
+=== Direct EngineHost release structural benchmark ===
+working_directory=C:\Users\thdwl\Documents\Codex\WebEditor
+command=powershell -NoProfile -ExecutionPolicy Bypass -File tools/cargo.ps1 test --release -p visual_authoring_wasm_bridge phase0e_r2_direct_engine_host -- --nocapture
+started_at_utc=2026-08-11T03:21:47.0280056Z
+   Compiling visual_authoring_wasm_bridge v0.1.0 (C:\Users\thdwl\Documents\Codex\WebEditor\crates\wasm_bridge)
+    Finished `release` profile [optimized] target(s) in 12.03s
+     Running unittests src\lib.rs (target\release\deps\visual_authoring_wasm_bridge-d4aaf128ad5884ac.exe)
+
+running 1 test
+PHASE0E_R2_WASM_JSON={"all_passed":true,"fixtures":[{"measured_iterations":30,"node_count":10000,"operations":{"group":{"max_work":394,"median_ms":0.4296,"p95_ms":0.5720999999999999,"samples_ms":[0.3144,0.3137,0.515,0.4359,0.43370000000000003,0.4642,0.4412,0.5670999999999999,0.4313,0.5720999999999999,0.4296,0.3456,0.3182,0.3395,0.3161,0.3195,0.3147,0.31970000000000004,0.31829999999999997,0.3147,0.3187,0.3144,0.4623,0.472,0.6018,0.4256,0.4703,0.5045,0.4279,0.4325],"work_samples":[394,394,394,394,394,394,394,394,394,394,394,394,394,394,394,394,394,394,394,394,394,394,394,394,394,394,394,394,394,394]},"redo":{"max_work":309,"median_ms":0.4028,"p95_ms":0.5762,"samples_ms":[0.29819999999999997,0.3006,0.4792,0.5542,0.4016,0.40700000000000003,0.4034,0.4452,0.3984,0.4185,0.6554,0.3075,0.30269999999999997,0.3015,0.2973,0.2939,0.3054,0.2949,0.29359999999999997,0.2927,0.3059,0.4738,0.404,0.5762,0.42729999999999996,0.4028,0.40030000000000004,0.4393,0.4623,0.4452],"work_samples":[309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309,309]},"sibling_insert_delete_reorder_then_ungroup":{"max_work":346,"median_ms":0.36479999999999996,"p95_ms":0.8229,"samples_ms":[0.3631,0.4371,0.36479999999999996,0.36019999999999996,0.3612,0.3699,0.3635,0.3037,0.3043,0.7284999999999999,0.7422000000000001,0.3371,0.32949999999999996,0.3343,0.7956000000000001,0.8059999999999999,0.8229,0.8275,0.3508,0.3995,0.3618,0.3896,0.37120000000000003,0.35209999999999997,0.3638,0.3682,0.3655,0.3202,0.35619999999999996,0.5127],"work_samples":[346,346,346,346,346,346,346,346,346,346,346,346,346,346,346,346,346,346,346,346,346,346,346,346,346,346,346,346,346,346]},"undo":{"max_work":233,"median_ms":0.38739999999999997,"p95_ms":0.5468,"samples_ms":[0.2757,0.3137,0.6348,0.5142,0.4247,0.3782,0.37589999999999996,0.48879999999999996,0.4168,0.3882,0.5468,0.3412,0.2855,0.2813,0.2831,0.27769999999999995,0.2764,0.2812,0.2778,0.27530000000000004,0.2776,0.4618,0.4323,0.4047,0.4073,0.4271,0.38739999999999997,0.4181,0.373,0.4136],"work_samples":[233,233,233,233,233,233,233,233,233,233,233,233,233,233,233,233,233,233,233,233,233,233,233,233,233,233,233,233,233,233]},"ungroup":{"max_work":299,"median_ms":0.3977,"p95_ms":0.5005,"samples_ms":[0.29109999999999997,0.29300000000000004,0.4605,0.5005,0.3984,0.41800000000000004,0.45740000000000003,0.4007,0.39649999999999996,0.4501,0.38230000000000003,0.2998,0.30029999999999996,0.3137,0.2923,0.29819999999999997,0.2938,0.2926,0.2919,0.3552,0.2939,0.4147,0.5932999999999999,0.4595,0.4004,0.4047,0.4475,0.4025,0.3977,0.31770000000000004],"work_samples":[299,299,299,299,299,299,299,299,299,299,299,299,299,299,299,299,299,299,299,299,299,299,299,299,299,299,299,299,299,299]}},"persistence_bytes":6545096,"target_ids":["00000000-0000-0000-0000-000000000002","00000000-0000-0000-0000-00000000138a","00000000-0000-0000-0000-000000002711"],"warmups":10},{"measured_iterations":30,"node_count":100000,"operations":{"group":{"max_work":484,"median_ms":0.21000000000000002,"p95_ms":0.2563,"samples_ms":[0.2049,0.2059,0.2179,0.2082,0.2156,0.21469999999999997,0.2263,0.20570000000000002,0.20550000000000002,0.20729999999999998,0.2764,0.2163,0.21330000000000002,0.2044,0.2043,0.2059,0.2068,0.22460000000000002,0.21000000000000002,0.2096,0.2046,0.2033,0.2563,0.2424,0.20650000000000002,0.21230000000000002,0.2054,0.2273,0.2228,0.2223],"work_samples":[484,484,484,484,484,484,484,484,484,484,484,484,484,484,484,484,484,484,484,484,484,484,484,484,484,484,484,484,484,484]},"redo":{"max_work":375,"median_ms":0.18450000000000003,"p95_ms":0.20829999999999999,"samples_ms":[0.2334,0.1821,0.20829999999999999,0.1832,0.184,0.1849,0.186,0.193,0.1846,0.18239999999999998,0.1855,0.1829,0.1842,0.1872,0.193,0.1828,0.1837,0.1832,0.1831,0.1834,0.18780000000000002,0.1838,0.185,0.18689999999999998,0.1831,0.18430000000000002,0.1842,0.19090000000000001,0.1847,0.18450000000000003],"work_samples":[375,375,375,375,375,375,375,375,375,375,375,375,375,375,375,375,375,375,375,375,375,375,375,375,375,375,375,375,375,375]},"sibling_insert_delete_reorder_then_ungroup":{"max_work":448,"median_ms":0.185,"p95_ms":0.5827,"samples_ms":[0.2614,0.2633,0.2763,0.5827,0.5561,0.5839000000000001,0.4944,0.1848,0.1847,0.18259999999999998,0.1841,0.1835,0.1837,0.1821,0.1835,0.1864,0.1839,0.47419999999999995,0.47550000000000003,0.47409999999999997,0.4897,0.1965,0.18330000000000002,0.18330000000000002,0.1829,0.18919999999999998,0.18330000000000002,0.185,0.1832,0.184],"work_samples":[448,448,448,448,448,448,448,448,448,448,448,448,448,448,448,448,448,448,448,448,448,448,448,448,448,448,448,448,448,448]},"undo":{"max_work":288,"median_ms":0.1682,"p95_ms":0.1799,"samples_ms":[0.1669,0.1663,0.1679,0.16899999999999998,0.1683,0.1707,0.1783,0.1673,0.1678,0.1673,0.1887,0.1678,0.16970000000000002,0.1729,0.1655,0.16699999999999998,0.1681,0.1738,0.1682,0.1692,0.1663,0.1669,0.1799,0.1776,0.1665,0.16899999999999998,0.1717,0.16770000000000002,0.1675,0.1707],"work_samples":[288,288,288,288,288,288,288,288,288,288,288,288,288,288,288,288,288,288,288,288,288,288,288,288,288,288,288,288,288,288]},"ungroup":{"max_work":371,"median_ms":0.1848,"p95_ms":0.1988,"samples_ms":[0.1885,0.1928,0.1988,0.1847,0.1825,0.1867,0.1847,0.1842,0.1916,0.1825,0.1849,0.1831,0.18230000000000002,0.1835,0.1851,0.1926,0.1829,0.18259999999999998,0.18230000000000002,0.18259999999999998,0.1831,0.188,0.1966,0.1854,0.184,0.1834,0.19019999999999998,0.1848,0.3328,0.1918],"work_samples":[371,371,371,371,371,371,371,371,371,371,371,371,371,371,371,371,371,371,371,371,371,371,371,371,371,371,371,371,371,371]}},"persistence_bytes":65851687,"target_ids":["00000000-0000-0000-0000-000000000002","00000000-0000-0000-0000-00000000c352","00000000-0000-0000-0000-0000000186a1"],"warmups":10}],"layer":"direct-engine-host","phase":"0E-R2","ratios_100k_over_10k":{"group":{"median_time":0.48882681564245817,"work_count":1.2284263959390862},"redo":{"median_time":0.458043694141013,"work_count":1.2135922330097086},"sibling_insert_delete_reorder_then_ungroup":{"median_time":0.5071271929824562,"work_count":1.2947976878612717},"undo":{"median_time":0.43417656169334023,"work_count":1.2360515021459229},"ungroup":{"median_time":0.4646718632134775,"work_count":1.2408026755852843}}}
+test tests::phase0e_r2_direct_engine_host_is_bounded_at_10k_and_100k ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 10 filtered out; finished in 16.90s
+
+     Running tests\phase0e_projection.rs (target\release\deps\phase0e_projection-d59375f332e2029e.exe)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 3 filtered out; finished in 0.00s
+
+     Running tests\phase0e_r1_projection.rs (target\release\deps\phase0e_r1_projection-d895f308daaba90a.exe)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.00s
+
+exit_code=0
+finished_at_utc=2026-08-11T03:22:18.5741477Z
+
+=== Clean frontend dependency install ===
+working_directory=C:\Users\thdwl\Documents\Codex\WebEditor\web\editor
+command=npm.cmd ci --ignore-scripts
+started_at_utc=2026-08-11T03:22:18.5867175Z
+
+added 108 packages, and audited 109 packages in 16s
+
+19 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+exit_code=0
+finished_at_utc=2026-08-11T03:22:35.4541753Z
+
+=== Frontend production build ===
+working_directory=C:\Users\thdwl\Documents\Codex\WebEditor\web\editor
+command=npm.cmd run build
+started_at_utc=2026-08-11T03:22:35.4611734Z
+
+> visual-authoring-phase0e-editor@0.1.0 build
+> tsc -b && vite build
+
+[36mvite v6.4.3 [32mbuilding for production...[36m[39m
+transforming...
+[32m✓[39m 1582 modules transformed.
+rendering chunks...
+computing gzip size...
+[2mdist/[22m[32mindex.html                 [39m[1m[2m  0.48 kB[22m[1m[22m[2m │ gzip:  0.32 kB[22m
+[2mdist/[22m[35massets/index-DGN16Mgl.css  [39m[1m[2m 13.66 kB[22m[1m[22m[2m │ gzip:  3.62 kB[22m
+[2mdist/[22m[36massets/index-COpXeZyr.js   [39m[1m[2m210.07 kB[22m[1m[22m[2m │ gzip: 65.10 kB[22m[2m │ map: 538.45 kB[22m
+[32m✓ built in 5.87s[39m
+exit_code=0
+finished_at_utc=2026-08-11T03:22:47.2027131Z
+
+=== React ProjectionStore tests ===
+working_directory=C:\Users\thdwl\Documents\Codex\WebEditor\web\editor
+command=npm.cmd test
+started_at_utc=2026-08-11T03:22:47.2107130Z
+
+> visual-authoring-phase0e-editor@0.1.0 test
+> vitest run tests/projection.test.ts
+
+
+[1m[46m RUN [49m[22m [36mv3.2.7 [39m[90mC:/Users/thdwl/Documents/Codex/WebEditor/web/editor[39m
+
+[90mstdout[2m | tests/projection.test.ts[2m > [22m[2mR2 React ProjectionStore bounded benchmark[2m > [22m[2m10k and 100k group/ungroup use 10 warmups and 30 measured iterations
+[22m[39mPHASE0E_R2_REACT_JSON={"phase":"0E-R2","layer":"react-projection-store","fixtures":[{"node_count":10000,"target_ids":["node-0","node-5000","node-9999"],"warmups":10,"measured_iterations":30,"group":{"samples_ms":[0.06300000000010186,0.05749999999989086,0.05900000000019645,0.05719999999996617,0.05770000000006803,0.088799999999992,0.0546999999999116,0.05259999999998399,0.05569999999988795,0.07230000000004111,0.053599999999960346,0.060899999999946886,0.053699999999935244,0.05060000000003129,0.054300000000012005,0.08220000000005712,0.06549999999992906,0.04760000000010223,0.05580000000009022,0.05079999999998108,0.04970000000002983,0.051199999999880674,0.054300000000012005,0.04769999999984975,0.04850000000010368,0.06790000000000873,0.0706000000000131,0.05420000000003711,0.05600000000004002,0.0543999999999869],"median_ms":0.05569999999988795,"p95_ms":0.08220000000005712,"work_samples":[482,482,482,482,482,482,482,482,482,482,482,482,482,482,482,482,482,482,482,482,482,482,482,482,482,482,482,482,482,482]},"ungroup":{"samples_ms":[0.05780000000004293,0.06960000000003674,0.07909999999992579,0.0603000000000975,0.05920000000014625,0.06319999999982429,0.06690000000003238,0.08140000000003056,0.05900000000019645,0.05719999999996617,0.05410000000006221,0.051799999999957436,0.05169999999998254,0.05880000000001928,0.0544999999999618,0.05869999999981701,0.051199999999880674,0.050700000000006185,0.06910000000016225,0.050800000000208456,0.05809999999996762,0.051099999999905776,0.06420000000002801,0.05030000000010659,0.05219999999985703,0.12170000000014625,0.06079999999997199,0.06140000000004875,0.053200000000060754,0.06669999999985521],"median_ms":0.05880000000001928,"p95_ms":0.08140000000003056,"work_samples":[554,554,554,554,554,554,554,554,554,554,554,554,554,554,554,554,554,554,554,554,554,554,554,554,554,554,554,554,554,554]}},{"node_count":100000,"target_ids":["node-0","node-50000","node-99999"],"warmups":10,"measured_iterations":30,"group":{"samples_ms":[0.07539999999994507,0.05829999999991742,0.07740000000012515,0.0524000000000342,0.057299999999941065,0.050800000000208456,0.05089999999995598,0.049600000000054933,0.05370000000016262,0.05330000000003565,0.05039999999985412,0.05150000000003274,0.05019999999990432,0.05400000000008731,0.06420000000002801,0.05629999999996471,0.04989999999997963,0.04680000000007567,0.047100000000000364,0.04760000000010223,0.04629999999997381,0.11819999999988795,0.05989999999997053,0.054799999999886495,0.07190000000014152,0.049600000000054933,0.048900000000003274,0.047100000000000364,0.05489999999986139,0.04719999999997526],"median_ms":0.0524000000000342,"p95_ms":0.07740000000012515,"work_samples":[491,491,491,491,491,491,491,491,491,491,491,491,491,491,491,491,491,491,491,491,491,491,491,491,491,491,491,491,491,491]},"ungroup":{"samples_ms":[0.06359999999995125,0.05870000000004438,0.058499999999867214,0.05510000000003856,0.056800000000066575,0.05300000000011096,0.0523000000000593,0.06930000000011205,0.055499999999938154,0.0543999999999869,0.05269999999995889,0.05349999999998545,0.11019999999984975,0.08690000000001419,0.11660000000006221,0.05330000000003565,0.05169999999998254,0.05269999999995889,0.05149999999980537,0.04989999999997963,0.09200000000009823,0.09969999999998436,0.05850000000009459,0.05899999999996908,0.055499999999938154,0.05100000000015825,0.051099999999905776,0.04980000000000473,0.05329999999980828,0.04989999999997963],"median_ms":0.05510000000003856,"p95_ms":0.11019999999984975,"work_samples":[606,606,606,606,606,606,606,606,606,606,606,606,606,606,606,606,606,606,606,606,606,606,606,606,606,606,606,606,606,606]}}],"ratios_100k_over_10k":{"groupWork":1.0186721991701244,"ungroupWork":1.0938628158844765,"groupMedianTime":0.9407540394998134,"ungroupMedianTime":0.9370748299323214},"all_passed":true}
+
+[90mstdout[2m | tests/projection.test.ts[2m > [22m[2mR2 Layers and engine z-order agreement[2m > [22m[2meight overlapping siblings retain exact noncontiguous group and ungroup order
+[22m[39mPHASE0E_R2_REACT_ORDER_JSON={"phase":"0E-R2","overlapping_sibling_count":8,"targets":["sibling-0","sibling-3","sibling-7"],"grouped_layers_order":["group-eight","sibling-0","sibling-3","sibling-7","sibling-1","sibling-2","sibling-4","sibling-5","sibling-6"],"engine_topmost_order":["sibling-6","sibling-5","sibling-4","sibling-2","sibling-1","sibling-7","sibling-3","sibling-0"],"restored_layers_order":["sibling-0","sibling-1","sibling-2","sibling-3","sibling-4","sibling-5","sibling-6","sibling-7"],"stale_dense_index_present":false,"all_passed":true}
+
+ [32m✓[39m tests/projection.test.ts [2m([22m[2m5 tests[22m[2m)[22m[33m 1207[2mms[22m[39m
+   [33m[2m✓[22m[39m versioned UI projection[2m > [22m100k group and ungroup use bounded structural operations without a full hierarchy rebuild [33m 518[2mms[22m[39m
+   [33m[2m✓[22m[39m R2 React ProjectionStore bounded benchmark[2m > [22m10k and 100k group/ungroup use 10 warmups and 30 measured iterations [33m 620[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m5 passed[39m[22m[90m (5)[39m
+[2m   Start at [22m 12:22:49
+[2m   Duration [22m 2.18s[2m (transform 132ms, setup 0ms, collect 182ms, tests 1.21s, environment 0ms, prepare 273ms)[22m
+
+exit_code=0
+finished_at_utc=2026-08-11T03:22:52.1129128Z
+
+=== Actual Chrome R2 browser proof ===
+working_directory=C:\Users\thdwl\Documents\Codex\WebEditor\web\editor
+command=npm.cmd run test:browser:r2
+started_at_utc=2026-08-11T03:22:52.1259111Z
+
+> visual-authoring-phase0e-editor@0.1.0 test:browser:r2
+> npm run build && node scripts/browser-proof-r2.mjs && vitest run tests/browser-proof-r2.test.ts
+
+
+> visual-authoring-phase0e-editor@0.1.0 build
+> tsc -b && vite build
+
+[36mvite v6.4.3 [32mbuilding for production...[36m[39m
+transforming...
+[32m✓[39m 1582 modules transformed.
+rendering chunks...
+computing gzip size...
+[2mdist/[22m[32mindex.html                 [39m[1m[2m  0.48 kB[22m[1m[22m[2m │ gzip:  0.32 kB[22m
+[2mdist/[22m[35massets/index-DGN16Mgl.css  [39m[1m[2m 13.66 kB[22m[1m[22m[2m │ gzip:  3.62 kB[22m
+[2mdist/[22m[36massets/index-COpXeZyr.js   [39m[1m[2m210.07 kB[22m[1m[22m[2m │ gzip: 65.10 kB[22m[2m │ map: 538.45 kB[22m
+[32m✓ built in 4.40s[39m
+Phase 0E-R2 actual browser proof: PASS
+browser=Chrome/151.0.7922.76
+gpu=NVIDIA GeForce GTX 970
+proof=C:\Users\thdwl\Documents\Codex\WebEditor\docs\verification\PHASE_0E_R2_BROWSER_PROOF.json
+screenshots=5
+
+[1m[46m RUN [49m[22m [36mv3.2.7 [39m[90mC:/Users/thdwl/Documents/Codex/WebEditor/web/editor[39m
+
+ [32m✓[39m tests/browser-proof-r2.test.ts [2m([22m[2m1 test[22m[2m)[22m[32m 7[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m   Start at [22m 12:24:57
+[2m   Duration [22m 801ms[2m (transform 44ms, setup 0ms, collect 46ms, tests 7ms, environment 0ms, prepare 258ms)[22m
+
+exit_code=0
+finished_at_utc=2026-08-11T03:24:58.6515831Z
+
+FINAL_STATUS=PASS
+completed_at_utc=2026-08-11T03:24:58.6597459Z

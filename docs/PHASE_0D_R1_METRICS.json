@@ -1,0 +1,101 @@
+{
+  "all_passed": true,
+  "baseline_external_measurements": {
+    "hundred_k_load_ms": 2640.0,
+    "hundred_k_single_edit_ms": 96.1,
+    "ten_k_fully_visible_order_ms": 568.9,
+    "ten_k_single_edit_ms": 7.4
+  },
+  "checks": {
+    "actual_wgpu_device": true,
+    "camera_revisions_unchanged": true,
+    "f32_omission_zero_upload_and_visibility": true,
+    "f32_recovery_same_slot": true,
+    "gpu_validation_errors_zero": true,
+    "hundred_k_camera_no_full_render_scan": true,
+    "hundred_k_camera_spatial_candidates_only": true,
+    "hundred_k_single_dirty_item": true,
+    "hundred_k_single_no_clone": true,
+    "hundred_k_single_no_full_scan": true,
+    "hundred_k_single_no_order_walk": true,
+    "hundred_k_single_no_rebuild": true,
+    "hundred_k_single_one_document_node": true,
+    "hundred_k_single_one_gpu_instance": true,
+    "hundred_k_single_one_render_item": true,
+    "ten_k_one_batch_one_draw": true,
+    "ten_k_sibling_search_zero": true,
+    "ten_k_single_bounded": true
+  },
+  "hundred_k": {
+    "f32_omission": {
+      "gpu_encode_attempted": 1,
+      "gpu_encode_omitted": 1,
+      "instance_upload_bytes": 48,
+      "recovered_gpu_encode_omitted": 0,
+      "stable_slot": true,
+      "visible_after_omission": 0
+    },
+    "initial_instance_upload_bytes": 6291456,
+    "load_ms": 1424.9505,
+    "narrow_camera_update": {
+      "culling_candidates": 1,
+      "document_scene_render_revision_changes": false,
+      "full_render_model_scans": 0,
+      "render_items_read": 1,
+      "visible_items": 1,
+      "wall_ms": 0.0373
+    },
+    "single_leaf_transform": {
+      "allocation_growth_count": 0,
+      "dirty_render_items": 1,
+      "document_nodes_scanned": 1,
+      "full_instance_uploads": 0,
+      "full_render_model_scans": 0,
+      "full_render_rebuilds": 0,
+      "full_scene_rebuilds": 0,
+      "gpu_dirty_ranges": 1,
+      "instance_upload_bytes": 48,
+      "order_nodes_visited": 0,
+      "render_items_cloned": 0,
+      "render_items_planned": 1,
+      "render_items_read": 1,
+      "render_items_written": 1,
+      "scene_nodes_visited": 2,
+      "sibling_search_steps": 0,
+      "wall_ms": 0.0426
+    }
+  },
+  "phase": "0D-R1",
+  "protocol_version": 1,
+  "render_binary_schema_version": 1,
+  "renderer": {
+    "actual_wgpu": true,
+    "adapter": "NVIDIA GeForce GTX 970",
+    "backend": "Vulkan",
+    "device_type": "DiscreteGpu",
+    "driver": "NVIDIA",
+    "driver_info": "581.57"
+  },
+  "ten_k_fully_visible": {
+    "batches": 1,
+    "build_ms": 128.1253,
+    "cull_and_order_ms": 9.184899999999999,
+    "culling_candidates": 10000,
+    "draw_calls": 1,
+    "full_render_model_scans": 0,
+    "initial_instance_upload_bytes": 786432,
+    "order_nodes_visited": 39996,
+    "sibling_search_steps": 0,
+    "single_leaf_transform": {
+      "dirty_render_items": 1,
+      "full_render_model_scans": 0,
+      "instance_upload_bytes": 48,
+      "order_nodes_visited": 0,
+      "render_items_cloned": 0,
+      "wall_ms": 0.14750000000000002
+    },
+    "submitted_instances": 10000,
+    "total": 10000,
+    "visible_items": 10000
+  }
+}

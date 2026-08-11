@@ -1,0 +1,25 @@
+﻿Phase 0E-R3 Native structural output
+command=powershell -NoProfile -ExecutionPolicy Bypass -File tools/cargo.ps1 test --release -p visual_authoring_runtime --test phase0e_r3_matrix -- --nocapture
+started_at_utc=2026-08-11T04:57:56.7248488Z
+   Compiling visual_authoring_runtime v0.1.0 (C:\Users\thdwl\Documents\Codex\WebEditor\crates\runtime)
+    Finished `release` profile [optimized] target(s) in 3.69s
+     Running tests\phase0e_r3_matrix.rs (target\release\deps\phase0e_r3_matrix-97d9ffed324a9b36.exe)
+
+running 1 test
+test phase0e_r3_native_release_complexity_matrix has been running for over 60 seconds
+System.Management.Automation.RemoteException
+thread 'phase0e_r3_native_release_complexity_matrix' panicked at crates\runtime\tests\phase0e_r3_matrix.rs:317:13:
+10000/uniform: N ratio 1.8679987604713633
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test phase0e_r3_native_release_complexity_matrix ... FAILED
+
+failures:
+
+failures:
+    phase0e_r3_native_release_complexity_matrix
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 207.40s
+
+error: test failed, to rerun pass `-p visual_authoring_runtime --test phase0e_r3_matrix`
+exit_code=101
+finished_at_utc=2026-08-11T05:01:29.2420034Z
