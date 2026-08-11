@@ -1,0 +1,106 @@
+name: PR Fast Checks
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pr-fast-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  integrity:
+    name: Approved baseline and repository hygiene
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          lfs: true
+      - name: Pull Git LFS objects
+        shell: pwsh
+        run: git lfs pull
+      - name: Verify approved Phase 0E-R3 payload
+        shell: pwsh
+        run: ./tools/verify-approved-phase0e-r3.ps1
+      - name: Check secrets, generated artifacts, and large files
+        shell: pwsh
+        run: ./tools/ci-guardrails.ps1
+
+  rust:
+    name: Rust format, lint, and tests
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: false
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: 1.89.0
+          components: rustfmt, clippy
+      - name: Format
+        shell: pwsh
+        run: cargo fmt --all -- --check
+      - name: Clippy
+        shell: pwsh
+        run: cargo clippy --workspace --all-targets -- -D warnings
+      - name: Workspace tests
+        shell: pwsh
+        run: cargo test --workspace --all-targets
+
+  web:
+    name: React and Web unit tests and builds
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Editor install
+        working-directory: web/editor
+        run: npm ci
+      - name: Editor unit tests
+        working-directory: web/editor
+        run: npm test
+      - name: Editor production build
+        working-directory: web/editor
+        run: npm run build
+      - name: Preview install
+        working-directory: web/phase0d-preview
+        run: npm ci
+      - name: Preview unit tests
+        working-directory: web/phase0d-preview
+        run: npm test
+      - name: Preview production build
+        working-directory: web/phase0d-preview
+        run: npm run build
+
+  wasm:
+    name: Pinned WASM build and ABI initialization
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: false
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: 1.89.0
+          targets: wasm32-unknown-unknown
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install pinned wasm-bindgen CLI
+        shell: pwsh
+        run: cargo install wasm-bindgen-cli --version 0.2.126 --locked
+      - name: Verify approved checked-in WASM package
+        run: node tools/ci-wasm-smoke.mjs
+      - name: Build pinned WASM package in an isolated output
+        shell: pwsh
+        run: ./tools/build-phase0e-wasm.ps1 -OutDir target/ci-wasm-pkg
+      - name: Verify fresh bindings, ABI, protocol, and EngineHost initialization
+        run: node tools/ci-wasm-smoke.mjs --pkg target/ci-wasm-pkg

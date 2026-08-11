@@ -1,0 +1,88 @@
+{
+    "schema_version":  1,
+    "phase":  "0E-R3",
+    "captured_at_utc":  "2026-08-11T12:05:41.2886131Z",
+    "repository":  "https://github.com/sindexer/EditorM",
+    "base":  {
+                 "branch":  "main",
+                 "sha":  "6ad6bdc29c4f6915b558daa60d50b33dd5b960e1"
+             },
+    "head":  {
+                 "branch":  "bootstrap/phase0e-r3-baseline",
+                 "baseline_commit":  "39085167a1b9d2ce1ba78060b3fee4d9327aaf27",
+                 "operational_commit":  "self"
+             },
+    "approved_archive":  {
+                             "name":  "visual_authoring_engine_phase0e_r3_review_2026-08-11.zip",
+                             "bytes":  49362055,
+                             "entries":  299,
+                             "sha256":  "cc4d73772f4f6ea6dba133d3b05b8a6fd1263425c419c69f42c06ed26e3905db",
+                             "checksum_entries":  297,
+                             "checksum_passed":  297
+                         },
+    "approved_payload":  {
+                             "archive_blob_matches":  "297/297",
+                             "product_or_test_changes":  0,
+                             "checksums_file_modified":  false,
+                             "checksum_scope":  "approved Phase 0E-R3 package; GitHub operational files are outside this immutable evidence"
+                         },
+    "git_lfs":  {
+                    "patterns":  [
+                                     "*.fig",
+                                     "*.psd"
+                                 ],
+                    "path":  "visual_authoring_engine_codex_package/reference/wanted-design-system/Wanted Design System (Community).fig",
+                    "bytes":  46381631,
+                    "sha256":  "d6f87f906ef2cbf211cae4b7bfe92429c064a4d783529ff14386b0a809fe7887",
+                    "pointer_oid":  "sha256:d6f87f906ef2cbf211cae4b7bfe92429c064a4d783529ff14386b0a809fe7887",
+                    "tracked":  true
+                },
+    "intentional_repository_differences":  {
+                                               "baseline_commit_additions":  [
+                                                                                 ".gitattributes"
+                                                                             ],
+                                               "operational_commit_additions":  [
+                                                                                    "AGENTS.md",
+                                                                                    "docs/ROADMAP.md",
+                                                                                    "docs/QUALITY_AND_EFFICIENCY_POLICY.md",
+                                                                                    "docs/GITHUB_REVIEW_WORKFLOW.md",
+                                                                                    "docs/verification/PHASE_0E_R3_GIT_IMPORT.json",
+                                                                                    ".github/pull_request_template.md",
+                                                                                    ".github/workflows/pr-fast.yml",
+                                                                                    ".github/workflows/phase-gate.yml",
+                                                                                    "tools/ci-guardrails.ps1",
+                                                                                    "tools/ci-wasm-smoke.mjs",
+                                                                                    "tools/verify-approved-phase0e-r3.ps1"
+                                                                                ],
+                                               "operational_commit_modifications":  [
+                                                                                        ".gitignore"
+                                                                                    ]
+                                           },
+    "excluded":  [
+                     "node_modules",
+                     "target",
+                     "dist",
+                     ".tools",
+                     "coverage",
+                     "caches",
+                     "temporary files",
+                     "review ZIPs and sidecars",
+                     ".env and credentials",
+                     "local-only settings",
+                     "regenerable build output"
+                 ],
+    "phase1_started":  false,
+    "wasm_rebuild_validation":  {
+                                    "toolchain":  "Rust 1.89.0 / wasm32-unknown-unknown",
+                                    "wasm_bindgen_cli":  "0.2.126",
+                                    "approved_sha256":  "bbad837fbe7be3d21733d2318a596adec7798c45ef6fb300b54665672cd99367",
+                                    "approved_bytes":  1229366,
+                                    "fresh_local_sha256":  "c10d033a0f4ad7ee73da70130b1451e61e22167ff03798501cdbb6110228951e",
+                                    "fresh_local_bytes":  1229430,
+                                    "binding_files_byte_identical":  true,
+                                    "module_and_engine_host_initialized":  true,
+                                    "protocol_version":  1,
+                                    "render_binary_schema_version":  1,
+                                    "note":  "WASM binary byte identity is not claimed across build environments; pinned rebuild success and binding/ABI/protocol behavior are verified."
+                                }
+}

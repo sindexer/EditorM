@@ -1,0 +1,80 @@
+name: Manual Phase Gate Software Verification
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirmation:
+        description: Type RUN_PHASE_GATE_SOFTWARE to run the expensive software checks.
+        required: true
+        type: string
+      local_hardware_evidence:
+        description: Reference to fresh local WebGPU hardware evidence; hosted runners do not replace it.
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: manual-phase-gate-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  verify-authorization:
+    runs-on: windows-latest
+    steps:
+      - name: Require explicit dispatch confirmation
+        shell: pwsh
+        run: |
+          if ('${{ inputs.confirmation }}' -ne 'RUN_PHASE_GATE_SOFTWARE') {
+            throw 'Explicit phase-gate confirmation was not supplied.'
+          }
+          if ([string]::IsNullOrWhiteSpace('${{ inputs.local_hardware_evidence }}')) {
+            throw 'A reference to fresh local hardware evidence is required.'
+          }
+          Write-Output 'This workflow verifies runner-compatible software only.'
+          Write-Output 'It does not claim actual hardware WebGPU proof.'
+
+  structural-and-wasm:
+    needs: verify-authorization
+    runs-on: windows-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: false
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: 1.89.0
+          targets: wasm32-unknown-unknown
+          components: rustfmt, clippy
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install pinned wasm-bindgen CLI
+        shell: pwsh
+        run: cargo install wasm-bindgen-cli --version 0.2.126 --locked
+      - name: Release structural matrix
+        shell: pwsh
+        run: cargo test --release -p visual_authoring_runtime --test phase0e_r3_matrix -- --nocapture
+      - name: Verify approved checked-in WASM package
+        run: node tools/ci-wasm-smoke.mjs
+      - name: Build pinned WASM package in an isolated output
+        shell: pwsh
+        run: ./tools/build-phase0e-wasm.ps1 -OutDir target/ci-wasm-pkg
+      - name: Verify fresh bindings, ABI, protocol, and EngineHost initialization
+        run: node tools/ci-wasm-smoke.mjs --pkg target/ci-wasm-pkg
+      - name: Install editor dependencies
+        working-directory: web/editor
+        run: npm ci
+      - name: Actual direct WASM full matrix
+        working-directory: web/editor
+        run: npm run test:direct-wasm:r3
+      - name: React ProjectionStore full matrix
+        working-directory: web/editor
+        run: npm run test:react:r3
+      - name: Hardware boundary notice
+        shell: pwsh
+        run: |
+          Write-Output 'Local hardware evidence reference: ${{ inputs.local_hardware_evidence }}'
+          Write-Output 'No mock, fallback, or hosted-runner GPU result is represented as hardware proof.'
