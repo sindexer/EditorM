@@ -43,3 +43,5 @@ finally {
         Remove-Item -LiteralPath $resolvedTemp -Recurse -Force -ErrorAction SilentlyContinue
     }
 }
+
+exit 0
