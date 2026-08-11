@@ -4,47 +4,55 @@
 - Head branch / SHA:
 - Active phase and authorization:
 - Product behavior changed:
+- Scope classifier result:
 
-## Approved baseline
+## Approved history and current changes
 
-- Phase 0E-R3 ZIP SHA-256:
-- `CHECKSUMS.sha256` result:
-- Approved product/test changes:
+- Approved Phase 0E-R3 commit remains an ancestor:
+- `CHECKSUMS.sha256` and protected Phase 0 history unchanged:
+- Product paths changed:
+- Test paths changed:
 - Git LFS status:
 
-## Changes
+## Selected and skipped verification
 
-- Included files:
-- Intentionally excluded/generated files:
-- Repository-governance-only differences:
+| Job | Selected | Result | Selection or skip reason |
+| --- | --- | --- | --- |
+| Integrity / LFS / secret safety | Always |  |  |
+| Rust |  |  |  |
+| WASM |  |  |  |
+| Editor |  |  |  |
+| Preview |  |  |  |
+| Local hardware evidence validation |  |  |  |
+| PR Decision | Always |  |  |
 
-## Verification performed
+The one-time R3 baseline audit is distinct from current product tests. Stored Phase 0 JSON is not represented as a new execution.
 
-| Command | Result |
-| --- | --- |
-|  |  |
+## Cache and duration
 
-## Verification not performed
-
-- Check and reason:
+- Cargo cache hit / key scope:
+- wasm-bindgen cache hit:
+- Editor npm cache hit:
+- Preview npm cache hit:
+- Previous comparable CI duration:
+- Current CI duration:
 
 ## Security and repository hygiene
 
-- Tracked-secret scan:
+- Secret scan (file paths/count only; no values logged):
 - Forbidden-artifact scan:
 - Large-file/LFS scan:
 
 ## Hardware evidence
 
 - Renderer/WGSL/binary-schema/GPU path changed:
-- Fresh local WebGPU proof attached, if required:
+- Newly added tracked local proof path and SHA-256, if required:
+- Hosted runner validation only; actual hardware execution claimed: no
 
-## Known issues
+## Review and packaging boundary
 
-- None / describe:
-
-## Phase boundary
-
-- [ ] Phase 1 or later product work has not started without separate authorization.
-- [ ] Stored evidence has not been represented as a new execution.
-- [ ] Required CI is green before Ready for review.
+- [ ] Review feedback is a follow-up commit in this PR, not a replacement PR.
+- [ ] No ordinary-PR review ZIP was created.
+- [ ] Quality criteria and test counts were not reduced to save time.
+- [ ] Phase Gate runs the complete suite when authorized.
+- [ ] A later product phase has not started without separate authorization.

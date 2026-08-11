@@ -4,22 +4,25 @@ These instructions apply to the entire repository.
 
 ## Authorization boundary
 
-- Phase 0E-R3 is the approved baseline. Do not implement Phase 1 or later work without an explicit phase authorization.
-- Preserve the product sequence in `docs/ROADMAP.md`; do not pull later requirements into an earlier phase.
-- Treat `CHECKSUMS.sha256` as immutable evidence for the approved Phase 0E-R3 package. GitHub-only operational additions are intentionally outside that checksum scope.
+- Phase 0E-R3 is the approved baseline. Phase 0 is complete and Phase 1 is not authorized.
+- Preserve the Phase 1 through Phase 8 order in `docs/ROADMAP.md`; do not pull later requirements into an earlier phase.
+- Treat `CHECKSUMS.sha256` and the Phase 0 files that existed at approved commit `39085167a1b9d2ce1ba78060b3fee4d9327aaf27` as immutable history. Add a new ADR instead of rewriting ADR-001 through ADR-041.
 
 ## Change discipline
 
+- Keep product, test, evidence, and repository-governance changes distinguishable.
 - Use typed, recoverable errors at public boundaries and preserve failure atomicity.
-- Keep Document, Scene, Render, Worker, GPU, selection, history, and diagnostics revisions synchronized.
 - Do not replace bounded or order-statistic structures with full scans, dense rewrites, or hidden fallback rebuilds.
-- Add focused regression tests for behavioral changes. Run the smallest relevant checks while iterating and the required gate suite before a gate or release candidate.
-- Never rewrite historical verification evidence as if it were a new execution. New evidence must include the command, timestamps, environment, exit status, and raw samples where applicable.
+- Never represent stored verification JSON as a new execution. New evidence must record its command, timestamps, environment, exit status, and raw samples where applicable.
+- Do not commit `target`, `node_modules`, `dist`, caches, review ZIPs, credentials, local-only settings, internal Qwen addresses, tokens, or account data.
 
 ## GitHub workflow
 
 - Follow `docs/GITHUB_REVIEW_WORKFLOW.md` and `docs/QUALITY_AND_EFFICIENCY_POLICY.md`.
-- Keep product changes and repository-governance changes distinguishable in commits and PR descriptions.
-- Do not commit `target`, `node_modules`, `dist`, caches, review ZIPs, credentials, or local-only settings.
+- General PRs always run integrity, Git LFS, forbidden-artifact, large-blob, and secret checks. Other jobs are selected by the fail-closed changed-path classifier, and every skip must have a recorded reason in `PR Decision`.
+- CI/workflow/classifier changes and unknown product paths run the full software suite. Documentation-only PRs do not repeat unrelated Rust, WASM, or web builds.
+- The one-time 297-file R3 byte audit belongs to `baseline-audit.yml`; do not apply R3 byte identity to future product worktrees.
+- Phase Gates run the complete software suite. Renderer, WGSL, render-binary-schema, or GPU-application changes also require fresh tracked local hardware evidence. A hosted runner may validate that evidence but cannot claim it executed the hardware proof.
 - Large approved binary originals must use Git LFS. Never replace an LFS-managed source with a normal Git blob.
-- GitHub-hosted checks cannot substitute for actual hardware WebGPU proof. Attach fresh local hardware evidence when renderer, WGSL, binary schema, or GPU application paths change.
+- Address review feedback as follow-up commits in the same PR. Do not create a replacement PR or a review ZIP for each PR.
+- Reduce repeated cost with path selection and keyed caches; never reduce assertions, test counts, or gate thresholds to save time.

@@ -1,14 +1,18 @@
-name: Manual Phase Gate Software Verification
+name: Manual Phase Gate Full Verification
 
 on:
   workflow_dispatch:
     inputs:
       confirmation:
-        description: Type RUN_PHASE_GATE_SOFTWARE to run the expensive software checks.
+        description: Type RUN_PHASE_GATE_WITH_LOCAL_HARDWARE_EVIDENCE.
         required: true
         type: string
-      local_hardware_evidence:
-        description: Reference to fresh local WebGPU hardware evidence; hosted runners do not replace it.
+      local_hardware_evidence_path:
+        description: Tracked repository-relative JSON path below docs/verification.
+        required: true
+        type: string
+      local_hardware_evidence_sha256:
+        description: SHA-256 of the tracked local hardware evidence JSON.
         required: true
         type: string
 
@@ -20,61 +24,248 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  verify-authorization:
+  verify_authorization:
+    name: Validate dispatch and tracked local hardware evidence
     runs-on: windows-latest
+    timeout-minutes: 10
     steps:
-      - name: Require explicit dispatch confirmation
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          lfs: false
+          persist-credentials: false
+      - name: Require exact confirmation and validate evidence
+        shell: pwsh
+        env:
+          PHASE_GATE_CONFIRMATION: ${{ inputs.confirmation }}
+          HARDWARE_EVIDENCE_PATH: ${{ inputs.local_hardware_evidence_path }}
+          HARDWARE_EVIDENCE_SHA256: ${{ inputs.local_hardware_evidence_sha256 }}
+        run: |
+          if ($env:PHASE_GATE_CONFIRMATION -cne 'RUN_PHASE_GATE_WITH_LOCAL_HARDWARE_EVIDENCE') {
+            throw 'Exact phase-gate confirmation was not supplied.'
+          }
+          ./tools/validate-hardware-evidence.ps1 -EvidencePath $env:HARDWARE_EVIDENCE_PATH -EvidenceSha256 $env:HARDWARE_EVIDENCE_SHA256
+      - name: State the hardware boundary
         shell: pwsh
         run: |
-          if ('${{ inputs.confirmation }}' -ne 'RUN_PHASE_GATE_SOFTWARE') {
-            throw 'Explicit phase-gate confirmation was not supplied.'
-          }
-          if ([string]::IsNullOrWhiteSpace('${{ inputs.local_hardware_evidence }}')) {
-            throw 'A reference to fresh local hardware evidence is required.'
-          }
-          Write-Output 'This workflow verifies runner-compatible software only.'
-          Write-Output 'It does not claim actual hardware WebGPU proof.'
+          Add-Content -LiteralPath $env:GITHUB_STEP_SUMMARY -Value @"
+          The hosted runner validated a tracked, fresh local hardware proof and its SHA-256.
+          It did not execute, emulate, or claim actual hardware WebGPU itself.
+          "@
 
-  structural-and-wasm:
-    needs: verify-authorization
+  integrity:
+    name: Full repository integrity
+    needs: verify_authorization
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          lfs: false
+          persist-credentials: false
+      - name: Repository and historical evidence guardrails
+        shell: pwsh
+        run: ./tools/ci-guardrails.ps1
+      - name: Scope and secret-output self-tests
+        shell: pwsh
+        run: |
+          ./tools/ci-change-scope-self-test.ps1
+          ./tools/ci-guardrails-self-test.ps1
+
+  rust:
+    name: Full Rust verification
+    needs: verify_authorization
+    runs-on: windows-latest
+    timeout-minutes: 45
+    steps:
+      - name: Start timing
+        shell: pwsh
+        run: Add-Content -LiteralPath $env:GITHUB_ENV -Value "CI_JOB_STARTED=$([DateTimeOffset]::UtcNow.ToUnixTimeSeconds())"
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          lfs: false
+          persist-credentials: false
+      - uses: dtolnay/rust-toolchain@4360b52568e2003a75bf9bc1d59f33a8e3fc893c # stable, 2026-08-05
+        with:
+          toolchain: 1.89.0
+          components: rustfmt, clippy
+      - name: Restore Cargo host cache
+        id: cargo_cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-rust-1.89.0-host-${{ hashFiles('Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-rust-1.89.0-host-
+      - name: Format
+        shell: pwsh
+        run: cargo fmt --all -- --check
+      - name: Clippy
+        shell: pwsh
+        run: |
+          $arguments = @('clippy', '--workspace', '--all-targets', '--', '-D', 'warnings')
+          ./tools/ci-cargo.ps1 -CargoArguments $arguments
+      - name: Workspace tests
+        shell: pwsh
+        run: |
+          $arguments = @('test', '--workspace', '--all-targets')
+          ./tools/ci-cargo.ps1 -CargoArguments $arguments
+      - name: Summarize cache and duration
+        if: always()
+        shell: pwsh
+        env:
+          CACHE_HIT: ${{ steps.cargo_cache.outputs.cache-hit }}
+        run: |
+          $elapsed = [DateTimeOffset]::UtcNow.ToUnixTimeSeconds() - [int64]$env:CI_JOB_STARTED
+          Add-Content -LiteralPath $env:GITHUB_STEP_SUMMARY -Value "### Phase Gate Rust`n- Cargo cache exact hit: $env:CACHE_HIT`n- Elapsed seconds: $elapsed"
+
+  wasm_and_structural:
+    name: Full structural matrix and WASM verification
+    needs: verify_authorization
     runs-on: windows-latest
     timeout-minutes: 120
     steps:
-      - uses: actions/checkout@v4
+      - name: Start timing
+        shell: pwsh
+        run: Add-Content -LiteralPath $env:GITHUB_ENV -Value "CI_JOB_STARTED=$([DateTimeOffset]::UtcNow.ToUnixTimeSeconds())"
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           lfs: false
-      - uses: dtolnay/rust-toolchain@stable
+          persist-credentials: false
+      - uses: dtolnay/rust-toolchain@4360b52568e2003a75bf9bc1d59f33a8e3fc893c # stable, 2026-08-05
         with:
           toolchain: 1.89.0
           targets: wasm32-unknown-unknown
-          components: rustfmt, clippy
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: 22
-      - name: Install pinned wasm-bindgen CLI
+          package-manager-cache: false
+      - name: Restore WASM Cargo and CLI cache
+        id: wasm_cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            ~/.cargo/bin/wasm-bindgen*
+            target
+          key: ${{ runner.os }}-rust-1.89.0-wasm32-unknown-unknown-${{ hashFiles('Cargo.lock') }}-wasm-bindgen-0.2.126
+          restore-keys: ${{ runner.os }}-rust-1.89.0-wasm32-unknown-unknown-${{ hashFiles('Cargo.lock') }}-
+      - name: Install exact wasm-bindgen CLI only when absent
         shell: pwsh
-        run: cargo install wasm-bindgen-cli --version 0.2.126 --locked
+        run: |
+          $command = Get-Command wasm-bindgen -ErrorAction SilentlyContinue
+          $version = if ($null -ne $command) { (& wasm-bindgen --version).Trim() } else { '' }
+          if ($version -cne 'wasm-bindgen 0.2.126') {
+            cargo install wasm-bindgen-cli --version 0.2.126 --locked --force
+            if ($LASTEXITCODE -ne 0) { throw 'wasm-bindgen CLI installation failed' }
+          }
       - name: Release structural matrix
         shell: pwsh
         run: cargo test --release -p visual_authoring_runtime --test phase0e_r3_matrix -- --nocapture
-      - name: Verify approved checked-in WASM package
+      - name: Verify checked-in WASM package
         run: node tools/ci-wasm-smoke.mjs
-      - name: Build pinned WASM package in an isolated output
+      - name: Build and verify fresh WASM package
         shell: pwsh
-        run: ./tools/build-phase0e-wasm.ps1 -OutDir target/ci-wasm-pkg
-      - name: Verify fresh bindings, ABI, protocol, and EngineHost initialization
-        run: node tools/ci-wasm-smoke.mjs --pkg target/ci-wasm-pkg
-      - name: Install editor dependencies
+        run: |
+          ./tools/build-phase0e-wasm.ps1 -OutDir target/ci-wasm-pkg
+          node tools/ci-wasm-smoke.mjs --pkg target/ci-wasm-pkg
+      - name: Install editor dependencies for actual-WASM matrices
         working-directory: web/editor
         run: npm ci
       - name: Actual direct WASM full matrix
         working-directory: web/editor
         run: npm run test:direct-wasm:r3
+      - name: Summarize cache and duration
+        if: always()
+        shell: pwsh
+        env:
+          CACHE_HIT: ${{ steps.wasm_cache.outputs.cache-hit }}
+        run: |
+          $elapsed = [DateTimeOffset]::UtcNow.ToUnixTimeSeconds() - [int64]$env:CI_JOB_STARTED
+          Add-Content -LiteralPath $env:GITHUB_STEP_SUMMARY -Value "### Phase Gate WASM/structural`n- Cargo/CLI cache exact hit: $env:CACHE_HIT`n- Elapsed seconds: $elapsed"
+
+  editor:
+    name: Full Editor verification
+    needs: verify_authorization
+    runs-on: windows-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          lfs: false
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22
+          package-manager-cache: false
+      - name: Restore editor npm cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-22-editor-${{ hashFiles('web/editor/package-lock.json') }}
+          restore-keys: ${{ runner.os }}-node-22-editor-
+      - name: Install dependencies
+        working-directory: web/editor
+        run: npm ci
+      - name: Unit tests and build
+        working-directory: web/editor
+        run: npm test && npm run build
       - name: React ProjectionStore full matrix
         working-directory: web/editor
         run: npm run test:react:r3
-      - name: Hardware boundary notice
+
+  preview:
+    name: Full Preview verification
+    needs: verify_authorization
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          lfs: false
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22
+          package-manager-cache: false
+      - name: Restore preview npm cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-22-preview-${{ hashFiles('web/phase0d-preview/package-lock.json') }}
+          restore-keys: ${{ runner.os }}-node-22-preview-
+      - name: Install, test, and build
+        working-directory: web/phase0d-preview
+        run: npm ci && npm test && npm run build
+
+  decision:
+    name: Phase Gate Software Decision
+    if: always()
+    needs:
+      - verify_authorization
+      - integrity
+      - rust
+      - wasm_and_structural
+      - editor
+      - preview
+    runs-on: windows-latest
+    timeout-minutes: 5
+    env:
+      AUTH_RESULT: ${{ needs.verify_authorization.result }}
+      INTEGRITY_RESULT: ${{ needs.integrity.result }}
+      RUST_RESULT: ${{ needs.rust.result }}
+      WASM_RESULT: ${{ needs.wasm_and_structural.result }}
+      EDITOR_RESULT: ${{ needs.editor.result }}
+      PREVIEW_RESULT: ${{ needs.preview.result }}
+    steps:
+      - name: Require the complete software matrix
         shell: pwsh
         run: |
-          Write-Output 'Local hardware evidence reference: ${{ inputs.local_hardware_evidence }}'
-          Write-Output 'No mock, fallback, or hosted-runner GPU result is represented as hardware proof.'
+          foreach ($name in @('AUTH_RESULT', 'INTEGRITY_RESULT', 'RUST_RESULT', 'WASM_RESULT', 'EDITOR_RESULT', 'PREVIEW_RESULT')) {
+            if ((Get-Item "env:$name").Value -cne 'success') { throw "$name did not succeed" }
+          }
+          Add-Content -LiteralPath $env:GITHUB_STEP_SUMMARY -Value 'All runner-compatible Phase Gate software jobs passed. Local hardware execution remains represented only by the validated tracked evidence.'

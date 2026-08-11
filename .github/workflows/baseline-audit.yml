@@ -1,0 +1,70 @@
+name: Approved Phase 0E-R3 Baseline Audit
+
+on:
+  pull_request:
+  push:
+    tags:
+      - phase-0e-r3-approved
+  workflow_dispatch:
+    inputs:
+      approved_ref:
+        description: Approved Phase 0E-R3 commit SHA or phase-0e-r3-approved tag.
+        required: true
+        default: 39085167a1b9d2ce1ba78060b3fee4d9327aaf27
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: baseline-audit-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  approved_baseline:
+    name: Immutable approved baseline and LFS audit
+    if: github.event_name != 'pull_request' || github.event.pull_request.number == 1
+    runs-on: windows-latest
+    timeout-minutes: 20
+    env:
+      APPROVED_BASELINE_SHA: 39085167a1b9d2ce1ba78060b3fee4d9327aaf27
+    steps:
+      - name: Checkout governance scripts
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 1
+          lfs: false
+          path: governance
+          persist-credentials: false
+      - name: Checkout approved baseline explicitly
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.approved_ref || (github.event_name == 'push' && github.ref || '39085167a1b9d2ce1ba78060b3fee4d9327aaf27') }}
+          fetch-depth: 1
+          lfs: true
+          path: approved_baseline
+          persist-credentials: false
+      - name: Require the approved commit
+        shell: pwsh
+        run: |
+          $resolved = (& git -C approved_baseline rev-parse HEAD).Trim()
+          if ($resolved -cne $env:APPROVED_BASELINE_SHA) {
+            throw "Requested ref does not resolve to the approved Phase 0E-R3 baseline"
+          }
+      - name: Pull approved Git LFS object
+        shell: pwsh
+        run: git -C approved_baseline lfs pull
+      - name: Verify all 297 approved files and LFS content
+        shell: pwsh
+        run: ./governance/tools/verify-approved-phase0e-r3.ps1 -RepositoryRoot ./approved_baseline
+      - name: Record audit scope
+        if: always()
+        shell: pwsh
+        run: |
+          Add-Content -LiteralPath $env:GITHUB_STEP_SUMMARY -Value @"
+          ### Approved baseline audit
+          - Audited commit: $env:APPROVED_BASELINE_SHA
+          - Scope: immutable Phase 0E-R3 product package, CHECKSUMS.sha256, and approved Git LFS object
+          - Historical evidence is validated as stored evidence, not represented as a new product execution.
+          "@

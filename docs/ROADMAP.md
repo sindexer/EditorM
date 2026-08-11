@@ -1,63 +1,98 @@
 # EditorM Product Roadmap
 
-This roadmap preserves the approved development order. A requirement may be clarified inside its mapped phase, but it must not be implemented earlier without a new authorization.
+This roadmap restores and preserves the approved development order. Phase 0 is complete. Phase 1 is not approved, and none of the capabilities below are implemented by this GitHub-governance correction.
 
 ## Completed baseline: Phase 0
 
-Phase 0A through Phase 0E-R3 established finite core math, typed and reversible document mutation, scene and spatial derivation, render-model deltas, Worker-owned WASM execution, real WebGPU rendering, the professional editor shell, structural group/ungroup operations, exact ordering, bounded diagnostics, and actual hardware evidence.
+Phase 0A through Phase 0E-R3 established finite math, typed reversible document mutation, scene/spatial derivation, render-model deltas, Worker-owned WASM execution, actual WebGPU rendering, the professional editor shell, structural group/ungroup, exact ordering, bounded diagnostics, and actual hardware evidence. Gate 0E-R3 remains the approved baseline.
 
-Gate 0E-R3 is the approved GitHub baseline. Historical Phase 0 documents and verification artifacts remain part of the initial repository record.
+## Phase 1 — Direct-manipulation editor foundation
 
-## Phase 1: Direct-manipulation editor foundation
+- analytic coverage anti-aliasing for circles and ellipses;
+- MSAA only where its need is demonstrated;
+- verification across DPR, zoom, pan, and rotation;
+- Frame tool;
+- 1920×1080 default, followed by 3840×2160, optional DCI 4K, and user-defined sizes;
+- direct selection, movement, and resizing;
+- multiple selection;
+- alignment, distribution, and snapping;
+- opacity;
+- default fill;
+- corner radius;
+- default stroke;
+- fully undoable and redoable human direct editing.
 
-Authorized only by a separate Phase 1 instruction. Planned requirements:
-
-- pixel-aligned rectangle corners and thin-line rendering rules;
-- analytic coverage anti-aliasing and MSAA where justified;
-- DPR, zoom, pan, rotation, and transform-aware rendering checks;
-- configurable frame/canvas sizes, including 1920x1080 and 3840x2160 presets, with DCI 4K only as a user-selected size;
-- frame boundaries, clipping, selection, direct move, and resize;
-- multiple selection, alignment, distribution, and snapping;
-- opacity, default fill, corner radius, and default stroke;
-- fully undoable human direct manipulation.
-
-Exit criteria must cover exact document semantics, transaction/history behavior, viewport mapping, visual correctness, accessibility, bounded work, and fresh hardware proof where GPU paths change.
-
-## Phase 2: Vector and text editing
+## Phase 2 — Vector and text
 
 - Pen and Bezier tools;
-- vector path editing;
-- extended stroke properties;
+- path editing;
+- extended stroke;
 - gradients and composite fills;
-- text editing and layout;
+- text;
 - boolean operations.
 
-## Effects and image phase
+## Phase 3 — Layout and components
 
-- drop shadow and inner shadow;
-- image fills;
+- auto layout;
+- constraints;
+- reusable components and instances;
+- component properties and variants;
+- structures that remain directly editable by people.
+
+## Phase 4 — Effects and images
+
+- drop shadow;
+- inner shadow;
+- image fill;
 - image placement, replacement, and crop;
-- renderer and export paths that preserve effects.
+- rendering that preserves effects;
+- native image objects that remain selectable and editable.
 
-## AI-assisted editing phase
+## Phase 5 — Motion
 
-- Qwen image-model integration;
-- conversational editor control;
-- natural-language requests translated into typed editor commands;
+- keyframes;
+- easing;
+- timeline;
+- editable motion properties;
+- explicit separation between static editor state and animation state.
+
+## Phase 6 — Broadcast-graphics semantic structure
+
+- semantic objects for news and broadcast graphics;
+- data binding;
+- templates;
+- automatic generation of repeated graphics;
+- structures compatible with PSD/AE production workflows.
+
+## Phase 7 — Qwen internal-network AI editing
+
+Qwen is first defined as an internal-network LLM command controller, not merely as a Qwen image-model integration.
+
+- internal-network Qwen connection;
+- editor control through a chat tab;
+- natural language converted into typed editor commands;
 - dry-run and change previews;
-- deterministic execution and complete undo/redo;
-- human editing of AI-created results with the same tools;
-- editable document objects rather than flattened pixels;
-- revision, transaction, selection, and GPU atomicity under latency, retry, duplicate, stale, and out-of-order responses.
+- deterministic replay;
+- undo/redo for every AI change;
+- human editing of AI-created results with existing tools;
+- native document objects rather than flattened pixels;
+- fast high-volume creation and editing;
+- revision and transaction atomicity;
+- defense against retry, duplicate, stale, and out-of-order responses;
+- internal-network failure and reconnection handling;
+- any Qwen image model separated as an image-asset provider rather than confused with the document command controller.
 
-## Project and import/export phase
+Internal Qwen IP addresses, tokens, and account data must never be committed. `.env.example` may contain variable names and descriptions only.
+
+## Phase 8 — Projects, compatibility, and export
 
 - image import;
-- frame-scoped export;
-- multiple projects;
+- frame-scoped image export;
+- multiple project tabs;
 - per-project Document, history, selection, and viewport state;
 - unsaved-change warnings;
-- isolation of Worker and GPU responses during project switching.
+- Worker/GPU response isolation during tab changes;
+- asset and external-format compatibility.
 
 ## Gate policy
 

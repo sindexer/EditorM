@@ -1,4 +1,4 @@
-name: PR Fast Checks
+name: PR Scope-Aware Checks
 
 on:
   pull_request:
@@ -13,64 +13,241 @@ concurrency:
 
 jobs:
   integrity:
-    name: Approved baseline and repository hygiene
+    name: Repository integrity, LFS, and secret safety
     runs-on: windows-latest
+    timeout-minutes: 15
+    env:
+      HEAD_REF: ${{ github.event.pull_request.head.sha || github.sha }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
-          lfs: true
-      - name: Pull Git LFS objects
+          lfs: false
+          persist-credentials: false
+      - name: Protect the approved ancestor and historical Phase 0 evidence
         shell: pwsh
-        run: git lfs pull
-      - name: Verify approved Phase 0E-R3 payload
+        run: ./tools/ci-guardrails.ps1 -HeadRef $env:HEAD_REF
+      - name: Prove secret values are not printed
         shell: pwsh
-        run: ./tools/verify-approved-phase0e-r3.ps1
-      - name: Check secrets, generated artifacts, and large files
+        run: ./tools/ci-guardrails-self-test.ps1
+
+  classify:
+    name: Classify changed paths fail-closed
+    runs-on: windows-latest
+    timeout-minutes: 10
+    env:
+      BASE_REF: ${{ github.event.pull_request.base.sha || 'origin/main' }}
+      HEAD_REF: ${{ github.event.pull_request.head.sha || github.sha }}
+    outputs:
+      docs_only: ${{ steps.scope.outputs.docs_only }}
+      rust: ${{ steps.scope.outputs.rust }}
+      wasm: ${{ steps.scope.outputs.wasm }}
+      editor_web: ${{ steps.scope.outputs.editor_web }}
+      preview_web: ${{ steps.scope.outputs.preview_web }}
+      render_or_gpu: ${{ steps.scope.outputs.render_or_gpu }}
+      ci_or_unknown: ${{ steps.scope.outputs.ci_or_unknown }}
+      changed_count: ${{ steps.scope.outputs.changed_count }}
+      product_change_count: ${{ steps.scope.outputs.product_change_count }}
+      test_change_count: ${{ steps.scope.outputs.test_change_count }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          lfs: false
+          persist-credentials: false
+      - name: Run scope-classifier self-tests
         shell: pwsh
-        run: ./tools/ci-guardrails.ps1
+        run: ./tools/ci-change-scope-self-test.ps1
+      - name: Classify this pull request
+        id: scope
+        shell: pwsh
+        run: ./tools/ci-change-scope.ps1 -BaseRef $env:BASE_REF -HeadRef $env:HEAD_REF
 
   rust:
-    name: Rust format, lint, and tests
+    name: Rust format, lint, and workspace tests
+    needs: classify
+    if: needs.classify.outputs.rust == 'true'
     runs-on: windows-latest
+    timeout-minutes: 35
     steps:
-      - uses: actions/checkout@v4
+      - name: Start timing
+        shell: pwsh
+        run: Add-Content -LiteralPath $env:GITHUB_ENV -Value "CI_JOB_STARTED=$([DateTimeOffset]::UtcNow.ToUnixTimeSeconds())"
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           lfs: false
-      - uses: dtolnay/rust-toolchain@stable
+          persist-credentials: false
+      - uses: dtolnay/rust-toolchain@4360b52568e2003a75bf9bc1d59f33a8e3fc893c # stable, 2026-08-05
         with:
           toolchain: 1.89.0
           components: rustfmt, clippy
+      - name: Restore Cargo host cache
+        id: cargo_cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-rust-1.89.0-host-${{ hashFiles('Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-rust-1.89.0-host-
       - name: Format
         shell: pwsh
         run: cargo fmt --all -- --check
       - name: Clippy
         shell: pwsh
-        run: cargo clippy --workspace --all-targets -- -D warnings
+        run: |
+          $arguments = @('clippy', '--workspace', '--all-targets', '--', '-D', 'warnings')
+          ./tools/ci-cargo.ps1 -CargoArguments $arguments
       - name: Workspace tests
         shell: pwsh
-        run: cargo test --workspace --all-targets
+        run: |
+          $arguments = @('test', '--workspace', '--all-targets')
+          ./tools/ci-cargo.ps1 -CargoArguments $arguments
+      - name: Summarize Rust cache and duration
+        if: always()
+        shell: pwsh
+        env:
+          CACHE_HIT: ${{ steps.cargo_cache.outputs.cache-hit }}
+        run: |
+          $elapsed = [DateTimeOffset]::UtcNow.ToUnixTimeSeconds() - [int64]$env:CI_JOB_STARTED
+          Add-Content -LiteralPath $env:GITHUB_STEP_SUMMARY -Value "### Rust`n- Cargo cache exact hit: $env:CACHE_HIT`n- Elapsed seconds: $elapsed"
 
-  web:
-    name: React and Web unit tests and builds
+  wasm:
+    name: Pinned WASM build and ABI initialization
+    needs: classify
+    if: needs.classify.outputs.wasm == 'true'
     runs-on: windows-latest
+    timeout-minutes: 35
     steps:
-      - uses: actions/checkout@v4
+      - name: Start timing
+        shell: pwsh
+        run: Add-Content -LiteralPath $env:GITHUB_ENV -Value "CI_JOB_STARTED=$([DateTimeOffset]::UtcNow.ToUnixTimeSeconds())"
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           lfs: false
-      - uses: actions/setup-node@v4
+          persist-credentials: false
+      - uses: dtolnay/rust-toolchain@4360b52568e2003a75bf9bc1d59f33a8e3fc893c # stable, 2026-08-05
+        with:
+          toolchain: 1.89.0
+          targets: wasm32-unknown-unknown
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: 22
-      - name: Editor install
+          package-manager-cache: false
+      - name: Restore WASM Cargo and CLI cache
+        id: wasm_cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            ~/.cargo/bin/wasm-bindgen*
+            target
+          key: ${{ runner.os }}-rust-1.89.0-wasm32-unknown-unknown-${{ hashFiles('Cargo.lock') }}-wasm-bindgen-0.2.126
+          restore-keys: ${{ runner.os }}-rust-1.89.0-wasm32-unknown-unknown-${{ hashFiles('Cargo.lock') }}-
+      - name: Install exact wasm-bindgen CLI only when absent
+        shell: pwsh
+        run: |
+          $command = Get-Command wasm-bindgen -ErrorAction SilentlyContinue
+          $version = if ($null -ne $command) { (& wasm-bindgen --version).Trim() } else { '' }
+          if ($version -cne 'wasm-bindgen 0.2.126') {
+            cargo install wasm-bindgen-cli --version 0.2.126 --locked --force
+            if ($LASTEXITCODE -ne 0) { throw 'wasm-bindgen CLI installation failed' }
+          }
+      - name: Verify checked-in WASM package
+        run: node tools/ci-wasm-smoke.mjs
+      - name: Build pinned WASM package with clean-cache fallback
+        shell: pwsh
+        run: |
+          try {
+            ./tools/build-phase0e-wasm.ps1 -OutDir target/ci-wasm-pkg
+          }
+          catch {
+            $target = [IO.Path]::GetFullPath((Join-Path $PWD 'target'))
+            if (Test-Path -LiteralPath $target) { Remove-Item -LiteralPath $target -Recurse -Force }
+            ./tools/build-phase0e-wasm.ps1 -OutDir target/ci-wasm-pkg
+          }
+      - name: Verify fresh bindings, ABI, protocol, and EngineHost initialization
+        run: node tools/ci-wasm-smoke.mjs --pkg target/ci-wasm-pkg
+      - name: Summarize WASM cache and duration
+        if: always()
+        shell: pwsh
+        env:
+          CACHE_HIT: ${{ steps.wasm_cache.outputs.cache-hit }}
+        run: |
+          $elapsed = [DateTimeOffset]::UtcNow.ToUnixTimeSeconds() - [int64]$env:CI_JOB_STARTED
+          Add-Content -LiteralPath $env:GITHUB_STEP_SUMMARY -Value "### WASM`n- Cargo/CLI cache exact hit: $env:CACHE_HIT`n- Elapsed seconds: $elapsed"
+
+  editor_web:
+    name: Editor tests, type check, and build
+    needs: classify
+    if: needs.classify.outputs.editor_web == 'true'
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - name: Start timing
+        shell: pwsh
+        run: Add-Content -LiteralPath $env:GITHUB_ENV -Value "CI_JOB_STARTED=$([DateTimeOffset]::UtcNow.ToUnixTimeSeconds())"
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          lfs: false
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22
+          package-manager-cache: false
+      - name: Restore editor npm cache
+        id: npm_cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-22-editor-${{ hashFiles('web/editor/package-lock.json') }}
+          restore-keys: ${{ runner.os }}-node-22-editor-
+      - name: Install editor dependencies
         working-directory: web/editor
         run: npm ci
       - name: Editor unit tests
         working-directory: web/editor
         run: npm test
-      - name: Editor production build
+      - name: Editor type check and production build
         working-directory: web/editor
         run: npm run build
-      - name: Preview install
+      - name: Summarize editor cache and duration
+        if: always()
+        shell: pwsh
+        env:
+          CACHE_HIT: ${{ steps.npm_cache.outputs.cache-hit }}
+        run: |
+          $elapsed = [DateTimeOffset]::UtcNow.ToUnixTimeSeconds() - [int64]$env:CI_JOB_STARTED
+          Add-Content -LiteralPath $env:GITHUB_STEP_SUMMARY -Value "### Editor web`n- npm cache exact hit: $env:CACHE_HIT`n- Elapsed seconds: $elapsed"
+
+  preview_web:
+    name: Preview tests and build
+    needs: classify
+    if: needs.classify.outputs.preview_web == 'true'
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - name: Start timing
+        shell: pwsh
+        run: Add-Content -LiteralPath $env:GITHUB_ENV -Value "CI_JOB_STARTED=$([DateTimeOffset]::UtcNow.ToUnixTimeSeconds())"
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          lfs: false
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22
+          package-manager-cache: false
+      - name: Restore preview npm cache
+        id: npm_cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-22-preview-${{ hashFiles('web/phase0d-preview/package-lock.json') }}
+          restore-keys: ${{ runner.os }}-node-22-preview-
+      - name: Install preview dependencies
         working-directory: web/phase0d-preview
         run: npm ci
       - name: Preview unit tests
@@ -79,28 +256,105 @@ jobs:
       - name: Preview production build
         working-directory: web/phase0d-preview
         run: npm run build
+      - name: Summarize preview cache and duration
+        if: always()
+        shell: pwsh
+        env:
+          CACHE_HIT: ${{ steps.npm_cache.outputs.cache-hit }}
+        run: |
+          $elapsed = [DateTimeOffset]::UtcNow.ToUnixTimeSeconds() - [int64]$env:CI_JOB_STARTED
+          Add-Content -LiteralPath $env:GITHUB_STEP_SUMMARY -Value "### Preview web`n- npm cache exact hit: $env:CACHE_HIT`n- Elapsed seconds: $elapsed"
 
-  wasm:
-    name: Pinned WASM build and ABI initialization
+  hardware_evidence:
+    name: Fresh local hardware evidence requirement
+    needs: classify
+    if: needs.classify.outputs.render_or_gpu == 'true'
     runs-on: windows-latest
+    timeout-minutes: 10
+    env:
+      BASE_REF: ${{ github.event.pull_request.base.sha || 'origin/main' }}
+      HEAD_REF: ${{ github.event.pull_request.head.sha || github.sha }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          fetch-depth: 0
           lfs: false
-      - uses: dtolnay/rust-toolchain@stable
-        with:
-          toolchain: 1.89.0
-          targets: wasm32-unknown-unknown
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-      - name: Install pinned wasm-bindgen CLI
+          persist-credentials: false
+      - name: Validate a newly added actual-hardware proof
         shell: pwsh
-        run: cargo install wasm-bindgen-cli --version 0.2.126 --locked
-      - name: Verify approved checked-in WASM package
-        run: node tools/ci-wasm-smoke.mjs
-      - name: Build pinned WASM package in an isolated output
+        run: ./tools/validate-pr-hardware-evidence.ps1 -BaseRef $env:BASE_REF -HeadRef $env:HEAD_REF
+      - name: State the hosted-runner boundary
         shell: pwsh
-        run: ./tools/build-phase0e-wasm.ps1 -OutDir target/ci-wasm-pkg
-      - name: Verify fresh bindings, ABI, protocol, and EngineHost initialization
-        run: node tools/ci-wasm-smoke.mjs --pkg target/ci-wasm-pkg
+        run: Add-Content -LiteralPath $env:GITHUB_STEP_SUMMARY -Value "The hosted runner validated a tracked local proof file; it did not execute or claim hardware WebGPU itself."
+
+  decision:
+    name: PR Decision
+    if: always()
+    needs:
+      - integrity
+      - classify
+      - rust
+      - wasm
+      - editor_web
+      - preview_web
+      - hardware_evidence
+    runs-on: windows-latest
+    timeout-minutes: 5
+    env:
+      INTEGRITY_RESULT: ${{ needs.integrity.result }}
+      CLASSIFY_RESULT: ${{ needs.classify.result }}
+      SELECT_RUST: ${{ needs.classify.outputs.rust }}
+      RESULT_RUST: ${{ needs.rust.result }}
+      SELECT_WASM: ${{ needs.classify.outputs.wasm }}
+      RESULT_WASM: ${{ needs.wasm.result }}
+      SELECT_EDITOR: ${{ needs.classify.outputs.editor_web }}
+      RESULT_EDITOR: ${{ needs.editor_web.result }}
+      SELECT_PREVIEW: ${{ needs.classify.outputs.preview_web }}
+      RESULT_PREVIEW: ${{ needs.preview_web.result }}
+      SELECT_HARDWARE: ${{ needs.classify.outputs.render_or_gpu }}
+      RESULT_HARDWARE: ${{ needs.hardware_evidence.result }}
+      DOCS_ONLY: ${{ needs.classify.outputs.docs_only }}
+      CI_OR_UNKNOWN: ${{ needs.classify.outputs.ci_or_unknown }}
+      CHANGED_COUNT: ${{ needs.classify.outputs.changed_count }}
+      PRODUCT_CHANGE_COUNT: ${{ needs.classify.outputs.product_change_count }}
+      TEST_CHANGE_COUNT: ${{ needs.classify.outputs.test_change_count }}
+    steps:
+      - name: Require every selected job and only allow intentional skips
+        shell: pwsh
+        run: |
+          if ($env:INTEGRITY_RESULT -cne 'success') { throw "Repository integrity result: $env:INTEGRITY_RESULT" }
+          if ($env:CLASSIFY_RESULT -cne 'success') { throw "Change classification result: $env:CLASSIFY_RESULT" }
+          function Assert-Decision([string]$Name, [string]$Selected, [string]$Result) {
+            if ($Selected -ceq 'true') {
+              if ($Result -cne 'success') { throw "$Name was required but result was $Result" }
+            }
+            elseif ($Selected -ceq 'false') {
+              if ($Result -cne 'skipped') { throw "$Name was not selected but result was $Result" }
+            }
+            else {
+              throw "$Name selection output is missing or invalid"
+            }
+          }
+          Assert-Decision 'Rust' $env:SELECT_RUST $env:RESULT_RUST
+          Assert-Decision 'WASM' $env:SELECT_WASM $env:RESULT_WASM
+          Assert-Decision 'Editor web' $env:SELECT_EDITOR $env:RESULT_EDITOR
+          Assert-Decision 'Preview web' $env:SELECT_PREVIEW $env:RESULT_PREVIEW
+          Assert-Decision 'Hardware evidence' $env:SELECT_HARDWARE $env:RESULT_HARDWARE
+
+          Add-Content -LiteralPath $env:GITHUB_STEP_SUMMARY -Value @"
+          ### PR Decision
+          | Job | Selected | Result | Rule |
+          | --- | --- | --- | --- |
+          | Integrity and secret safety | true | $env:INTEGRITY_RESULT | Always |
+          | Rust | $env:SELECT_RUST | $env:RESULT_RUST | Rust/Cargo or fail-closed full suite |
+          | WASM | $env:SELECT_WASM | $env:RESULT_WASM | core/WASM/protocol/schema or full suite |
+          | Editor web | $env:SELECT_EDITOR | $env:RESULT_EDITOR | web/editor or full suite |
+          | Preview web | $env:SELECT_PREVIEW | $env:RESULT_PREVIEW | web/phase0d-preview or full suite |
+          | Local hardware evidence validation | $env:SELECT_HARDWARE | $env:RESULT_HARDWARE | renderer/WGSL/GPU paths only |
+
+          - Docs only: $env:DOCS_ONLY
+          - CI or unknown fail-closed: $env:CI_OR_UNKNOWN
+          - Changed paths: $env:CHANGED_COUNT
+          - Product paths: $env:PRODUCT_CHANGE_COUNT
+          - Test paths: $env:TEST_CHANGE_COUNT
+          "@
