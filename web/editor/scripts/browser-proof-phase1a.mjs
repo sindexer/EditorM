@@ -46,6 +46,7 @@ let chromeProcess;
 let preview;
 let maxFallbackRebuildCountSeen = 0;
 const fallbackCheckpoints = [];
+const browserProofStartedAtUtc = new Date().toISOString();
 
 function fixtureNodeId(index) {
   const hex = (BigInt(index) + 1n).toString(16).padStart(32, "0");
@@ -1053,11 +1054,18 @@ try {
     };
   }
 
+  const browserProofFinishedAtUtc = new Date().toISOString();
   const proof = {
     phase: "1A",
     proof_kind: "actual-hardware-browser",
-    captured_at_utc: new Date().toISOString(),
+    captured_at_utc: browserProofFinishedAtUtc,
     browser: version.Browser,
+    browser_mode: "actual Chrome; no mock; no Canvas2D fallback",
+    execution: {
+      command: "npm run test:browser:phase1a",
+      started_at_utc: browserProofStartedAtUtc,
+      finished_at_utc: browserProofFinishedAtUtc,
+    },
     user_agent: await evaluate("navigator.userAgent"),
     chrome_process_id: chromeProcess.pid,
     chrome_profile: profile,

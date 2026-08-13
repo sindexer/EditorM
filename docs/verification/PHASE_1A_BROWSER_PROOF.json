@@ -1,11 +1,17 @@
 {
   "phase": "1A",
   "proof_kind": "actual-hardware-browser",
-  "captured_at_utc": "2026-08-13T17:27:09.913Z",
+  "captured_at_utc": "2026-08-13T17:50:42.777Z",
   "browser": "Chrome/151.0.7922.110",
+  "browser_mode": "actual Chrome; no mock; no Canvas2D fallback",
+  "execution": {
+    "command": "npm run test:browser:phase1a",
+    "started_at_utc": "2026-08-13T17:50:28.552Z",
+    "finished_at_utc": "2026-08-13T17:50:42.777Z"
+  },
   "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/151.0.0.0 Safari/537.36",
-  "chrome_process_id": 12156,
-  "chrome_profile": "C:\\Users\\thdwl\\AppData\\Local\\Temp\\phase1a-chrome-18908-1786642015791",
+  "chrome_process_id": 12220,
+  "chrome_profile": "C:\\Users\\thdwl\\AppData\\Local\\Temp\\phase1a-chrome-23284-1786643428552",
   "gpu": {
     "adapter": "maxwell",
     "backend": "browser-webgpu (implementation backend not exposed by Web API)",
@@ -21,7 +27,7 @@
     }
   },
   "preview": {
-    "url": "http://127.0.0.1:54205/",
+    "url": "http://127.0.0.1:54608/",
     "health": {
       "ok": true,
       "status": 200,
@@ -48,7 +54,7 @@
         "content_type": "application/wasm"
       }
     },
-    "stdout": "Phase 0E editor: http://127.0.0.1:54205/\n",
+    "stdout": "Phase 0E editor: http://127.0.0.1:54608/\n",
     "stderr": ""
   },
   "initial": {
@@ -132,8 +138,8 @@
       "buffer_bytes": 264,
       "upload_calls": 2,
       "frame_upload_bytes": 36,
-      "render_submit_ms": 1.899999976158142,
-      "frame_ms": 2,
+      "render_submit_ms": 2.199999988079071,
+      "frame_ms": 2.300000011920929,
       "validation_errors": 0,
       "frame_sequence": 5,
       "gpu_encode_attempted": 0,
@@ -313,8 +319,8 @@
         "buffer_bytes": 264,
         "upload_calls": 1,
         "frame_upload_bytes": 32,
-        "render_submit_ms": 35.30000001192093,
-        "frame_ms": 35.30000001192093,
+        "render_submit_ms": 45.60000002384186,
+        "frame_ms": 45.69999998807907,
         "validation_errors": 0,
         "frame_sequence": 7,
         "gpu_encode_attempted": 0,
@@ -558,8 +564,8 @@
         "buffer_bytes": 264,
         "upload_calls": 1,
         "frame_upload_bytes": 32,
-        "render_submit_ms": 0.800000011920929,
-        "frame_ms": 0.800000011920929,
+        "render_submit_ms": 1.4000000357627869,
+        "frame_ms": 1.5,
         "validation_errors": 0,
         "frame_sequence": 9,
         "gpu_encode_attempted": 0,
@@ -595,7 +601,7 @@
         "sequenceDenseIndexRewrites": 0
       },
       "selection": [
-        "16e98a31-a5eb-4e53-a7f2-263ac37ecf20"
+        "a73329c0-8a0f-4b03-a3cb-f5f18ee2141b"
       ],
       "response_gpu_overlay_sequence_match": true,
       "fsm": "Idle",
@@ -651,7 +657,7 @@
           "height": 2160,
           "width": 3840
         },
-        "id": "16e98a31-a5eb-4e53-a7f2-263ac37ecf20",
+        "id": "a73329c0-8a0f-4b03-a3cb-f5f18ee2141b",
         "kind": "frame",
         "local_transform": [
           1,
@@ -742,7 +748,7 @@
       "fixture": "EDITOR",
       "metrics": {
         "allocation_growth_count": 0,
-        "cpu_update_ms": 2,
+        "cpu_update_ms": 6,
         "culling_candidates": 1,
         "document_full_clones": 0,
         "document_nodes": 2,
@@ -803,7 +809,7 @@
         "buffer_bytes": 264,
         "upload_calls": 3,
         "frame_upload_bytes": 148,
-        "render_submit_ms": 0.800000011920929,
+        "render_submit_ms": 0.8999999761581421,
         "frame_ms": 1,
         "validation_errors": 0,
         "frame_sequence": 10,
@@ -911,9 +917,9 @@
       "worker_runtime_owner": "dedicated-worker",
       "wasm_initialized": true,
       "heartbeat": 2,
-      "engine_sequence": 13,
-      "gpu_frame_sequence": 13,
-      "overlay_sequence": 13,
+      "engine_sequence": 14,
+      "gpu_frame_sequence": 14,
+      "overlay_sequence": 14,
       "revisions": {
         "document": 4,
         "render": 4,
@@ -983,10 +989,10 @@
         "buffer_bytes": 264,
         "upload_calls": 2,
         "frame_upload_bytes": 40,
-        "render_submit_ms": 1.399999976158142,
-        "frame_ms": 1.5,
+        "render_submit_ms": 1.800000011920929,
+        "frame_ms": 1.800000011920929,
         "validation_errors": 0,
-        "frame_sequence": 13,
+        "frame_sequence": 14,
         "gpu_encode_attempted": 0,
         "gpu_encode_omitted": 0,
         "instance_upload_bytes": 0,
@@ -1020,7 +1026,7 @@
         "sequenceDenseIndexRewrites": 0
       },
       "selection": [
-        "16e98a31-a5eb-4e53-a7f2-263ac37ecf20"
+        "a73329c0-8a0f-4b03-a3cb-f5f18ee2141b"
       ],
       "response_gpu_overlay_sequence_match": true,
       "fsm": "Idle",
@@ -1076,7 +1082,7 @@
           "height": 2160,
           "width": 3840
         },
-        "id": "16e98a31-a5eb-4e53-a7f2-263ac37ecf20",
+        "id": "a73329c0-8a0f-4b03-a3cb-f5f18ee2141b",
         "kind": "frame",
         "local_transform": [
           1,
@@ -1167,7 +1173,7 @@
       "fixture": "EDITOR",
       "metrics": {
         "allocation_growth_count": 0,
-        "cpu_update_ms": 0,
+        "cpu_update_ms": 1,
         "culling_candidates": 2,
         "document_full_clones": 0,
         "document_nodes": 3,
@@ -1229,7 +1235,7 @@
         "upload_calls": 3,
         "frame_upload_bytes": 152,
         "render_submit_ms": 3.300000011920929,
-        "frame_ms": 3.5,
+        "frame_ms": 3.300000011920929,
         "validation_errors": 0,
         "frame_sequence": 19,
         "gpu_encode_attempted": 1,
@@ -1265,7 +1271,7 @@
         "sequenceDenseIndexRewrites": 0
       },
       "selection": [
-        "16e98a31-a5eb-4e53-a7f2-263ac37ecf20"
+        "a73329c0-8a0f-4b03-a3cb-f5f18ee2141b"
       ],
       "response_gpu_overlay_sequence_match": true,
       "fsm": "Idle",
@@ -1321,7 +1327,7 @@
           "height": 2160,
           "width": 3840
         },
-        "id": "16e98a31-a5eb-4e53-a7f2-263ac37ecf20",
+        "id": "a73329c0-8a0f-4b03-a3cb-f5f18ee2141b",
         "kind": "frame",
         "local_transform": [
           1,
@@ -1473,8 +1479,8 @@
         "buffer_bytes": 496,
         "upload_calls": 1,
         "frame_upload_bytes": 32,
-        "render_submit_ms": 1.199999988079071,
-        "frame_ms": 1.300000011920929,
+        "render_submit_ms": 1,
+        "frame_ms": 1,
         "validation_errors": 0,
         "frame_sequence": 129,
         "gpu_encode_attempted": 0,
@@ -1491,11 +1497,11 @@
         "hierarchyNodesVisited": 5,
         "hierarchyFullRebuilds": 2,
         "projectionStructuralOperations": 5,
-        "layersFlattenedNodesVisited": 545,
+        "layersFlattenedNodesVisited": 558,
         "mountedRows": 5,
-        "pointerRawIntents": 35,
+        "pointerRawIntents": 34,
         "pointerRequestsSent": 21,
-        "pointerRequestsCoalesced": 14,
+        "pointerRequestsCoalesced": 13,
         "sequenceEntriesExamined": 105,
         "sequenceEntriesCopied": 18,
         "sequenceEntriesMovedOrShifted": 27,
@@ -1510,7 +1516,7 @@
         "sequenceDenseIndexRewrites": 0
       },
       "selection": [
-        "c2f8a477-43d1-41a8-9ea5-5c2a60e63b5e"
+        "4c4bcb28-f41b-472a-b5c0-0a128bb8ae74"
       ],
       "response_gpu_overlay_sequence_match": true,
       "fsm": "Idle",
@@ -1566,7 +1572,7 @@
           "height": 90,
           "width": 140
         },
-        "id": "c2f8a477-43d1-41a8-9ea5-5c2a60e63b5e",
+        "id": "4c4bcb28-f41b-472a-b5c0-0a128bb8ae74",
         "kind": "rectangle",
         "local_transform": [
           1,
@@ -1718,7 +1724,7 @@
         "buffer_bytes": 496,
         "upload_calls": 1,
         "frame_upload_bytes": 32,
-        "render_submit_ms": 0.800000011920929,
+        "render_submit_ms": 0.8999999761581421,
         "frame_ms": 0.8999999761581421,
         "validation_errors": 0,
         "frame_sequence": 139,
@@ -1736,11 +1742,11 @@
         "hierarchyNodesVisited": 5,
         "hierarchyFullRebuilds": 2,
         "projectionStructuralOperations": 5,
-        "layersFlattenedNodesVisited": 595,
+        "layersFlattenedNodesVisited": 603,
         "mountedRows": 5,
-        "pointerRawIntents": 47,
+        "pointerRawIntents": 46,
         "pointerRequestsSent": 28,
-        "pointerRequestsCoalesced": 19,
+        "pointerRequestsCoalesced": 18,
         "sequenceEntriesExamined": 105,
         "sequenceEntriesCopied": 18,
         "sequenceEntriesMovedOrShifted": 27,
@@ -1755,7 +1761,7 @@
         "sequenceDenseIndexRewrites": 0
       },
       "selection": [
-        "c2f8a477-43d1-41a8-9ea5-5c2a60e63b5e"
+        "4c4bcb28-f41b-472a-b5c0-0a128bb8ae74"
       ],
       "response_gpu_overlay_sequence_match": true,
       "fsm": "Idle",
@@ -1811,7 +1817,7 @@
           "height": 92.60714285714286,
           "width": 144.0969387755102
         },
-        "id": "c2f8a477-43d1-41a8-9ea5-5c2a60e63b5e",
+        "id": "4c4bcb28-f41b-472a-b5c0-0a128bb8ae74",
         "kind": "rectangle",
         "local_transform": [
           1,
@@ -1927,7 +1933,7 @@
         "indexed_nodes": 4,
         "instance_upload_bytes": 112,
         "invalid_derived_nodes": 0,
-        "order_nodes_visited": 24,
+        "order_nodes_visited": 20,
         "render_items_cloned": 0,
         "render_items_planned": 1,
         "render_items_read": 5,
@@ -1963,8 +1969,8 @@
         "buffer_bytes": 496,
         "upload_calls": 3,
         "frame_upload_bytes": 160,
-        "render_submit_ms": 2.099999964237213,
-        "frame_ms": 2.199999988079071,
+        "render_submit_ms": 3.5,
+        "frame_ms": 3.600000023841858,
         "validation_errors": 0,
         "frame_sequence": 140,
         "gpu_encode_attempted": 1,
@@ -1981,11 +1987,11 @@
         "hierarchyNodesVisited": 5,
         "hierarchyFullRebuilds": 2,
         "projectionStructuralOperations": 5,
-        "layersFlattenedNodesVisited": 600,
+        "layersFlattenedNodesVisited": 608,
         "mountedRows": 5,
-        "pointerRawIntents": 47,
+        "pointerRawIntents": 46,
         "pointerRequestsSent": 28,
-        "pointerRequestsCoalesced": 19,
+        "pointerRequestsCoalesced": 18,
         "sequenceEntriesExamined": 105,
         "sequenceEntriesCopied": 18,
         "sequenceEntriesMovedOrShifted": 27,
@@ -2000,7 +2006,7 @@
         "sequenceDenseIndexRewrites": 0
       },
       "selection": [
-        "c2f8a477-43d1-41a8-9ea5-5c2a60e63b5e"
+        "4c4bcb28-f41b-472a-b5c0-0a128bb8ae74"
       ],
       "response_gpu_overlay_sequence_match": true,
       "fsm": "Idle",
@@ -2056,7 +2062,7 @@
           "height": 92.60714285714286,
           "width": 145.0969387755102
         },
-        "id": "c2f8a477-43d1-41a8-9ea5-5c2a60e63b5e",
+        "id": "4c4bcb28-f41b-472a-b5c0-0a128bb8ae74",
         "kind": "rectangle",
         "local_transform": [
           1,
@@ -2172,7 +2178,7 @@
         "indexed_nodes": 4,
         "instance_upload_bytes": 112,
         "invalid_derived_nodes": 0,
-        "order_nodes_visited": 24,
+        "order_nodes_visited": 20,
         "render_items_cloned": 0,
         "render_items_planned": 1,
         "render_items_read": 5,
@@ -2208,8 +2214,8 @@
         "buffer_bytes": 496,
         "upload_calls": 3,
         "frame_upload_bytes": 160,
-        "render_submit_ms": 0.8999999761581421,
-        "frame_ms": 1,
+        "render_submit_ms": 1.0999999642372131,
+        "frame_ms": 1.199999988079071,
         "validation_errors": 0,
         "frame_sequence": 141,
         "gpu_encode_attempted": 1,
@@ -2226,11 +2232,11 @@
         "hierarchyNodesVisited": 5,
         "hierarchyFullRebuilds": 2,
         "projectionStructuralOperations": 5,
-        "layersFlattenedNodesVisited": 605,
+        "layersFlattenedNodesVisited": 613,
         "mountedRows": 5,
-        "pointerRawIntents": 47,
+        "pointerRawIntents": 46,
         "pointerRequestsSent": 28,
-        "pointerRequestsCoalesced": 19,
+        "pointerRequestsCoalesced": 18,
         "sequenceEntriesExamined": 105,
         "sequenceEntriesCopied": 18,
         "sequenceEntriesMovedOrShifted": 27,
@@ -2245,7 +2251,7 @@
         "sequenceDenseIndexRewrites": 0
       },
       "selection": [
-        "c2f8a477-43d1-41a8-9ea5-5c2a60e63b5e"
+        "4c4bcb28-f41b-472a-b5c0-0a128bb8ae74"
       ],
       "response_gpu_overlay_sequence_match": true,
       "fsm": "Idle",
@@ -2301,7 +2307,7 @@
           "height": 92.60714285714286,
           "width": 144.0969387755102
         },
-        "id": "c2f8a477-43d1-41a8-9ea5-5c2a60e63b5e",
+        "id": "4c4bcb28-f41b-472a-b5c0-0a128bb8ae74",
         "kind": "rectangle",
         "local_transform": [
           1,
@@ -2417,7 +2423,7 @@
         "indexed_nodes": 4,
         "instance_upload_bytes": 112,
         "invalid_derived_nodes": 0,
-        "order_nodes_visited": 24,
+        "order_nodes_visited": 20,
         "render_items_cloned": 0,
         "render_items_planned": 1,
         "render_items_read": 5,
@@ -2453,8 +2459,8 @@
         "buffer_bytes": 496,
         "upload_calls": 3,
         "frame_upload_bytes": 160,
-        "render_submit_ms": 0.8999999761581421,
-        "frame_ms": 0.8999999761581421,
+        "render_submit_ms": 1.199999988079071,
+        "frame_ms": 1.300000011920929,
         "validation_errors": 0,
         "frame_sequence": 142,
         "gpu_encode_attempted": 1,
@@ -2471,11 +2477,11 @@
         "hierarchyNodesVisited": 5,
         "hierarchyFullRebuilds": 2,
         "projectionStructuralOperations": 5,
-        "layersFlattenedNodesVisited": 610,
+        "layersFlattenedNodesVisited": 618,
         "mountedRows": 5,
-        "pointerRawIntents": 47,
+        "pointerRawIntents": 46,
         "pointerRequestsSent": 28,
-        "pointerRequestsCoalesced": 19,
+        "pointerRequestsCoalesced": 18,
         "sequenceEntriesExamined": 105,
         "sequenceEntriesCopied": 18,
         "sequenceEntriesMovedOrShifted": 27,
@@ -2490,7 +2496,7 @@
         "sequenceDenseIndexRewrites": 0
       },
       "selection": [
-        "c2f8a477-43d1-41a8-9ea5-5c2a60e63b5e"
+        "4c4bcb28-f41b-472a-b5c0-0a128bb8ae74"
       ],
       "response_gpu_overlay_sequence_match": true,
       "fsm": "Idle",
@@ -2546,7 +2552,7 @@
           "height": 92.60714285714286,
           "width": 145.0969387755102
         },
-        "id": "c2f8a477-43d1-41a8-9ea5-5c2a60e63b5e",
+        "id": "4c4bcb28-f41b-472a-b5c0-0a128bb8ae74",
         "kind": "rectangle",
         "local_transform": [
           1,
@@ -2624,26 +2630,26 @@
     "default": {
       "path": "docs/verification/phase1a-editor-default.png",
       "bytes": 33431,
-      "modified_utc": "2026-08-13T17:26:59.245Z"
+      "modified_utc": "2026-08-13T17:50:32.367Z"
     },
     "selection": {
       "path": "docs/verification/phase1a-frame-4k.png",
       "bytes": 62393,
-      "modified_utc": "2026-08-13T17:26:59.621Z"
+      "modified_utc": "2026-08-13T17:50:32.724Z"
     },
     "nested_group": {
       "path": "docs/verification/phase1a-appearance-aa.png",
-      "bytes": 65435,
-      "modified_utc": "2026-08-13T17:27:09.894Z"
+      "bytes": 65385,
+      "modified_utc": "2026-08-13T17:50:42.760Z"
     },
     "component_showcase": {
       "path": "docs/verification/phase1a-dpr-zoom-matrix.png",
-      "bytes": 61351,
-      "modified_utc": "2026-08-13T17:27:05.967Z"
+      "bytes": 61340,
+      "modified_utc": "2026-08-13T17:50:38.868Z"
     }
   },
   "console_errors": [],
-  "chrome_stderr_tail": "\r\nDevTools listening on ws://127.0.0.1:54210/devtools/browser/4e462b04-7346-47da-961d-00b43ddb2e59\r\n[12156:15324:0814/022700.308:ERROR:google_apis\\gcm\\engine\\registration_request.cc:291] Registration response error message: DEPRECATED_ENDPOINT\r\n",
+  "chrome_stderr_tail": "\r\nDevTools listening on ws://127.0.0.1:54613/devtools/browser/dbabcc1e-1a27-45c4-b267-43c5d8fefa9b\r\n[12220:23568:0814/025033.155:ERROR:google_apis\\gcm\\engine\\registration_request.cc:291] Registration response error message: DEPRECATED_ENDPOINT\r\n",
   "max_fallback_rebuild_count_seen": 0,
   "fallback_checkpoints": [
     {
@@ -2672,12 +2678,12 @@
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 13,
+      "engine_sequence": 14,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 13,
+      "engine_sequence": 14,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
@@ -2877,12 +2883,12 @@
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 88,
+      "engine_sequence": 87,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 88,
+      "engine_sequence": 87,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
@@ -2907,7 +2913,7 @@
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 96,
+      "engine_sequence": 95,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
@@ -2937,12 +2943,12 @@
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 118,
+      "engine_sequence": 117,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 118,
+      "engine_sequence": 117,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },

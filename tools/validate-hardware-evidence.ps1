@@ -46,28 +46,62 @@ catch {
 }
 
 if ($proof.proof_kind -ne "actual-hardware-browser") { throw "Evidence is not an actual-hardware browser proof" }
-if ($proof.hardware.actual_hardware -ne $true -or $proof.runtime.actual_webgpu -ne $true) { throw "Evidence does not prove actual WebGPU hardware use" }
-if ($proof.runtime.backend -notmatch "browser-webgpu") { throw "Evidence backend is not browser WebGPU" }
-if ($proof.browser.mode -notmatch "no mock" -or $proof.browser.mode -notmatch "no Canvas2D fallback") { throw "Evidence does not explicitly exclude mock and Canvas2D fallback" }
-if ($proof.max_fallback_rebuild_count_seen -ne 0) { throw "Evidence reports a fallback or rebuild" }
-if ($proof.all_passed -ne $true -or $proof.checks.actual_hardware_webgpu -ne $true) { throw "Hardware proof did not pass all checks" }
-if ($proof.checks.actual_pixel_readback -ne $true) { throw "Hardware proof does not contain a passing pixel readback" }
-if ($proof.checks.create_shape_dom_pointer -ne $true -or $proof.checks.undo_redo_dom_controls -ne $true) { throw "Hardware proof does not contain DOM input evidence" }
+$phaseProperty = $proof.PSObject.Properties["phase"]
+$isPhase1A = $null -ne $phaseProperty -and [string]$phaseProperty.Value -eq "1A"
 
-$adapter = [string]$proof.runtime.adapter
-$device = [string]$proof.hardware.active_device.deviceString
-$driverVendor = [string]$proof.hardware.active_device.driverVendor
-$driverVersion = [string]$proof.hardware.active_device.driverVersion
+if ($isPhase1A) {
+    if ($proof.initial.actual_webgpu -ne $true -or $proof.checks.actual_adapter_and_device -ne $true) {
+        throw "Phase 1A evidence does not prove actual WebGPU hardware use"
+    }
+    if ($proof.gpu.backend -notmatch "browser-webgpu") { throw "Phase 1A evidence backend is not browser WebGPU" }
+    if ($proof.browser_mode -notmatch "no mock" -or $proof.browser_mode -notmatch "no Canvas2D fallback") {
+        throw "Phase 1A evidence does not explicitly exclude mock and Canvas2D fallback"
+    }
+    if ($proof.max_fallback_rebuild_count_seen -ne 0 -or $proof.checks.fallback_rebuild_zero -ne $true) {
+        throw "Phase 1A evidence reports a fallback or rebuild"
+    }
+    if ($proof.all_passed -ne $true -or $proof.checks.actual_pixel_readback -ne $true) {
+        throw "Phase 1A hardware proof did not pass all checks"
+    }
+    if ($proof.checks.frame_4k_created_selected_undo_redo -ne $true -or $proof.checks.direct_move_resize_undo_redo -ne $true) {
+        throw "Phase 1A hardware proof does not contain DOM input evidence"
+    }
+
+    $adapter = [string]$proof.gpu.adapter
+    $device = [string]$proof.gpu.active_device.deviceString
+    $driverVendor = [string]$proof.gpu.active_device.driverVendor
+    $driverVersion = [string]$proof.gpu.active_device.driverVersion
+    $capturedAt = [DateTimeOffset]::Parse([string]$proof.captured_at_utc)
+    $startedAt = [DateTimeOffset]::Parse([string]$proof.execution.started_at_utc)
+    $finishedAt = [DateTimeOffset]::Parse([string]$proof.execution.finished_at_utc)
+    $command = [string]$proof.execution.command
+}
+else {
+    if ($proof.hardware.actual_hardware -ne $true -or $proof.runtime.actual_webgpu -ne $true) { throw "Evidence does not prove actual WebGPU hardware use" }
+    if ($proof.runtime.backend -notmatch "browser-webgpu") { throw "Evidence backend is not browser WebGPU" }
+    if ($proof.browser.mode -notmatch "no mock" -or $proof.browser.mode -notmatch "no Canvas2D fallback") { throw "Evidence does not explicitly exclude mock and Canvas2D fallback" }
+    if ($proof.max_fallback_rebuild_count_seen -ne 0) { throw "Evidence reports a fallback or rebuild" }
+    if ($proof.all_passed -ne $true -or $proof.checks.actual_hardware_webgpu -ne $true) { throw "Hardware proof did not pass all checks" }
+    if ($proof.checks.actual_pixel_readback -ne $true) { throw "Hardware proof does not contain a passing pixel readback" }
+    if ($proof.checks.create_shape_dom_pointer -ne $true -or $proof.checks.undo_redo_dom_controls -ne $true) { throw "Hardware proof does not contain DOM input evidence" }
+
+    $adapter = [string]$proof.runtime.adapter
+    $device = [string]$proof.hardware.active_device.deviceString
+    $driverVendor = [string]$proof.hardware.active_device.driverVendor
+    $driverVersion = [string]$proof.hardware.active_device.driverVersion
+    $capturedAt = [DateTimeOffset]::Parse([string]$proof.captured_at_utc)
+    $startedAt = [DateTimeOffset]::Parse([string]$proof.r3_complexity_matrix.started_at_utc)
+    $finishedAt = [DateTimeOffset]::Parse([string]$proof.r3_complexity_matrix.finished_at_utc)
+    $command = [string]$proof.r3_complexity_matrix.command
+}
+
 if ([string]::IsNullOrWhiteSpace($adapter) -or [string]::IsNullOrWhiteSpace($device) -or
     [string]::IsNullOrWhiteSpace($driverVendor) -or [string]::IsNullOrWhiteSpace($driverVersion)) {
     throw "Hardware proof is missing adapter or driver information"
 }
-
-$capturedAt = [DateTimeOffset]::Parse([string]$proof.captured_at_utc)
-$startedAt = [DateTimeOffset]::Parse([string]$proof.r3_complexity_matrix.started_at_utc)
-$finishedAt = [DateTimeOffset]::Parse([string]$proof.r3_complexity_matrix.finished_at_utc)
-$command = [string]$proof.r3_complexity_matrix.command
-if ($finishedAt -lt $startedAt -or [string]::IsNullOrWhiteSpace($command)) { throw "Hardware proof is missing a valid execution interval or command" }
+if ($finishedAt -lt $startedAt -or [string]::IsNullOrWhiteSpace($command)) {
+    throw "Hardware proof is missing a valid execution interval or command"
+}
 $age = [DateTimeOffset]::UtcNow - $capturedAt.ToUniversalTime()
 if ($age.TotalMinutes -lt -5 -or $age.TotalHours -gt $MaximumAgeHours) {
     throw "Hardware proof is not fresh enough for this phase-gate dispatch"
@@ -83,13 +117,19 @@ if (-not $pixelFull.StartsWith($verificationRoot, [StringComparison]::OrdinalIgn
 $null = & git -C $repoRoot ls-files --error-unmatch -- $pixelRelative 2>$null
 if ($LASTEXITCODE -ne 0) { throw "Pixel readback artifact must be tracked by Git" }
 $pixelProof = Get-Content -Raw -LiteralPath $pixelFull | ConvertFrom-Json
-if ($pixelProof.kind -ne "actual-webgpu-texture-readback" -or $pixelProof.all_passed -ne $true) {
+if ($isPhase1A) {
+    if ($pixelProof.proof_kind -ne "actual-hardware-webgpu-pixel-readback" -or $pixelProof.all_passed -ne $true) {
+        throw "Phase 1A pixel artifact is not a passing actual-WebGPU readback"
+    }
+}
+elseif ($pixelProof.kind -ne "actual-webgpu-texture-readback" -or $pixelProof.all_passed -ne $true) {
     throw "Pixel readback artifact is not a passing actual-WebGPU readback"
 }
 
 [pscustomobject]@{
     evidence_path = $relative
     evidence_sha256 = $actualHash
+    phase = if ($isPhase1A) { "1A" } else { "legacy" }
     captured_at_utc = $capturedAt.ToUniversalTime().ToString("o")
     command = $command
     actual_webgpu = $true

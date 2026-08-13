@@ -1,7 +1,7 @@
 {
   "phase": "1A",
   "proof_kind": "actual-hardware-webgpu-pixel-readback",
-  "captured_at_utc": "2026-08-13T17:27:09.896Z",
+  "captured_at_utc": "2026-08-13T17:50:42.762Z",
   "color_contract": "sRGB UI to linear premultiplied WebGPU output",
   "analytic_aa": "fwidth + smoothstep; no fragment discard",
   "cases": [

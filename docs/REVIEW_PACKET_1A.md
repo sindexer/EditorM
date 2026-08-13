@@ -44,11 +44,11 @@ All commands below were run on Windows against the final source state:
 | `npm.cmd run build` | PASS |
 | `npm.cmd run test:browser:phase1a` | PASS: fresh actual hardware run plus 4 artifact assertions |
 
-The complete command/result record is [PHASE_1A_VERIFICATION.txt](verification/PHASE_1A_VERIFICATION.txt).
+The complete command/result record is [PHASE_1A_VERIFICATION.txt](verification/PHASE_1A_VERIFICATION.txt). Checked-in and fresh pinned WASM packages are both 1,285,981 bytes with SHA-256 `5a543298efef4ce276a4dab100727b09b57f856c2447e9e4db7237c7e4ae78d0`; both instantiate EngineHost with protocol v1 and render schema v2.
 
 ## Actual Chrome, Worker, WASM, and WebGPU proof
 
-Fresh capture: `2026-08-13T17:27:09.913Z`.
+Fresh capture: `2026-08-13T17:50:42.777Z`.
 
 - Chrome `151.0.7922.110`, new process, new temporary profile.
 - NVIDIA GeForce GTX 970 actual WebGPU device.
@@ -86,16 +86,20 @@ Both use a 1920×1080 viewport, DPR 1, one batch, one draw call, and actual NVID
 
 A first `npm.ps1` validation entry did not execute because of Windows execution policy and was not counted as a pass; final commands use `npm.cmd`. Two failures while authoring the new artifact test (one TypeScript type inference error and one temporary-profile expectation mismatch) were corrected before the final 15/15 and 4/4 passing runs.
 
+## CI first-run incident
+
+The first PR Actions run, [31726409602](https://github.com/sindexer/EditorM/actions/runs/31726409602), is preserved as a failure. Rust (9m04s), Editor, integrity, and classification passed. WASM smoke still hard-coded the approved Phase 0 binary hash/schema v1; Preview tests still expected schema v1 and `discard`; and the hardware validator only recognized the Phase 0E-R3 proof shape. These were validation-contract gaps exposed by the authorized Phase 1 schema change, not retries hidden as passes. The follow-up keeps the legacy Phase 0 proof branch, validates current checked-in and fresh pinned schema v2 WASM initialization, asserts analytic AA/no-discard, and requires explicit Phase 1A execution/no-mock/no-Canvas2D fields. The legacy Phase 0E-R3 proof was structurally revalidated after the compatibility change.
+
 ## Evidence index and hashes
 
-- `docs/verification/PHASE_1A_BROWSER_PROOF.json` — `8caa83cb07b8a51c6f7e3827e97d6cb862194d5fa73f34bc9e7b1084c57c792d`
-- `docs/verification/PHASE_1A_PIXEL_READBACK.json` — `4deb37d439c412303aa56077edef16129be7d2a03baceb99758729737c280b86`
+- `docs/verification/PHASE_1A_BROWSER_PROOF.json` — `ee9584bf0f2e2c9863c473fe7b938e25d1f775de4ffe3c0e2d036e2db78e2815`
+- `docs/verification/PHASE_1A_PIXEL_READBACK.json` — `f884312db341e8c8c9f3d0726ab1fe017792ca5df89bcbd17ca2017098624a98`
 - `docs/PHASE_1A_METRICS.json` — `b74162be5fc66ca84c363c5decf53bd30fba1bd6387a0da684738986c1cbb777`
 - `docs/verification/PHASE_1A_BROWSER_INCIDENT_PRE_FIX.json` — `6353bb842f7f474b38012a052969df2962e1108734bdb0ac26b73c10509e1668`
 - `docs/verification/phase1a-editor-default.png` — `5ceec717d942e439dbb0d9ed630283869ff01bb4d0bd666a8651d2c1c5686859`
 - `docs/verification/phase1a-frame-4k.png` — `19151523b81ca6e899cd28e08d79a3f3a74453b4df40c9309c83d9895cabbd7d`
-- `docs/verification/phase1a-appearance-aa.png` — `10043df2cc842e7f8508ec62148ddb3f296602e06e3311caa336167956cfb1cc`
-- `docs/verification/phase1a-dpr-zoom-matrix.png` — `3b6585743a733dc31b04db910f5a18c75c2ec5d36ef4a9ebffe172c8f761fe02`
+- `docs/verification/phase1a-appearance-aa.png` — `dbc39099074844cb249bdfac5b15a22b6c54a1ce2ca928f249ae07448ed6d6cb`
+- `docs/verification/phase1a-dpr-zoom-matrix.png` — `720fc23556c4f3dbccd5c59a944b195026111868b83ed331a2ce215c815b9dc1`
 
 ## Run locally
 

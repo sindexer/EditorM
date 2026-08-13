@@ -29,6 +29,7 @@ WASM and generated contract
 ---------------------------
 - powershell -NoProfile -ExecutionPolicy Bypass -File tools/build-phase0e-wasm.ps1
   PASS. Release wasm and wasm-bindgen web module were generated.
+- Checked-in and fresh pinned packages: SHA-256 5a543298efef4ce276a4dab100727b09b57f856c2447e9e4db7237c7e4ae78d0, 1,285,981 bytes; protocol v1, render schema v2, EngineHost initialize PASS.
 - node web/phase0d-preview/scripts/generate-render-contract.mjs --check
   PASS. The generated browser WGSL string matches shared/render_contract.wgsl.
 - A legacy direct-wasm R3 script was intentionally not rerun because it writes a Phase 0E-R3 historical evidence path. Current WASM initialization is proven by the fresh Phase 1A Dedicated Worker browser run below.
@@ -46,7 +47,7 @@ A first attempt through npm.ps1 did not execute because Windows PowerShell execu
 
 Fresh actual hardware browser proof
 -----------------------------------
-- captured_at_utc: 2026-08-13T17:27:09.913Z
+- captured_at_utc: 2026-08-13T17:50:42.777Z
 - browser: Chrome/151.0.7922.110
 - GPU: NVIDIA GeForce GTX 970
 - runtime owner: Dedicated Worker
@@ -100,18 +101,22 @@ Comparative 10,000 visible primitive case:
 
 Evidence SHA-256
 ---------------
-8caa83cb07b8a51c6f7e3827e97d6cb862194d5fa73f34bc9e7b1084c57c792d  docs/verification/PHASE_1A_BROWSER_PROOF.json
-4deb37d439c412303aa56077edef16129be7d2a03baceb99758729737c280b86  docs/verification/PHASE_1A_PIXEL_READBACK.json
+ee9584bf0f2e2c9863c473fe7b938e25d1f775de4ffe3c0e2d036e2db78e2815  docs/verification/PHASE_1A_BROWSER_PROOF.json
+f884312db341e8c8c9f3d0726ab1fe017792ca5df89bcbd17ca2017098624a98  docs/verification/PHASE_1A_PIXEL_READBACK.json
 b74162be5fc66ca84c363c5decf53bd30fba1bd6387a0da684738986c1cbb777  docs/PHASE_1A_METRICS.json
 6353bb842f7f474b38012a052969df2962e1108734bdb0ac26b73c10509e1668  docs/verification/PHASE_1A_BROWSER_INCIDENT_PRE_FIX.json
 5ceec717d942e439dbb0d9ed630283869ff01bb4d0bd666a8651d2c1c5686859  docs/verification/phase1a-editor-default.png
 19151523b81ca6e899cd28e08d79a3f3a74453b4df40c9309c83d9895cabbd7d  docs/verification/phase1a-frame-4k.png
-10043df2cc842e7f8508ec62148ddb3f296602e06e3311caa336167956cfb1cc  docs/verification/phase1a-appearance-aa.png
-3b6585743a733dc31b04db910f5a18c75c2ec5d36ef4a9ebffe172c8f761fe02  docs/verification/phase1a-dpr-zoom-matrix.png
+dbc39099074844cb249bdfac5b15a22b6c54a1ce2ca928f249ae07448ed6d6cb  docs/verification/phase1a-appearance-aa.png
+720fc23556c4f3dbccd5c59a944b195026111868b83ed331a2ce215c815b9dc1  docs/verification/phase1a-dpr-zoom-matrix.png
 
 Preserved incident
 ------------------
 PHASE_1A_BROWSER_INCIDENT_PRE_FIX.json records the pre-fix condition_timeout while waiting for the Resizing FSM. It remains evidence of a failed run and is not represented as a current pass. Hardware proof development also exposed and led to correction of a nonuniform ellipse centered-stroke quad clipping defect and an affine selection-overlay mapping defect.
+
+CI first-run incident and correction
+------------------------------------
+PR #2 Actions run 31726409602 is preserved as a failed first run. Rust, Editor, repository integrity, and scope classification passed. Three stale Phase 0 assumptions failed: ci-wasm-smoke required the approved Phase 0 WASM hash/schema v1, Preview tests required render schema v1 and fragment discard, and the hardware validator accepted only the Phase 0E-R3 proof shape. The first failures were not rerun into a pass. The validators/tests were corrected to verify current checked-in and fresh schema v2 WASM while retaining the legacy Phase 0 evidence branch, to assert analytic AA with no discard, and to validate an explicit Phase 1A execution/no-fallback contract. The legacy Phase 0E-R3 hardware proof was revalidated structurally after the compatibility change.
 
 Scope integrity
 ---------------

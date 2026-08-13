@@ -21,6 +21,11 @@ describe("Phase 1A stored proof integrity", () => {
     expect(browser.browser).toMatch(/^Chrome\//);
     expect(browser.chrome_process_id).toBeGreaterThan(0);
     expect(browser.chrome_profile).toMatch(/phase1a-chrome-/);
+    expect(browser.browser_mode).toMatch(/no mock; no Canvas2D fallback/);
+    expect(browser.execution.command).toBe("npm run test:browser:phase1a");
+    expect(Date.parse(browser.execution.started_at_utc)).toBeLessThanOrEqual(
+      Date.parse(browser.execution.finished_at_utc),
+    );
     expect(browser.gpu.active_device.deviceString).toBe("NVIDIA GeForce GTX 970");
     expect(browser.initial.worker_runtime_owner).toBe("dedicated-worker");
     expect(browser.initial.wasm_initialized).toBe(true);
