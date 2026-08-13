@@ -67,11 +67,12 @@ jobs:
       - name: Repository and historical evidence guardrails
         shell: pwsh
         run: ./tools/ci-guardrails.ps1
-      - name: Scope and secret-output self-tests
+      - name: Scope, secret-output, and first-failure self-tests
         shell: pwsh
         run: |
           ./tools/ci-change-scope-self-test.ps1
           ./tools/ci-guardrails-self-test.ps1
+          ./tools/ci-failure-semantics-self-test.ps1
 
   rust:
     name: Full Rust verification
@@ -105,14 +106,10 @@ jobs:
         run: cargo fmt --all -- --check
       - name: Clippy
         shell: pwsh
-        run: |
-          $arguments = @('clippy', '--workspace', '--all-targets', '--', '-D', 'warnings')
-          ./tools/ci-cargo.ps1 -CargoArguments $arguments
+        run: cargo clippy --workspace --all-targets -- -D warnings
       - name: Workspace tests
         shell: pwsh
-        run: |
-          $arguments = @('test', '--workspace', '--all-targets')
-          ./tools/ci-cargo.ps1 -CargoArguments $arguments
+        run: cargo test --workspace --all-targets
       - name: Summarize cache and duration
         if: always()
         shell: pwsh

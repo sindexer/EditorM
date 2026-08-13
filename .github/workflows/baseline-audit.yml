@@ -7,10 +7,9 @@ on:
       - phase-0e-r3-approved
   workflow_dispatch:
     inputs:
-      approved_ref:
-        description: Approved Phase 0E-R3 commit SHA or phase-0e-r3-approved tag.
-        required: true
-        default: 39085167a1b9d2ce1ba78060b3fee4d9327aaf27
+      lineage_ref:
+        description: Optional governance commit/ref whose ancestry should be checked; the audited payload remains fixed.
+        required: false
         type: string
 
 permissions:
@@ -22,49 +21,91 @@ concurrency:
 
 jobs:
   approved_baseline:
-    name: Immutable approved baseline and LFS audit
+    name: Immutable approved payload and governance lineage audit
     if: github.event_name != 'pull_request' || github.event.pull_request.number == 1
     runs-on: windows-latest
     timeout-minutes: 20
     env:
-      APPROVED_BASELINE_SHA: 39085167a1b9d2ce1ba78060b3fee4d9327aaf27
+      APPROVED_PAYLOAD_SHA: 39085167a1b9d2ce1ba78060b3fee4d9327aaf27
+      APPROVED_TAG_NAME: phase-0e-r3-approved
+      EVENT_NAME: ${{ github.event_name }}
+      EVENT_REF: ${{ github.ref }}
+      EVENT_REF_TYPE: ${{ github.ref_type }}
+      GOVERNANCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+      LINEAGE_REF_INPUT: ${{ inputs.lineage_ref || '' }}
     steps:
-      - name: Checkout governance scripts
+      - name: Checkout governance workflow and verification scripts
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
-          fetch-depth: 1
+          fetch-depth: 0
           lfs: false
           path: governance
           persist-credentials: false
-      - name: Checkout approved baseline explicitly
+      - name: Checkout the fixed approved payload
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.approved_ref || (github.event_name == 'push' && github.ref || '39085167a1b9d2ce1ba78060b3fee4d9327aaf27') }}
+          ref: 39085167a1b9d2ce1ba78060b3fee4d9327aaf27
           fetch-depth: 1
           lfs: true
           path: approved_baseline
           persist-credentials: false
-      - name: Require the approved commit
+      - name: Validate tag identity, payload identity, and lineage
         shell: pwsh
         run: |
-          $resolved = (& git -C approved_baseline rev-parse HEAD).Trim()
-          if ($resolved -cne $env:APPROVED_BASELINE_SHA) {
-            throw "Requested ref does not resolve to the approved Phase 0E-R3 baseline"
+          $governanceResolved = (& git -C governance rev-parse HEAD).Trim()
+          if ($governanceResolved -cne $env:GOVERNANCE_SHA) {
+            throw "Governance checkout does not match the triggering commit."
           }
-      - name: Pull approved Git LFS object
+
+          if ($env:EVENT_NAME -ceq 'push') {
+            if ($env:EVENT_REF_TYPE -cne 'tag' -or $env:EVENT_REF -cne "refs/tags/$env:APPROVED_TAG_NAME") {
+              throw "The approval tag event must be exactly $env:APPROVED_TAG_NAME."
+            }
+          }
+
+          $lineageTarget = $governanceResolved
+          if ($env:EVENT_NAME -ceq 'workflow_dispatch' -and -not [string]::IsNullOrWhiteSpace($env:LINEAGE_REF_INPUT)) {
+            $candidate = $env:LINEAGE_REF_INPUT.Trim()
+            $validRef = $candidate -match '^[0-9a-fA-F]{40}$' -or
+              ($candidate -match '^refs/(heads|tags)/[A-Za-z0-9._/-]+$' -and
+               $candidate -notmatch '\.\.' -and $candidate -notmatch '/-' -and
+               $candidate -notmatch '@\{')
+            if (-not $validRef) { throw "Lineage ref input is invalid." }
+            & git -C governance fetch --no-tags origin $candidate
+            if ($LASTEXITCODE -ne 0) { throw "Unable to fetch the lineage ref." }
+            $lineageTarget = (& git -C governance rev-parse FETCH_HEAD).Trim()
+          }
+
+          $payloadResolved = (& git -C approved_baseline rev-parse HEAD).Trim()
+          if ($payloadResolved -cne $env:APPROVED_PAYLOAD_SHA) {
+            throw "Approved payload checkout does not match the fixed Phase 0E-R3 payload."
+          }
+
+          & git -C governance cat-file -e "$env:APPROVED_PAYLOAD_SHA^{commit}"
+          if ($LASTEXITCODE -ne 0) { throw "Approved payload commit is unavailable in governance history." }
+          & git -C governance merge-base --is-ancestor $env:APPROVED_PAYLOAD_SHA $lineageTarget
+          if ($LASTEXITCODE -ne 0) { throw "Approved payload is not an ancestor of the governance/tag target." }
+
+          Add-Content -LiteralPath $env:GITHUB_ENV -Value "GOVERNANCE_RESOLVED_SHA=$governanceResolved"
+          Add-Content -LiteralPath $env:GITHUB_ENV -Value "LINEAGE_TARGET_SHA=$lineageTarget"
+      - name: Pull the approved payload Git LFS object
         shell: pwsh
         run: git -C approved_baseline lfs pull
-      - name: Verify all 297 approved files and LFS content
+      - name: Verify exactly 297 files in the fixed approved payload
         shell: pwsh
         run: ./governance/tools/verify-approved-phase0e-r3.ps1 -RepositoryRoot ./approved_baseline
-      - name: Record audit scope
+      - name: Record audit roles without making a new execution claim
         if: always()
         shell: pwsh
         run: |
           Add-Content -LiteralPath $env:GITHUB_STEP_SUMMARY -Value @"
-          ### Approved baseline audit
-          - Audited commit: $env:APPROVED_BASELINE_SHA
-          - Scope: immutable Phase 0E-R3 product package, CHECKSUMS.sha256, and approved Git LFS object
-          - Historical evidence is validated as stored evidence, not represented as a new product execution.
+          ### Approved payload and governance lineage audit
+          - Governance workflow/scripts commit: $env:GOVERNANCE_RESOLVED_SHA
+          - Lineage target commit: $env:LINEAGE_TARGET_SHA
+          - Fixed byte-audited payload commit: $env:APPROVED_PAYLOAD_SHA
+          - Future approval tag name: $env:APPROVED_TAG_NAME
+          - The tag/governance target is not claimed to be byte-identical to the 297-file payload.
+          - The 297-file byte audit applies only to the fixed approved payload commit.
+          - Historical evidence remains stored evidence and is not represented as a new execution.
           "@

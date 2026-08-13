@@ -30,6 +30,9 @@ jobs:
       - name: Prove secret values are not printed
         shell: pwsh
         run: ./tools/ci-guardrails-self-test.ps1
+      - name: Prove first-failure semantics
+        shell: pwsh
+        run: ./tools/ci-failure-semantics-self-test.ps1
 
   classify:
     name: Classify changed paths fail-closed
@@ -96,14 +99,10 @@ jobs:
         run: cargo fmt --all -- --check
       - name: Clippy
         shell: pwsh
-        run: |
-          $arguments = @('clippy', '--workspace', '--all-targets', '--', '-D', 'warnings')
-          ./tools/ci-cargo.ps1 -CargoArguments $arguments
+        run: cargo clippy --workspace --all-targets -- -D warnings
       - name: Workspace tests
         shell: pwsh
-        run: |
-          $arguments = @('test', '--workspace', '--all-targets')
-          ./tools/ci-cargo.ps1 -CargoArguments $arguments
+        run: cargo test --workspace --all-targets
       - name: Summarize Rust cache and duration
         if: always()
         shell: pwsh
@@ -157,17 +156,9 @@ jobs:
           }
       - name: Verify checked-in WASM package
         run: node tools/ci-wasm-smoke.mjs
-      - name: Build pinned WASM package with clean-cache fallback
+      - name: Build pinned WASM package once
         shell: pwsh
-        run: |
-          try {
-            ./tools/build-phase0e-wasm.ps1 -OutDir target/ci-wasm-pkg
-          }
-          catch {
-            $target = [IO.Path]::GetFullPath((Join-Path $PWD 'target'))
-            if (Test-Path -LiteralPath $target) { Remove-Item -LiteralPath $target -Recurse -Force }
-            ./tools/build-phase0e-wasm.ps1 -OutDir target/ci-wasm-pkg
-          }
+        run: ./tools/build-phase0e-wasm.ps1 -OutDir target/ci-wasm-pkg
       - name: Verify fresh bindings, ABI, protocol, and EngineHost initialization
         run: node tools/ci-wasm-smoke.mjs --pkg target/ci-wasm-pkg
       - name: Summarize WASM cache and duration

@@ -24,11 +24,15 @@ Run the complete Rust, WASM, actual-WASM matrix, Editor, Preview, and runner-com
 
 - npm caches are keyed by OS, Node version, and the relevant `package-lock.json` hash; `node_modules` is never cached.
 - Cargo registry, Git database, target output, and the exact `wasm-bindgen-cli 0.2.126` are keyed by OS, Rust 1.89.0, target, and `Cargo.lock` hash.
-- A failed Cargo build retries once after removing only the repository `target` directory so damaged caches recover without weakening the final result.
+- Caches reduce execution time; they never change the meaning of a Clippy, test, or WASM build failure.
+- Clippy, workspace tests, and the pinned WASM build run once. Their first non-zero exit is the job result; CI does not delete `target` or retry automatically.
+- If cache corruption is suspected, preserve the failed run and logs, then use a separate Actions rerun. Record both attempts and never present the rerun as if the first execution passed.
 - Cache hit state and major job duration are written to the Actions summary.
 - Third-party actions use immutable full commit SHAs with the corresponding supported release noted inline.
 - Concurrency cancels obsolete runs for the same PR. Jobs have explicit timeouts.
 
 ## Evidence integrity and cost control
+
+The future `phase-0e-r3-approved` tag points to the final Bootstrap merge commit, which must contain fixed payload commit `39085167a1b9d2ce1ba78060b3fee4d9327aaf27` as an ancestor. The 297-file byte audit always checks only that fixed payload commit, never the tag target's current tree.
 
 The approved R3 297-file byte audit is separate from current product verification. Preserve prior-phase evidence byte-for-byte and never treat stored JSON as a new execution. Do not regenerate unchanged evidence, repeat full matrices for documentation-only changes, hide failures, introduce mocks, lower thresholds, or reduce tests solely to save time.

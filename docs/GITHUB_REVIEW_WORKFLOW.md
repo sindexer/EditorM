@@ -8,7 +8,9 @@ Open PRs as drafts and move them to Ready for review only after `PR Decision` an
 
 ## Approved baseline audit versus current product verification
 
-`.github/workflows/baseline-audit.yml` performs the one-time immutable Phase 0E-R3 audit for bootstrap PR #1, an explicit approved commit, or the future `phase-0e-r3-approved` tag. It explicitly checks out approved commit `39085167a1b9d2ce1ba78060b3fee4d9327aaf27`, verifies all 297 package checksums, and validates the approved Git LFS object. Historical Phase 0 evidence is stored evidence, not a newly executed product test.
+`.github/workflows/baseline-audit.yml` separates two roles. `governance` checks out the PR head, workflow-dispatch governance commit, or future tag target so the workflow and verification scripts exist. `approved_baseline` always checks out fixed payload commit `39085167a1b9d2ce1ba78060b3fee4d9327aaf27`, verifies all 297 package checksums, and validates the approved Git LFS object.
+
+The future `phase-0e-r3-approved` tag points to PR #1's final Bootstrap merge commit, not directly to the payload commit. The workflow requires the tag name exactly, verifies that the fixed payload is an ancestor of the tag/governance target, and never claims the tag target's current product tree is byte-identical to the 297-file payload. Workflow dispatch may name only a lineage target; it cannot replace the fixed audited payload. Historical Phase 0 evidence is stored evidence, not a newly executed product test.
 
 Future product branches are not required to remain byte-identical to R3. `.github/workflows/pr-fast.yml` instead verifies that the approved commit remains an ancestor and that files which existed in the approved history have not been changed, deleted, renamed, or overwritten. Protected history includes `CHECKSUMS.sha256`, Phase 0 authorization/review/verification files, ADR-001 through ADR-041, and the authoritative package.
 
@@ -27,6 +29,10 @@ Repository integrity, Git LFS, forbidden-artifact, large-blob, and tracked-secre
 | Workflow, CI, classifier, or unknown path | Full software suite, fail-closed |
 
 `PR Decision` always runs. A selected job must succeed, an intentionally unselected job must be `skipped`, and a missing classification or result fails the PR. Its summary records why each job ran or was omitted.
+
+## Failure semantics and cache recovery
+
+Caches reduce time only. Clippy, workspace tests, and the pinned WASM build each run once, and the first non-zero exit fails the job without automatic `target` deletion or retry. Suspected cache corruption is investigated by preserving the failed run and logs, then starting a separate Actions rerun. If a rerun passes, both attempts remain recorded and the initial failure is not rewritten.
 
 ## Phase Gate and hardware boundary
 

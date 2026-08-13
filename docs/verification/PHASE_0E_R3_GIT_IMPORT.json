@@ -1,5 +1,5 @@
 {
-  "schema_version": 2,
+  "schema_version": 3,
   "phase": "0E-R3",
   "captured_at_utc": "2026-08-11T12:05:41.2886131Z",
   "repository": "https://github.com/sindexer/EditorM",
@@ -11,7 +11,8 @@
     "branch": "bootstrap/phase0e-r3-baseline",
     "baseline_commit": "39085167a1b9d2ce1ba78060b3fee4d9327aaf27",
     "operational_commit": "self",
-    "external_review_r1_commit": "self"
+    "external_review_r1_commit": "self",
+    "external_review_r2_commit": "self"
   },
   "approved_archive": {
     "name": "visual_authoring_engine_phase0e_r3_review_2026-08-11.zip",
@@ -79,6 +80,21 @@
       "docs/verification/PHASE_0E_R3_GIT_IMPORT.json",
       "tools/ci-guardrails.ps1",
       "tools/verify-approved-phase0e-r3.ps1"
+    ],
+    "external_review_r2_additions": [
+      "tools/ci-failure-semantics-self-test.ps1"
+    ],
+    "external_review_r2_modifications": [
+      "AGENTS.md",
+      ".github/workflows/baseline-audit.yml",
+      ".github/workflows/phase-gate.yml",
+      ".github/workflows/pr-fast.yml",
+      "docs/GITHUB_REVIEW_WORKFLOW.md",
+      "docs/QUALITY_AND_EFFICIENCY_POLICY.md",
+      "docs/verification/PHASE_0E_R3_GIT_IMPORT.json"
+    ],
+    "external_review_r2_deletions": [
+      "tools/ci-cargo.ps1"
     ]
   },
   "external_review_r1_correction": {
@@ -119,5 +135,21 @@
     "protocol_version": 1,
     "render_binary_schema_version": 1,
     "note": "WASM binary byte identity is not claimed across build environments; pinned rebuild success and binding/ABI/protocol behavior are verified."
+  },
+  "external_review_r2_correction": {
+    "scope": "GitHub workflow, baseline-tag lineage, failure semantics, and operational documentation only",
+    "approval_tag": "phase-0e-r3-approved",
+    "approval_tag_target": "future final Bootstrap merge commit",
+    "fixed_payload_sha": "39085167a1b9d2ce1ba78060b3fee4d9327aaf27",
+    "fixed_payload_must_be_ancestor": true,
+    "byte_audit_target": "fixed payload commit only",
+    "cargo_automatic_retry": false,
+    "wasm_build_automatic_retry": false,
+    "synthetic_failure_exit_preserved": true,
+    "synthetic_failure_invocations_expected": 1,
+    "approved_product_source_changes": 0,
+    "approved_test_changes": 0,
+    "historical_phase0_evidence_changes": 0,
+    "phase1_started": false
   }
 }

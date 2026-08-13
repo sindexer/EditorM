@@ -21,8 +21,9 @@ These instructions apply to the entire repository.
 - Follow `docs/GITHUB_REVIEW_WORKFLOW.md` and `docs/QUALITY_AND_EFFICIENCY_POLICY.md`.
 - General PRs always run integrity, Git LFS, forbidden-artifact, large-blob, and secret checks. Other jobs are selected by the fail-closed changed-path classifier, and every skip must have a recorded reason in `PR Decision`.
 - CI/workflow/classifier changes and unknown product paths run the full software suite. Documentation-only PRs do not repeat unrelated Rust, WASM, or web builds.
-- The one-time 297-file R3 byte audit belongs to `baseline-audit.yml`; do not apply R3 byte identity to future product worktrees.
+- The one-time 297-file R3 byte audit belongs to `baseline-audit.yml` and always targets fixed payload commit `39085167a1b9d2ce1ba78060b3fee4d9327aaf27`. The future `phase-0e-r3-approved` tag points to the final Bootstrap merge commit, which must contain that payload as an ancestor; do not apply R3 byte identity to the tag target or future product worktrees.
 - Phase Gates run the complete software suite. Renderer, WGSL, render-binary-schema, or GPU-application changes also require fresh tracked local hardware evidence. A hosted runner may validate that evidence but cannot claim it executed the hardware proof.
 - Large approved binary originals must use Git LFS. Never replace an LFS-managed source with a normal Git blob.
 - Address review feedback as follow-up commits in the same PR. Do not create a replacement PR or a review ZIP for each PR.
 - Reduce repeated cost with path selection and keyed caches; never reduce assertions, test counts, or gate thresholds to save time.
+- Preserve first-failure semantics: do not automatically delete `target` or retry failed Clippy, tests, or WASM builds. Preserve the failed run and use a separate Actions rerun when cache corruption is suspected.
