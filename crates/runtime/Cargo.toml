@@ -18,6 +18,11 @@ required-features = ["native-wgpu"]
 name = "phase0d_r1_proof"
 path = "src/bin/phase0d_r1_proof.rs"
 required-features = ["native-wgpu"]
+[[bin]]
+name = "phase1a_proof"
+path = "src/bin/phase1a_proof.rs"
+required-features = ["native-wgpu"]
+
 [dependencies]
 pollster = { workspace = true, optional = true }
 serde_json.workspace = true

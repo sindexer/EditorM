@@ -64,6 +64,7 @@ pub enum DocumentChange {
     },
     AppearanceChanged {
         node: NodeId,
+        bounds_changed: bool,
     },
     PersistentPropertyChanged {
         node: NodeId,

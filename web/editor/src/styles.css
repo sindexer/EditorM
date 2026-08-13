@@ -144,7 +144,8 @@ button:disabled { cursor: not-allowed; color: var(--ui-label-assistive) !importa
 .selection-handle { fill: #fff; stroke: var(--ui-primary); stroke-width: 1.5; }
 .selection-handle.rotate { fill: var(--ui-primary); }
 .rotation-stem { stroke: var(--ui-primary); stroke-width: 1; }
-.handle-hit { fill: transparent; stroke: transparent; pointer-events: all; cursor: nwse-resize; }
+.transform-handle-hit { position: absolute; width: 20px; height: 20px; padding: 0; border: 0; border-radius: 50%; background: transparent; transform: translate(-50%, -50%); z-index: 4; }
+.resize-hit { cursor: nwse-resize; }
 .rotate-hit { cursor: grab; }
 .canvas-loading { position: absolute; inset: 0; display: grid; place-content: center; grid-auto-flow: column; gap: 9px; color: #dce5f3; background: rgba(9, 14, 20, 0.74); font-size: 12px; }
 .spinner { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,.25); border-top-color: white; border-radius: 50%; animation: spin .8s linear infinite; }
@@ -225,3 +226,44 @@ kbd { padding: 1px 4px; border: 1px solid rgba(255,255,255,.24); border-radius: 
 .showcase-menu [role="menuitem"] { justify-content: flex-start; border: 0; background: transparent; padding: 7px 8px; text-align: left; }
 .showcase-menu [role="menuitem"]:hover { background: #f1f3f8; }
 .showcase [role="radio"]:focus-visible, .showcase [role="tab"]:focus-visible { outline: 2px solid #5b67f1; outline-offset: 2px; }
+
+/* Phase 1A visible-frame and appearance controls */
+.canvas-shell.tool-frame { cursor: crosshair; }
+.frame-preset-popover {
+  position: absolute;
+  z-index: 8;
+  top: 14px;
+  left: 14px;
+  display: grid;
+  gap: 7px;
+  width: 250px;
+  padding: 12px;
+  color: var(--ui-label-neutral);
+  background: rgba(255, 255, 255, 0.98);
+  border: 1px solid var(--ui-line-neutral);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-popover);
+}
+.frame-preset-popover strong { font-size: 12px; }
+.frame-preset-popover > button {
+  min-height: 30px;
+  padding: 0 9px;
+  border: 1px solid var(--ui-line-neutral);
+  border-radius: var(--radius-sm);
+  background: var(--ui-surface);
+  color: var(--ui-label-neutral);
+  text-align: left;
+  cursor: pointer;
+}
+.frame-preset-popover > button:hover { background: var(--ui-primary-soft); border-color: rgba(0, 102, 255, 0.22); }
+.frame-preset-popover > button.button.primary { justify-content: center; color: white; background: var(--ui-primary); text-align: center; }
+.frame-preset-popover small { color: var(--ui-label-alternative); font-size: 10px; }
+.frame-custom-row { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+.frame-custom-row label { display: grid; grid-template-columns: 16px 1fr; align-items: center; gap: 4px; color: var(--ui-label-alternative); font-size: 10px; }
+.frame-custom-row input { width: 100%; min-width: 0; height: 30px; padding: 0 7px; border: 1px solid var(--ui-line-neutral); border-radius: var(--radius-sm); }
+
+.appearance-section { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--ui-line-neutral); }
+.appearance-heading { margin-bottom: 9px; color: var(--ui-label-neutral); font-size: 11px; font-weight: 700; }
+.appearance-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px 8px; }
+.color-field input[type="color"] { height: 30px; padding: 3px 5px; cursor: pointer; }
+.appearance-section > small { display: block; margin-top: 8px; color: var(--ui-label-assistive); font-size: 9px; line-height: 1.4; }

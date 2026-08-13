@@ -6,13 +6,15 @@
   "description": "Phase 0E professional React editor shell backed by the Worker-owned Rust/WASM runtime and actual WebGPU.",
   "scripts": {
     "build": "tsc -b && vite build",
-    "test": "vitest run tests/projection.test.ts",
+    "test": "vitest run tests/projection.test.ts tests/phase1a-contract.test.ts tests/browser-proof-phase1a.test.ts",
     "test:browser": "npm run build && node scripts/browser-proof.mjs && vitest run tests/browser-proof.test.ts",
     "start": "node server.mjs",
     "test:browser:r2": "npm run build && node scripts/browser-proof-r2.mjs && vitest run tests/browser-proof-r2.test.ts",
     "test:react:r3": "vitest run tests/r3-matrix.test.ts",
     "test:direct-wasm:r3": "node scripts/direct-wasm-r3.mjs",
-    "test:browser:r3": "npm run build && node scripts/browser-proof-r3.mjs && vitest run tests/browser-proof-r3.test.ts"
+    "test:browser:r3": "npm run build && node scripts/browser-proof-r3.mjs && vitest run tests/browser-proof-r3.test.ts",
+    "test:phase1a": "vitest run tests/phase1a-contract.test.ts tests/browser-proof-phase1a.test.ts",
+    "test:browser:phase1a": "npm run build && node scripts/browser-proof-phase1a.mjs && vitest run tests/browser-proof-phase1a.test.ts"
   },
   "dependencies": {
     "@vitejs/plugin-react": "4.7.0",

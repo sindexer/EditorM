@@ -11,12 +11,12 @@ use serde::{Deserialize, Serialize};
 use thiserror::Error;
 use visual_authoring_core_math::{Affine2, Vec2};
 use visual_authoring_document::{
-    Appearance, Document, DocumentError, DocumentSnapshot, Geometry, GroupRestoration,
-    GroupRestorationRun, NodeId, NodeKind, NodeSnapshot, NodeSpec,
+    Appearance, ColorRgba, CornerRadii, Document, DocumentError, DocumentSnapshot, Geometry,
+    GroupRestoration, GroupRestorationRun, NodeId, NodeKind, NodeSnapshot, NodeSpec, Stroke,
 };
 
 pub const DOCUMENT_FORMAT: &str = "visual-authoring-document";
-pub const CURRENT_VERSION: u32 = 1;
+pub const CURRENT_VERSION: u32 = 2;
 
 #[derive(Debug, Error)]
 pub enum SerializationError {
@@ -57,7 +57,7 @@ pub fn from_json(json: &str) -> Result<Document, SerializationError> {
         .and_then(serde_json::Value::as_u64)
         .ok_or(SerializationError::InvalidEnvelopeField("version"))?;
     match version {
-        1 => serde_json::from_value::<StoredEnvelopeV1>(value)?.into_document(),
+        1 | 2 => serde_json::from_value::<StoredEnvelopeV1>(value)?.into_document(),
         unsupported => Err(SerializationError::UnsupportedVersion(unsupported)),
     }
 }
@@ -92,7 +92,7 @@ impl StoredEnvelopeV1 {
         if self.format != DOCUMENT_FORMAT {
             return Err(SerializationError::UnsupportedFormat(self.format));
         }
-        if self.version != CURRENT_VERSION {
+        if self.version != 1 && self.version != CURRENT_VERSION {
             return Err(SerializationError::UnsupportedVersion(u64::from(
                 self.version,
             )));
@@ -360,12 +360,115 @@ impl From<StoredAffine2V1> for Affine2 {
 #[serde(deny_unknown_fields)]
 struct StoredAppearanceV1 {
     opacity: f64,
+    #[serde(default)]
+    fill: StoredColorV2,
+    #[serde(default)]
+    corner_radii: StoredCornerRadiiV2,
+    #[serde(default)]
+    stroke: StoredStrokeV2,
+}
+
+#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+struct StoredColorV2 {
+    r: f64,
+    g: f64,
+    b: f64,
+    a: f64,
+}
+
+impl Default for StoredColorV2 {
+    fn default() -> Self {
+        ColorRgba::default().into()
+    }
+}
+
+impl From<ColorRgba> for StoredColorV2 {
+    fn from(color: ColorRgba) -> Self {
+        Self {
+            r: color.r,
+            g: color.g,
+            b: color.b,
+            a: color.a,
+        }
+    }
+}
+
+impl From<StoredColorV2> for ColorRgba {
+    fn from(color: StoredColorV2) -> Self {
+        Self::new(color.r, color.g, color.b, color.a)
+    }
+}
+
+#[derive(Clone, Copy, Debug, Default, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+struct StoredCornerRadiiV2 {
+    top_left: f64,
+    top_right: f64,
+    bottom_right: f64,
+    bottom_left: f64,
+}
+
+impl From<CornerRadii> for StoredCornerRadiiV2 {
+    fn from(radii: CornerRadii) -> Self {
+        Self {
+            top_left: radii.top_left,
+            top_right: radii.top_right,
+            bottom_right: radii.bottom_right,
+            bottom_left: radii.bottom_left,
+        }
+    }
+}
+
+impl From<StoredCornerRadiiV2> for CornerRadii {
+    fn from(radii: StoredCornerRadiiV2) -> Self {
+        Self {
+            top_left: radii.top_left,
+            top_right: radii.top_right,
+            bottom_right: radii.bottom_right,
+            bottom_left: radii.bottom_left,
+        }
+    }
+}
+
+#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+struct StoredStrokeV2 {
+    color: StoredColorV2,
+    width: f64,
+}
+
+impl Default for StoredStrokeV2 {
+    fn default() -> Self {
+        Stroke::default().into()
+    }
+}
+
+impl From<Stroke> for StoredStrokeV2 {
+    fn from(stroke: Stroke) -> Self {
+        Self {
+            color: stroke.color.into(),
+            width: stroke.width,
+        }
+    }
+}
+
+impl From<StoredStrokeV2> for Stroke {
+    fn from(stroke: StoredStrokeV2) -> Self {
+        Self {
+            color: stroke.color.into(),
+            width: stroke.width,
+        }
+    }
 }
 
 impl From<Appearance> for StoredAppearanceV1 {
     fn from(appearance: Appearance) -> Self {
         Self {
             opacity: appearance.opacity,
+            fill: appearance.fill.into(),
+            corner_radii: appearance.corner_radii.into(),
+            stroke: appearance.stroke.into(),
         }
     }
 }
@@ -373,7 +476,10 @@ impl From<Appearance> for StoredAppearanceV1 {
 impl From<StoredAppearanceV1> for Appearance {
     fn from(appearance: StoredAppearanceV1) -> Self {
         Self {
+            fill: appearance.fill.into(),
             opacity: appearance.opacity,
+            corner_radii: appearance.corner_radii.into(),
+            stroke: appearance.stroke.into(),
         }
     }
 }
@@ -529,7 +635,11 @@ mod tests {
         let first_id = NodeId::new();
         let second_id = NodeId::new();
         let identity = StoredAffine2V1::from(Affine2::IDENTITY);
-        let appearance = StoredAppearanceV1 { opacity: 1.0 };
+        let appearance = Appearance {
+            opacity: 1.0,
+            ..Appearance::default()
+        }
+        .into();
         let node = |id, name: &str, parent, children| StoredNodeV1 {
             id,
             name: name.into(),
@@ -733,5 +843,53 @@ mod tests {
             restored.document().node(root).unwrap().children(),
             &[x, f, a, b, d, e]
         );
+    }
+
+    #[test]
+    fn phase1a_appearance_round_trips_and_version_one_migrates_defaults() {
+        let (document, _frame_id, rectangle_id, _ellipse_id) = sample_document();
+        let mut editor = HeadlessEditorCore::new(document).unwrap();
+        let appearance = Appearance {
+            fill: ColorRgba::new(0.91, 0.22, 0.13, 0.8),
+            opacity: 0.65,
+            corner_radii: CornerRadii {
+                top_left: 4.0,
+                top_right: 8.0,
+                bottom_right: 12.0,
+                bottom_left: 16.0,
+            },
+            stroke: Stroke {
+                color: ColorRgba::new(0.1, 0.2, 0.3, 0.75),
+                width: 6.0,
+            },
+        };
+        editor
+            .dispatch(Command::SetAppearance {
+                target: rectangle_id,
+                appearance,
+            })
+            .unwrap();
+
+        let json = to_json_pretty(editor.document()).unwrap();
+        let restored = from_json(&json).unwrap();
+        assert_eq!(
+            restored.node(rectangle_id).unwrap().appearance(),
+            appearance
+        );
+
+        let mut legacy: serde_json::Value = serde_json::from_str(&json).unwrap();
+        legacy["version"] = 1_u64.into();
+        for node in legacy["document"]["nodes"].as_array_mut().unwrap() {
+            let stored = node["appearance"].as_object_mut().unwrap();
+            stored.remove("fill");
+            stored.remove("corner_radii");
+            stored.remove("stroke");
+        }
+        let migrated = from_json(&legacy.to_string()).unwrap();
+        let migrated_appearance = migrated.node(rectangle_id).unwrap().appearance();
+        assert_eq!(migrated_appearance.opacity, appearance.opacity);
+        assert_eq!(migrated_appearance.fill, ColorRgba::default());
+        assert_eq!(migrated_appearance.corner_radii, CornerRadii::default());
+        assert_eq!(migrated_appearance.stroke, Stroke::default());
     }
 }

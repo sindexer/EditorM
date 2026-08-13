@@ -10,8 +10,8 @@ use serde::Deserialize;
 use serde_json::{json, Value};
 use visual_authoring_core_math::{Affine2, Vec2};
 use visual_authoring_document::{
-    Appearance, Command, DocumentChange, DocumentChangeSet, Geometry, NodeId, NodeKind, NodeSpec,
-    StructuralGroupChange,
+    Appearance, ColorRgba, Command, Document, DocumentChange, DocumentChangeSet, Geometry, NodeId,
+    NodeKind, NodeSpec, StructuralGroupChange,
 };
 use visual_authoring_render_model::{
     CullingResult, PrimitiveKind, RenderDelta, RenderEncodingDiagnosticKind, RenderItem,
@@ -24,8 +24,8 @@ use visual_authoring_runtime::{
 use wasm_bindgen::prelude::*;
 
 pub const PROTOCOL_VERSION: u32 = 1;
-pub const RENDER_BINARY_SCHEMA_VERSION: u32 = 1;
-const INSTANCE_STRIDE_BYTES: usize = 48;
+pub const RENDER_BINARY_SCHEMA_VERSION: u32 = 2;
+const INSTANCE_STRIDE_BYTES: usize = 112;
 const DIRTY_RECORD_STRIDE_BYTES: usize = 4 + INSTANCE_STRIDE_BYTES;
 
 #[derive(Debug, Deserialize)]
@@ -114,6 +114,19 @@ enum CommandRequest {
     SetOpacity {
         node_id: String,
         opacity: f64,
+    },
+    SetFill {
+        node_id: String,
+        color: [f64; 4],
+    },
+    SetCornerRadii {
+        node_id: String,
+        radii: [f64; 4],
+    },
+    SetStroke {
+        node_id: String,
+        color: [f64; 4],
+        width: f64,
     },
     CreateShape {
         node_id: String,
@@ -424,7 +437,8 @@ impl EngineHost {
             }
             HostRequest::Command { command } => {
                 let structural = command.structural_nodes_touched().is_some();
-                let outcome = self.runtime.dispatch(command.into_command()?)?;
+                let command = command.into_command(self.runtime.document())?;
+                let outcome = self.runtime.dispatch(command)?;
                 if structural {
                     self.request_metrics.document_nodes_touched =
                         outcome.command.affected().len() as u64;
@@ -440,7 +454,8 @@ impl EngineHost {
             }
             HostRequest::UpdateTransaction { command } => {
                 let structural = command.structural_nodes_touched().is_some();
-                let outcome = self.runtime.update_transaction(command.into_command()?)?;
+                let command = command.into_command(self.runtime.document())?;
+                let outcome = self.runtime.update_transaction(command)?;
                 if structural {
                     self.request_metrics.document_nodes_touched =
                         outcome.command.affected().len() as u64;
@@ -691,7 +706,7 @@ impl EngineHost {
                 DocumentChange::LocalTransformChanged { node }
                 | DocumentChange::GeometryChanged { node }
                 | DocumentChange::VisibilityChanged { node }
-                | DocumentChange::AppearanceChanged { node }
+                | DocumentChange::AppearanceChanged { node, .. }
                 | DocumentChange::PersistentPropertyChanged { node, .. } => {
                     upsert_ids.insert(*node);
                 }
@@ -756,6 +771,29 @@ impl EngineHost {
             "visible": node.visible(),
             "locked": node.locked(),
             "opacity": node.appearance().opacity,
+            "appearance": {
+                "fill": [
+                    node.appearance().fill.r,
+                    node.appearance().fill.g,
+                    node.appearance().fill.b,
+                    node.appearance().fill.a
+                ],
+                "corner_radii": [
+                    node.appearance().corner_radii.top_left,
+                    node.appearance().corner_radii.top_right,
+                    node.appearance().corner_radii.bottom_right,
+                    node.appearance().corner_radii.bottom_left
+                ],
+                "stroke": {
+                    "color": [
+                        node.appearance().stroke.color.r,
+                        node.appearance().stroke.color.g,
+                        node.appearance().stroke.color.b,
+                        node.appearance().stroke.color.a
+                    ],
+                    "width": node.appearance().stroke.width
+                }
+            },
             "local_transform": [local.m11, local.m12, local.m21, local.m22, local.tx, local.ty],
             "world_transform": world.map(|matrix| [
                 matrix.m11, matrix.m12, matrix.m21, matrix.m22, matrix.tx, matrix.ty
@@ -1162,7 +1200,7 @@ impl CommandRequest {
         }
     }
 
-    fn into_command(self) -> Result<Command, HostFailure> {
+    fn into_command(self, document: &Document) -> Result<Command, HostFailure> {
         match self {
             Self::MoveNode { node_index, x, y } => {
                 require_finite(&[x, y], "node translation")?;
@@ -1224,10 +1262,42 @@ impl CommandRequest {
                         "opacity must be between 0 and 1",
                     ));
                 }
-                Ok(Command::SetAppearance {
-                    target: parse_node_id(&node_id)?,
-                    appearance: Appearance { opacity },
-                })
+                let target = parse_node_id(&node_id)?;
+                let mut appearance = current_appearance(document, target)?;
+                appearance.opacity = opacity;
+                Ok(Command::SetAppearance { target, appearance })
+            }
+            Self::SetFill { node_id, color } => {
+                let target = parse_node_id(&node_id)?;
+                let mut appearance = current_appearance(document, target)?;
+                appearance.fill = parse_color(color)?;
+                Ok(Command::SetAppearance { target, appearance })
+            }
+            Self::SetCornerRadii { node_id, radii } => {
+                require_non_negative(&radii, "corner radii")?;
+                let target = parse_node_id(&node_id)?;
+                let mut appearance = current_appearance(document, target)?;
+                appearance.corner_radii = visual_authoring_document::CornerRadii {
+                    top_left: radii[0],
+                    top_right: radii[1],
+                    bottom_right: radii[2],
+                    bottom_left: radii[3],
+                };
+                Ok(Command::SetAppearance { target, appearance })
+            }
+            Self::SetStroke {
+                node_id,
+                color,
+                width,
+            } => {
+                require_non_negative(&[width], "stroke width")?;
+                let target = parse_node_id(&node_id)?;
+                let mut appearance = current_appearance(document, target)?;
+                appearance.stroke = visual_authoring_document::Stroke {
+                    color: parse_color(color)?,
+                    width,
+                };
+                Ok(Command::SetAppearance { target, appearance })
             }
             Self::CreateShape {
                 node_id,
@@ -1246,6 +1316,7 @@ impl CommandRequest {
                 let mut spec = match shape.as_str() {
                     "rectangle" => NodeSpec::rectangle(id, name, Vec2::new(width, height)),
                     "ellipse" => NodeSpec::ellipse(id, name, Vec2::new(width, height)),
+                    "frame" => NodeSpec::frame(id, name, Vec2::new(width, height)),
                     _ => {
                         return Err(HostFailure::new(
                             "invalid_command",
@@ -1300,6 +1371,39 @@ impl CommandRequest {
                 }
             }
         }
+    }
+}
+
+fn current_appearance(document: &Document, target: NodeId) -> Result<Appearance, HostFailure> {
+    document
+        .node(target)
+        .map(visual_authoring_document::Node::appearance)
+        .ok_or_else(|| HostFailure::new("node_not_found", format!("node {target} was not found")))
+}
+
+fn parse_color(color: [f64; 4]) -> Result<ColorRgba, HostFailure> {
+    require_finite(&color, "color")?;
+    if color
+        .iter()
+        .any(|component| !(0.0..=1.0).contains(component))
+    {
+        return Err(HostFailure::new(
+            "invalid_command",
+            "color components must be between 0 and 1",
+        ));
+    }
+    Ok(ColorRgba::new(color[0], color[1], color[2], color[3]))
+}
+
+fn require_non_negative(values: &[f64], label: &str) -> Result<(), HostFailure> {
+    require_finite(values, label)?;
+    if values.iter().all(|value| *value >= 0.0) {
+        Ok(())
+    } else {
+        Err(HostFailure::new(
+            "invalid_command",
+            format!("{label} must be non-negative"),
+        ))
     }
 }
 
@@ -1361,6 +1465,7 @@ fn node_kind_label(kind: NodeKind) -> &'static str {
 fn parse_fixture(value: &str) -> Result<FixtureKind, HostFailure> {
     match value.to_ascii_lowercase().as_str() {
         "preview" | "demo" => Ok(FixtureKind::Preview),
+        "editor" | "phase-1a" => Ok(FixtureKind::Editor),
         "bench-a" | "a" | "1k" => Ok(FixtureKind::BenchA),
         "bench-b" | "b" | "10k" => Ok(FixtureKind::BenchB),
         "bench-c" | "c" | "100k" => Ok(FixtureKind::BenchC),
@@ -1442,7 +1547,20 @@ fn encode_item(item: &RenderItem) -> Option<[u8; INSTANCE_STRIDE_BYTES]> {
         world.m22,
         item.size.x,
         item.size.y,
+        item.fill_linear[0],
+        item.fill_linear[1],
+        item.fill_linear[2],
+        item.fill_linear[3],
         item.opacity,
+        item.corner_radii[0],
+        item.corner_radii[1],
+        item.corner_radii[2],
+        item.corner_radii[3],
+        item.stroke_linear[0],
+        item.stroke_linear[1],
+        item.stroke_linear[2],
+        item.stroke_linear[3],
+        item.stroke_width,
     ];
     if values.iter().any(|value| !finite_f32(*value)) {
         return None;
@@ -1468,6 +1586,16 @@ fn encode_item(item: &RenderItem) -> Option<[u8; INSTANCE_STRIDE_BYTES]> {
     }
     let primitive = u32::from(item.primitive == PrimitiveKind::Ellipse);
     bytes[44..48].copy_from_slice(&primitive.to_le_bytes());
+    for (index, value) in item.fill_linear.into_iter().enumerate() {
+        bytes[48 + index * 4..52 + index * 4].copy_from_slice(&(value as f32).to_le_bytes());
+    }
+    for (index, value) in item.corner_radii.into_iter().enumerate() {
+        bytes[64 + index * 4..68 + index * 4].copy_from_slice(&(value as f32).to_le_bytes());
+    }
+    for (index, value) in item.stroke_linear.into_iter().enumerate() {
+        bytes[80 + index * 4..84 + index * 4].copy_from_slice(&(value as f32).to_le_bytes());
+    }
+    bytes[96..100].copy_from_slice(&(item.stroke_width as f32).to_le_bytes());
     Some(bytes)
 }
 
@@ -2674,5 +2802,104 @@ mod tests {
             "all_passed": true,
         });
         println!("PHASE0E_R3_ENGINE_HOST_MATRIX_JSON={report}");
+    }
+
+    #[test]
+    fn phase1a_frame_appearance_is_typed_incremental_and_undoable() {
+        let mut host = EngineHost::new_inner().unwrap();
+        let frame_id = fixture_node_id(1);
+        let loaded = response(
+            &mut host,
+            request(
+                "load-editor",
+                json!({ "type": "load_fixture", "fixture": "editor" }),
+            ),
+        );
+        assert!(loaded["ok"].as_bool().unwrap());
+        assert_eq!(loaded["fixture"], "EDITOR");
+        assert_eq!(loaded["projection"]["upserts"][1]["kind"], "frame");
+        assert_eq!(
+            loaded["projection"]["upserts"][1]["name"],
+            "Frame 1920×1080"
+        );
+
+        let before_revision = host.runtime.document_revision();
+        let fill = response(
+            &mut host,
+            request(
+                "set-fill",
+                json!({
+                    "type": "command",
+                    "command": {
+                        "kind": "set_fill",
+                        "node_id": frame_id.to_string(),
+                        "color": [1.0, 0.0, 0.0, 0.75]
+                    }
+                }),
+            ),
+        );
+        assert!(fill["ok"].as_bool().unwrap());
+        assert_eq!(fill["render_delta"]["dirty_slots"], 1);
+        assert_eq!(
+            fill["projection"]["upserts"][0]["appearance"]["fill"],
+            json!([1.0, 0.0, 0.0, 0.75])
+        );
+        assert_eq!(
+            host.pending.dirty_instances.len(),
+            DIRTY_RECORD_STRIDE_BYTES
+        );
+        let linear_red =
+            f32::from_le_bytes(host.pending.dirty_instances[52..56].try_into().unwrap());
+        assert_eq!(linear_red, 1.0);
+        assert_eq!(host.runtime.document_revision(), before_revision + 1);
+
+        let stroke = response(
+            &mut host,
+            request(
+                "set-stroke",
+                json!({
+                    "type": "command",
+                    "command": {
+                        "kind": "set_stroke",
+                        "node_id": frame_id.to_string(),
+                        "color": [0.0, 0.0, 0.0, 1.0],
+                        "width": 8.0
+                    }
+                }),
+            ),
+        );
+        assert!(stroke["ok"].as_bool().unwrap());
+        assert_eq!(stroke["render_delta"]["dirty_slots"], 1);
+        assert_eq!(
+            stroke["projection"]["upserts"][0]["appearance"]["stroke"]["width"],
+            8.0
+        );
+
+        let before_invalid = host.runtime.document().snapshot();
+        let invalid = response(
+            &mut host,
+            request(
+                "invalid-stroke",
+                json!({
+                    "type": "command",
+                    "command": {
+                        "kind": "set_stroke",
+                        "node_id": frame_id.to_string(),
+                        "color": [0.0, 0.0, 0.0, 1.0],
+                        "width": -1.0
+                    }
+                }),
+            ),
+        );
+        assert!(!invalid["ok"].as_bool().unwrap());
+        assert_eq!(invalid["error"]["code"], "invalid_command");
+        assert_eq!(host.runtime.document().snapshot(), before_invalid);
+
+        let undo = response(&mut host, request("undo-stroke", json!({ "type": "undo" })));
+        assert!(undo["ok"].as_bool().unwrap());
+        assert_eq!(
+            undo["projection"]["upserts"][0]["appearance"]["stroke"]["width"],
+            1.0
+        );
     }
 }

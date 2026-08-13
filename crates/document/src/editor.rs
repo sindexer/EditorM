@@ -656,7 +656,10 @@ mod tests {
         editor
             .dispatch(Command::SetAppearance {
                 target: rectangle,
-                appearance: Appearance { opacity: 0.4 },
+                appearance: Appearance {
+                    opacity: 0.4,
+                    ..Appearance::default()
+                },
             })
             .unwrap();
         let metadata = BTreeMap::from([("role".into(), "badge".into())]);
@@ -679,7 +682,13 @@ mod tests {
         assert!(!node.visible());
         assert!(node.locked());
         assert_eq!(node.geometry().unwrap().size(), Vec2::new(40.0, 30.0));
-        assert_eq!(node.appearance(), Appearance { opacity: 0.4 });
+        assert_eq!(
+            node.appearance(),
+            Appearance {
+                opacity: 0.4,
+                ..Appearance::default()
+            }
+        );
         assert_eq!(node.metadata(), &metadata);
         editor.document().validate_invariants().unwrap();
     }
@@ -803,7 +812,7 @@ mod tests {
         ));
         assert!(matches!(
             assert_atomic_error(&mut editor, Command::SetAppearance {
-                target: child, appearance: Appearance { opacity: 2.0 },
+                target: child, appearance: Appearance { opacity: 2.0, ..Appearance::default() },
             }),
             CommandError::Document(DocumentError::InvalidAppearance(id)) if id == child
         ));
@@ -993,6 +1002,7 @@ mod tests {
                 target: node,
                 appearance: Appearance {
                     opacity: f64::INFINITY,
+                    ..Appearance::default()
                 },
             })
             .unwrap_err();
@@ -1114,7 +1124,10 @@ mod tests {
             },
             Command::SetAppearance {
                 target: rectangle,
-                appearance: Appearance { opacity: 0.25 },
+                appearance: Appearance {
+                    opacity: 0.25,
+                    ..Appearance::default()
+                },
             },
             Command::SetMetadata {
                 target: rectangle,
@@ -1181,6 +1194,7 @@ mod tests {
                         target: node,
                         appearance: Appearance {
                             opacity: f64::from(value.unsigned_abs() % 1_001) / 1_000.0,
+                            ..Appearance::default()
                         },
                     },
                 };

@@ -96,15 +96,99 @@ impl Geometry {
     }
 }
 
-/// Minimal persistent appearance boundary for Phase 0A.
+/// Persistent sRGB color. Conversion to the renderer's linear working space happens at the
+/// derived RenderModel boundary so serialization and UI values remain stable and intuitive.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct ColorRgba {
+    pub r: f64,
+    pub g: f64,
+    pub b: f64,
+    pub a: f64,
+}
+
+impl ColorRgba {
+    pub const fn new(r: f64, g: f64, b: f64, a: f64) -> Self {
+        Self { r, g, b, a }
+    }
+
+    fn is_valid(self) -> bool {
+        [self.r, self.g, self.b, self.a]
+            .into_iter()
+            .all(|component| component.is_finite() && (0.0..=1.0).contains(&component))
+    }
+}
+
+impl Default for ColorRgba {
+    fn default() -> Self {
+        Self::new(0.20, 0.58, 0.96, 1.0)
+    }
+}
+
+/// Four independent rectangle corner radii in top-left, top-right, bottom-right,
+/// bottom-left order. The renderer normalizes overlapping radii against geometry size.
+#[derive(Clone, Copy, Debug, Default, PartialEq)]
+pub struct CornerRadii {
+    pub top_left: f64,
+    pub top_right: f64,
+    pub bottom_right: f64,
+    pub bottom_left: f64,
+}
+
+impl CornerRadii {
+    pub const fn uniform(radius: f64) -> Self {
+        Self {
+            top_left: radius,
+            top_right: radius,
+            bottom_right: radius,
+            bottom_left: radius,
+        }
+    }
+
+    fn is_valid(self) -> bool {
+        [
+            self.top_left,
+            self.top_right,
+            self.bottom_right,
+            self.bottom_left,
+        ]
+        .into_iter()
+        .all(|radius| radius.is_finite() && radius >= 0.0)
+    }
+}
+
+/// Phase 1A supports a single, explicitly centered solid stroke alignment.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct Stroke {
+    pub color: ColorRgba,
+    pub width: f64,
+}
+
+impl Default for Stroke {
+    fn default() -> Self {
+        Self {
+            color: ColorRgba::new(0.08, 0.11, 0.16, 1.0),
+            width: 0.0,
+        }
+    }
+}
+
+/// Versioned persistent primitive appearance. Opacity is independent from fill/stroke alpha.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct Appearance {
+    pub fill: ColorRgba,
     pub opacity: f64,
+    pub corner_radii: CornerRadii,
+    pub stroke: Stroke,
 }
 
 impl Default for Appearance {
     fn default() -> Self {
-        Self { opacity: 1.0 }
+        Self {
+            fill: ColorRgba::default(),
+            opacity: 1.0,
+            corner_radii: CornerRadii::default(),
+            stroke: Stroke::default(),
+        }
     }
 }
 
@@ -1410,15 +1494,23 @@ fn geometry_matches(spec: &NodeSpec) -> bool {
     let size_is_valid = |size: Vec2| size.is_finite() && size.x >= 0.0 && size.y >= 0.0;
     match (spec.kind, &spec.geometry) {
         (NodeKind::Document | NodeKind::Group, None) => true,
-        (NodeKind::Frame, Some(Geometry::Frame { size }))
-        | (NodeKind::Rectangle, Some(Geometry::Rectangle { size }))
+        (NodeKind::Frame, Some(Geometry::Frame { size })) => {
+            size.is_finite() && size.x > 0.0 && size.y > 0.0
+        }
+        (NodeKind::Rectangle, Some(Geometry::Rectangle { size }))
         | (NodeKind::Ellipse, Some(Geometry::Ellipse { size })) => size_is_valid(*size),
         _ => false,
     }
 }
 
 fn appearance_is_valid(appearance: Appearance) -> bool {
-    appearance.opacity.is_finite() && (0.0..=1.0).contains(&appearance.opacity)
+    appearance.fill.is_valid()
+        && appearance.opacity.is_finite()
+        && (0.0..=1.0).contains(&appearance.opacity)
+        && appearance.corner_radii.is_valid()
+        && appearance.stroke.color.is_valid()
+        && appearance.stroke.width.is_finite()
+        && appearance.stroke.width >= 0.0
 }
 
 #[cfg(test)]

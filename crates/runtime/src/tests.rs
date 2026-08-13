@@ -893,7 +893,10 @@ fn appearance_dirty_is_tracked_without_transform_or_bounds_recompute() {
     let outcome = runtime
         .dispatch(Command::SetAppearance {
             target: id,
-            appearance: Appearance { opacity: 0.5 },
+            appearance: Appearance {
+                opacity: 0.5,
+                ..Appearance::default()
+            },
         })
         .unwrap();
     assert_eq!(outcome.scene.dirty_nodes, 1);
@@ -1286,5 +1289,55 @@ fn eight_overlapping_siblings_keep_exact_order_and_hit_test_across_reorder_undo_
     assert_eq!(
         hit_world(&mut runtime, Vec2::new(5.0, 5.0)).all(),
         expected.iter().rev().copied().collect::<Vec<_>>()
+    );
+}
+#[test]
+fn centered_stroke_expands_bounds_and_undo_restores_them_incrementally() {
+    let mut runtime = EngineRuntime::blank("Root").unwrap();
+    let root = runtime.document().root_id();
+    let id = rectangle(
+        &mut runtime,
+        root,
+        NodeId::new(),
+        Vec2::new(100.0, 50.0),
+        Affine2::translation(Vec2::new(10.0, 20.0)),
+    );
+    let before = runtime
+        .scene()
+        .node(id)
+        .unwrap()
+        .own_world_bounds()
+        .unwrap();
+    let outcome = runtime
+        .dispatch(Command::SetAppearance {
+            target: id,
+            appearance: Appearance {
+                stroke: visual_authoring_document::Stroke {
+                    width: 10.0,
+                    ..visual_authoring_document::Stroke::default()
+                },
+                ..Appearance::default()
+            },
+        })
+        .unwrap();
+    let after = runtime
+        .scene()
+        .node(id)
+        .unwrap()
+        .own_world_bounds()
+        .unwrap();
+
+    assert_eq!(outcome.scene.bounds_recomputed, 1);
+    assert_eq!(
+        outcome.render.dirty_slots,
+        vec![runtime.render_model().item(id).unwrap().slot]
+    );
+    assert_eq!(after.min, Vec2::new(5.0, 15.0));
+    assert_eq!(after.max, Vec2::new(115.0, 75.0));
+
+    runtime.undo().unwrap().unwrap();
+    assert_eq!(
+        runtime.scene().node(id).unwrap().own_world_bounds(),
+        Some(before)
     );
 }

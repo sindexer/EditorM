@@ -9,7 +9,7 @@ use bounds::{union, BoundsAggregate};
 use thiserror::Error;
 use visual_authoring_core_math::{Affine2, Rect, Vec2};
 use visual_authoring_document::{
-    Document, DocumentChange, DocumentChangeSet, Geometry, InvariantViolation, NodeId,
+    Appearance, Document, DocumentChange, DocumentChangeSet, Geometry, InvariantViolation, NodeId,
     OrderSequence, SequenceWork, StructuralGroupChange,
 };
 use visual_authoring_spatial::{RTreeIndex, SpatialError, SpatialIndex};
@@ -601,15 +601,22 @@ impl ComputedScene {
                 DocumentChange::VisibilityChanged { node } => {
                     self.refresh_visibility_subtree(document, *node, target_revision, &mut stats)?
                 }
-                DocumentChange::AppearanceChanged { node } => {
-                    let record = self
-                        .nodes
-                        .get_mut(node)
-                        .ok_or(SceneError::MissingSceneNode(*node))?;
-                    record.last_dirty = DirtyCategories::appearance();
-                    record.last_changed_revision = target_revision;
-                    stats.dirty_nodes += 1;
-                    stats.visited_scene_nodes += 1;
+                DocumentChange::AppearanceChanged {
+                    node,
+                    bounds_changed,
+                } => {
+                    if *bounds_changed {
+                        self.refresh_geometry(document, *node, target_revision, &mut stats)?;
+                    } else {
+                        let record = self
+                            .nodes
+                            .get_mut(node)
+                            .ok_or(SceneError::MissingSceneNode(*node))?;
+                        record.last_dirty = DirtyCategories::appearance();
+                        record.last_changed_revision = target_revision;
+                        stats.dirty_nodes += 1;
+                        stats.visited_scene_nodes += 1;
+                    }
                 }
                 DocumentChange::PersistentPropertyChanged { .. }
                 | DocumentChange::FullDocumentReset => {}
@@ -716,7 +723,7 @@ impl ComputedScene {
             )
         };
         let own_world_bounds = if let Some(world) = world_transform {
-            match geometry_world_bounds(node.geometry(), world) {
+            match geometry_world_bounds(node.geometry(), node.appearance(), world) {
                 Ok(bounds) => bounds,
                 Err(()) => {
                     invalid = Some(InvalidDerivedState::NonFiniteWorldBounds);
@@ -828,7 +835,7 @@ impl ComputedScene {
             .node(id)
             .ok_or(SceneError::MissingDocumentNode(id))?;
         let (bounds, invalid) = if let Some(world) = old.world_transform {
-            match geometry_world_bounds(node.geometry(), world) {
+            match geometry_world_bounds(node.geometry(), node.appearance(), world) {
                 Ok(bounds) => (bounds, None),
                 Err(()) => (None, Some(InvalidDerivedState::NonFiniteWorldBounds)),
             }
@@ -1390,20 +1397,27 @@ impl ComputedScene {
         if !local.is_finite() {
             return false;
         }
-        let Some(geometry) = document.node(id).and_then(|node| node.geometry()) else {
+        let Some(node) = document.node(id) else {
+            return false;
+        };
+        let Some(geometry) = node.geometry() else {
             return false;
         };
         let size = geometry.size();
         if size.x <= 0.0 || size.y <= 0.0 {
             return false;
         }
+        let half_stroke = node.appearance().stroke.width * 0.5;
         match geometry {
             Geometry::Frame { .. } | Geometry::Rectangle { .. } => {
-                local.x >= 0.0 && local.x <= size.x && local.y >= 0.0 && local.y <= size.y
+                local.x >= -half_stroke
+                    && local.x <= size.x + half_stroke
+                    && local.y >= -half_stroke
+                    && local.y <= size.y + half_stroke
             }
             Geometry::Ellipse { .. } => {
                 let center = size * 0.5;
-                let radii = size * 0.5;
+                let radii = size * 0.5 + Vec2::new(half_stroke, half_stroke);
                 let x = (local.x - center.x) / radii.x;
                 let y = (local.y - center.y) / radii.y;
                 x.mul_add(x, y * y) <= 1.0
@@ -1487,15 +1501,20 @@ fn adjust_counter(counter: &mut u64, old: bool, new: bool) {
     }
 }
 
-fn geometry_world_bounds(geometry: Option<&Geometry>, world: Affine2) -> Result<Option<Rect>, ()> {
+fn geometry_world_bounds(
+    geometry: Option<&Geometry>,
+    appearance: Appearance,
+    world: Affine2,
+) -> Result<Option<Rect>, ()> {
     let Some(geometry) = geometry else {
         return Ok(None);
     };
     let size = geometry.size();
+    let half_stroke = appearance.stroke.width * 0.5;
     let bounds = match geometry {
         Geometry::Ellipse { .. } => {
             let center = world.transform_point(size * 0.5);
-            let radii = size * 0.5;
+            let radii = size * 0.5 + Vec2::new(half_stroke, half_stroke);
             let extent = Vec2::new(
                 (world.m11 * radii.x).hypot(world.m12 * radii.y),
                 (world.m21 * radii.x).hypot(world.m22 * radii.y),
@@ -1506,7 +1525,10 @@ fn geometry_world_bounds(geometry: Option<&Geometry>, world: Affine2) -> Result<
             Rect::from_min_max(center - extent, center + extent)
         }
         Geometry::Frame { .. } | Geometry::Rectangle { .. } => {
-            world.transform_rect(Rect::from_size(size))
+            world.transform_rect(Rect::from_min_max(
+                Vec2::new(-half_stroke, -half_stroke),
+                size + Vec2::new(half_stroke, half_stroke),
+            ))
         }
     };
     bounds.is_finite().then_some(Some(bounds)).ok_or(())

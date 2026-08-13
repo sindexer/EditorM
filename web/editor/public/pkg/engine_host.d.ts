@@ -27,12 +27,12 @@ export interface InitOutput {
     readonly __wbg_enginehost_free: (a: number, b: number) => void;
     readonly enginehost_new: () => [number, number, number];
     readonly enginehost_protocolVersion: () => number;
+    readonly enginehost_renderBinarySchemaVersion: () => number;
     readonly enginehost_handleJson: (a: number, b: number, c: number) => [number, number];
     readonly enginehost_takeFullInstances: (a: number) => any;
     readonly enginehost_takeDirtyInstances: (a: number) => any;
     readonly enginehost_takeRemovedSlots: (a: number) => any;
     readonly enginehost_takeVisibleSlots: (a: number) => any;
-    readonly enginehost_renderBinarySchemaVersion: () => number;
     readonly __wbindgen_externrefs: WebAssembly.Table;
     readonly __wbindgen_malloc: (a: number, b: number) => number;
     readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;

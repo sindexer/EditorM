@@ -1,99 +1,55 @@
-# Visual Authoring Engine
+# EditorM Visual Authoring Engine
 
-Phase 0D-R1 corrects the Gate 0D atomicity, bounded-work, ordering, and Worker/GPU sequencing defects while preserving the Gate 0A-0C Document, command/history/selection, serialization, and computed-scene semantics.
+Phase 0E-R3 is complete and preserved as the approved GitHub baseline. Phase 1A is in development on feat/phase1a-visible-frame-primitives: the editor now opens on a real 1920×1080 Frame and uses shared analytic anti-aliasing for rectangle, rounded rectangle, Frame, and ellipse rendering.
 
-The current path is real, not mocked: a Dedicated Worker owns a wasm32 `EngineRuntime`; a versioned EngineHost protocol returns transferable render data; and a main-thread WebGPU renderer draws rectangle and ellipse instances. A native `wgpu` renderer provides a separate hardware proof. Phase 0E product editor work has not started.
+The live product path is not mocked. A Dedicated Worker owns the Rust/WASM EngineRuntime; versioned projection and render deltas cross the Worker boundary; the main thread submits them to actual WebGPU. React owns only disposable UI projection and interaction state.
+
+## Run the editor on Windows
+
+    powershell -NoProfile -ExecutionPolicy Bypass -File tools/start-editor.ps1
+
+The script checks the required toolchain, builds the WASM bridge, installs locked Editor dependencies when absent, builds the production UI, selects an available localhost port, health-checks the server and assets, prints the URL, and opens the default browser. Stop it with Ctrl+C.
+
+Actual WebGPU is required. WebGPU absence, adapter/device failure, Worker boot failure, WASM failure, or asset/MIME failure is a blocking typed error; there is no Canvas2D, mock-renderer, or static-image success fallback.
+
+## Phase 1A user path
+
+1. Confirm the default Frame 1920×1080 in Layers and on canvas.
+2. Press F and create Full HD, 4K UHD, DCI 4K, or a custom Frame.
+3. Use R or O to draw a Rectangle or Ellipse.
+4. Select a primitive and edit fill, opacity, uniform corner radius, stroke color, and centered stroke width in Inspector.
+5. Move or resize the selection directly on canvas.
+6. Use Ctrl+Z / Ctrl+Y or the toolbar for undo/redo.
+7. Use Fit selection for the current Frame.
+
+Fill/stroke colors are stored as sRGB and converted to linear space at the RenderModel boundary. The shared WGSL returns premultiplied linear output and uses derivative-based analytic coverage without fragment discard.
 
 ## Workspace
 
-- `crates/core_math`: finite-aware f64 vector, Rect, and Affine2 primitives.
-- `crates/document`: persistent Document truth, typed commands, transactions, history, selection, revisioned semantic changes, and atomic mutation.
-- `crates/serialization`: version 1 persistent JSON; runtime/session state is excluded.
-- `crates/spatial`: replaceable `SpatialIndex` and production `RTreeIndex`.
-- `crates/scene`: rebuildable ComputedScene, invalid-derived policy, hierarchy/bounds, R*-tree queries, exact hit testing, cached sibling order, and structural work metrics.
-- `crates/render_model`: backend-neutral RenderItems, stable slots, bounded prepared patches, O(1) counters, typed f32 omission diagnostics, and indexed culling.
-- `crates/renderer_wgpu`: native wgpu device/pipeline/buffers, instanced rendering, shared WGSL, GPU-boundary handling, metrics, and offscreen proof.
-- `crates/runtime`: EngineRuntime, Camera, deterministic fixtures, and Phase 0C/0D/0D-R1 proof binaries.
-- `crates/wasm_bridge`: wasm-bindgen EngineHost, render schema versioning, sequencing, and Worker protocol boundary.
-- `shared`: common WGSL and checked render binary schema used by native and browser renderers.
-- `web/phase0d-preview`: dependency-free diagnostic preview, Worker host, browser WebGPU, self-contained hardware automation, and pixel readback proof.
-- `docs/adr`: ADR-001 through ADR-028.
-- `visual_authoring_engine_codex_package`: immutable authoritative project reference.
-
-## Ownership and synchronization
-
-```text
-Document (persistent f64 truth)
-  -> typed Command / transaction / history
-  -> revisioned DocumentChangeSet
-  -> ComputedScene + RTreeIndex
-  -> bounded RenderModel patch + stable slot
-  -> native wgpu renderer
-       or
-     wasm EngineHost in Dedicated Worker
-       -> sequenced transferable instance/visibility buffers
-       -> serialized main-thread WebGPU frame
-```
-
-JavaScript has no Document mirror or mutation API. Scene, spatial data, RenderModel, GPU buffers, and visible sets are disposable derived state. Camera is session state and changes no Document, Scene, or Render revision. A valid f64 item outside f32 range remains in the Document, is zeroed/omitted from GPU visibility with a typed diagnostic, and recovers its stable slot after correction.
-
-## Run the diagnostic preview on Windows
-
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File tools/start-phase0d-preview.ps1
-```
-
-The script installs/builds the static diagnostic, starts a local server, prints its URL/PID, and opens the default browser. Add `-NoBrowser` to suppress opening.
-
-The automated browser proof needs no pre-started server:
-
-```powershell
-cd web/phase0d-preview
-npm run test:browser
-```
-
-It selects a localhost port, starts and health-checks the preview, validates asset status and WASM MIME, launches a new Chrome process with a temporary profile, uses actual WebGPU, writes proof/screenshot/pixel artifacts, and cleans up its server, browser, and profile. WebGPU absence is blocking; there is no Canvas2D, mock, or static-image success fallback.
-
-## Rebuild the WASM bridge
-
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File tools/build-phase0d-wasm.ps1
-```
-
-This requires target `wasm32-unknown-unknown` and `wasm-bindgen` CLI 0.2.126. Set `VAE_WASM_BINDGEN` if the verified executable is not on PATH or under `VAE_TOOL_ROOT`.
+- crates/document: persistent Frame and primitive appearance truth, typed commands, transactions, history, and atomic validation.
+- crates/serialization: version 2 appearance persistence and version 1 default migration.
+- crates/scene: stroke-aware bounds, culling, spatial index, and exact hit testing.
+- crates/render_model: stable slots, sRGB-to-linear conversion, and bounded per-item deltas.
+- crates/renderer_wgpu: native WebGPU backend using the shared WGSL and binary schema.
+- crates/wasm_bridge: Worker-owned EngineHost, projection, and render-binary protocol.
+- shared: render binary schema v2 and analytic-AA WGSL used by native and browser renderers.
+- web/editor: Wanted Design System-adapted React editor shell and actual WebGPU renderer.
+- web/phase0d-preview: retained Phase 0 diagnostic preview.
+- docs/adr: immutable ADR-001–041 plus Phase 1A ADR-042–044.
 
 ## Verification
 
-Run the complete recorded verification:
+    $env:VAE_TOOL_ROOT='C:\path\to\WebEditor\.tools'
+    powershell -NoProfile -ExecutionPolicy Bypass -File tools/cargo.ps1 fmt --all -- --check
+    powershell -NoProfile -ExecutionPolicy Bypass -File tools/cargo.ps1 clippy --workspace --all-targets -- -D warnings
+    powershell -NoProfile -ExecutionPolicy Bypass -File tools/cargo.ps1 build --workspace --all-targets
+    powershell -NoProfile -ExecutionPolicy Bypass -File tools/cargo.ps1 test --workspace --all-targets
+    cd web/editor
+    npm test
+    npm run build
 
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File tools/phase0d-r1-verify.ps1
-```
+Browser proof commands and new evidence paths are recorded in the Phase 1A review packet. Keep target, node_modules, dist, credentials, ZIP files, and temporary browser profiles out of commits.
 
-Or run only the native and self-contained browser hardware proofs:
+## Phase boundary
 
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File tools/phase0d-r1-proof.ps1
-```
-
-The final Windows run passed format, Clippy with warnings denied, debug and release workspace builds, all-target tests, doctest, dependency tree, wasm32 release build, generated WASM package, Phase 0C and Phase 0D regression proofs, clean web install/build/unit tests, and actual Chrome WebGPU proof.
-
-- Rust unit/integration/property tests: 154 passed, 0 failed, 0 ignored.
-- Compile-fail doctest: 1 passed, 0 failed, 0 ignored.
-- Web unit tests: 6 passed, 0 failed, 0 skipped.
-- Browser proof artifact test: 1 passed, 0 failed, 0 skipped.
-- Native R1 structural checks: 18/18 true.
-- Browser R1 checks: 24/24 true.
-
-Evidence:
-
-- `docs/PHASE_0D_R1_METRICS.json`
-- `docs/verification/PHASE_0D_R1_VERIFICATION.txt`
-- `docs/verification/PHASE_0D_R1_BROWSER_PROOF.json`
-- `docs/verification/PHASE_0D_R1_PIXEL_READBACK.json`
-- `docs/verification/phase0d-r1-preview.png`
-- `docs/REVIEW_PACKET_0D_R1.md`
-
-## Gate boundary
-
-Work stops at the Gate 0D-R1 review package. The preview is a technical diagnostic, not a Wanted Design System product UI. Phase 0E, React product UI, and Wanted Design System integration have not started and require separate external authorization.
+Phase 1A includes visible Frame creation, solid primitive appearance, direct single-selection manipulation, undo/redo, analytic AA, and real WebGPU proof. It intentionally excludes snapping, multi-selection transforms, Pen/Bezier, text, gradients, images, shadows, auto layout, components, motion, AI integration, export, and transform-aware Frame clipping.

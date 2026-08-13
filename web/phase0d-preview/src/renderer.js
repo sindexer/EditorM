@@ -33,7 +33,9 @@ export class WebGpuRenderer {
       throw new RendererFailure("adapter_unavailable", "No WebGPU adapter was returned");
     }
     const device = await adapter.requestDevice({ label: "Phase 0D WebGPU device" });
-    return new WebGpuRenderer(canvas, adapter, device);
+    const renderer = new WebGpuRenderer(canvas, adapter, device);
+    await renderer.pipelineReady;
+    return renderer;
   }
 
   constructor(canvas, adapter, device) {
@@ -87,15 +89,24 @@ export class WebGpuRenderer {
       this.metrics.validation_errors = this.validationErrors;
       this.lastError = { code: "gpu_validation_error", message: event.error.message };
     });
-    this.initializePipeline();
+    this.pipelineReady = this.initializePipeline();
   }
 
-  initializePipeline() {
+  async initializePipeline() {
     this.device.pushErrorScope("validation");
     const shader = this.device.createShaderModule({
       label: "Phase 0D geometry-aware shader",
       code: SHADER_SOURCE,
     });
+    const compilation = await shader.getCompilationInfo();
+    const compilationErrors = compilation.messages.filter((message) => message.type === "error");
+    if (compilationErrors.length > 0) {
+      await this.device.popErrorScope();
+      throw new RendererFailure(
+        "shader_compilation_failed",
+        compilationErrors.map((message) => message.lineNum + ":" + message.linePos + " " + message.message).join("\\n"),
+      );
+    }
     this.bindGroupLayout = this.device.createBindGroupLayout({
       label: "Phase 0D bind group layout",
       entries: [
@@ -128,7 +139,7 @@ export class WebGpuRenderer {
           {
             format: this.format,
             blend: {
-              color: { srcFactor: "src-alpha", dstFactor: "one-minus-src-alpha", operation: "add" },
+              color: { srcFactor: "one", dstFactor: "one-minus-src-alpha", operation: "add" },
               alpha: { srcFactor: "one", dstFactor: "one-minus-src-alpha", operation: "add" },
             },
           },
@@ -144,13 +155,13 @@ export class WebGpuRenderer {
     this.ensureInstanceBuffer(INSTANCE_STRIDE);
     this.ensureVisibleBuffer(4);
     this.configureSurface();
-    this.device.popErrorScope().then((error) => {
-      if (error) {
-        this.validationErrors += 1;
-        this.metrics.validation_errors = this.validationErrors;
-        this.lastError = { code: "pipeline_validation_error", message: error.message };
-      }
-    });
+    const pipelineError = await this.device.popErrorScope();
+    if (pipelineError) {
+      this.validationErrors += 1;
+      this.metrics.validation_errors = this.validationErrors;
+      this.lastError = { code: "pipeline_validation_error", message: pipelineError.message };
+      throw new RendererFailure("pipeline_validation_error", pipelineError.message);
+    }
   }
 
   capabilities() {
@@ -375,6 +386,7 @@ export class WebGpuRenderer {
     this.metrics.render_submit_ms = performance.now() - started;
     return this.metrics;
   }
+
 
   async readPixel(x, y) {
     const physicalX = Math.floor(x * this.lastDpr);

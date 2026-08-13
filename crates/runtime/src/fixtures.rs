@@ -4,12 +4,14 @@
 use uuid::Uuid;
 use visual_authoring_core_math::{Affine2, Vec2};
 use visual_authoring_document::{
-    Document, DocumentError, DocumentSnapshot, NodeId, NodeSnapshot, NodeSpec,
+    Appearance, ColorRgba, Document, DocumentError, DocumentSnapshot, NodeId, NodeSnapshot,
+    NodeSpec, Stroke,
 };
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum FixtureKind {
     Preview,
+    Editor,
     BenchA,
     BenchB,
     BenchC,
@@ -21,6 +23,7 @@ impl FixtureKind {
     pub const fn label(self) -> &'static str {
         match self {
             Self::Preview => "PREVIEW",
+            Self::Editor => "EDITOR",
             Self::BenchA => "BENCH-A",
             Self::BenchB => "BENCH-B",
             Self::BenchC => "BENCH-C",
@@ -37,6 +40,7 @@ pub fn fixture_node_id(index: u128) -> NodeId {
 pub fn build_fixture(kind: FixtureKind) -> Result<Document, DocumentError> {
     match kind {
         FixtureKind::Preview => preview_shapes(),
+        FixtureKind::Editor => editor_document(),
         FixtureKind::BenchA => flat_rectangles(1_000, 40.0),
         FixtureKind::BenchB => flat_rectangles(10_000, 40.0),
         FixtureKind::BenchC => flat_rectangles(100_000, 512.0),
@@ -44,6 +48,37 @@ pub fn build_fixture(kind: FixtureKind) -> Result<Document, DocumentError> {
     }
 }
 
+fn editor_document() -> Result<Document, DocumentError> {
+    let root_id = fixture_node_id(0);
+    let frame_id = fixture_node_id(1);
+    let mut frame = NodeSpec::frame(frame_id, "Frame 1920×1080", Vec2::new(1920.0, 1080.0));
+    frame.local_transform = Affine2::translation(Vec2::new(-960.0, -540.0));
+    frame.appearance = Appearance {
+        fill: ColorRgba::new(0.97, 0.975, 0.985, 1.0),
+        stroke: Stroke {
+            width: 1.0,
+            ..Stroke::default()
+        },
+        ..Appearance::default()
+    };
+    Document::from_snapshot(DocumentSnapshot {
+        root_id,
+        nodes: vec![
+            NodeSnapshot {
+                spec: NodeSpec::document(root_id, "EditorM"),
+                parent: None,
+                children: vec![frame_id],
+                group_restoration: None,
+            },
+            NodeSnapshot {
+                spec: frame,
+                parent: Some(root_id),
+                children: Vec::new(),
+                group_restoration: None,
+            },
+        ],
+    })
+}
 fn preview_shapes() -> Result<Document, DocumentError> {
     let root_id = fixture_node_id(0);
     let rectangle_id = fixture_node_id(1);
