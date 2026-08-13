@@ -1,0 +1,19 @@
+[package]
+name = "visual_authoring_document"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[features]
+test-support = []
+
+[dependencies]
+serde.workspace = true
+thiserror.workspace = true
+uuid.workspace = true
+visual_authoring_core_math = { path = "../core_math" }
+
+[dev-dependencies]
+proptest.workspace = true
+

@@ -1,0 +1,19 @@
+Phase 0E-R1 raw structural test output
+started=2026-08-10T23:06:41.3583632+09:00
+finished=2026-08-10T23:06:50.9004739+09:00
+command=powershell -NoProfile -ExecutionPolicy Bypass -File tools/cargo.ps1 test --release -p visual_authoring_runtime --test phase0e_r1_structure -- --nocapture
+exit_code=0
+
+   Compiling visual_authoring_renderer_wgpu v0.1.0 (C:\Users\thdwl\Documents\Codex\WebEditor\crates\renderer_wgpu)
+   Compiling visual_authoring_runtime v0.1.0 (C:\Users\thdwl\Documents\Codex\WebEditor\crates\runtime)
+    Finished `release` profile [optimized] target(s) in 6.88s
+     Running tests\phase0e_r1_structure.rs (target\release\deps\phase0e_r1_structure-3a0345edb974283d.exe)
+
+running 2 tests
+nodes=10000 group_us=558 ungroup_us=306 group_scene_visited=8 ungroup_scene_visited=6 group_render_visited=4 ungroup_render_visited=3
+test group_ungroup_first_middle_last_are_bounded_at_10k ... ok
+nodes=100000 group_us=3440 ungroup_us=2417 group_scene_visited=8 ungroup_scene_visited=6 group_render_visited=4 ungroup_render_visited=3
+test group_ungroup_first_middle_last_are_bounded_at_100k ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.42s
+

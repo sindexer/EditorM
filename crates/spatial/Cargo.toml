@@ -1,0 +1,15 @@
+[package]
+name = "visual_authoring_spatial"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+rstar.workspace = true
+thiserror.workspace = true
+visual_authoring_core_math = { path = "../core_math" }
+visual_authoring_document = { path = "../document" }
+
+[dev-dependencies]
+uuid.workspace = true

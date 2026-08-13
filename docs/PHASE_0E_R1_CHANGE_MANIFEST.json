@@ -1,0 +1,66 @@
+{
+    "phase":  "0E-R1",
+    "generated_at_utc":  "2026-08-10T14:10:11.8526820Z",
+    "baseline":  {
+                     "archive":  "visual_authoring_engine_phase0e_review_2026-08-10.zip",
+                     "sha256":  "2e1481e7b6da938872c3e75f2726fdbaeb3d28a47b8e72dc28c97a3fcac9b60c",
+                     "project_files":  189
+                 },
+    "counts":  {
+                   "added":  26,
+                   "modified":  15,
+                   "deleted":  0
+               },
+    "added":  [
+                  "crates/runtime/tests/phase0e_r1_structure.rs",
+                  "crates/serialization/tests/phase0e_r1_group_positions.rs",
+                  "crates/wasm_bridge/tests/phase0e_r1_projection.rs",
+                  "docs/adr/ADR-033-bounded-structural-patches-and-projection-v2.md",
+                  "docs/adr/ADR-034-interaction-generations-and-serialized-cancellation.md",
+                  "docs/PHASE_0E_EXTERNAL_REVIEW.md",
+                  "docs/PHASE_0E_R1_AUTHORIZATION.md",
+                  "docs/PHASE_0E_R1_CHANGE_MANIFEST.json",
+                  "docs/PHASE_0E_R1_MANUAL_CHECKLIST.md",
+                  "docs/PHASE_0E_R1_METRICS.json",
+                  "docs/REVIEW_PACKET_0E_R1.md",
+                  "docs/verification/PHASE_0E_R1_BROWSER_PROOF.json",
+                  "docs/verification/PHASE_0E_R1_GROUP_METRICS.json",
+                  "docs/verification/PHASE_0E_R1_GROUP_TEST_OUTPUT.txt",
+                  "docs/verification/PHASE_0E_R1_PIXEL_READBACK.json",
+                  "docs/verification/PHASE_0E_R1_POINTERCANCEL_PROOF.json",
+                  "docs/verification/PHASE_0E_R1_UI_AUDIT.md",
+                  "docs/verification/PHASE_0E_R1_VERIFICATION.txt",
+                  "docs/verification/phase0e-r1-100k-structure.png",
+                  "docs/verification/phase0e-r1-component-showcase.png",
+                  "docs/verification/phase0e-r1-editor-default.png",
+                  "docs/verification/phase0e-r1-editor-nested-group.png",
+                  "docs/verification/phase0e-r1-editor-selection.png",
+                  "tools/package-phase0e-r1-review.ps1",
+                  "tools/phase0e-r1-structure-proof.ps1",
+                  "tools/phase0e-r1-verify.ps1"
+              ],
+    "modified":  [
+                     "CHECKSUMS.sha256",
+                     "crates/document/src/change.rs",
+                     "crates/document/src/command.rs",
+                     "crates/document/src/lib.rs",
+                     "crates/render_model/src/lib.rs",
+                     "crates/scene/src/lib.rs",
+                     "crates/wasm_bridge/src/lib.rs",
+                     "web/editor/public/pkg/engine_host_bg.wasm",
+                     "web/editor/scripts/browser-proof.mjs",
+                     "web/editor/src/App.tsx",
+                     "web/editor/src/engine.ts",
+                     "web/editor/src/styles.css",
+                     "web/editor/src/types.ts",
+                     "web/editor/tests/browser-proof.test.ts",
+                     "web/editor/tests/projection.test.ts"
+                 ],
+    "deleted":  [
+
+                ],
+    "existing_baseline_docs_or_evidence_changed":  0,
+    "authoritative_files_byte_identical":  "19/19",
+    "authoritative_sha256sums_passed":  "18/18",
+    "phase1_started":  false
+}

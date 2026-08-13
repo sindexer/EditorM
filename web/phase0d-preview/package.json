@@ -1,0 +1,17 @@
+{
+  "name": "visual-authoring-phase0d-preview",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Gate 0D diagnostic preview for Worker-owned WASM core and actual WebGPU rendering.",
+  "scripts": {
+    "clean": "node scripts/clean.mjs",
+    "build": "node scripts/generate-render-contract.mjs && node scripts/build.mjs",
+    "test": "node scripts/generate-render-contract.mjs --check && node --test tests/unit.test.mjs",
+    "test:browser": "node scripts/generate-render-contract.mjs && node scripts/build.mjs && node scripts/browser-test.mjs && node --test tests/browser-proof.test.mjs",
+    "start": "node server.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

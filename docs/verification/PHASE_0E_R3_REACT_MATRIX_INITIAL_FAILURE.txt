@@ -1,0 +1,52 @@
+﻿Phase 0E-R3 React ProjectionStore matrix output
+command=npm.cmd run test:react:r3
+work_unit_formula=max(entries_examined,rank_order_comparisons)+entries_copied+entries_moved_or_shifted+nodes_allocated+ceil(allocated_bytes/8)+tree_rebalances+fallback/full-scan/full-copy/dense-rewrite counters
+started_at_utc=2026-08-11T07:39:42.9402957Z
+
+> visual-authoring-phase0e-editor@0.1.0 test:react:r3
+> vitest run tests/r3-matrix.test.ts
+
+
+[1m[46m RUN [49m[22m [36mv3.2.7 [39m[90mC:/Users/thdwl/Documents/Codex/WebEditor/web/editor[39m
+
+ [31m❯[39m tests/r3-matrix.test.ts [2m([22m[2m1 test[22m[2m | [22m[31m1 failed[39m[2m)[22m[33m 285527[2mms[22m[39m
+[31m   [31m×[31m Phase 0E-R3 React ProjectionStore complexity matrix[2m > [22mall N, k, and selection patterns remain bounded and exact[39m[33m 285525[2mms[22m[39m
+[31m     → expected 1.4675452017325996 to be less than or equal to 1.35[39m
+System.Management.Automation.RemoteException
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+System.Management.Automation.RemoteException
+[41m[1m FAIL [22m[49m tests/r3-matrix.test.ts[2m > [22mPhase 0E-R3 React ProjectionStore complexity matrix[2m > [22mall N, k, and selection patterns remain bounded and exact
+[31m[1mAssertionError[22m: expected 1.4675452017325996 to be less than or equal to 1.35[39m
+[36m [2m❯[22m tests/r3-matrix.test.ts:[2m169:21[22m[39m
+    [90m167| [39m    [35mfor[39m ([35mconst[39m k [35mof[39m [33mKS[39m) [35mfor[39m ([35mconst[39m pattern [35mof[39m [33mPATTERNS[39m) {
+    [90m168| [39m      const ratio = entry(100_000, k, pattern).operations.group.maximu…
+    [90m169| [39m      [34mexpect[39m(ratio)[33m.[39m[34mtoBeLessThanOrEqual[39m([34m1.35[39m)[33m;[39m
+    [90m   | [39m                    [31m^[39m
+    [90m170| [39m      thresholds.push({ name: `n_ratio_${k}_${pattern}`, value: ratio,…
+    [90m171| [39m    }
+System.Management.Automation.RemoteException
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯[22m[39m
+System.Management.Automation.RemoteException
+[31m⎯⎯⎯⎯⎯⎯[39m[1m[41m Unhandled Errors [49m[22m[31m⎯⎯⎯⎯⎯⎯[39m
+[31m[1m
+Vitest caught 1 unhandled error during the test run.
+This might cause false positive tests. Resolve unhandled errors to make sure your tests are not affected.[22m[39m
+System.Management.Automation.RemoteException
+[31m⎯⎯⎯⎯⎯⎯[39m[1m[41m Unhandled Error [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+[31m[1mError[22m: [vitest-worker]: Timeout calling "onTaskUpdate"[39m
+[90m [2m❯[22m Object.onTimeoutError node_modules/vitest/dist/chunks/rpc.-pEldfrD.js:[2m53:10[22m[39m
+[90m [2m❯[22m Timeout._onTimeout node_modules/vitest/dist/chunks/index.B521nVV-.js:[2m59:62[22m[39m
+[90m [2m❯[22m listOnTimeout node:internal/timers:[2m605:17[22m[39m
+[90m [2m❯[22m processTimers node:internal/timers:[2m541:7[22m[39m
+System.Management.Automation.RemoteException
+[31m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[39m
+System.Management.Automation.RemoteException
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m     Errors [22m [1m[31m1 error[39m[22m
+[2m   Start at [22m 16:39:45
+[2m   Duration [22m 286.38s[2m (transform 119ms, setup 0ms, collect 189ms, tests 285.53s, environment 0ms, prepare 227ms)[22m
+
+exit_code=1
+finished_at_utc=2026-08-11T07:44:32.5905257Z

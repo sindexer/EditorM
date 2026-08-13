@@ -1,0 +1,151 @@
+{
+  "phase": "0E-R1",
+  "captured_at_utc": "2026-08-10T13:58:39.389Z",
+  "source": "docs/verification/PHASE_0E_R1_BROWSER_PROOF.json",
+  "input": "actual DOM PointerEvent(pointercancel)",
+  "before": {
+    "revisions": {
+      "document": 98,
+      "render": 98,
+      "scene": 98
+    },
+    "history": {
+      "redo_depth": 0,
+      "transaction_active": false,
+      "undo_depth": 8
+    },
+    "fsm": "Idle",
+    "interaction_queue": {
+      "generation": 1,
+      "in_flight": false,
+      "scheduled": false,
+      "latest": false
+    },
+    "engine_sequence": 138,
+    "gpu_frame_sequence": 138,
+    "overlay_sequence": 138,
+    "response_gpu_overlay_sequence_match": true,
+    "primary_local_transform": [
+      0.9007169525689137,
+      -0.4344064586938933,
+      0.4344064586938933,
+      0.9007169525689137,
+      32,
+      -67.7
+    ],
+    "console_errors": 0,
+    "gpu_validation_errors": 0
+  },
+  "queued": {
+    "revisions": {
+      "document": 104,
+      "render": 104,
+      "scene": 104
+    },
+    "history": {
+      "redo_depth": 0,
+      "transaction_active": true,
+      "undo_depth": 8
+    },
+    "fsm": "Resizing",
+    "interaction_queue": {
+      "generation": 1,
+      "in_flight": true,
+      "scheduled": true,
+      "latest": false
+    },
+    "engine_sequence": 146,
+    "gpu_frame_sequence": 146,
+    "overlay_sequence": 146,
+    "response_gpu_overlay_sequence_match": true,
+    "primary_local_transform": [
+      0.9007169525689137,
+      -0.4344064586938933,
+      0.4344064586938933,
+      0.9007169525689137,
+      32,
+      -67.7
+    ],
+    "console_errors": 0,
+    "gpu_validation_errors": 0
+  },
+  "after": {
+    "revisions": {
+      "document": 105,
+      "render": 105,
+      "scene": 105
+    },
+    "history": {
+      "redo_depth": 0,
+      "transaction_active": false,
+      "undo_depth": 8
+    },
+    "fsm": "Idle",
+    "interaction_queue": {
+      "generation": 2,
+      "in_flight": false,
+      "scheduled": false,
+      "latest": false
+    },
+    "engine_sequence": 147,
+    "gpu_frame_sequence": 147,
+    "overlay_sequence": 147,
+    "response_gpu_overlay_sequence_match": true,
+    "primary_local_transform": [
+      0.9007169525689137,
+      -0.4344064586938933,
+      0.4344064586938933,
+      0.9007169525689137,
+      32,
+      -67.7
+    ],
+    "console_errors": 0,
+    "gpu_validation_errors": 0
+  },
+  "settled": {
+    "revisions": {
+      "document": 105,
+      "render": 105,
+      "scene": 105
+    },
+    "history": {
+      "redo_depth": 0,
+      "transaction_active": false,
+      "undo_depth": 8
+    },
+    "fsm": "Idle",
+    "interaction_queue": {
+      "generation": 2,
+      "in_flight": false,
+      "scheduled": false,
+      "latest": false
+    },
+    "engine_sequence": 147,
+    "gpu_frame_sequence": 147,
+    "overlay_sequence": 147,
+    "response_gpu_overlay_sequence_match": true,
+    "primary_local_transform": [
+      0.9007169525689137,
+      -0.4344064586938933,
+      0.4344064586938933,
+      0.9007169525689137,
+      32,
+      -67.7
+    ],
+    "console_errors": 0,
+    "gpu_validation_errors": 0
+  },
+  "assertions": {
+    "actual_dom_pointercancel_serialized": true,
+    "history_unchanged": true,
+    "transaction_inactive": true,
+    "queued_intent_cleared": true,
+    "stale_generation_cannot_apply": true,
+    "semantic_transform_restored": true,
+    "settled_state_unchanged": true,
+    "response_gpu_overlay_sequence_match": true,
+    "console_errors_zero": true,
+    "gpu_validation_errors_zero": true
+  },
+  "all_passed": true
+}

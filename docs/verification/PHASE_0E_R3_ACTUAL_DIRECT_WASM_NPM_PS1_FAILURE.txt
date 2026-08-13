@@ -1,0 +1,8 @@
+﻿Phase 0E-R3 actual WASM invocation incident
+attempted_command=npm run test:direct-wasm:r3
+started_at_utc=2026-08-11T07:26:14.2117514Z
+finished_at_utc=2026-08-11T07:26:14.4389370Z
+node_launched=false
+product_code_executed=false
+result=PowerShell blocked C:\Program Files\nodejs\npm.ps1 because script execution is disabled
+resolution=reran through npm.cmd; see PHASE_0E_R3_ACTUAL_DIRECT_WASM_CONSOLE.txt

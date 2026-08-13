@@ -1,0 +1,38 @@
+# Rust and local toolchains
+/target/
+**/target/
+/.tools/
+**/.tools/
+
+# JavaScript dependencies and generated output
+**/node_modules/
+**/dist/
+**/coverage/
+**/.vite/
+**/.vitest/
+**/.npm/
+*.tsbuildinfo
+
+# Environment and credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.pfx
+*.key
+
+# Review packages and temporary output
+*.zip
+*.zip.sha256
+*.log
+*.tmp
+*.temp
+
+# IDE and operating system files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Rust editor backups
+**/*.rs.bk

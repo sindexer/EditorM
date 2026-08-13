@@ -1,0 +1,17 @@
+[package]
+name = "visual_authoring_serialization"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+visual_authoring_core_math = { path = "../core_math" }
+visual_authoring_document = { path = "../document" }
+
+[dev-dependencies]
+uuid.workspace = true
+

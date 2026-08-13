@@ -1,0 +1,19 @@
+./00_MASTER_INSTRUCTION.md
+./01_ENGINE_ARCHITECTURE_SPEC_V1_1.md
+./02_ENGINE_DEVELOPMENT_RULES.md
+./03_UI_WANTED_DESIGN_SYSTEM_SPEC.md
+./04_PHASE0_EXECUTION_PLAN.md
+./05_TASK_PHASE0A.md
+./06_REVIEW_PROTOCOL.md
+./07_BENCHMARK_AND_INSTRUMENTATION_SPEC.md
+./08_CODEX_HANDOFF_PROMPT.txt
+./09_FUTURE_ROADMAP_AND_GATES.md
+./10_MASTER_CONSOLIDATED_SPEC.md
+./MANIFEST.txt
+./README_FIRST.md
+./SHA256SUMS.txt
+./reference/wanted-design-system/Wanted Design System (Community).fig
+./reference/wanted-design-system/meta.json
+./reference/wanted-design-system/thumbnail.png
+./templates/ADR_TEMPLATE.md
+./templates/REVIEW_PACKET_TEMPLATE.md

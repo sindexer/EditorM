@@ -1,0 +1,16 @@
+﻿Phase 0E-R3 WASM build output
+command=powershell -NoProfile -ExecutionPolicy Bypass -File tools/build-phase0e-wasm.ps1
+started_at_utc=2026-08-11T05:32:14.7749483Z
+   Compiling visual_authoring_document v0.1.0 (C:\Users\thdwl\Documents\Codex\WebEditor\crates\document)
+   Compiling visual_authoring_spatial v0.1.0 (C:\Users\thdwl\Documents\Codex\WebEditor\crates\spatial)
+   Compiling visual_authoring_serialization v0.1.0 (C:\Users\thdwl\Documents\Codex\WebEditor\crates\serialization)
+   Compiling visual_authoring_scene v0.1.0 (C:\Users\thdwl\Documents\Codex\WebEditor\crates\scene)
+   Compiling visual_authoring_render_model v0.1.0 (C:\Users\thdwl\Documents\Codex\WebEditor\crates\render_model)
+   Compiling visual_authoring_runtime v0.1.0 (C:\Users\thdwl\Documents\Codex\WebEditor\crates\runtime)
+   Compiling visual_authoring_wasm_bridge v0.1.0 (C:\Users\thdwl\Documents\Codex\WebEditor\crates\wasm_bridge)
+    Finished `release` profile [optimized] target(s) in 15.68s
+wasm=C:\Users\thdwl\Documents\Codex\WebEditor\target\wasm32-unknown-unknown\release\visual_authoring_wasm_bridge.wasm
+web_module=C:\Users\thdwl\Documents\Codex\WebEditor\web\editor\public\pkg
+phase0e_wasm=web/editor/public/pkg
+exit_code=0
+finished_at_utc=2026-08-11T05:32:32.8106750Z

@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%277%27 fill=%27%230b1727%27/%3E%3Ccircle cx=%2716%27 cy=%2716%27 r=%278%27 fill=%27%233ce69e%27/%3E%3C/svg%3E" />
+    <title>Visual Authoring Engine · Phase 0D Proof</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body data-ready="false">
+    <header>
+      <div>
+        <p class="eyebrow">GATE 0D · RUNTIME FOUNDATION</p>
+        <h1>Worker / WASM / WebGPU diagnostic</h1>
+      </div>
+      <div class="gate"><span></span><strong>ACTUAL RUNTIME PROOF</strong></div>
+    </header>
+    <main>
+      <section class="stage" aria-label="WebGPU preview">
+        <div class="controls">
+          <label>Fixture
+            <select id="fixture">
+              <option value="preview">Rectangle + Ellipse</option>
+              <option value="bench-a">BENCH-A · 1k</option>
+              <option value="bench-b">BENCH-B · 10k</option>
+              <option value="bench-c">BENCH-C · 100k sparse</option>
+            </select>
+          </label>
+          <button id="move-node">Move one node</button>
+          <button id="undo">Undo</button>
+          <button id="redo">Redo</button>
+          <button id="reset-view">Reset</button>
+          <button id="fit-view">Fit</button>
+          <button id="restart-worker">Restart worker</button>
+        </div>
+        <div class="canvas-shell">
+          <canvas id="viewport" data-testid="webgpu-canvas"></canvas>
+          <div class="canvas-labels"><span>Drag to pan · Wheel to pointer-zoom · Click to hit-test</span><span data-bind="fixtureName">PREVIEW</span></div>
+        </div>
+      </section>
+      <aside class="hud" data-testid="proof-hud">
+        <div class="hud-title"><span>LIVE PROOF HUD</span><i></i></div>
+        <dl>
+          <div><dt>WASM</dt><dd data-bind="wasm">not initialized</dd></div>
+          <div><dt>Runtime placement</dt><dd data-bind="owner">starting</dd></div>
+          <div><dt>Worker heartbeat</dt><dd data-bind="heartbeat">waiting</dd></div>
+          <div><dt>Protocol version</dt><dd data-bind="protocol">1</dd></div>
+          <div><dt>WebGPU</dt><dd data-bind="webgpu">pending</dd></div>
+          <div><dt>Adapter</dt><dd data-bind="adapter">pending</dd></div>
+          <div><dt>Device</dt><dd data-bind="device">pending</dd></div>
+          <div><dt>Backend</dt><dd data-bind="backend">pending</dd></div>
+          <div><dt>Doc / Scene / Render rev</dt><dd data-bind="revisions">– / – / –</dd></div>
+          <div><dt>Total / Visible / Culled</dt><dd data-bind="nodes">– / – / –</dd></div>
+          <div><dt>Spatial candidates</dt><dd data-bind="candidates">–</dd></div>
+          <div><dt>Draw calls</dt><dd data-bind="drawCalls">–</dd></div>
+          <div><dt>Batches</dt><dd data-bind="batches">–</dd></div>
+          <div><dt>Submitted instances</dt><dd data-bind="submitted">–</dd></div>
+          <div><dt>GPU buffers / bytes</dt><dd data-bind="buffers">–</dd></div>
+          <div><dt>Frame uploads</dt><dd data-bind="upload">–</dd></div>
+          <div><dt>CPU / submit / frame</dt><dd data-bind="timings">–</dd></div>
+          <div><dt>Fallback rebuilds</dt><dd data-bind="fallbacks">–</dd></div>
+          <div><dt>GPU validation errors</dt><dd data-bind="validation">–</dd></div>
+          <div><dt>Hit-test topmost</dt><dd data-bind="hit">none</dd></div>
+          <div class="error"><dt>Latest typed error</dt><dd data-bind="error">none</dd></div>
+        </dl>
+      </aside>
+    </main>
+    <footer>Diagnostic surface only · No Phase 0E editor UI · Document truth remains in Rust Worker</footer>
+    <script type="module" src="./src/app.js"></script>
+  </body>
+</html>

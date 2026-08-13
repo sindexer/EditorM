@@ -1,0 +1,91 @@
+{
+    "phase":  "0E",
+    "generated_at_utc":  "2026-08-10T02:37:10.8865536Z",
+    "baseline":  {
+                     "file":  "visual_authoring_engine_phase0d_r1_p1_review_2026-08-10.zip",
+                     "sha256":  "09f91d68eead8e3f0d7c6317f1bd5e7f03e4d85eaa2636f6f0ef21c553ffbde7"
+                 },
+    "counts":  {
+                   "added":  56,
+                   "modified":  5,
+                   "deleted":  0
+               },
+    "added":  [
+                  "crates/document/tests/phase0e_group.rs",
+                  "crates/runtime/src/bin/phase0e_proof.rs",
+                  "crates/wasm_bridge/tests/phase0e_projection.rs",
+                  "docs/adr/ADR-029-worker-owned-ui-projection.md",
+                  "docs/adr/ADR-030-direct-manipulation-transaction-fsm.md",
+                  "docs/adr/ADR-031-atomic-group-ungroup-compound-command.md",
+                  "docs/adr/ADR-032-wanted-editor-adaptation.md",
+                  "docs/PHASE_0E_AUTHORIZATION.md",
+                  "docs/PHASE_0E_CHANGE_MANIFEST.json",
+                  "docs/PHASE_0E_MANUAL_CHECKLIST.md",
+                  "docs/PHASE_0E_METRICS.json",
+                  "docs/REVIEW_PACKET_0E.md",
+                  "docs/UI_COMPONENT_MAPPING.md",
+                  "docs/UI_TOKEN_PROVENANCE.md",
+                  "docs/verification/PHASE_0E_BROWSER_PROOF.json",
+                  "docs/verification/PHASE_0E_PIXEL_READBACK.json",
+                  "docs/verification/PHASE_0E_UI_AUDIT.md",
+                  "docs/verification/PHASE_0E_VERIFICATION.txt",
+                  "docs/verification/phase0e-100k-debug.png",
+                  "docs/verification/phase0e-component-showcase.png",
+                  "docs/verification/phase0e-editor-default.png",
+                  "docs/verification/phase0e-editor-nested-group.png",
+                  "docs/verification/phase0e-editor-selection.png",
+                  "tools/build-phase0e-wasm.ps1",
+                  "tools/package-phase0e.ps1",
+                  "tools/phase0e-proof.ps1",
+                  "tools/phase0e-verify.ps1",
+                  "tools/start-phase0e-editor.ps1",
+                  "web/editor/dist/assets/index-DKEZ66A7.js",
+                  "web/editor/dist/assets/index-DKEZ66A7.js.map",
+                  "web/editor/dist/assets/index-DqYhvbkT.css",
+                  "web/editor/dist/index.html",
+                  "web/editor/dist/pkg/engine_host.d.ts",
+                  "web/editor/dist/pkg/engine_host.js",
+                  "web/editor/dist/pkg/engine_host_bg.wasm",
+                  "web/editor/dist/pkg/engine_host_bg.wasm.d.ts",
+                  "web/editor/dist/worker.js",
+                  "web/editor/index.html",
+                  "web/editor/package.json",
+                  "web/editor/package-lock.json",
+                  "web/editor/public/pkg/engine_host.d.ts",
+                  "web/editor/public/pkg/engine_host.js",
+                  "web/editor/public/pkg/engine_host_bg.wasm",
+                  "web/editor/public/pkg/engine_host_bg.wasm.d.ts",
+                  "web/editor/public/worker.js",
+                  "web/editor/scripts/browser-proof.mjs",
+                  "web/editor/server.mjs",
+                  "web/editor/src/App.tsx",
+                  "web/editor/src/engine.ts",
+                  "web/editor/src/main.tsx",
+                  "web/editor/src/styles.css",
+                  "web/editor/src/types.ts",
+                  "web/editor/tests/browser-proof.test.ts",
+                  "web/editor/tests/projection.test.ts",
+                  "web/editor/tsconfig.json",
+                  "web/editor/vite.config.ts"
+              ],
+    "modified":  [
+                     "CHECKSUMS.sha256",
+                     "crates/document/src/command.rs",
+                     "crates/document/src/editor.rs",
+                     "crates/runtime/src/lib.rs",
+                     "crates/wasm_bridge/src/lib.rs"
+                 ],
+    "deleted":  [
+
+                ],
+    "prior_stage_evidence":  {
+                                 "files_checked":  13,
+                                 "changed":  0
+                             },
+    "authoritative":  {
+                          "physical_files":  19,
+                          "byte_identical":  19,
+                          "checksum_entries_passed":  18,
+                          "checksum_entries_total":  18
+                      }
+}

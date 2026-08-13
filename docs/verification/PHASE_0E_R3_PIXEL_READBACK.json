@@ -1,0 +1,70 @@
+{
+  "phase": "0E-R3",
+  "captured_at_utc": "2026-08-11T08:45:28.876Z",
+  "kind": "actual-webgpu-texture-readback",
+  "expected": {
+    "background": [
+      9,
+      14,
+      20
+    ],
+    "rectangle": [
+      51,
+      148,
+      245
+    ],
+    "ellipse": [
+      245,
+      115,
+      64
+    ]
+  },
+  "samples": {
+    "rectangle_center": {
+      "x": 400,
+      "y": 421.5,
+      "physical_x": 400,
+      "physical_y": 421,
+      "format": "bgra8unorm",
+      "rgba": [
+        51,
+        148,
+        245,
+        255
+      ]
+    },
+    "ellipse_center": {
+      "x": 600,
+      "y": 471.5,
+      "physical_x": 600,
+      "physical_y": 471,
+      "format": "bgra8unorm",
+      "rgba": [
+        245,
+        115,
+        64,
+        255
+      ]
+    },
+    "ellipse_aabb_corner": {
+      "x": 688,
+      "y": 383.5,
+      "physical_x": 688,
+      "physical_y": 383,
+      "format": "bgra8unorm",
+      "rgba": [
+        9,
+        14,
+        20,
+        255
+      ]
+    }
+  },
+  "assertions": {
+    "rectangle_center_matches_shader": true,
+    "ellipse_center_matches_shader": true,
+    "ellipse_aabb_corner_is_background": true,
+    "alpha_is_opaque": true
+  },
+  "all_passed": true
+}

@@ -1,0 +1,4933 @@
+{
+  "phase": "0D-R1",
+  "captured_at_utc": "2026-08-09T16:06:31.661Z",
+  "proof_kind": "actual-hardware-browser",
+  "preview_url": "http://127.0.0.1:62278/",
+  "harness": {
+    "self_contained_server": true,
+    "health": {
+      "ok": true,
+      "phase": "0D"
+    },
+    "assets": {
+      "/index.html": {
+        "status": 200,
+        "content_type": "text/html; charset=utf-8"
+      },
+      "/src/worker.js": {
+        "status": 200,
+        "content_type": "text/javascript; charset=utf-8"
+      },
+      "/pkg/engine_host.js": {
+        "status": 200,
+        "content_type": "text/javascript; charset=utf-8"
+      },
+      "/pkg/engine_host_bg.wasm": {
+        "status": 200,
+        "content_type": "application/wasm"
+      }
+    },
+    "temporary_chrome_profile": "C:\\Users\\thdwl\\AppData\\Local\\Temp\\phase0d-chrome-1786291579883"
+  },
+  "browser": {
+    "product": "Chrome/151.0.7922.76",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/151.0.0.0 Safari/537.36",
+    "protocol_version": "1.3",
+    "command_line_mode": "headless=new with --enable-unsafe-webgpu; no WebGPU mock"
+  },
+  "hardware": {
+    "actual_hardware": true,
+    "active_device": {
+      "vendorId": 4318,
+      "deviceId": 5058,
+      "subSysId": 913970264,
+      "revision": 161,
+      "vendorString": "",
+      "deviceString": "NVIDIA GeForce GTX 970",
+      "driverVendor": "NVIDIA",
+      "driverVersion": "32.0.15.8157"
+    },
+    "devices": [
+      {
+        "vendorId": 4318,
+        "deviceId": 5058,
+        "subSysId": 913970264,
+        "revision": 161,
+        "vendorString": "",
+        "deviceString": "NVIDIA GeForce GTX 970",
+        "driverVendor": "NVIDIA",
+        "driverVersion": "32.0.15.8157"
+      },
+      {
+        "vendorId": 5140,
+        "deviceId": 140,
+        "subSysId": 0,
+        "revision": 0,
+        "vendorString": "",
+        "deviceString": "Microsoft Basic Render Driver",
+        "driverVendor": "",
+        "driverVersion": "10.0.19041.5794"
+      }
+    ],
+    "aux_attributes": {
+      "amdSwitchable": false,
+      "bgra8OverlaySupport": "SOFTWARE",
+      "canSupportThreadedTextureMailbox": false,
+      "directComposition": true,
+      "directMLFeatureLevel": "Not supported",
+      "directRenderingVersion": "",
+      "displayType": "ANGLE_D3D11",
+      "dx12FeatureLevel": "Not supported",
+      "glExtensions": "GL_AMD_performance_monitor GL_ANGLE_base_vertex_base_instance_shader_builtin GL_ANGLE_blob_cache GL_ANGLE_client_arrays GL_ANGLE_clip_cull_distance GL_ANGLE_copy_texture_3d GL_ANGLE_depth_texture GL_ANGLE_framebuffer_blit GL_ANGLE_framebuffer_multisample GL_ANGLE_get_serialized_context_string GL_ANGLE_get_tex_level_parameter GL_ANGLE_instanced_arrays GL_ANGLE_memory_size GL_ANGLE_multiview_multisample GL_ANGLE_pack_reverse_row_order GL_ANGLE_polygon_mode GL_ANGLE_program_binary_readiness_query GL_ANGLE_program_cache_control GL_ANGLE_provoking_vertex GL_ANGLE_renderability_validation GL_ANGLE_request_extension GL_ANGLE_robust_client_memory GL_ANGLE_shader_pixel_local_storage GL_ANGLE_shader_pixel_local_storage_coherent GL_ANGLE_stencil_texturing GL_ANGLE_texture_compression_dxt3 GL_ANGLE_texture_compression_dxt5 GL_ANGLE_texture_multisample GL_ANGLE_texture_usage GL_ANGLE_translated_shader_source GL_APPLE_clip_distance GL_ARM_rgba8 GL_CHROMIUM_bind_generates_resource GL_CHROMIUM_bind_uniform_location GL_CHROMIUM_copy_compressed_texture GL_CHROMIUM_copy_texture GL_CHROMIUM_lose_context GL_EXT_EGL_image_external_wrap_modes GL_EXT_base_instance GL_EXT_blend_func_extended GL_EXT_blend_minmax GL_EXT_clip_control GL_EXT_clip_cull_distance GL_EXT_color_buffer_float GL_EXT_color_buffer_half_float GL_EXT_conservative_depth GL_EXT_debug_label GL_EXT_debug_marker GL_EXT_depth_clamp GL_EXT_discard_framebuffer GL_EXT_disjoint_timer_query GL_EXT_draw_buffers GL_EXT_draw_buffers_indexed GL_EXT_draw_elements_base_vertex GL_EXT_float_blend GL_EXT_frag_depth GL_EXT_instanced_arrays GL_EXT_map_buffer_range GL_EXT_occlusion_query_boolean GL_EXT_polygon_offset_clamp GL_EXT_read_format_bgra GL_EXT_render_snorm GL_EXT_robustness GL_EXT_sRGB GL_EXT_shader_texture_lod GL_EXT_texture_border_clamp GL_EXT_texture_compression_bptc GL_EXT_texture_compression_dxt1 GL_EXT_texture_compression_rgtc GL_EXT_texture_compression_s3tc_srgb GL_EXT_texture_filter_anisotropic GL_EXT_texture_format_BGRA8888 GL_EXT_texture_mirror_clamp_to_edge GL_EXT_texture_norm16 GL_EXT_texture_rg GL_EXT_texture_storage GL_EXT_texture_type_2_10_10_10_REV GL_EXT_unpack_subimage GL_KHR_debug GL_KHR_parallel_shader_compile GL_KHR_robustness GL_NV_EGL_stream_consumer_external GL_NV_fence GL_NV_framebuffer_blit GL_NV_pack_subimage GL_NV_pixel_buffer_object GL_NV_shader_noperspective_interpolation GL_OES_EGL_image GL_OES_EGL_image_external GL_OES_EGL_image_external_essl3 GL_OES_compressed_EAC_R11_signed_texture GL_OES_compressed_EAC_R11_unsigned_texture GL_OES_compressed_EAC_RG11_signed_texture GL_OES_compressed_EAC_RG11_unsigned_texture GL_OES_compressed_ETC2_RGB8_texture GL_OES_compressed_ETC2_RGBA8_texture GL_OES_compressed_ETC2_punchthroughA_RGBA8_texture GL_OES_compressed_ETC2_punchthroughA_sRGB8_alpha_texture GL_OES_compressed_ETC2_sRGB8_alpha8_texture GL_OES_compressed_ETC2_sRGB8_texture GL_OES_depth24 GL_OES_depth32 GL_OES_draw_buffers_indexed GL_OES_draw_elements_base_vertex GL_OES_element_index_uint GL_OES_fbo_render_mipmap GL_OES_get_program_binary GL_OES_mapbuffer GL_OES_packed_depth_stencil GL_OES_required_internalformat GL_OES_rgb8_rgba8 GL_OES_sample_variables GL_OES_shader_multisample_interpolation GL_OES_standard_derivatives GL_OES_surfaceless_context GL_OES_texture_border_clamp GL_OES_texture_float GL_OES_texture_float_linear GL_OES_texture_half_float GL_OES_texture_half_float_linear GL_OES_texture_npot GL_OES_texture_stencil8 GL_OES_texture_storage_multisample_2d_array GL_OES_vertex_array_object GL_OVR_multiview GL_OVR_multiview2 GL_WEBGL_video_texture ",
+      "glImplementationParts": "(gl=egl-angle,angle=d3d11)",
+      "glRenderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 970 (0x000013C2) Direct3D11 vs_5_0 ps_5_0, D3D11-32.0.15.8157)",
+      "glResetNotificationStrategy": 33362,
+      "glVendor": "Google Inc. (NVIDIA)",
+      "glVersion": "OpenGL ES 3.0 (ANGLE 2.1.28226 git hash: 392ccfac4cdb)",
+      "glWsExtensions": "EGL_EXT_create_context_robustness EGL_ANGLE_d3d_share_handle_client_buffer EGL_ANGLE_d3d_texture_client_buffer EGL_ANGLE_surface_d3d_texture_2d_share_handle EGL_ANGLE_query_surface_pointer EGL_ANGLE_window_fixed_size EGL_ANGLE_keyed_mutex EGL_ANGLE_surface_orientation EGL_ANGLE_direct_composition EGL_NV_post_sub_buffer EGL_KHR_create_context EGL_KHR_image EGL_KHR_image_base EGL_KHR_gl_texture_2D_image EGL_KHR_gl_texture_cubemap_image EGL_KHR_gl_renderbuffer_image EGL_KHR_get_all_proc_addresses EGL_KHR_stream EGL_KHR_stream_consumer_gltexture EGL_NV_stream_consumer_gltexture_yuv EGL_ANGLE_stream_producer_d3d_texture EGL_ANGLE_create_context_webgl_compatibility EGL_CHROMIUM_create_context_bind_generates_resource EGL_CHROMIUM_sync_control EGL_EXT_pixel_format_float EGL_KHR_surfaceless_context EGL_ANGLE_display_texture_share_group EGL_ANGLE_display_semaphore_share_group EGL_ANGLE_create_context_client_arrays EGL_ANGLE_program_cache_control EGL_ANGLE_robust_resource_initialization EGL_ANGLE_create_context_extensions_enabled EGL_ANDROID_blob_cache EGL_ANDROID_recordable EGL_ANGLE_image_d3d11_texture EGL_ANGLE_create_context_backwards_compatible EGL_KHR_no_config_context EGL_KHR_create_context_no_error EGL_KHR_reusable_sync EGL_ANGLE_memory_usage_report ",
+      "glWsVendor": "Google Inc. (NVIDIA)",
+      "glWsVersion": "1.5 (ANGLE 2.1.28226 git hash: 392ccfac4cdb)",
+      "inProcessGpu": false,
+      "initializationTime": 0.343405,
+      "isAsan": false,
+      "isClangCoverage": false,
+      "jpegDecodeAcceleratorSupported": false,
+      "maxMsaaSamples": "8",
+      "nv12OverlaySupport": "SOFTWARE",
+      "optimus": false,
+      "p010OverlaySupport": "SOFTWARE",
+      "passthroughCmdDecoder": true,
+      "pixelShaderVersion": "5.0",
+      "processCrashCount": 0,
+      "rgb10a2OverlaySupport": "SOFTWARE",
+      "sandboxed": false,
+      "skiaBackendType": "GaneshGL",
+      "subpixelFontRendering": true,
+      "supportsD3dSharedImages": false,
+      "supportsDirectML": false,
+      "supportsDx12": false,
+      "supportsOverlays": true,
+      "supportsVulkan": false,
+      "targetCpuBits": 64,
+      "vertexShaderVersion": "5.0",
+      "visibilityCallbackCallCount": 0,
+      "vulkanVersion": "Not supported",
+      "yuy2OverlaySupport": "SOFTWARE"
+    },
+    "feature_status": {
+      "2d_canvas": "enabled",
+      "direct_rendering_display_compositor": "disabled_off_ok",
+      "gpu_compositing": "enabled",
+      "multiple_raster_threads": "enabled_on",
+      "opengl": "enabled_on",
+      "rasterization": "enabled",
+      "raw_draw": "disabled_off_ok",
+      "skia_graphite": "disabled_off",
+      "trees_in_viz": "disabled_off",
+      "video_decode": "enabled",
+      "video_encode": "enabled",
+      "webgl": "enabled",
+      "webgpu": "enabled",
+      "webnn": "disabled_off"
+    }
+  },
+  "runtime": {
+    "protocol_version": 1,
+    "render_binary_schema_version": 1,
+    "wasm_initialized": true,
+    "worker_runtime_owner": "dedicated-worker",
+    "worker_heartbeat": 1,
+    "main_thread_document_mutation_api": false,
+    "actual_webgpu": true,
+    "adapter": "maxwell",
+    "vendor": "nvidia",
+    "architecture": "maxwell",
+    "device": "Phase 0D WebGPU device",
+    "backend": "browser-webgpu (implementation backend not exposed by Web API)",
+    "fixture": "PREVIEW",
+    "revisions": {
+      "document": 2,
+      "render": 2,
+      "scene": 2
+    },
+    "culling": {
+      "culled": 0,
+      "spatial_candidates": 2,
+      "submitted_instances": 2,
+      "total": 2,
+      "visible": 2
+    },
+    "render_delta": {
+      "dirty_ranges": 1,
+      "dirty_slots": 1,
+      "full": false,
+      "removed_slots": 0,
+      "render_full_rebuilds": 0,
+      "scene_full_rebuilds": 0,
+      "upload_bytes": 52
+    },
+    "render_encoding": {
+      "diagnostics": [],
+      "gpu_omitted_items": 0
+    },
+    "work_counters": {
+      "allocation_growth_count": 0,
+      "cpu_update_ms": 0,
+      "culling_candidates": 2,
+      "document_nodes": 3,
+      "document_nodes_scanned": 1,
+      "fallback_rebuild_count": 0,
+      "full_render_model_scans": 0,
+      "gpu_encode_attempted": 1,
+      "gpu_encode_omitted": 0,
+      "indexed_nodes": 2,
+      "instance_upload_bytes": 48,
+      "invalid_derived_nodes": 0,
+      "order_nodes_visited": 4,
+      "render_items_cloned": 0,
+      "render_items_planned": 1,
+      "render_items_read": 3,
+      "render_items_written": 1,
+      "scene_nodes_visited": 2,
+      "sibling_search_steps": 0,
+      "visible_items": 2,
+      "visible_slot_upload_bytes": 8
+    },
+    "gpu": {
+      "draw_calls": 1,
+      "batches": 1,
+      "submitted_instances": 2,
+      "buffer_count": 3,
+      "buffer_bytes": 4840032,
+      "upload_calls": 3,
+      "frame_upload_bytes": 88,
+      "render_submit_ms": 1.0999999940395355,
+      "frame_ms": 1.2000000029802322,
+      "validation_errors": 0,
+      "frame_sequence": 14,
+      "gpu_encode_attempted": 1,
+      "gpu_encode_omitted": 0,
+      "instance_upload_bytes": 48,
+      "visible_slot_upload_bytes": 8,
+      "allocation_growth_count": 8
+    },
+    "engine_sequence": 14,
+    "latest_engine_sequence": 14,
+    "gpu_frame_sequence": 14,
+    "response_gpu_sequence_match": true,
+    "hit_test_topmost": "00000000-0000-0000-0000-000000000003",
+    "fallback_rebuild_count": 0,
+    "gpu_validation_errors": 0,
+    "last_typed_error": null,
+    "console_errors": 0,
+    "worker_restarts": 2,
+    "worker_generation": 2,
+    "stale_frames_discarded": 0,
+    "camera_raw_intents": 309,
+    "camera_requests_sent": 52,
+    "camera_requests_coalesced": 267,
+    "camera_requests_dropped": 257,
+    "camera_request_in_flight": false
+  },
+  "webgpu": {
+    "actual_webgpu": true,
+    "adapter": "maxwell",
+    "vendor": "nvidia",
+    "architecture": "maxwell",
+    "device": "Phase 0D WebGPU device",
+    "backend": "browser-webgpu (implementation backend not exposed by Web API)",
+    "gpu_validation_errors": 0,
+    "renderer_location": "main-thread",
+    "core_location": "dedicated-worker"
+  },
+  "scenarios": {
+    "initial_rectangle_ellipse": {
+      "protocol_version": 1,
+      "render_binary_schema_version": 1,
+      "wasm_initialized": true,
+      "worker_runtime_owner": "dedicated-worker",
+      "worker_heartbeat": 1,
+      "main_thread_document_mutation_api": false,
+      "actual_webgpu": true,
+      "adapter": "maxwell",
+      "vendor": "nvidia",
+      "architecture": "maxwell",
+      "device": "Phase 0D WebGPU device",
+      "backend": "browser-webgpu (implementation backend not exposed by Web API)",
+      "fixture": "PREVIEW",
+      "revisions": {
+        "document": 0,
+        "render": 0,
+        "scene": 0
+      },
+      "culling": {
+        "culled": 0,
+        "spatial_candidates": 2,
+        "submitted_instances": 2,
+        "total": 2,
+        "visible": 2
+      },
+      "render_delta": {
+        "dirty_ranges": 0,
+        "dirty_slots": 0,
+        "full": false,
+        "removed_slots": 0,
+        "render_full_rebuilds": 0,
+        "scene_full_rebuilds": 0,
+        "upload_bytes": 0
+      },
+      "render_encoding": {
+        "diagnostics": [],
+        "gpu_omitted_items": 0
+      },
+      "work_counters": {
+        "allocation_growth_count": 0,
+        "cpu_update_ms": 0,
+        "culling_candidates": 2,
+        "document_nodes": 3,
+        "document_nodes_scanned": 0,
+        "fallback_rebuild_count": 0,
+        "full_render_model_scans": 0,
+        "gpu_encode_attempted": 0,
+        "gpu_encode_omitted": 0,
+        "indexed_nodes": 2,
+        "instance_upload_bytes": 0,
+        "invalid_derived_nodes": 0,
+        "order_nodes_visited": 4,
+        "render_items_cloned": 0,
+        "render_items_planned": 0,
+        "render_items_read": 2,
+        "render_items_written": 0,
+        "scene_nodes_visited": 0,
+        "sibling_search_steps": 0,
+        "visible_items": 2,
+        "visible_slot_upload_bytes": 8
+      },
+      "gpu": {
+        "draw_calls": 1,
+        "batches": 1,
+        "submitted_instances": 2,
+        "buffer_count": 3,
+        "buffer_bytes": 136,
+        "upload_calls": 2,
+        "frame_upload_bytes": 40,
+        "render_submit_ms": 5.600000008940697,
+        "frame_ms": 5.800000011920929,
+        "validation_errors": 0,
+        "frame_sequence": 2,
+        "gpu_encode_attempted": 0,
+        "gpu_encode_omitted": 0,
+        "instance_upload_bytes": 0,
+        "visible_slot_upload_bytes": 8,
+        "allocation_growth_count": 4
+      },
+      "engine_sequence": 2,
+      "latest_engine_sequence": 3,
+      "gpu_frame_sequence": 2,
+      "response_gpu_sequence_match": true,
+      "hit_test_topmost": null,
+      "fallback_rebuild_count": 0,
+      "gpu_validation_errors": 0,
+      "last_typed_error": null,
+      "console_errors": 0,
+      "worker_restarts": 1,
+      "worker_generation": 1,
+      "stale_frames_discarded": 0,
+      "camera_raw_intents": 0,
+      "camera_requests_sent": 0,
+      "camera_requests_coalesced": 0,
+      "camera_requests_dropped": 0,
+      "camera_request_in_flight": false
+    },
+    "resize": {
+      "response": {
+        "binary": {
+          "dirty_instances": false,
+          "full_instances": false,
+          "removed_slots": false,
+          "visible_slots": true
+        },
+        "camera": {
+          "center": [
+            0,
+            0
+          ],
+          "dpr": 1,
+          "viewport": [
+            984,
+            603
+          ],
+          "zoom": 1
+        },
+        "culling": {
+          "culled": 0,
+          "spatial_candidates": 2,
+          "submitted_instances": 2,
+          "total": 2,
+          "visible": 2
+        },
+        "engine_sequence": 4,
+        "error": null,
+        "fixture": "PREVIEW",
+        "history": {
+          "redo_depth": 0,
+          "transaction_active": false,
+          "undo_depth": 0
+        },
+        "metrics": {
+          "allocation_growth_count": 0,
+          "cpu_update_ms": 0,
+          "culling_candidates": 2,
+          "document_nodes": 3,
+          "document_nodes_scanned": 0,
+          "fallback_rebuild_count": 0,
+          "full_render_model_scans": 0,
+          "gpu_encode_attempted": 0,
+          "gpu_encode_omitted": 0,
+          "indexed_nodes": 2,
+          "instance_upload_bytes": 0,
+          "invalid_derived_nodes": 0,
+          "order_nodes_visited": 4,
+          "render_items_cloned": 0,
+          "render_items_planned": 0,
+          "render_items_read": 2,
+          "render_items_written": 0,
+          "scene_nodes_visited": 0,
+          "sibling_search_steps": 0,
+          "visible_items": 2,
+          "visible_slot_upload_bytes": 8
+        },
+        "ok": true,
+        "protocol_version": 1,
+        "render_binary_schema_version": 1,
+        "render_delta": {
+          "dirty_ranges": 0,
+          "dirty_slots": 0,
+          "full": false,
+          "removed_slots": 0,
+          "render_full_rebuilds": 0,
+          "scene_full_rebuilds": 0,
+          "upload_bytes": 0
+        },
+        "render_encoding": {
+          "diagnostics": [],
+          "gpu_omitted_items": 0
+        },
+        "request_id": "camera-1786291583024-3",
+        "resources": {
+          "allocated_slots": 2,
+          "dirty_record_stride_bytes": 52,
+          "free_slots": 0,
+          "gpu_encodable_items": 2,
+          "gpu_omitted_items": 0,
+          "instance_capacity": 2,
+          "instance_stride_bytes": 48,
+          "renderable_items": 2,
+          "total_render_items": 2
+        },
+        "result": {
+          "camera_changed": true
+        },
+        "revisions": {
+          "document": 0,
+          "render": 0,
+          "scene": 0
+        },
+        "runtime_owner": "dedicated-worker",
+        "type": "engine_response"
+      },
+      "proof": {
+        "protocol_version": 1,
+        "render_binary_schema_version": 1,
+        "wasm_initialized": true,
+        "worker_runtime_owner": "dedicated-worker",
+        "worker_heartbeat": 1,
+        "main_thread_document_mutation_api": false,
+        "actual_webgpu": true,
+        "adapter": "maxwell",
+        "vendor": "nvidia",
+        "architecture": "maxwell",
+        "device": "Phase 0D WebGPU device",
+        "backend": "browser-webgpu (implementation backend not exposed by Web API)",
+        "fixture": "PREVIEW",
+        "revisions": {
+          "document": 0,
+          "render": 0,
+          "scene": 0
+        },
+        "culling": {
+          "culled": 0,
+          "spatial_candidates": 2,
+          "submitted_instances": 2,
+          "total": 2,
+          "visible": 2
+        },
+        "render_delta": {
+          "dirty_ranges": 0,
+          "dirty_slots": 0,
+          "full": false,
+          "removed_slots": 0,
+          "render_full_rebuilds": 0,
+          "scene_full_rebuilds": 0,
+          "upload_bytes": 0
+        },
+        "render_encoding": {
+          "diagnostics": [],
+          "gpu_omitted_items": 0
+        },
+        "work_counters": {
+          "allocation_growth_count": 0,
+          "cpu_update_ms": 0,
+          "culling_candidates": 2,
+          "document_nodes": 3,
+          "document_nodes_scanned": 0,
+          "fallback_rebuild_count": 0,
+          "full_render_model_scans": 0,
+          "gpu_encode_attempted": 0,
+          "gpu_encode_omitted": 0,
+          "indexed_nodes": 2,
+          "instance_upload_bytes": 0,
+          "invalid_derived_nodes": 0,
+          "order_nodes_visited": 4,
+          "render_items_cloned": 0,
+          "render_items_planned": 0,
+          "render_items_read": 2,
+          "render_items_written": 0,
+          "scene_nodes_visited": 0,
+          "sibling_search_steps": 0,
+          "visible_items": 2,
+          "visible_slot_upload_bytes": 8
+        },
+        "gpu": {
+          "draw_calls": 1,
+          "batches": 1,
+          "submitted_instances": 2,
+          "buffer_count": 3,
+          "buffer_bytes": 136,
+          "upload_calls": 2,
+          "frame_upload_bytes": 40,
+          "render_submit_ms": 4.5,
+          "frame_ms": 4.5999999940395355,
+          "validation_errors": 0,
+          "frame_sequence": 4,
+          "gpu_encode_attempted": 0,
+          "gpu_encode_omitted": 0,
+          "instance_upload_bytes": 0,
+          "visible_slot_upload_bytes": 8,
+          "allocation_growth_count": 4
+        },
+        "engine_sequence": 4,
+        "latest_engine_sequence": 4,
+        "gpu_frame_sequence": 4,
+        "response_gpu_sequence_match": true,
+        "hit_test_topmost": null,
+        "fallback_rebuild_count": 0,
+        "gpu_validation_errors": 0,
+        "last_typed_error": null,
+        "console_errors": 0,
+        "worker_restarts": 1,
+        "worker_generation": 1,
+        "stale_frames_discarded": 0,
+        "camera_raw_intents": 0,
+        "camera_requests_sent": 0,
+        "camera_requests_coalesced": 0,
+        "camera_requests_dropped": 0,
+        "camera_request_in_flight": false
+      }
+    },
+    "fit_for_pixel_proof": {
+      "response": {
+        "binary": {
+          "dirty_instances": false,
+          "full_instances": false,
+          "removed_slots": false,
+          "visible_slots": true
+        },
+        "camera": {
+          "center": [
+            45,
+            25
+          ],
+          "dpr": 1,
+          "viewport": [
+            984,
+            603
+          ],
+          "zoom": 2.204878048780488
+        },
+        "culling": {
+          "culled": 0,
+          "spatial_candidates": 2,
+          "submitted_instances": 2,
+          "total": 2,
+          "visible": 2
+        },
+        "engine_sequence": 5,
+        "error": null,
+        "fixture": "PREVIEW",
+        "history": {
+          "redo_depth": 0,
+          "transaction_active": false,
+          "undo_depth": 0
+        },
+        "metrics": {
+          "allocation_growth_count": 0,
+          "cpu_update_ms": 0,
+          "culling_candidates": 2,
+          "document_nodes": 3,
+          "document_nodes_scanned": 0,
+          "fallback_rebuild_count": 0,
+          "full_render_model_scans": 0,
+          "gpu_encode_attempted": 0,
+          "gpu_encode_omitted": 0,
+          "indexed_nodes": 2,
+          "instance_upload_bytes": 0,
+          "invalid_derived_nodes": 0,
+          "order_nodes_visited": 4,
+          "render_items_cloned": 0,
+          "render_items_planned": 0,
+          "render_items_read": 2,
+          "render_items_written": 0,
+          "scene_nodes_visited": 0,
+          "sibling_search_steps": 0,
+          "visible_items": 2,
+          "visible_slot_upload_bytes": 8
+        },
+        "ok": true,
+        "protocol_version": 1,
+        "render_binary_schema_version": 1,
+        "render_delta": {
+          "dirty_ranges": 0,
+          "dirty_slots": 0,
+          "full": false,
+          "removed_slots": 0,
+          "render_full_rebuilds": 0,
+          "scene_full_rebuilds": 0,
+          "upload_bytes": 0
+        },
+        "render_encoding": {
+          "diagnostics": [],
+          "gpu_omitted_items": 0
+        },
+        "request_id": "camera-1786291583034-4",
+        "resources": {
+          "allocated_slots": 2,
+          "dirty_record_stride_bytes": 52,
+          "free_slots": 0,
+          "gpu_encodable_items": 2,
+          "gpu_omitted_items": 0,
+          "instance_capacity": 2,
+          "instance_stride_bytes": 48,
+          "renderable_items": 2,
+          "total_render_items": 2
+        },
+        "result": {
+          "camera_changed": true
+        },
+        "revisions": {
+          "document": 0,
+          "render": 0,
+          "scene": 0
+        },
+        "runtime_owner": "dedicated-worker",
+        "type": "engine_response"
+      },
+      "proof": {
+        "protocol_version": 1,
+        "render_binary_schema_version": 1,
+        "wasm_initialized": true,
+        "worker_runtime_owner": "dedicated-worker",
+        "worker_heartbeat": 1,
+        "main_thread_document_mutation_api": false,
+        "actual_webgpu": true,
+        "adapter": "maxwell",
+        "vendor": "nvidia",
+        "architecture": "maxwell",
+        "device": "Phase 0D WebGPU device",
+        "backend": "browser-webgpu (implementation backend not exposed by Web API)",
+        "fixture": "PREVIEW",
+        "revisions": {
+          "document": 0,
+          "render": 0,
+          "scene": 0
+        },
+        "culling": {
+          "culled": 0,
+          "spatial_candidates": 2,
+          "submitted_instances": 2,
+          "total": 2,
+          "visible": 2
+        },
+        "render_delta": {
+          "dirty_ranges": 0,
+          "dirty_slots": 0,
+          "full": false,
+          "removed_slots": 0,
+          "render_full_rebuilds": 0,
+          "scene_full_rebuilds": 0,
+          "upload_bytes": 0
+        },
+        "render_encoding": {
+          "diagnostics": [],
+          "gpu_omitted_items": 0
+        },
+        "work_counters": {
+          "allocation_growth_count": 0,
+          "cpu_update_ms": 0,
+          "culling_candidates": 2,
+          "document_nodes": 3,
+          "document_nodes_scanned": 0,
+          "fallback_rebuild_count": 0,
+          "full_render_model_scans": 0,
+          "gpu_encode_attempted": 0,
+          "gpu_encode_omitted": 0,
+          "indexed_nodes": 2,
+          "instance_upload_bytes": 0,
+          "invalid_derived_nodes": 0,
+          "order_nodes_visited": 4,
+          "render_items_cloned": 0,
+          "render_items_planned": 0,
+          "render_items_read": 2,
+          "render_items_written": 0,
+          "scene_nodes_visited": 0,
+          "sibling_search_steps": 0,
+          "visible_items": 2,
+          "visible_slot_upload_bytes": 8
+        },
+        "gpu": {
+          "draw_calls": 1,
+          "batches": 1,
+          "submitted_instances": 2,
+          "buffer_count": 3,
+          "buffer_bytes": 136,
+          "upload_calls": 2,
+          "frame_upload_bytes": 40,
+          "render_submit_ms": 1.6000000089406967,
+          "frame_ms": 1.7000000029802322,
+          "validation_errors": 0,
+          "frame_sequence": 5,
+          "gpu_encode_attempted": 0,
+          "gpu_encode_omitted": 0,
+          "instance_upload_bytes": 0,
+          "visible_slot_upload_bytes": 8,
+          "allocation_growth_count": 4
+        },
+        "engine_sequence": 5,
+        "latest_engine_sequence": 5,
+        "gpu_frame_sequence": 5,
+        "response_gpu_sequence_match": true,
+        "hit_test_topmost": null,
+        "fallback_rebuild_count": 0,
+        "gpu_validation_errors": 0,
+        "last_typed_error": null,
+        "console_errors": 0,
+        "worker_restarts": 1,
+        "worker_generation": 1,
+        "stale_frames_discarded": 0,
+        "camera_raw_intents": 0,
+        "camera_requests_sent": 0,
+        "camera_requests_coalesced": 0,
+        "camera_requests_dropped": 0,
+        "camera_request_in_flight": false
+      }
+    },
+    "pixel_readback": {
+      "captured_at_utc": "2026-08-09T16:06:31.517Z",
+      "expected": {
+        "rectangle": [
+          51,
+          148,
+          245
+        ],
+        "ellipse": [
+          245,
+          115,
+          64
+        ],
+        "background": [
+          9,
+          14,
+          20
+        ]
+      },
+      "samples": {
+        "rectangle_inside": {
+          "world": [
+            -100,
+            -20
+          ],
+          "viewport": [
+            172.29268292682923,
+            202.28048780487802
+          ],
+          "x": 172.29268292682923,
+          "y": 202.28048780487802,
+          "physical_x": 172,
+          "physical_y": 202,
+          "format": "bgra8unorm",
+          "rgba": [
+            51,
+            148,
+            245,
+            255
+          ]
+        },
+        "ellipse_center": {
+          "world": [
+            160,
+            40
+          ],
+          "viewport": [
+            745.5609756097562,
+            334.5731707317073
+          ],
+          "x": 745.5609756097562,
+          "y": 334.5731707317073,
+          "physical_x": 745,
+          "physical_y": 334,
+          "format": "bgra8unorm",
+          "rgba": [
+            245,
+            115,
+            64,
+            255
+          ]
+        },
+        "ellipse_aabb_corner": {
+          "world": [
+            245,
+            -45
+          ],
+          "viewport": [
+            932.9756097560976,
+            147.15853658536585
+          ],
+          "x": 932.9756097560976,
+          "y": 147.15853658536585,
+          "physical_x": 932,
+          "physical_y": 147,
+          "format": "bgra8unorm",
+          "rgba": [
+            9,
+            14,
+            20,
+            255
+          ]
+        },
+        "overlap_initial": {
+          "world": [
+            78,
+            40
+          ],
+          "viewport": [
+            564.7609756097561,
+            334.5731707317073
+          ],
+          "x": 564.7609756097561,
+          "y": 334.5731707317073,
+          "physical_x": 564,
+          "physical_y": 334,
+          "format": "bgra8unorm",
+          "rgba": [
+            245,
+            115,
+            64,
+            255
+          ]
+        },
+        "overlap_reordered": {
+          "world": [
+            78,
+            40
+          ],
+          "viewport": [
+            564.7609756097561,
+            334.5731707317073
+          ],
+          "x": 564.7609756097561,
+          "y": 334.5731707317073,
+          "physical_x": 564,
+          "physical_y": 334,
+          "format": "bgra8unorm",
+          "rgba": [
+            51,
+            148,
+            245,
+            255
+          ]
+        },
+        "overlap_undo": {
+          "world": [
+            78,
+            40
+          ],
+          "viewport": [
+            564.7609756097561,
+            334.5731707317073
+          ],
+          "x": 564.7609756097561,
+          "y": 334.5731707317073,
+          "physical_x": 564,
+          "physical_y": 334,
+          "format": "bgra8unorm",
+          "rgba": [
+            245,
+            115,
+            64,
+            255
+          ]
+        },
+        "overlap_redo": {
+          "world": [
+            78,
+            40
+          ],
+          "viewport": [
+            564.7609756097561,
+            334.5731707317073
+          ],
+          "x": 564.7609756097561,
+          "y": 334.5731707317073,
+          "physical_x": 564,
+          "physical_y": 334,
+          "format": "bgra8unorm",
+          "rgba": [
+            51,
+            148,
+            245,
+            255
+          ]
+        },
+        "offscreen_center": {
+          "x": 492,
+          "y": 301.5,
+          "physical_x": 492,
+          "physical_y": 301,
+          "format": "bgra8unorm",
+          "rgba": [
+            9,
+            14,
+            20,
+            255
+          ]
+        }
+      },
+      "assertions": {
+        "rectangle_inside_is_rectangle_color": true,
+        "ellipse_center_is_ellipse_color": true,
+        "ellipse_aabb_corner_is_background": true,
+        "overlap_initial_topmost_is_ellipse": true,
+        "overlap_reorder_topmost_is_rectangle": true,
+        "overlap_undo_restores_ellipse": true,
+        "overlap_redo_restores_rectangle": true,
+        "offscreen_object_pixel_is_background": true
+      },
+      "all_passed": true
+    },
+    "reorder": {
+      "response": {
+        "binary": {
+          "dirty_instances": false,
+          "full_instances": false,
+          "removed_slots": false,
+          "visible_slots": true
+        },
+        "camera": {
+          "center": [
+            45,
+            25
+          ],
+          "dpr": 1,
+          "viewport": [
+            984,
+            603
+          ],
+          "zoom": 2.204878048780488
+        },
+        "culling": {
+          "culled": 0,
+          "spatial_candidates": 2,
+          "submitted_instances": 2,
+          "total": 2,
+          "visible": 2
+        },
+        "engine_sequence": 6,
+        "error": null,
+        "fixture": "PREVIEW",
+        "history": {
+          "redo_depth": 0,
+          "transaction_active": false,
+          "undo_depth": 1
+        },
+        "metrics": {
+          "allocation_growth_count": 0,
+          "cpu_update_ms": 7,
+          "culling_candidates": 2,
+          "document_nodes": 3,
+          "document_nodes_scanned": 1,
+          "fallback_rebuild_count": 0,
+          "full_render_model_scans": 0,
+          "gpu_encode_attempted": 0,
+          "gpu_encode_omitted": 0,
+          "indexed_nodes": 2,
+          "instance_upload_bytes": 0,
+          "invalid_derived_nodes": 0,
+          "order_nodes_visited": 6,
+          "render_items_cloned": 0,
+          "render_items_planned": 1,
+          "render_items_read": 3,
+          "render_items_written": 0,
+          "scene_nodes_visited": 1,
+          "sibling_search_steps": 0,
+          "visible_items": 2,
+          "visible_slot_upload_bytes": 8
+        },
+        "ok": true,
+        "protocol_version": 1,
+        "render_binary_schema_version": 1,
+        "render_delta": {
+          "dirty_ranges": 0,
+          "dirty_slots": 0,
+          "full": false,
+          "removed_slots": 0,
+          "render_full_rebuilds": 0,
+          "scene_full_rebuilds": 0,
+          "upload_bytes": 0
+        },
+        "render_encoding": {
+          "diagnostics": [],
+          "gpu_omitted_items": 0
+        },
+        "request_id": "command-1786291583085-5",
+        "resources": {
+          "allocated_slots": 2,
+          "dirty_record_stride_bytes": 52,
+          "free_slots": 0,
+          "gpu_encodable_items": 2,
+          "gpu_omitted_items": 0,
+          "instance_capacity": 2,
+          "instance_stride_bytes": 48,
+          "renderable_items": 2,
+          "total_render_items": 2
+        },
+        "result": {
+          "changed": true
+        },
+        "revisions": {
+          "document": 1,
+          "render": 1,
+          "scene": 1
+        },
+        "runtime_owner": "dedicated-worker",
+        "type": "engine_response"
+      },
+      "proof": {
+        "protocol_version": 1,
+        "render_binary_schema_version": 1,
+        "wasm_initialized": true,
+        "worker_runtime_owner": "dedicated-worker",
+        "worker_heartbeat": 1,
+        "main_thread_document_mutation_api": false,
+        "actual_webgpu": true,
+        "adapter": "maxwell",
+        "vendor": "nvidia",
+        "architecture": "maxwell",
+        "device": "Phase 0D WebGPU device",
+        "backend": "browser-webgpu (implementation backend not exposed by Web API)",
+        "fixture": "PREVIEW",
+        "revisions": {
+          "document": 1,
+          "render": 1,
+          "scene": 1
+        },
+        "culling": {
+          "culled": 0,
+          "spatial_candidates": 2,
+          "submitted_instances": 2,
+          "total": 2,
+          "visible": 2
+        },
+        "render_delta": {
+          "dirty_ranges": 0,
+          "dirty_slots": 0,
+          "full": false,
+          "removed_slots": 0,
+          "render_full_rebuilds": 0,
+          "scene_full_rebuilds": 0,
+          "upload_bytes": 0
+        },
+        "render_encoding": {
+          "diagnostics": [],
+          "gpu_omitted_items": 0
+        },
+        "work_counters": {
+          "allocation_growth_count": 0,
+          "cpu_update_ms": 7,
+          "culling_candidates": 2,
+          "document_nodes": 3,
+          "document_nodes_scanned": 1,
+          "fallback_rebuild_count": 0,
+          "full_render_model_scans": 0,
+          "gpu_encode_attempted": 0,
+          "gpu_encode_omitted": 0,
+          "indexed_nodes": 2,
+          "instance_upload_bytes": 0,
+          "invalid_derived_nodes": 0,
+          "order_nodes_visited": 6,
+          "render_items_cloned": 0,
+          "render_items_planned": 1,
+          "render_items_read": 3,
+          "render_items_written": 0,
+          "scene_nodes_visited": 1,
+          "sibling_search_steps": 0,
+          "visible_items": 2,
+          "visible_slot_upload_bytes": 8
+        },
+        "gpu": {
+          "draw_calls": 1,
+          "batches": 1,
+          "submitted_instances": 2,
+          "buffer_count": 3,
+          "buffer_bytes": 136,
+          "upload_calls": 2,
+          "frame_upload_bytes": 40,
+          "render_submit_ms": 1.800000011920929,
+          "frame_ms": 1.800000011920929,
+          "validation_errors": 0,
+          "frame_sequence": 6,
+          "gpu_encode_attempted": 0,
+          "gpu_encode_omitted": 0,
+          "instance_upload_bytes": 0,
+          "visible_slot_upload_bytes": 8,
+          "allocation_growth_count": 4
+        },
+        "engine_sequence": 6,
+        "latest_engine_sequence": 6,
+        "gpu_frame_sequence": 6,
+        "response_gpu_sequence_match": true,
+        "hit_test_topmost": null,
+        "fallback_rebuild_count": 0,
+        "gpu_validation_errors": 0,
+        "last_typed_error": null,
+        "console_errors": 0,
+        "worker_restarts": 1,
+        "worker_generation": 1,
+        "stale_frames_discarded": 0,
+        "camera_raw_intents": 0,
+        "camera_requests_sent": 0,
+        "camera_requests_coalesced": 0,
+        "camera_requests_dropped": 0,
+        "camera_request_in_flight": false
+      }
+    },
+    "reorder_undo": {
+      "response": {
+        "binary": {
+          "dirty_instances": false,
+          "full_instances": false,
+          "removed_slots": false,
+          "visible_slots": true
+        },
+        "camera": {
+          "center": [
+            45,
+            25
+          ],
+          "dpr": 1,
+          "viewport": [
+            984,
+            603
+          ],
+          "zoom": 2.204878048780488
+        },
+        "culling": {
+          "culled": 0,
+          "spatial_candidates": 2,
+          "submitted_instances": 2,
+          "total": 2,
+          "visible": 2
+        },
+        "engine_sequence": 7,
+        "error": null,
+        "fixture": "PREVIEW",
+        "history": {
+          "redo_depth": 1,
+          "transaction_active": false,
+          "undo_depth": 0
+        },
+        "metrics": {
+          "allocation_growth_count": 0,
+          "cpu_update_ms": 1,
+          "culling_candidates": 2,
+          "document_nodes": 3,
+          "document_nodes_scanned": 1,
+          "fallback_rebuild_count": 0,
+          "full_render_model_scans": 0,
+          "gpu_encode_attempted": 0,
+          "gpu_encode_omitted": 0,
+          "indexed_nodes": 2,
+          "instance_upload_bytes": 0,
+          "invalid_derived_nodes": 0,
+          "order_nodes_visited": 6,
+          "render_items_cloned": 0,
+          "render_items_planned": 1,
+          "render_items_read": 3,
+          "render_items_written": 0,
+          "scene_nodes_visited": 1,
+          "sibling_search_steps": 0,
+          "visible_items": 2,
+          "visible_slot_upload_bytes": 8
+        },
+        "ok": true,
+        "protocol_version": 1,
+        "render_binary_schema_version": 1,
+        "render_delta": {
+          "dirty_ranges": 0,
+          "dirty_slots": 0,
+          "full": false,
+          "removed_slots": 0,
+          "render_full_rebuilds": 0,
+          "scene_full_rebuilds": 0,
+          "upload_bytes": 0
+        },
+        "render_encoding": {
+          "diagnostics": [],
+          "gpu_omitted_items": 0
+        },
+        "request_id": "undo-1786291583106-6",
+        "resources": {
+          "allocated_slots": 2,
+          "dirty_record_stride_bytes": 52,
+          "free_slots": 0,
+          "gpu_encodable_items": 2,
+          "gpu_omitted_items": 0,
+          "instance_capacity": 2,
+          "instance_stride_bytes": 48,
+          "renderable_items": 2,
+          "total_render_items": 2
+        },
+        "result": {
+          "changed": true
+        },
+        "revisions": {
+          "document": 2,
+          "render": 2,
+          "scene": 2
+        },
+        "runtime_owner": "dedicated-worker",
+        "type": "engine_response"
+      },
+      "proof": {
+        "protocol_version": 1,
+        "render_binary_schema_version": 1,
+        "wasm_initialized": true,
+        "worker_runtime_owner": "dedicated-worker",
+        "worker_heartbeat": 1,
+        "main_thread_document_mutation_api": false,
+        "actual_webgpu": true,
+        "adapter": "maxwell",
+        "vendor": "nvidia",
+        "architecture": "maxwell",
+        "device": "Phase 0D WebGPU device",
+        "backend": "browser-webgpu (implementation backend not exposed by Web API)",
+        "fixture": "PREVIEW",
+        "revisions": {
+          "document": 2,
+          "render": 2,
+          "scene": 2
+        },
+        "culling": {
+          "culled": 0,
+          "spatial_candidates": 2,
+          "submitted_instances": 2,
+          "total": 2,
+          "visible": 2
+        },
+        "render_delta": {
+          "dirty_ranges": 0,
+          "dirty_slots": 0,
+          "full": false,
+          "removed_slots": 0,
+          "render_full_rebuilds": 0,
+          "scene_full_rebuilds": 0,
+          "upload_bytes": 0
+        },
+        "render_encoding": {
+          "diagnostics": [],
+          "gpu_omitted_items": 0
+        },
+        "work_counters": {
+          "allocation_growth_count": 0,
+          "cpu_update_ms": 1,
+          "culling_candidates": 2,
+          "document_nodes": 3,
+          "document_nodes_scanned": 1,
+          "fallback_rebuild_count": 0,
+          "full_render_model_scans": 0,
+          "gpu_encode_attempted": 0,
+          "gpu_encode_omitted": 0,
+          "indexed_nodes": 2,
+          "instance_upload_bytes": 0,
+          "invalid_derived_nodes": 0,
+          "order_nodes_visited": 6,
+          "render_items_cloned": 0,
+          "render_items_planned": 1,
+          "render_items_read": 3,
+          "render_items_written": 0,
+          "scene_nodes_visited": 1,
+          "sibling_search_steps": 0,
+          "visible_items": 2,
+          "visible_slot_upload_bytes": 8
+        },
+        "gpu": {
+          "draw_calls": 1,
+          "batches": 1,
+          "submitted_instances": 2,
+          "buffer_count": 3,
+          "buffer_bytes": 136,
+          "upload_calls": 2,
+          "frame_upload_bytes": 40,
+          "render_submit_ms": 6.799999997019768,
+          "frame_ms": 6.899999991059303,
+          "validation_errors": 0,
+          "frame_sequence": 7,
+          "gpu_encode_attempted": 0,
+          "gpu_encode_omitted": 0,
+          "instance_upload_bytes": 0,
+          "visible_slot_upload_bytes": 8,
+          "allocation_growth_count": 4
+        },
+        "engine_sequence": 7,
+        "latest_engine_sequence": 7,
+        "gpu_frame_sequence": 7,
+        "response_gpu_sequence_match": true,
+        "hit_test_topmost": null,
+        "fallback_rebuild_count": 0,
+        "gpu_validation_errors": 0,
+        "last_typed_error": null,
+        "console_errors": 0,
+        "worker_restarts": 1,
+        "worker_generation": 1,
+        "stale_frames_discarded": 0,
+        "camera_raw_intents": 0,
+        "camera_requests_sent": 0,
+        "camera_requests_coalesced": 0,
+        "camera_requests_dropped": 0,
+        "camera_request_in_flight": false
+      }
+    },
+    "reorder_redo": {
+      "response": {
+        "binary": {
+          "dirty_instances": false,
+          "full_instances": false,
+          "removed_slots": false,
+          "visible_slots": true
+        },
+        "camera": {
+          "center": [
+            45,
+            25
+          ],
+          "dpr": 1,
+          "viewport": [
+            984,
+            603
+          ],
+          "zoom": 2.204878048780488
+        },
+        "culling": {
+          "culled": 0,
+          "spatial_candidates": 2,
+          "submitted_instances": 2,
+          "total": 2,
+          "visible": 2
+        },
+        "engine_sequence": 8,
+        "error": null,
+        "fixture": "PREVIEW",
+        "history": {
+          "redo_depth": 0,
+          "transaction_active": false,
+          "undo_depth": 1
+        },
+        "metrics": {
+          "allocation_growth_count": 0,
+          "cpu_update_ms": 1,
+          "culling_candidates": 2,
+          "document_nodes": 3,
+          "document_nodes_scanned": 1,
+          "fallback_rebuild_count": 0,
+          "full_render_model_scans": 0,
+          "gpu_encode_attempted": 0,
+          "gpu_encode_omitted": 0,
+          "indexed_nodes": 2,
+          "instance_upload_bytes": 0,
+          "invalid_derived_nodes": 0,
+          "order_nodes_visited": 6,
+          "render_items_cloned": 0,
+          "render_items_planned": 1,
+          "render_items_read": 3,
+          "render_items_written": 0,
+          "scene_nodes_visited": 1,
+          "sibling_search_steps": 0,
+          "visible_items": 2,
+          "visible_slot_upload_bytes": 8
+        },
+        "ok": true,
+        "protocol_version": 1,
+        "render_binary_schema_version": 1,
+        "render_delta": {
+          "dirty_ranges": 0,
+          "dirty_slots": 0,
+          "full": false,
+          "removed_slots": 0,
+          "render_full_rebuilds": 0,
+          "scene_full_rebuilds": 0,
+          "upload_bytes": 0
+        },
+        "render_encoding": {
+          "diagnostics": [],
+          "gpu_omitted_items": 0
+        },
+        "request_id": "redo-1786291583133-7",
+        "resources": {
+          "allocated_slots": 2,
+          "dirty_record_stride_bytes": 52,
+          "free_slots": 0,
+          "gpu_encodable_items": 2,
+          "gpu_omitted_items": 0,
+          "instance_capacity": 2,
+          "instance_stride_bytes": 48,
+          "renderable_items": 2,
+          "total_render_items": 2
+        },
+        "result": {
+          "changed": true
+        },
+        "revisions": {
+          "document": 3,
+          "render": 3,
+          "scene": 3
+        },
+        "runtime_owner": "dedicated-worker",
+        "type": "engine_response"
+      },
+      "proof": {
+        "protocol_version": 1,
+        "render_binary_schema_version": 1,
+        "wasm_initialized": true,
+        "worker_runtime_owner": "dedicated-worker",
+        "worker_heartbeat": 1,
+        "main_thread_document_mutation_api": false,
+        "actual_webgpu": true,
+        "adapter": "maxwell",
+        "vendor": "nvidia",
+        "architecture": "maxwell",
+        "device": "Phase 0D WebGPU device",
+        "backend": "browser-webgpu (implementation backend not exposed by Web API)",
+        "fixture": "PREVIEW",
+        "revisions": {
+          "document": 3,
+          "render": 3,
+          "scene": 3
+        },
+        "culling": {
+          "culled": 0,
+          "spatial_candidates": 2,
+          "submitted_instances": 2,
+          "total": 2,
+          "visible": 2
+        },
+        "render_delta": {
+          "dirty_ranges": 0,
+          "dirty_slots": 0,
+          "full": false,
+          "removed_slots": 0,
+          "render_full_rebuilds": 0,
+          "scene_full_rebuilds": 0,
+          "upload_bytes": 0
+        },
+        "render_encoding": {
+          "diagnostics": [],
+          "gpu_omitted_items": 0
+        },
+        "work_counters": {
+          "allocation_growth_count": 0,
+          "cpu_update_ms": 1,
+          "culling_candidates": 2,
+          "document_nodes": 3,
+          "document_nodes_scanned": 1,
+          "fallback_rebuild_count": 0,
+          "full_render_model_scans": 0,
+          "gpu_encode_attempted": 0,
+          "gpu_encode_omitted": 0,
+          "indexed_nodes": 2,
+          "instance_upload_bytes": 0,
+          "invalid_derived_nodes": 0,
+          "order_nodes_visited": 6,
+          "render_items_cloned": 0,
+          "render_items_planned": 1,
+          "render_items_read": 3,
+          "render_items_written": 0,
+          "scene_nodes_visited": 1,
+          "sibling_search_steps": 0,
+          "visible_items": 2,
+          "visible_slot_upload_bytes": 8
+        },
+        "gpu": {
+          "draw_calls": 1,
+          "batches": 1,
+          "submitted_instances": 2,
+          "buffer_count": 3,
+          "buffer_bytes": 136,
+          "upload_calls": 2,
+          "frame_upload_bytes": 40,
+          "render_submit_ms": 2.800000011920929,
+          "frame_ms": 2.9000000059604645,
+          "validation_errors": 0,
+          "frame_sequence": 8,
+          "gpu_encode_attempted": 0,
+          "gpu_encode_omitted": 0,
+          "instance_upload_bytes": 0,
+          "visible_slot_upload_bytes": 8,
+          "allocation_growth_count": 4
+        },
+        "engine_sequence": 8,
+        "latest_engine_sequence": 8,
+        "gpu_frame_sequence": 8,
+        "response_gpu_sequence_match": true,
+        "hit_test_topmost": null,
+        "fallback_rebuild_count": 0,
+        "gpu_validation_errors": 0,
+        "last_typed_error": null,
+        "console_errors": 0,
+        "worker_restarts": 1,
+        "worker_generation": 1,
+        "stale_frames_discarded": 0,
+        "camera_raw_intents": 0,
+        "camera_requests_sent": 0,
+        "camera_requests_coalesced": 0,
+        "camera_requests_dropped": 0,
+        "camera_request_in_flight": false
+      }
+    },
+    "pan": {
+      "response": {
+        "binary": {
+          "dirty_instances": false,
+          "full_instances": false,
+          "removed_slots": false,
+          "visible_slots": true
+        },
+        "camera": {
+          "center": [
+            8.716814159292035,
+            6.8584070796460175
+          ],
+          "dpr": 1,
+          "viewport": [
+            984,
+            603
+          ],
+          "zoom": 2.204878048780488
+        },
+        "culling": {
+          "culled": 0,
+          "spatial_candidates": 2,
+          "submitted_instances": 2,
+          "total": 2,
+          "visible": 2
+        },
+        "engine_sequence": 10,
+        "error": null,
+        "fixture": "PREVIEW",
+        "history": {
+          "redo_depth": 1,
+          "transaction_active": false,
+          "undo_depth": 0
+        },
+        "metrics": {
+          "allocation_growth_count": 0,
+          "cpu_update_ms": 0,
+          "culling_candidates": 2,
+          "document_nodes": 3,
+          "document_nodes_scanned": 0,
+          "fallback_rebuild_count": 0,
+          "full_render_model_scans": 0,
+          "gpu_encode_attempted": 0,
+          "gpu_encode_omitted": 0,
+          "indexed_nodes": 2,
+          "instance_upload_bytes": 0,
+          "invalid_derived_nodes": 0,
+          "order_nodes_visited": 4,
+          "render_items_cloned": 0,
+          "render_items_planned": 0,
+          "render_items_read": 2,
+          "render_items_written": 0,
+          "scene_nodes_visited": 0,
+          "sibling_search_steps": 0,
+          "visible_items": 2,
+          "visible_slot_upload_bytes": 8
+        },
+        "ok": true,
+        "protocol_version": 1,
+        "render_binary_schema_version": 1,
+        "render_delta": {
+          "dirty_ranges": 0,
+          "dirty_slots": 0,
+          "full": false,
+          "removed_slots": 0,
+          "render_full_rebuilds": 0,
+          "scene_full_rebuilds": 0,
+          "upload_bytes": 0
+        },
+        "render_encoding": {
+          "diagnostics": [],
+          "gpu_omitted_items": 0
+        },
+        "request_id": "camera-1786291583163-9",
+        "resources": {
+          "allocated_slots": 2,
+          "dirty_record_stride_bytes": 52,
+          "free_slots": 0,
+          "gpu_encodable_items": 2,
+          "gpu_omitted_items": 0,
+          "instance_capacity": 2,
+          "instance_stride_bytes": 48,
+          "renderable_items": 2,
+          "total_render_items": 2
+        },
+        "result": {
+          "camera_changed": true
+        },
+        "revisions": {
+          "document": 4,
+          "render": 4,
+          "scene": 4
+        },
+        "runtime_owner": "dedicated-worker",
+        "type": "engine_response"
+      },
+      "proof": {
+        "protocol_version": 1,
+        "render_binary_schema_version": 1,
+        "wasm_initialized": true,
+        "worker_runtime_owner": "dedicated-worker",
+        "worker_heartbeat": 1,
+        "main_thread_document_mutation_api": false,
+        "actual_webgpu": true,
+        "adapter": "maxwell",
+        "vendor": "nvidia",
+        "architecture": "maxwell",
+        "device": "Phase 0D WebGPU device",
+        "backend": "browser-webgpu (implementation backend not exposed by Web API)",
+        "fixture": "PREVIEW",
+        "revisions": {
+          "document": 4,
+          "render": 4,
+          "scene": 4
+        },
+        "culling": {
+          "culled": 0,
+          "spatial_candidates": 2,
+          "submitted_instances": 2,
+          "total": 2,
+          "visible": 2
+        },
+        "render_delta": {
+          "dirty_ranges": 0,
+          "dirty_slots": 0,
+          "full": false,
+          "removed_slots": 0,
+          "render_full_rebuilds": 0,
+          "scene_full_rebuilds": 0,
+          "upload_bytes": 0
+        },
+        "render_encoding": {
+          "diagnostics": [],
+          "gpu_omitted_items": 0
+        },
+        "work_counters": {
+          "allocation_growth_count": 0,
+          "cpu_update_ms": 0,
+          "culling_candidates": 2,
+          "document_nodes": 3,
+          "document_nodes_scanned": 0,
+          "fallback_rebuild_count": 0,
+          "full_render_model_scans": 0,
+          "gpu_encode_attempted": 0,
+          "gpu_encode_omitted": 0,
+          "indexed_nodes": 2,
+          "instance_upload_bytes": 0,
+          "invalid_derived_nodes": 0,
+          "order_nodes_visited": 4,
+          "render_items_cloned": 0,
+          "render_items_planned": 0,
+          "render_items_read": 2,
+          "render_items_written": 0,
+          "scene_nodes_visited": 0,
+          "sibling_search_steps": 0,
+          "visible_items": 2,
+          "visible_slot_upload_bytes": 8
+        },
+        "gpu": {
+          "draw_calls": 1,
+          "batches": 1,
+          "submitted_instances": 2,
+          "buffer_count": 3,
+          "buffer_bytes": 136,
+          "upload_calls": 2,
+          "frame_upload_bytes": 40,
+          "render_submit_ms": 8.799999997019768,
+          "frame_ms": 8.899999991059303,
+          "validation_errors": 0,
+          "frame_sequence": 10,
+          "gpu_encode_attempted": 0,
+          "gpu_encode_omitted": 0,
+          "instance_upload_bytes": 0,
+          "visible_slot_upload_bytes": 8,
+          "allocation_growth_count": 4
+        },
+        "engine_sequence": 10,
+        "latest_engine_sequence": 10,
+        "gpu_frame_sequence": 10,
+        "response_gpu_sequence_match": true,
+        "hit_test_topmost": null,
+        "fallback_rebuild_count": 0,
+        "gpu_validation_errors": 0,
+        "last_typed_error": null,
+        "console_errors": 0,
+        "worker_restarts": 1,
+        "worker_generation": 1,
+        "stale_frames_discarded": 0,
+        "camera_raw_intents": 0,
+        "camera_requests_sent": 0,
+        "camera_requests_coalesced": 0,
+        "camera_requests_dropped": 0,
+        "camera_request_in_flight": false
+      }
+    },
+    "zoom": {
+      "response": {
+        "binary": {
+          "dirty_instances": false,
+          "full_instances": false,
+          "removed_slots": false,
+          "visible_slots": true
+        },
+        "camera": {
+          "center": [
+            8.716814159292035,
+            6.8584070796460175
+          ],
+          "dpr": 1,
+          "viewport": [
+            984,
+            603
+          ],
+          "zoom": 1.25
+        },
+        "culling": {
+          "culled": 0,
+          "spatial_candidates": 2,
+          "submitted_instances": 2,
+          "total": 2,
+          "visible": 2
+        },
+        "engine_sequence": 11,
+        "error": null,
+        "fixture": "PREVIEW",
+        "history": {
+          "redo_depth": 1,
+          "transaction_active": false,
+          "undo_depth": 0
+        },
+        "metrics": {
+          "allocation_growth_count": 0,
+          "cpu_update_ms": 0,
+          "culling_candidates": 2,
+          "document_nodes": 3,
+          "document_nodes_scanned": 0,
+          "fallback_rebuild_count": 0,
+          "full_render_model_scans": 0,
+          "gpu_encode_attempted": 0,
+          "gpu_encode_omitted": 0,
+          "indexed_nodes": 2,
+          "instance_upload_bytes": 0,
+          "invalid_derived_nodes": 0,
+          "order_nodes_visited": 4,
+          "render_items_cloned": 0,
+          "render_items_planned": 0,
+          "render_items_read": 2,
+          "render_items_written": 0,
+          "scene_nodes_visited": 0,
+          "sibling_search_steps": 0,
+          "visible_items": 2,
+          "visible_slot_upload_bytes": 8
+        },
+        "ok": true,
+        "protocol_version": 1,
+        "render_binary_schema_version": 1,
+        "render_delta": {
+          "dirty_ranges": 0,
+          "dirty_slots": 0,
+          "full": false,
+          "removed_slots": 0,
+          "render_full_rebuilds": 0,
+          "scene_full_rebuilds": 0,
+          "upload_bytes": 0
+        },
+        "render_encoding": {
+          "diagnostics": [],
+          "gpu_omitted_items": 0
+        },
+        "request_id": "camera-1786291583180-10",
+        "resources": {
+          "allocated_slots": 2,
+          "dirty_record_stride_bytes": 52,
+          "free_slots": 0,
+          "gpu_encodable_items": 2,
+          "gpu_omitted_items": 0,
+          "instance_capacity": 2,
+          "instance_stride_bytes": 48,
+          "renderable_items": 2,
+          "total_render_items": 2
+        },
+        "result": {
+          "camera_changed": true
+        },
+        "revisions": {
+          "document": 4,
+          "render": 4,
+          "scene": 4
+        },
+        "runtime_owner": "dedicated-worker",
+        "type": "engine_response"
+      },
+      "proof": {
+        "protocol_version": 1,
+        "render_binary_schema_version": 1,
+        "wasm_initialized": true,
+        "worker_runtime_owner": "dedicated-worker",
+        "worker_heartbeat": 1,
+        "main_thread_document_mutation_api": false,
+        "actual_webgpu": true,
+        "adapter": "maxwell",
+        "vendor": "nvidia",
+        "architecture": "maxwell",
+        "device": "Phase 0D WebGPU device",
+        "backend": "browser-webgpu (implementation backend not exposed by Web API)",
+        "fixture": "PREVIEW",
+        "revisions": {
+          "document": 4,
+          "render": 4,
+          "scene": 4
+        },
+        "culling": {
+          "culled": 0,
+          "spatial_candidates": 2,
+          "submitted_instances": 2,
+          "total": 2,
+          "visible": 2
+        },
+        "render_delta": {
+          "dirty_ranges": 0,
+          "dirty_slots": 0,
+          "full": false,
+          "removed_slots": 0,
+          "render_full_rebuilds": 0,
+          "scene_full_rebuilds": 0,
+          "upload_bytes": 0
+        },
+        "render_encoding": {
+          "diagnostics": [],
+          "gpu_omitted_items": 0
+        },
+        "work_counters": {
+          "allocation_growth_count": 0,
+          "cpu_update_ms": 0,
+          "culling_candidates": 2,
+          "document_nodes": 3,
+          "document_nodes_scanned": 0,
+          "fallback_rebuild_count": 0,
+          "full_render_model_scans": 0,
+          "gpu_encode_attempted": 0,
+          "gpu_encode_omitted": 0,
+          "indexed_nodes": 2,
+          "instance_upload_bytes": 0,
+          "invalid_derived_nodes": 0,
+          "order_nodes_visited": 4,
+          "render_items_cloned": 0,
+          "render_items_planned": 0,
+          "render_items_read": 2,
+          "render_items_written": 0,
+          "scene_nodes_visited": 0,
+          "sibling_search_steps": 0,
+          "visible_items": 2,
+          "visible_slot_upload_bytes": 8
+        },
+        "gpu": {
+          "draw_calls": 1,
+          "batches": 1,
+          "submitted_instances": 2,
+          "buffer_count": 3,
+          "buffer_bytes": 136,
+          "upload_calls": 2,
+          "frame_upload_bytes": 40,
+          "render_submit_ms": 4.200000002980232,
+          "frame_ms": 4.300000011920929,
+          "validation_errors": 0,
+          "frame_sequence": 11,
+          "gpu_encode_attempted": 0,
+          "gpu_encode_omitted": 0,
+          "instance_upload_bytes": 0,
+          "visible_slot_upload_bytes": 8,
+          "allocation_growth_count": 4
+        },
+        "engine_sequence": 11,
+        "latest_engine_sequence": 11,
+        "gpu_frame_sequence": 11,
+        "response_gpu_sequence_match": true,
+        "hit_test_topmost": null,
+        "fallback_rebuild_count": 0,
+        "gpu_validation_errors": 0,
+        "last_typed_error": null,
+        "console_errors": 0,
+        "worker_restarts": 1,
+        "worker_generation": 1,
+        "stale_frames_discarded": 0,
+        "camera_raw_intents": 0,
+        "camera_requests_sent": 0,
+        "camera_requests_coalesced": 0,
+        "camera_requests_dropped": 0,
+        "camera_request_in_flight": false
+      }
+    },
+    "hit_test": {
+      "response": {
+        "binary": {
+          "dirty_instances": false,
+          "full_instances": false,
+          "removed_slots": false,
+          "visible_slots": false
+        },
+        "camera": {
+          "center": [
+            8.716814159292035,
+            6.8584070796460175
+          ],
+          "dpr": 1,
+          "viewport": [
+            984,
+            603
+          ],
+          "zoom": 1.25
+        },
+        "culling": {
+          "culled": 0,
+          "spatial_candidates": 2,
+          "submitted_instances": 2,
+          "total": 2,
+          "visible": 2
+        },
+        "engine_sequence": 12,
+        "error": null,
+        "fixture": "PREVIEW",
+        "history": {
+          "redo_depth": 1,
+          "transaction_active": false,
+          "undo_depth": 0
+        },
+        "metrics": {
+          "allocation_growth_count": 0,
+          "cpu_update_ms": 1,
+          "culling_candidates": 0,
+          "document_nodes": 3,
+          "document_nodes_scanned": 0,
+          "fallback_rebuild_count": 0,
+          "full_render_model_scans": 0,
+          "gpu_encode_attempted": 0,
+          "gpu_encode_omitted": 0,
+          "indexed_nodes": 2,
+          "instance_upload_bytes": 0,
+          "invalid_derived_nodes": 0,
+          "order_nodes_visited": 0,
+          "render_items_cloned": 0,
+          "render_items_planned": 0,
+          "render_items_read": 0,
+          "render_items_written": 0,
+          "scene_nodes_visited": 0,
+          "sibling_search_steps": 0,
+          "visible_items": 0,
+          "visible_slot_upload_bytes": 0
+        },
+        "ok": true,
+        "protocol_version": 1,
+        "render_binary_schema_version": 1,
+        "render_delta": {
+          "dirty_ranges": 0,
+          "dirty_slots": 0,
+          "full": false,
+          "removed_slots": 0,
+          "render_full_rebuilds": 0,
+          "scene_full_rebuilds": 0,
+          "upload_bytes": 0
+        },
+        "render_encoding": {
+          "diagnostics": [],
+          "gpu_omitted_items": 0
+        },
+        "request_id": "hit_test-1786291583189-11",
+        "resources": {
+          "allocated_slots": 2,
+          "dirty_record_stride_bytes": 52,
+          "free_slots": 0,
+          "gpu_encodable_items": 2,
+          "gpu_omitted_items": 0,
+          "instance_capacity": 2,
+          "instance_stride_bytes": 48,
+          "renderable_items": 2,
+          "total_render_items": 2
+        },
+        "result": {
+          "all": [
+            "00000000-0000-0000-0000-000000000003"
+          ],
+          "candidates": 1,
+          "exact_geometry_tests": 1,
+          "topmost": "00000000-0000-0000-0000-000000000003"
+        },
+        "revisions": {
+          "document": 4,
+          "render": 4,
+          "scene": 4
+        },
+        "runtime_owner": "dedicated-worker",
+        "type": "engine_response"
+      },
+      "proof": {
+        "protocol_version": 1,
+        "render_binary_schema_version": 1,
+        "wasm_initialized": true,
+        "worker_runtime_owner": "dedicated-worker",
+        "worker_heartbeat": 1,
+        "main_thread_document_mutation_api": false,
+        "actual_webgpu": true,
+        "adapter": "maxwell",
+        "vendor": "nvidia",
+        "architecture": "maxwell",
+        "device": "Phase 0D WebGPU device",
+        "backend": "browser-webgpu (implementation backend not exposed by Web API)",
+        "fixture": "PREVIEW",
+        "revisions": {
+          "document": 4,
+          "render": 4,
+          "scene": 4
+        },
+        "culling": {
+          "culled": 0,
+          "spatial_candidates": 2,
+          "submitted_instances": 2,
+          "total": 2,
+          "visible": 2
+        },
+        "render_delta": {
+          "dirty_ranges": 0,
+          "dirty_slots": 0,
+          "full": false,
+          "removed_slots": 0,
+          "render_full_rebuilds": 0,
+          "scene_full_rebuilds": 0,
+          "upload_bytes": 0
+        },
+        "render_encoding": {
+          "diagnostics": [],
+          "gpu_omitted_items": 0
+        },
+        "work_counters": {
+          "allocation_growth_count": 0,
+          "cpu_update_ms": 0,
+          "culling_candidates": 2,
+          "document_nodes": 3,
+          "document_nodes_scanned": 0,
+          "fallback_rebuild_count": 0,
+          "full_render_model_scans": 0,
+          "gpu_encode_attempted": 0,
+          "gpu_encode_omitted": 0,
+          "indexed_nodes": 2,
+          "instance_upload_bytes": 0,
+          "invalid_derived_nodes": 0,
+          "order_nodes_visited": 4,
+          "render_items_cloned": 0,
+          "render_items_planned": 0,
+          "render_items_read": 2,
+          "render_items_written": 0,
+          "scene_nodes_visited": 0,
+          "sibling_search_steps": 0,
+          "visible_items": 2,
+          "visible_slot_upload_bytes": 8
+        },
+        "gpu": {
+          "draw_calls": 1,
+          "batches": 1,
+          "submitted_instances": 2,
+          "buffer_count": 3,
+          "buffer_bytes": 136,
+          "upload_calls": 2,
+          "frame_upload_bytes": 40,
+          "render_submit_ms": 4.200000002980232,
+          "frame_ms": 4.300000011920929,
+          "validation_errors": 0,
+          "frame_sequence": 11,
+          "gpu_encode_attempted": 0,
+          "gpu_encode_omitted": 0,
+          "instance_upload_bytes": 0,
+          "visible_slot_upload_bytes": 8,
+          "allocation_growth_count": 4
+        },
+        "engine_sequence": 11,
+        "latest_engine_sequence": 12,
+        "gpu_frame_sequence": 11,
+        "response_gpu_sequence_match": true,
+        "hit_test_topmost": "00000000-0000-0000-0000-000000000003",
+        "fallback_rebuild_count": 0,
+        "gpu_validation_errors": 0,
+        "last_typed_error": null,
+        "console_errors": 0,
+        "worker_restarts": 1,
+        "worker_generation": 1,
+        "stale_frames_discarded": 0,
+        "camera_raw_intents": 0,
+        "camera_requests_sent": 0,
+        "camera_requests_coalesced": 0,
+        "camera_requests_dropped": 0,
+        "camera_request_in_flight": false
+      }
+    },
+    "single_node_command": {
+      "response": {
+        "binary": {
+          "dirty_instances": true,
+          "full_instances": false,
+          "removed_slots": false,
+          "visible_slots": true
+        },
+        "camera": {
+          "center": [
+            8.716814159292035,
+            6.8584070796460175
+          ],
+          "dpr": 1,
+          "viewport": [
+            984,
+            603
+          ],
+          "zoom": 1.25
+        },
+        "culling": {
+          "culled": 0,
+          "spatial_candidates": 2,
+          "submitted_instances": 2,
+          "total": 2,
+          "visible": 2
+        },
+        "engine_sequence": 13,
+        "error": null,
+        "fixture": "PREVIEW",
+        "history": {
+          "redo_depth": 0,
+          "transaction_active": false,
+          "undo_depth": 1
+        },
+        "metrics": {
+          "allocation_growth_count": 0,
+          "cpu_update_ms": 2,
+          "culling_candidates": 2,
+          "document_nodes": 3,
+          "document_nodes_scanned": 1,
+          "fallback_rebuild_count": 0,
+          "full_render_model_scans": 0,
+          "gpu_encode_attempted": 1,
+          "gpu_encode_omitted": 0,
+          "indexed_nodes": 2,
+          "instance_upload_bytes": 48,
+          "invalid_derived_nodes": 0,
+          "order_nodes_visited": 4,
+          "render_items_cloned": 0,
+          "render_items_planned": 1,
+          "render_items_read": 3,
+          "render_items_written": 1,
+          "scene_nodes_visited": 2,
+          "sibling_search_steps": 0,
+          "visible_items": 2,
+          "visible_slot_upload_bytes": 8
+        },
+        "ok": true,
+        "protocol_version": 1,
+        "render_binary_schema_version": 1,
+        "render_delta": {
+          "dirty_ranges": 1,
+          "dirty_slots": 1,
+          "full": false,
+          "removed_slots": 0,
+          "render_full_rebuilds": 0,
+          "scene_full_rebuilds": 0,
+          "upload_bytes": 52
+        },
+        "render_encoding": {
+          "diagnostics": [],
+          "gpu_omitted_items": 0
+        },
+        "request_id": "command-1786291583195-12",
+        "resources": {
+          "allocated_slots": 2,
+          "dirty_record_stride_bytes": 52,
+          "free_slots": 0,
+          "gpu_encodable_items": 2,
+          "gpu_omitted_items": 0,
+          "instance_capacity": 2,
+          "instance_stride_bytes": 48,
+          "renderable_items": 2,
+          "total_render_items": 2
+        },
+        "result": {
+          "changed": true
+        },
+        "revisions": {
+          "document": 5,
+          "render": 5,
+          "scene": 5
+        },
+        "runtime_owner": "dedicated-worker",
+        "type": "engine_response"
+      },
+      "proof": {
+        "protocol_version": 1,
+        "render_binary_schema_version": 1,
+        "wasm_initialized": true,
+        "worker_runtime_owner": "dedicated-worker",
+        "worker_heartbeat": 1,
+        "main_thread_document_mutation_api": false,
+        "actual_webgpu": true,
+        "adapter": "maxwell",
+        "vendor": "nvidia",
+        "architecture": "maxwell",
+        "device": "Phase 0D WebGPU device",
+        "backend": "browser-webgpu (implementation backend not exposed by Web API)",
+        "fixture": "PREVIEW",
+        "revisions": {
+          "document": 5,
+          "render": 5,
+          "scene": 5
+        },
+        "culling": {
+          "culled": 0,
+          "spatial_candidates": 2,
+          "submitted_instances": 2,
+          "total": 2,
+          "visible": 2
+        },
+        "render_delta": {
+          "dirty_ranges": 1,
+          "dirty_slots": 1,
+          "full": false,
+          "removed_slots": 0,
+          "render_full_rebuilds": 0,
+          "scene_full_rebuilds": 0,
+          "upload_bytes": 52
+        },
+        "render_encoding": {
+          "diagnostics": [],
+          "gpu_omitted_items": 0
+        },
+        "work_counters": {
+          "allocation_growth_count": 0,
+          "cpu_update_ms": 2,
+          "culling_candidates": 2,
+          "document_nodes": 3,
+          "document_nodes_scanned": 1,
+          "fallback_rebuild_count": 0,
+          "full_render_model_scans": 0,
+          "gpu_encode_attempted": 1,
+          "gpu_encode_omitted": 0,
+          "indexed_nodes": 2,
+          "instance_upload_bytes": 48,
+          "invalid_derived_nodes": 0,
+          "order_nodes_visited": 4,
+          "render_items_cloned": 0,
+          "render_items_planned": 1,
+          "render_items_read": 3,
+          "render_items_written": 1,
+          "scene_nodes_visited": 2,
+          "sibling_search_steps": 0,
+          "visible_items": 2,
+          "visible_slot_upload_bytes": 8
+        },
+        "gpu": {
+          "draw_calls": 1,
+          "batches": 1,
+          "submitted_instances": 2,
+          "buffer_count": 3,
+          "buffer_bytes": 136,
+          "upload_calls": 3,
+          "frame_upload_bytes": 88,
+          "render_submit_ms": 2.7000000029802322,
+          "frame_ms": 2.7999999970197678,
+          "validation_errors": 0,
+          "frame_sequence": 13,
+          "gpu_encode_attempted": 1,
+          "gpu_encode_omitted": 0,
+          "instance_upload_bytes": 48,
+          "visible_slot_upload_bytes": 8,
+          "allocation_growth_count": 4
+        },
+        "engine_sequence": 13,
+        "latest_engine_sequence": 13,
+        "gpu_frame_sequence": 13,
+        "response_gpu_sequence_match": true,
+        "hit_test_topmost": "00000000-0000-0000-0000-000000000003",
+        "fallback_rebuild_count": 0,
+        "gpu_validation_errors": 0,
+        "last_typed_error": null,
+        "console_errors": 0,
+        "worker_restarts": 1,
+        "worker_generation": 1,
+        "stale_frames_discarded": 0,
+        "camera_raw_intents": 0,
+        "camera_requests_sent": 0,
+        "camera_requests_coalesced": 0,
+        "camera_requests_dropped": 0,
+        "camera_request_in_flight": false
+      }
+    },
+    "undo": {
+      "response": {
+        "binary": {
+          "dirty_instances": true,
+          "full_instances": false,
+          "removed_slots": false,
+          "visible_slots": true
+        },
+        "camera": {
+          "center": [
+            8.716814159292035,
+            6.8584070796460175
+          ],
+          "dpr": 1,
+          "viewport": [
+            984,
+            603
+          ],
+          "zoom": 1.25
+        },
+        "culling": {
+          "culled": 0,
+          "spatial_candidates": 2,
+          "submitted_instances": 2,
+          "total": 2,
+          "visible": 2
+        },
+        "engine_sequence": 14,
+        "error": null,
+        "fixture": "PREVIEW",
+        "history": {
+          "redo_depth": 1,
+          "transaction_active": false,
+          "undo_depth": 0
+        },
+        "metrics": {
+          "allocation_growth_count": 0,
+          "cpu_update_ms": 0,
+          "culling_candidates": 2,
+          "document_nodes": 3,
+          "document_nodes_scanned": 1,
+          "fallback_rebuild_count": 0,
+          "full_render_model_scans": 0,
+          "gpu_encode_attempted": 1,
+          "gpu_encode_omitted": 0,
+          "indexed_nodes": 2,
+          "instance_upload_bytes": 48,
+          "invalid_derived_nodes": 0,
+          "order_nodes_visited": 4,
+          "render_items_cloned": 0,
+          "render_items_planned": 1,
+          "render_items_read": 3,
+          "render_items_written": 1,
+          "scene_nodes_visited": 2,
+          "sibling_search_steps": 0,
+          "visible_items": 2,
+          "visible_slot_upload_bytes": 8
+        },
+        "ok": true,
+        "protocol_version": 1,
+        "render_binary_schema_version": 1,
+        "render_delta": {
+          "dirty_ranges": 1,
+          "dirty_slots": 1,
+          "full": false,
+          "removed_slots": 0,
+          "render_full_rebuilds": 0,
+          "scene_full_rebuilds": 0,
+          "upload_bytes": 52
+        },
+        "render_encoding": {
+          "diagnostics": [],
+          "gpu_omitted_items": 0
+        },
+        "request_id": "undo-1786291583204-13",
+        "resources": {
+          "allocated_slots": 2,
+          "dirty_record_stride_bytes": 52,
+          "free_slots": 0,
+          "gpu_encodable_items": 2,
+          "gpu_omitted_items": 0,
+          "instance_capacity": 2,
+          "instance_stride_bytes": 48,
+          "renderable_items": 2,
+          "total_render_items": 2
+        },
+        "result": {
+          "changed": true
+        },
+        "revisions": {
+          "document": 6,
+          "render": 6,
+          "scene": 6
+        },
+        "runtime_owner": "dedicated-worker",
+        "type": "engine_response"
+      },
+      "proof": {
+        "protocol_version": 1,
+        "render_binary_schema_version": 1,
+        "wasm_initialized": true,
+        "worker_runtime_owner": "dedicated-worker",
+        "worker_heartbeat": 1,
+        "main_thread_document_mutation_api": false,
+        "actual_webgpu": true,
+        "adapter": "maxwell",
+        "vendor": "nvidia",
+        "architecture": "maxwell",
+        "device": "Phase 0D WebGPU device",
+        "backend": "browser-webgpu (implementation backend not exposed by Web API)",
+        "fixture": "PREVIEW",
+        "revisions": {
+          "document": 6,
+          "render": 6,
+          "scene": 6
+        },
+        "culling": {
+          "culled": 0,
+          "spatial_candidates": 2,
+          "submitted_instances": 2,
+          "total": 2,
+          "visible": 2
+        },
+        "render_delta": {
+          "dirty_ranges": 1,
+          "dirty_slots": 1,
+          "full": false,
+          "removed_slots": 0,
+          "render_full_rebuilds": 0,
+          "scene_full_rebuilds": 0,
+          "upload_bytes": 52
+        },
+        "render_encoding": {
+          "diagnostics": [],
+          "gpu_omitted_items": 0
+        },
+        "work_counters": {
+          "allocation_growth_count": 0,
+          "cpu_update_ms": 0,
+          "culling_candidates": 2,
+          "document_nodes": 3,
+          "document_nodes_scanned": 1,
+          "fallback_rebuild_count": 0,
+          "full_render_model_scans": 0,
+          "gpu_encode_attempted": 1,
+          "gpu_encode_omitted": 0,
+          "indexed_nodes": 2,
+          "instance_upload_bytes": 48,
+          "invalid_derived_nodes": 0,
+          "order_nodes_visited": 4,
+          "render_items_cloned": 0,
+          "render_items_planned": 1,
+          "render_items_read": 3,
+          "render_items_written": 1,
+          "scene_nodes_visited": 2,
+          "sibling_search_steps": 0,
+          "visible_items": 2,
+          "visible_slot_upload_bytes": 8
+        },
+        "gpu": {
+          "draw_calls": 1,
+          "batches": 1,
+          "submitted_instances": 2,
+          "buffer_count": 3,
+          "buffer_bytes": 136,
+          "upload_calls": 3,
+          "frame_upload_bytes": 88,
+          "render_submit_ms": 1.0999999940395355,
+          "frame_ms": 1.2000000029802322,
+          "validation_errors": 0,
+          "frame_sequence": 14,
+          "gpu_encode_attempted": 1,
+          "gpu_encode_omitted": 0,
+          "instance_upload_bytes": 48,
+          "visible_slot_upload_bytes": 8,
+          "allocation_growth_count": 4
+        },
+        "engine_sequence": 14,
+        "latest_engine_sequence": 14,
+        "gpu_frame_sequence": 14,
+        "response_gpu_sequence_match": true,
+        "hit_test_topmost": "00000000-0000-0000-0000-000000000003",
+        "fallback_rebuild_count": 0,
+        "gpu_validation_errors": 0,
+        "last_typed_error": null,
+        "console_errors": 0,
+        "worker_restarts": 1,
+        "worker_generation": 1,
+        "stale_frames_discarded": 0,
+        "camera_raw_intents": 0,
+        "camera_requests_sent": 0,
+        "camera_requests_coalesced": 0,
+        "camera_requests_dropped": 0,
+        "camera_request_in_flight": false
+      }
+    },
+    "redo": {
+      "response": {
+        "binary": {
+          "dirty_instances": true,
+          "full_instances": false,
+          "removed_slots": false,
+          "visible_slots": true
+        },
+        "camera": {
+          "center": [
+            8.716814159292035,
+            6.8584070796460175
+          ],
+          "dpr": 1,
+          "viewport": [
+            984,
+            603
+          ],
+          "zoom": 1.25
+        },
+        "culling": {
+          "culled": 0,
+          "spatial_candidates": 2,
+          "submitted_instances": 2,
+          "total": 2,
+          "visible": 2
+        },
+        "engine_sequence": 15,
+        "error": null,
+        "fixture": "PREVIEW",
+        "history": {
+          "redo_depth": 0,
+          "transaction_active": false,
+          "undo_depth": 1
+        },
+        "metrics": {
+          "allocation_growth_count": 0,
+          "cpu_update_ms": 0,
+          "culling_candidates": 2,
+          "document_nodes": 3,
+          "document_nodes_scanned": 1,
+          "fallback_rebuild_count": 0,
+          "full_render_model_scans": 0,
+          "gpu_encode_attempted": 1,
+          "gpu_encode_omitted": 0,
+          "indexed_nodes": 2,
+          "instance_upload_bytes": 48,
+          "invalid_derived_nodes": 0,
+          "order_nodes_visited": 4,
+          "render_items_cloned": 0,
+          "render_items_planned": 1,
+          "render_items_read": 3,
+          "render_items_written": 1,
+          "scene_nodes_visited": 2,
+          "sibling_search_steps": 0,
+          "visible_items": 2,
+          "visible_slot_upload_bytes": 8
+        },
+        "ok": true,
+        "protocol_version": 1,
+        "render_binary_schema_version": 1,
+        "render_delta": {
+          "dirty_ranges": 1,
+          "dirty_slots": 1,
+          "full": false,
+          "removed_slots": 0,
+          "render_full_rebuilds": 0,
+          "scene_full_rebuilds": 0,
+          "upload_bytes": 52
+        },
+        "render_encoding": {
+          "diagnostics": [],
+          "gpu_omitted_items": 0
+        },
+        "request_id": "redo-1786291583208-14",
+        "resources": {
+          "allocated_slots": 2,
+          "dirty_record_stride_bytes": 52,
+          "free_slots": 0,
+          "gpu_encodable_items": 2,
+          "gpu_omitted_items": 0,
+          "instance_capacity": 2,
+          "instance_stride_bytes": 48,
+          "renderable_items": 2,
+          "total_render_items": 2
+        },
+        "result": {
+          "changed": true
+        },
+        "revisions": {
+          "document": 7,
+          "render": 7,
+          "scene": 7
+        },
+        "runtime_owner": "dedicated-worker",
+        "type": "engine_response"
+      },
+      "proof": {
+        "protocol_version": 1,
+        "render_binary_schema_version": 1,
+        "wasm_initialized": true,
+        "worker_runtime_owner": "dedicated-worker",
+        "worker_heartbeat": 1,
+        "main_thread_document_mutation_api": false,
+        "actual_webgpu": true,
+        "adapter": "maxwell",
+        "vendor": "nvidia",
+        "architecture": "maxwell",
+        "device": "Phase 0D WebGPU device",
+        "backend": "browser-webgpu (implementation backend not exposed by Web API)",
+        "fixture": "PREVIEW",
+        "revisions": {
+          "document": 7,
+          "render": 7,
+          "scene": 7
+        },
+        "culling": {
+          "culled": 0,
+          "spatial_candidates": 2,
+          "submitted_instances": 2,
+          "total": 2,
+          "visible": 2
+        },
+        "render_delta": {
+          "dirty_ranges": 1,
+          "dirty_slots": 1,
+          "full": false,
+          "removed_slots": 0,
+          "render_full_rebuilds": 0,
+          "scene_full_rebuilds": 0,
+          "upload_bytes": 52
+        },
+        "render_encoding": {
+          "diagnostics": [],
+          "gpu_omitted_items": 0
+        },
+        "work_counters": {
+          "allocation_growth_count": 0,
+          "cpu_update_ms": 0,
+          "culling_candidates": 2,
+          "document_nodes": 3,
+          "document_nodes_scanned": 1,
+          "fallback_rebuild_count": 0,
+          "full_render_model_scans": 0,
+          "gpu_encode_attempted": 1,
+          "gpu_encode_omitted": 0,
+          "indexed_nodes": 2,
+          "instance_upload_bytes": 48,
+          "invalid_derived_nodes": 0,
+          "order_nodes_visited": 4,
+          "render_items_cloned": 0,
+          "render_items_planned": 1,
+          "render_items_read": 3,
+          "render_items_written": 1,
+          "scene_nodes_visited": 2,
+          "sibling_search_steps": 0,
+          "visible_items": 2,
+          "visible_slot_upload_bytes": 8
+        },
+        "gpu": {
+          "draw_calls": 1,
+          "batches": 1,
+          "submitted_instances": 2,
+          "buffer_count": 3,
+          "buffer_bytes": 136,
+          "upload_calls": 3,
+          "frame_upload_bytes": 88,
+          "render_submit_ms": 5.899999991059303,
+          "frame_ms": 6,
+          "validation_errors": 0,
+          "frame_sequence": 15,
+          "gpu_encode_attempted": 1,
+          "gpu_encode_omitted": 0,
+          "instance_upload_bytes": 48,
+          "visible_slot_upload_bytes": 8,
+          "allocation_growth_count": 4
+        },
+        "engine_sequence": 15,
+        "latest_engine_sequence": 15,
+        "gpu_frame_sequence": 15,
+        "response_gpu_sequence_match": true,
+        "hit_test_topmost": "00000000-0000-0000-0000-000000000003",
+        "fallback_rebuild_count": 0,
+        "gpu_validation_errors": 0,
+        "last_typed_error": null,
+        "console_errors": 0,
+        "worker_restarts": 1,
+        "worker_generation": 1,
+        "stale_frames_discarded": 0,
+        "camera_raw_intents": 0,
+        "camera_requests_sent": 0,
+        "camera_requests_coalesced": 0,
+        "camera_requests_dropped": 0,
+        "camera_request_in_flight": false
+      }
+    },
+    "ten_thousand_fit": {
+      "response": {
+        "binary": {
+          "dirty_instances": false,
+          "full_instances": false,
+          "removed_slots": false,
+          "visible_slots": true
+        },
+        "camera": {
+          "center": [
+            1985,
+            1985
+          ],
+          "dpr": 1,
+          "viewport": [
+            984,
+            603
+          ],
+          "zoom": 0.13173803526448363
+        },
+        "culling": {
+          "culled": 0,
+          "spatial_candidates": 10000,
+          "submitted_instances": 10000,
+          "total": 10000,
+          "visible": 10000
+        },
+        "engine_sequence": 17,
+        "error": null,
+        "fixture": "BENCH-B",
+        "history": {
+          "redo_depth": 0,
+          "transaction_active": false,
+          "undo_depth": 0
+        },
+        "metrics": {
+          "allocation_growth_count": 0,
+          "cpu_update_ms": 21,
+          "culling_candidates": 10000,
+          "document_nodes": 10001,
+          "document_nodes_scanned": 0,
+          "fallback_rebuild_count": 0,
+          "full_render_model_scans": 0,
+          "gpu_encode_attempted": 0,
+          "gpu_encode_omitted": 0,
+          "indexed_nodes": 10000,
+          "instance_upload_bytes": 0,
+          "invalid_derived_nodes": 0,
+          "order_nodes_visited": 39996,
+          "render_items_cloned": 0,
+          "render_items_planned": 0,
+          "render_items_read": 10000,
+          "render_items_written": 0,
+          "scene_nodes_visited": 0,
+          "sibling_search_steps": 0,
+          "visible_items": 10000,
+          "visible_slot_upload_bytes": 40000
+        },
+        "ok": true,
+        "protocol_version": 1,
+        "render_binary_schema_version": 1,
+        "render_delta": {
+          "dirty_ranges": 0,
+          "dirty_slots": 0,
+          "full": false,
+          "removed_slots": 0,
+          "render_full_rebuilds": 0,
+          "scene_full_rebuilds": 0,
+          "upload_bytes": 0
+        },
+        "render_encoding": {
+          "diagnostics": [],
+          "gpu_omitted_items": 0
+        },
+        "request_id": "camera-1786291583619-16",
+        "resources": {
+          "allocated_slots": 10000,
+          "dirty_record_stride_bytes": 52,
+          "free_slots": 0,
+          "gpu_encodable_items": 10000,
+          "gpu_omitted_items": 0,
+          "instance_capacity": 10000,
+          "instance_stride_bytes": 48,
+          "renderable_items": 10000,
+          "total_render_items": 10000
+        },
+        "result": {
+          "camera_changed": true
+        },
+        "revisions": {
+          "document": 8,
+          "render": 8,
+          "scene": 8
+        },
+        "runtime_owner": "dedicated-worker",
+        "type": "engine_response"
+      },
+      "proof": {
+        "protocol_version": 1,
+        "render_binary_schema_version": 1,
+        "wasm_initialized": true,
+        "worker_runtime_owner": "dedicated-worker",
+        "worker_heartbeat": 1,
+        "main_thread_document_mutation_api": false,
+        "actual_webgpu": true,
+        "adapter": "maxwell",
+        "vendor": "nvidia",
+        "architecture": "maxwell",
+        "device": "Phase 0D WebGPU device",
+        "backend": "browser-webgpu (implementation backend not exposed by Web API)",
+        "fixture": "BENCH-B",
+        "revisions": {
+          "document": 8,
+          "render": 8,
+          "scene": 8
+        },
+        "culling": {
+          "culled": 0,
+          "spatial_candidates": 10000,
+          "submitted_instances": 10000,
+          "total": 10000,
+          "visible": 10000
+        },
+        "render_delta": {
+          "dirty_ranges": 0,
+          "dirty_slots": 0,
+          "full": false,
+          "removed_slots": 0,
+          "render_full_rebuilds": 0,
+          "scene_full_rebuilds": 0,
+          "upload_bytes": 0
+        },
+        "render_encoding": {
+          "diagnostics": [],
+          "gpu_omitted_items": 0
+        },
+        "work_counters": {
+          "allocation_growth_count": 0,
+          "cpu_update_ms": 21,
+          "culling_candidates": 10000,
+          "document_nodes": 10001,
+          "document_nodes_scanned": 0,
+          "fallback_rebuild_count": 0,
+          "full_render_model_scans": 0,
+          "gpu_encode_attempted": 0,
+          "gpu_encode_omitted": 0,
+          "indexed_nodes": 10000,
+          "instance_upload_bytes": 0,
+          "invalid_derived_nodes": 0,
+          "order_nodes_visited": 39996,
+          "render_items_cloned": 0,
+          "render_items_planned": 0,
+          "render_items_read": 10000,
+          "render_items_written": 0,
+          "scene_nodes_visited": 0,
+          "sibling_search_steps": 0,
+          "visible_items": 10000,
+          "visible_slot_upload_bytes": 40000
+        },
+        "gpu": {
+          "draw_calls": 1,
+          "batches": 1,
+          "submitted_instances": 10000,
+          "buffer_count": 3,
+          "buffer_bytes": 520032,
+          "upload_calls": 2,
+          "frame_upload_bytes": 40032,
+          "render_submit_ms": 1,
+          "frame_ms": 1.2999999970197678,
+          "validation_errors": 0,
+          "frame_sequence": 17,
+          "gpu_encode_attempted": 0,
+          "gpu_encode_omitted": 0,
+          "instance_upload_bytes": 0,
+          "visible_slot_upload_bytes": 40000,
+          "allocation_growth_count": 7
+        },
+        "engine_sequence": 17,
+        "latest_engine_sequence": 17,
+        "gpu_frame_sequence": 17,
+        "response_gpu_sequence_match": true,
+        "hit_test_topmost": "00000000-0000-0000-0000-000000000003",
+        "fallback_rebuild_count": 0,
+        "gpu_validation_errors": 0,
+        "last_typed_error": null,
+        "console_errors": 0,
+        "worker_restarts": 1,
+        "worker_generation": 1,
+        "stale_frames_discarded": 0,
+        "camera_raw_intents": 0,
+        "camera_requests_sent": 0,
+        "camera_requests_coalesced": 0,
+        "camera_requests_dropped": 0,
+        "camera_request_in_flight": false
+      }
+    },
+    "ten_thousand_offscreen": {
+      "response": {
+        "binary": {
+          "dirty_instances": false,
+          "full_instances": false,
+          "removed_slots": false,
+          "visible_slots": true
+        },
+        "camera": {
+          "center": [
+            -759080232.9732313,
+            -759080232.9732313
+          ],
+          "dpr": 1,
+          "viewport": [
+            984,
+            603
+          ],
+          "zoom": 0.13173803526448363
+        },
+        "culling": {
+          "culled": 10000,
+          "spatial_candidates": 0,
+          "submitted_instances": 0,
+          "total": 10000,
+          "visible": 0
+        },
+        "engine_sequence": 18,
+        "error": null,
+        "fixture": "BENCH-B",
+        "history": {
+          "redo_depth": 0,
+          "transaction_active": false,
+          "undo_depth": 0
+        },
+        "metrics": {
+          "allocation_growth_count": 0,
+          "cpu_update_ms": 0,
+          "culling_candidates": 0,
+          "document_nodes": 10001,
+          "document_nodes_scanned": 0,
+          "fallback_rebuild_count": 0,
+          "full_render_model_scans": 0,
+          "gpu_encode_attempted": 0,
+          "gpu_encode_omitted": 0,
+          "indexed_nodes": 10000,
+          "instance_upload_bytes": 0,
+          "invalid_derived_nodes": 0,
+          "order_nodes_visited": 0,
+          "render_items_cloned": 0,
+          "render_items_planned": 0,
+          "render_items_read": 0,
+          "render_items_written": 0,
+          "scene_nodes_visited": 0,
+          "sibling_search_steps": 0,
+          "visible_items": 0,
+          "visible_slot_upload_bytes": 0
+        },
+        "ok": true,
+        "protocol_version": 1,
+        "render_binary_schema_version": 1,
+        "render_delta": {
+          "dirty_ranges": 0,
+          "dirty_slots": 0,
+          "full": false,
+          "removed_slots": 0,
+          "render_full_rebuilds": 0,
+          "scene_full_rebuilds": 0,
+          "upload_bytes": 0
+        },
+        "render_encoding": {
+          "diagnostics": [],
+          "gpu_omitted_items": 0
+        },
+        "request_id": "camera-1786291583644-17",
+        "resources": {
+          "allocated_slots": 10000,
+          "dirty_record_stride_bytes": 52,
+          "free_slots": 0,
+          "gpu_encodable_items": 10000,
+          "gpu_omitted_items": 0,
+          "instance_capacity": 10000,
+          "instance_stride_bytes": 48,
+          "renderable_items": 10000,
+          "total_render_items": 10000
+        },
+        "result": {
+          "camera_changed": true
+        },
+        "revisions": {
+          "document": 8,
+          "render": 8,
+          "scene": 8
+        },
+        "runtime_owner": "dedicated-worker",
+        "type": "engine_response"
+      },
+      "proof": {
+        "protocol_version": 1,
+        "render_binary_schema_version": 1,
+        "wasm_initialized": true,
+        "worker_runtime_owner": "dedicated-worker",
+        "worker_heartbeat": 1,
+        "main_thread_document_mutation_api": false,
+        "actual_webgpu": true,
+        "adapter": "maxwell",
+        "vendor": "nvidia",
+        "architecture": "maxwell",
+        "device": "Phase 0D WebGPU device",
+        "backend": "browser-webgpu (implementation backend not exposed by Web API)",
+        "fixture": "BENCH-B",
+        "revisions": {
+          "document": 8,
+          "render": 8,
+          "scene": 8
+        },
+        "culling": {
+          "culled": 10000,
+          "spatial_candidates": 0,
+          "submitted_instances": 0,
+          "total": 10000,
+          "visible": 0
+        },
+        "render_delta": {
+          "dirty_ranges": 0,
+          "dirty_slots": 0,
+          "full": false,
+          "removed_slots": 0,
+          "render_full_rebuilds": 0,
+          "scene_full_rebuilds": 0,
+          "upload_bytes": 0
+        },
+        "render_encoding": {
+          "diagnostics": [],
+          "gpu_omitted_items": 0
+        },
+        "work_counters": {
+          "allocation_growth_count": 0,
+          "cpu_update_ms": 0,
+          "culling_candidates": 0,
+          "document_nodes": 10001,
+          "document_nodes_scanned": 0,
+          "fallback_rebuild_count": 0,
+          "full_render_model_scans": 0,
+          "gpu_encode_attempted": 0,
+          "gpu_encode_omitted": 0,
+          "indexed_nodes": 10000,
+          "instance_upload_bytes": 0,
+          "invalid_derived_nodes": 0,
+          "order_nodes_visited": 0,
+          "render_items_cloned": 0,
+          "render_items_planned": 0,
+          "render_items_read": 0,
+          "render_items_written": 0,
+          "scene_nodes_visited": 0,
+          "sibling_search_steps": 0,
+          "visible_items": 0,
+          "visible_slot_upload_bytes": 0
+        },
+        "gpu": {
+          "draw_calls": 0,
+          "batches": 0,
+          "submitted_instances": 0,
+          "buffer_count": 3,
+          "buffer_bytes": 520032,
+          "upload_calls": 1,
+          "frame_upload_bytes": 32,
+          "render_submit_ms": 0.699999988079071,
+          "frame_ms": 0.699999988079071,
+          "validation_errors": 0,
+          "frame_sequence": 18,
+          "gpu_encode_attempted": 0,
+          "gpu_encode_omitted": 0,
+          "instance_upload_bytes": 0,
+          "visible_slot_upload_bytes": 0,
+          "allocation_growth_count": 7
+        },
+        "engine_sequence": 18,
+        "latest_engine_sequence": 18,
+        "gpu_frame_sequence": 18,
+        "response_gpu_sequence_match": true,
+        "hit_test_topmost": "00000000-0000-0000-0000-000000000003",
+        "fallback_rebuild_count": 0,
+        "gpu_validation_errors": 0,
+        "last_typed_error": null,
+        "console_errors": 0,
+        "worker_restarts": 1,
+        "worker_generation": 1,
+        "stale_frames_discarded": 0,
+        "camera_raw_intents": 0,
+        "camera_requests_sent": 0,
+        "camera_requests_coalesced": 0,
+        "camera_requests_dropped": 0,
+        "camera_request_in_flight": false
+      }
+    },
+    "sparse_hundred_thousand_narrow": {
+      "response": {
+        "binary": {
+          "dirty_instances": false,
+          "full_instances": true,
+          "removed_slots": false,
+          "visible_slots": true
+        },
+        "camera": {
+          "center": [
+            0,
+            0
+          ],
+          "dpr": 1,
+          "viewport": [
+            984,
+            603
+          ],
+          "zoom": 1
+        },
+        "culling": {
+          "culled": 99999,
+          "spatial_candidates": 1,
+          "submitted_instances": 1,
+          "total": 100000,
+          "visible": 1
+        },
+        "engine_sequence": 19,
+        "error": null,
+        "fixture": "BENCH-C",
+        "history": {
+          "redo_depth": 0,
+          "transaction_active": false,
+          "undo_depth": 0
+        },
+        "metrics": {
+          "allocation_growth_count": 16,
+          "cpu_update_ms": 5093,
+          "culling_candidates": 1,
+          "document_nodes": 100001,
+          "document_nodes_scanned": 100001,
+          "fallback_rebuild_count": 0,
+          "full_render_model_scans": 2,
+          "gpu_encode_attempted": 100000,
+          "gpu_encode_omitted": 0,
+          "indexed_nodes": 100000,
+          "instance_upload_bytes": 4800000,
+          "invalid_derived_nodes": 0,
+          "order_nodes_visited": 0,
+          "render_items_cloned": 0,
+          "render_items_planned": 100001,
+          "render_items_read": 1,
+          "render_items_written": 100000,
+          "scene_nodes_visited": 100001,
+          "sibling_search_steps": 0,
+          "visible_items": 1,
+          "visible_slot_upload_bytes": 4
+        },
+        "ok": true,
+        "protocol_version": 1,
+        "render_binary_schema_version": 1,
+        "render_delta": {
+          "dirty_ranges": 1,
+          "dirty_slots": 100000,
+          "full": true,
+          "removed_slots": 0,
+          "render_full_rebuilds": 1,
+          "scene_full_rebuilds": 0,
+          "upload_bytes": 4800000
+        },
+        "render_encoding": {
+          "diagnostics": [],
+          "gpu_omitted_items": 0
+        },
+        "request_id": "load_fixture-1786291583652-18",
+        "resources": {
+          "allocated_slots": 100000,
+          "dirty_record_stride_bytes": 52,
+          "free_slots": 0,
+          "gpu_encodable_items": 100000,
+          "gpu_omitted_items": 0,
+          "instance_capacity": 100000,
+          "instance_stride_bytes": 48,
+          "renderable_items": 100000,
+          "total_render_items": 100000
+        },
+        "result": {
+          "fixture": "BENCH-C"
+        },
+        "revisions": {
+          "document": 9,
+          "render": 9,
+          "scene": 9
+        },
+        "runtime_owner": "dedicated-worker",
+        "type": "engine_response"
+      },
+      "proof": {
+        "protocol_version": 1,
+        "render_binary_schema_version": 1,
+        "wasm_initialized": true,
+        "worker_runtime_owner": "dedicated-worker",
+        "worker_heartbeat": 1,
+        "main_thread_document_mutation_api": false,
+        "actual_webgpu": true,
+        "adapter": "maxwell",
+        "vendor": "nvidia",
+        "architecture": "maxwell",
+        "device": "Phase 0D WebGPU device",
+        "backend": "browser-webgpu (implementation backend not exposed by Web API)",
+        "fixture": "BENCH-C",
+        "revisions": {
+          "document": 9,
+          "render": 9,
+          "scene": 9
+        },
+        "culling": {
+          "culled": 99999,
+          "spatial_candidates": 1,
+          "submitted_instances": 1,
+          "total": 100000,
+          "visible": 1
+        },
+        "render_delta": {
+          "dirty_ranges": 1,
+          "dirty_slots": 100000,
+          "full": true,
+          "removed_slots": 0,
+          "render_full_rebuilds": 1,
+          "scene_full_rebuilds": 0,
+          "upload_bytes": 4800000
+        },
+        "render_encoding": {
+          "diagnostics": [],
+          "gpu_omitted_items": 0
+        },
+        "work_counters": {
+          "allocation_growth_count": 16,
+          "cpu_update_ms": 5093,
+          "culling_candidates": 1,
+          "document_nodes": 100001,
+          "document_nodes_scanned": 100001,
+          "fallback_rebuild_count": 0,
+          "full_render_model_scans": 2,
+          "gpu_encode_attempted": 100000,
+          "gpu_encode_omitted": 0,
+          "indexed_nodes": 100000,
+          "instance_upload_bytes": 4800000,
+          "invalid_derived_nodes": 0,
+          "order_nodes_visited": 0,
+          "render_items_cloned": 0,
+          "render_items_planned": 100001,
+          "render_items_read": 1,
+          "render_items_written": 100000,
+          "scene_nodes_visited": 100001,
+          "sibling_search_steps": 0,
+          "visible_items": 1,
+          "visible_slot_upload_bytes": 4
+        },
+        "gpu": {
+          "draw_calls": 1,
+          "batches": 1,
+          "submitted_instances": 1,
+          "buffer_count": 3,
+          "buffer_bytes": 4840032,
+          "upload_calls": 3,
+          "frame_upload_bytes": 4800036,
+          "render_submit_ms": 10.099999994039536,
+          "frame_ms": 13.300000011920929,
+          "validation_errors": 0,
+          "frame_sequence": 19,
+          "gpu_encode_attempted": 100000,
+          "gpu_encode_omitted": 0,
+          "instance_upload_bytes": 4800000,
+          "visible_slot_upload_bytes": 4,
+          "allocation_growth_count": 8
+        },
+        "engine_sequence": 19,
+        "latest_engine_sequence": 19,
+        "gpu_frame_sequence": 19,
+        "response_gpu_sequence_match": true,
+        "hit_test_topmost": "00000000-0000-0000-0000-000000000003",
+        "fallback_rebuild_count": 0,
+        "gpu_validation_errors": 0,
+        "last_typed_error": null,
+        "console_errors": 0,
+        "worker_restarts": 1,
+        "worker_generation": 1,
+        "stale_frames_discarded": 0,
+        "camera_raw_intents": 0,
+        "camera_requests_sent": 0,
+        "camera_requests_coalesced": 0,
+        "camera_requests_dropped": 0,
+        "camera_request_in_flight": false
+      }
+    },
+    "final_preview": {
+      "response": {
+        "binary": {
+          "dirty_instances": false,
+          "full_instances": false,
+          "removed_slots": false,
+          "visible_slots": true
+        },
+        "camera": {
+          "center": [
+            45,
+            25
+          ],
+          "dpr": 1,
+          "viewport": [
+            984,
+            603
+          ],
+          "zoom": 2.204878048780488
+        },
+        "culling": {
+          "culled": 0,
+          "spatial_candidates": 2,
+          "submitted_instances": 2,
+          "total": 2,
+          "visible": 2
+        },
+        "engine_sequence": 23,
+        "error": null,
+        "fixture": "PREVIEW",
+        "history": {
+          "redo_depth": 0,
+          "transaction_active": false,
+          "undo_depth": 0
+        },
+        "metrics": {
+          "allocation_growth_count": 0,
+          "cpu_update_ms": 0,
+          "culling_candidates": 2,
+          "document_nodes": 3,
+          "document_nodes_scanned": 0,
+          "fallback_rebuild_count": 0,
+          "full_render_model_scans": 0,
+          "gpu_encode_attempted": 0,
+          "gpu_encode_omitted": 0,
+          "indexed_nodes": 2,
+          "instance_upload_bytes": 0,
+          "invalid_derived_nodes": 0,
+          "order_nodes_visited": 4,
+          "render_items_cloned": 0,
+          "render_items_planned": 0,
+          "render_items_read": 2,
+          "render_items_written": 0,
+          "scene_nodes_visited": 0,
+          "sibling_search_steps": 0,
+          "visible_items": 2,
+          "visible_slot_upload_bytes": 8
+        },
+        "ok": true,
+        "protocol_version": 1,
+        "render_binary_schema_version": 1,
+        "render_delta": {
+          "dirty_ranges": 0,
+          "dirty_slots": 0,
+          "full": false,
+          "removed_slots": 0,
+          "render_full_rebuilds": 0,
+          "scene_full_rebuilds": 0,
+          "upload_bytes": 0
+        },
+        "render_encoding": {
+          "diagnostics": [],
+          "gpu_omitted_items": 0
+        },
+        "request_id": "camera-1786291588821-21",
+        "resources": {
+          "allocated_slots": 2,
+          "dirty_record_stride_bytes": 52,
+          "free_slots": 0,
+          "gpu_encodable_items": 2,
+          "gpu_omitted_items": 0,
+          "instance_capacity": 2,
+          "instance_stride_bytes": 48,
+          "renderable_items": 2,
+          "total_render_items": 2
+        },
+        "result": {
+          "camera_changed": true
+        },
+        "revisions": {
+          "document": 10,
+          "render": 10,
+          "scene": 10
+        },
+        "runtime_owner": "dedicated-worker",
+        "type": "engine_response"
+      },
+      "proof": {
+        "protocol_version": 1,
+        "render_binary_schema_version": 1,
+        "wasm_initialized": true,
+        "worker_runtime_owner": "dedicated-worker",
+        "worker_heartbeat": 2,
+        "main_thread_document_mutation_api": false,
+        "actual_webgpu": true,
+        "adapter": "maxwell",
+        "vendor": "nvidia",
+        "architecture": "maxwell",
+        "device": "Phase 0D WebGPU device",
+        "backend": "browser-webgpu (implementation backend not exposed by Web API)",
+        "fixture": "PREVIEW",
+        "revisions": {
+          "document": 10,
+          "render": 10,
+          "scene": 10
+        },
+        "culling": {
+          "culled": 0,
+          "spatial_candidates": 2,
+          "submitted_instances": 2,
+          "total": 2,
+          "visible": 2
+        },
+        "render_delta": {
+          "dirty_ranges": 0,
+          "dirty_slots": 0,
+          "full": false,
+          "removed_slots": 0,
+          "render_full_rebuilds": 0,
+          "scene_full_rebuilds": 0,
+          "upload_bytes": 0
+        },
+        "render_encoding": {
+          "diagnostics": [],
+          "gpu_omitted_items": 0
+        },
+        "work_counters": {
+          "allocation_growth_count": 0,
+          "cpu_update_ms": 0,
+          "culling_candidates": 2,
+          "document_nodes": 3,
+          "document_nodes_scanned": 0,
+          "fallback_rebuild_count": 0,
+          "full_render_model_scans": 0,
+          "gpu_encode_attempted": 0,
+          "gpu_encode_omitted": 0,
+          "indexed_nodes": 2,
+          "instance_upload_bytes": 0,
+          "invalid_derived_nodes": 0,
+          "order_nodes_visited": 4,
+          "render_items_cloned": 0,
+          "render_items_planned": 0,
+          "render_items_read": 2,
+          "render_items_written": 0,
+          "scene_nodes_visited": 0,
+          "sibling_search_steps": 0,
+          "visible_items": 2,
+          "visible_slot_upload_bytes": 8
+        },
+        "gpu": {
+          "draw_calls": 1,
+          "batches": 1,
+          "submitted_instances": 2,
+          "buffer_count": 3,
+          "buffer_bytes": 4840032,
+          "upload_calls": 2,
+          "frame_upload_bytes": 40,
+          "render_submit_ms": 1.3999999910593033,
+          "frame_ms": 1.3999999910593033,
+          "validation_errors": 0,
+          "frame_sequence": 23,
+          "gpu_encode_attempted": 0,
+          "gpu_encode_omitted": 0,
+          "instance_upload_bytes": 0,
+          "visible_slot_upload_bytes": 8,
+          "allocation_growth_count": 8
+        },
+        "engine_sequence": 23,
+        "latest_engine_sequence": 23,
+        "gpu_frame_sequence": 23,
+        "response_gpu_sequence_match": true,
+        "hit_test_topmost": "00000000-0000-0000-0000-000000000003",
+        "fallback_rebuild_count": 0,
+        "gpu_validation_errors": 0,
+        "last_typed_error": null,
+        "console_errors": 0,
+        "worker_restarts": 1,
+        "worker_generation": 1,
+        "stale_frames_discarded": 0,
+        "camera_raw_intents": 0,
+        "camera_requests_sent": 0,
+        "camera_requests_coalesced": 0,
+        "camera_requests_dropped": 0,
+        "camera_request_in_flight": false
+      }
+    },
+    "dom_move": {
+      "protocol_version": 1,
+      "render_binary_schema_version": 1,
+      "wasm_initialized": true,
+      "worker_runtime_owner": "dedicated-worker",
+      "worker_heartbeat": 2,
+      "main_thread_document_mutation_api": false,
+      "actual_webgpu": true,
+      "adapter": "maxwell",
+      "vendor": "nvidia",
+      "architecture": "maxwell",
+      "device": "Phase 0D WebGPU device",
+      "backend": "browser-webgpu (implementation backend not exposed by Web API)",
+      "fixture": "PREVIEW",
+      "revisions": {
+        "document": 11,
+        "render": 11,
+        "scene": 11
+      },
+      "culling": {
+        "culled": 0,
+        "spatial_candidates": 2,
+        "submitted_instances": 2,
+        "total": 2,
+        "visible": 2
+      },
+      "render_delta": {
+        "dirty_ranges": 1,
+        "dirty_slots": 1,
+        "full": false,
+        "removed_slots": 0,
+        "render_full_rebuilds": 0,
+        "scene_full_rebuilds": 0,
+        "upload_bytes": 52
+      },
+      "render_encoding": {
+        "diagnostics": [],
+        "gpu_omitted_items": 0
+      },
+      "work_counters": {
+        "allocation_growth_count": 0,
+        "cpu_update_ms": 0,
+        "culling_candidates": 2,
+        "document_nodes": 3,
+        "document_nodes_scanned": 1,
+        "fallback_rebuild_count": 0,
+        "full_render_model_scans": 0,
+        "gpu_encode_attempted": 1,
+        "gpu_encode_omitted": 0,
+        "indexed_nodes": 2,
+        "instance_upload_bytes": 48,
+        "invalid_derived_nodes": 0,
+        "order_nodes_visited": 4,
+        "render_items_cloned": 0,
+        "render_items_planned": 1,
+        "render_items_read": 3,
+        "render_items_written": 1,
+        "scene_nodes_visited": 2,
+        "sibling_search_steps": 0,
+        "visible_items": 2,
+        "visible_slot_upload_bytes": 8
+      },
+      "gpu": {
+        "draw_calls": 1,
+        "batches": 1,
+        "submitted_instances": 2,
+        "buffer_count": 3,
+        "buffer_bytes": 4840032,
+        "upload_calls": 3,
+        "frame_upload_bytes": 88,
+        "render_submit_ms": 3.0999999940395355,
+        "frame_ms": 3.0999999940395355,
+        "validation_errors": 0,
+        "frame_sequence": 24,
+        "gpu_encode_attempted": 1,
+        "gpu_encode_omitted": 0,
+        "instance_upload_bytes": 48,
+        "visible_slot_upload_bytes": 8,
+        "allocation_growth_count": 8
+      },
+      "engine_sequence": 24,
+      "latest_engine_sequence": 24,
+      "gpu_frame_sequence": 24,
+      "response_gpu_sequence_match": true,
+      "hit_test_topmost": "00000000-0000-0000-0000-000000000003",
+      "fallback_rebuild_count": 0,
+      "gpu_validation_errors": 0,
+      "last_typed_error": null,
+      "console_errors": 0,
+      "worker_restarts": 1,
+      "worker_generation": 1,
+      "stale_frames_discarded": 0,
+      "camera_raw_intents": 0,
+      "camera_requests_sent": 0,
+      "camera_requests_coalesced": 0,
+      "camera_requests_dropped": 0,
+      "camera_request_in_flight": false
+    },
+    "dom_undo": {
+      "protocol_version": 1,
+      "render_binary_schema_version": 1,
+      "wasm_initialized": true,
+      "worker_runtime_owner": "dedicated-worker",
+      "worker_heartbeat": 3,
+      "main_thread_document_mutation_api": false,
+      "actual_webgpu": true,
+      "adapter": "maxwell",
+      "vendor": "nvidia",
+      "architecture": "maxwell",
+      "device": "Phase 0D WebGPU device",
+      "backend": "browser-webgpu (implementation backend not exposed by Web API)",
+      "fixture": "PREVIEW",
+      "revisions": {
+        "document": 12,
+        "render": 12,
+        "scene": 12
+      },
+      "culling": {
+        "culled": 0,
+        "spatial_candidates": 2,
+        "submitted_instances": 2,
+        "total": 2,
+        "visible": 2
+      },
+      "render_delta": {
+        "dirty_ranges": 1,
+        "dirty_slots": 1,
+        "full": false,
+        "removed_slots": 0,
+        "render_full_rebuilds": 0,
+        "scene_full_rebuilds": 0,
+        "upload_bytes": 52
+      },
+      "render_encoding": {
+        "diagnostics": [],
+        "gpu_omitted_items": 0
+      },
+      "work_counters": {
+        "allocation_growth_count": 0,
+        "cpu_update_ms": 1,
+        "culling_candidates": 2,
+        "document_nodes": 3,
+        "document_nodes_scanned": 1,
+        "fallback_rebuild_count": 0,
+        "full_render_model_scans": 0,
+        "gpu_encode_attempted": 1,
+        "gpu_encode_omitted": 0,
+        "indexed_nodes": 2,
+        "instance_upload_bytes": 48,
+        "invalid_derived_nodes": 0,
+        "order_nodes_visited": 4,
+        "render_items_cloned": 0,
+        "render_items_planned": 1,
+        "render_items_read": 3,
+        "render_items_written": 1,
+        "scene_nodes_visited": 2,
+        "sibling_search_steps": 0,
+        "visible_items": 2,
+        "visible_slot_upload_bytes": 8
+      },
+      "gpu": {
+        "draw_calls": 1,
+        "batches": 1,
+        "submitted_instances": 2,
+        "buffer_count": 3,
+        "buffer_bytes": 4840032,
+        "upload_calls": 3,
+        "frame_upload_bytes": 88,
+        "render_submit_ms": 1.2000000029802322,
+        "frame_ms": 1.2000000029802322,
+        "validation_errors": 0,
+        "frame_sequence": 25,
+        "gpu_encode_attempted": 1,
+        "gpu_encode_omitted": 0,
+        "instance_upload_bytes": 48,
+        "visible_slot_upload_bytes": 8,
+        "allocation_growth_count": 8
+      },
+      "engine_sequence": 25,
+      "latest_engine_sequence": 26,
+      "gpu_frame_sequence": 25,
+      "response_gpu_sequence_match": true,
+      "hit_test_topmost": "00000000-0000-0000-0000-000000000003",
+      "fallback_rebuild_count": 0,
+      "gpu_validation_errors": 0,
+      "last_typed_error": null,
+      "console_errors": 0,
+      "worker_restarts": 1,
+      "worker_generation": 1,
+      "stale_frames_discarded": 0,
+      "camera_raw_intents": 0,
+      "camera_requests_sent": 0,
+      "camera_requests_coalesced": 0,
+      "camera_requests_dropped": 0,
+      "camera_request_in_flight": false
+    },
+    "dom_redo": {
+      "protocol_version": 1,
+      "render_binary_schema_version": 1,
+      "wasm_initialized": true,
+      "worker_runtime_owner": "dedicated-worker",
+      "worker_heartbeat": 3,
+      "main_thread_document_mutation_api": false,
+      "actual_webgpu": true,
+      "adapter": "maxwell",
+      "vendor": "nvidia",
+      "architecture": "maxwell",
+      "device": "Phase 0D WebGPU device",
+      "backend": "browser-webgpu (implementation backend not exposed by Web API)",
+      "fixture": "PREVIEW",
+      "revisions": {
+        "document": 13,
+        "render": 13,
+        "scene": 13
+      },
+      "culling": {
+        "culled": 0,
+        "spatial_candidates": 2,
+        "submitted_instances": 2,
+        "total": 2,
+        "visible": 2
+      },
+      "render_delta": {
+        "dirty_ranges": 1,
+        "dirty_slots": 1,
+        "full": false,
+        "removed_slots": 0,
+        "render_full_rebuilds": 0,
+        "scene_full_rebuilds": 0,
+        "upload_bytes": 52
+      },
+      "render_encoding": {
+        "diagnostics": [],
+        "gpu_omitted_items": 0
+      },
+      "work_counters": {
+        "allocation_growth_count": 0,
+        "cpu_update_ms": 0,
+        "culling_candidates": 2,
+        "document_nodes": 3,
+        "document_nodes_scanned": 1,
+        "fallback_rebuild_count": 0,
+        "full_render_model_scans": 0,
+        "gpu_encode_attempted": 1,
+        "gpu_encode_omitted": 0,
+        "indexed_nodes": 2,
+        "instance_upload_bytes": 48,
+        "invalid_derived_nodes": 0,
+        "order_nodes_visited": 4,
+        "render_items_cloned": 0,
+        "render_items_planned": 1,
+        "render_items_read": 3,
+        "render_items_written": 1,
+        "scene_nodes_visited": 2,
+        "sibling_search_steps": 0,
+        "visible_items": 2,
+        "visible_slot_upload_bytes": 8
+      },
+      "gpu": {
+        "draw_calls": 1,
+        "batches": 1,
+        "submitted_instances": 2,
+        "buffer_count": 3,
+        "buffer_bytes": 4840032,
+        "upload_calls": 3,
+        "frame_upload_bytes": 88,
+        "render_submit_ms": 1,
+        "frame_ms": 1.1000000089406967,
+        "validation_errors": 0,
+        "frame_sequence": 27,
+        "gpu_encode_attempted": 1,
+        "gpu_encode_omitted": 0,
+        "instance_upload_bytes": 48,
+        "visible_slot_upload_bytes": 8,
+        "allocation_growth_count": 8
+      },
+      "engine_sequence": 27,
+      "latest_engine_sequence": 27,
+      "gpu_frame_sequence": 27,
+      "response_gpu_sequence_match": true,
+      "hit_test_topmost": "00000000-0000-0000-0000-000000000003",
+      "fallback_rebuild_count": 0,
+      "gpu_validation_errors": 0,
+      "last_typed_error": null,
+      "console_errors": 0,
+      "worker_restarts": 1,
+      "worker_generation": 1,
+      "stale_frames_discarded": 0,
+      "camera_raw_intents": 0,
+      "camera_requests_sent": 0,
+      "camera_requests_coalesced": 0,
+      "camera_requests_dropped": 0,
+      "camera_request_in_flight": false
+    },
+    "dom_fixture": {
+      "protocol_version": 1,
+      "render_binary_schema_version": 1,
+      "wasm_initialized": true,
+      "worker_runtime_owner": "dedicated-worker",
+      "worker_heartbeat": 3,
+      "main_thread_document_mutation_api": false,
+      "actual_webgpu": true,
+      "adapter": "maxwell",
+      "vendor": "nvidia",
+      "architecture": "maxwell",
+      "device": "Phase 0D WebGPU device",
+      "backend": "browser-webgpu (implementation backend not exposed by Web API)",
+      "fixture": "BENCH-A",
+      "revisions": {
+        "document": 14,
+        "render": 14,
+        "scene": 14
+      },
+      "culling": {
+        "culled": 896,
+        "spatial_candidates": 104,
+        "submitted_instances": 104,
+        "total": 1000,
+        "visible": 104
+      },
+      "render_delta": {
+        "dirty_ranges": 1,
+        "dirty_slots": 1000,
+        "full": true,
+        "removed_slots": 0,
+        "render_full_rebuilds": 1,
+        "scene_full_rebuilds": 0,
+        "upload_bytes": 48000
+      },
+      "render_encoding": {
+        "diagnostics": [],
+        "gpu_omitted_items": 0
+      },
+      "work_counters": {
+        "allocation_growth_count": 9,
+        "cpu_update_ms": 20,
+        "culling_candidates": 104,
+        "document_nodes": 1001,
+        "document_nodes_scanned": 1001,
+        "fallback_rebuild_count": 0,
+        "full_render_model_scans": 2,
+        "gpu_encode_attempted": 1000,
+        "gpu_encode_omitted": 0,
+        "indexed_nodes": 1000,
+        "instance_upload_bytes": 48000,
+        "invalid_derived_nodes": 0,
+        "order_nodes_visited": 412,
+        "render_items_cloned": 0,
+        "render_items_planned": 1001,
+        "render_items_read": 104,
+        "render_items_written": 1000,
+        "scene_nodes_visited": 1001,
+        "sibling_search_steps": 0,
+        "visible_items": 104,
+        "visible_slot_upload_bytes": 416
+      },
+      "gpu": {
+        "draw_calls": 1,
+        "batches": 1,
+        "submitted_instances": 104,
+        "buffer_count": 3,
+        "buffer_bytes": 4840032,
+        "upload_calls": 3,
+        "frame_upload_bytes": 48448,
+        "render_submit_ms": 1.4000000059604645,
+        "frame_ms": 1.5,
+        "validation_errors": 0,
+        "frame_sequence": 28,
+        "gpu_encode_attempted": 1000,
+        "gpu_encode_omitted": 0,
+        "instance_upload_bytes": 48000,
+        "visible_slot_upload_bytes": 416,
+        "allocation_growth_count": 8
+      },
+      "engine_sequence": 28,
+      "latest_engine_sequence": 28,
+      "gpu_frame_sequence": 28,
+      "response_gpu_sequence_match": true,
+      "hit_test_topmost": "00000000-0000-0000-0000-000000000003",
+      "fallback_rebuild_count": 0,
+      "gpu_validation_errors": 0,
+      "last_typed_error": null,
+      "console_errors": 0,
+      "worker_restarts": 1,
+      "worker_generation": 1,
+      "stale_frames_discarded": 0,
+      "camera_raw_intents": 0,
+      "camera_requests_sent": 0,
+      "camera_requests_coalesced": 0,
+      "camera_requests_dropped": 0,
+      "camera_request_in_flight": false
+    },
+    "dom_hit": {
+      "protocol_version": 1,
+      "render_binary_schema_version": 1,
+      "wasm_initialized": true,
+      "worker_runtime_owner": "dedicated-worker",
+      "worker_heartbeat": 5,
+      "main_thread_document_mutation_api": false,
+      "actual_webgpu": true,
+      "adapter": "maxwell",
+      "vendor": "nvidia",
+      "architecture": "maxwell",
+      "device": "Phase 0D WebGPU device",
+      "backend": "browser-webgpu (implementation backend not exposed by Web API)",
+      "fixture": "PREVIEW",
+      "revisions": {
+        "document": 15,
+        "render": 15,
+        "scene": 15
+      },
+      "culling": {
+        "culled": 0,
+        "spatial_candidates": 2,
+        "submitted_instances": 2,
+        "total": 2,
+        "visible": 2
+      },
+      "render_delta": {
+        "dirty_ranges": 0,
+        "dirty_slots": 0,
+        "full": false,
+        "removed_slots": 0,
+        "render_full_rebuilds": 0,
+        "scene_full_rebuilds": 0,
+        "upload_bytes": 0
+      },
+      "render_encoding": {
+        "diagnostics": [],
+        "gpu_omitted_items": 0
+      },
+      "work_counters": {
+        "allocation_growth_count": 0,
+        "cpu_update_ms": 0,
+        "culling_candidates": 2,
+        "document_nodes": 3,
+        "document_nodes_scanned": 0,
+        "fallback_rebuild_count": 0,
+        "full_render_model_scans": 0,
+        "gpu_encode_attempted": 0,
+        "gpu_encode_omitted": 0,
+        "indexed_nodes": 2,
+        "instance_upload_bytes": 0,
+        "invalid_derived_nodes": 0,
+        "order_nodes_visited": 4,
+        "render_items_cloned": 0,
+        "render_items_planned": 0,
+        "render_items_read": 2,
+        "render_items_written": 0,
+        "scene_nodes_visited": 0,
+        "sibling_search_steps": 0,
+        "visible_items": 2,
+        "visible_slot_upload_bytes": 8
+      },
+      "gpu": {
+        "draw_calls": 1,
+        "batches": 1,
+        "submitted_instances": 2,
+        "buffer_count": 3,
+        "buffer_bytes": 4840032,
+        "upload_calls": 2,
+        "frame_upload_bytes": 40,
+        "render_submit_ms": 2.2999999970197678,
+        "frame_ms": 2.3999999910593033,
+        "validation_errors": 0,
+        "frame_sequence": 76,
+        "gpu_encode_attempted": 0,
+        "gpu_encode_omitted": 0,
+        "instance_upload_bytes": 0,
+        "visible_slot_upload_bytes": 8,
+        "allocation_growth_count": 8
+      },
+      "engine_sequence": 76,
+      "latest_engine_sequence": 76,
+      "gpu_frame_sequence": 76,
+      "response_gpu_sequence_match": true,
+      "hit_test_topmost": "00000000-0000-0000-0000-000000000003",
+      "fallback_rebuild_count": 0,
+      "gpu_validation_errors": 0,
+      "last_typed_error": null,
+      "console_errors": 0,
+      "worker_restarts": 1,
+      "worker_generation": 1,
+      "stale_frames_discarded": 0,
+      "camera_raw_intents": 292,
+      "camera_requests_sent": 41,
+      "camera_requests_coalesced": 259,
+      "camera_requests_dropped": 251,
+      "camera_request_in_flight": false
+    },
+    "hit_ready_frame": {
+      "protocol_version": 1,
+      "render_binary_schema_version": 1,
+      "wasm_initialized": true,
+      "worker_runtime_owner": "dedicated-worker",
+      "worker_heartbeat": 5,
+      "main_thread_document_mutation_api": false,
+      "actual_webgpu": true,
+      "adapter": "maxwell",
+      "vendor": "nvidia",
+      "architecture": "maxwell",
+      "device": "Phase 0D WebGPU device",
+      "backend": "browser-webgpu (implementation backend not exposed by Web API)",
+      "fixture": "PREVIEW",
+      "revisions": {
+        "document": 15,
+        "render": 15,
+        "scene": 15
+      },
+      "culling": {
+        "culled": 0,
+        "spatial_candidates": 2,
+        "submitted_instances": 2,
+        "total": 2,
+        "visible": 2
+      },
+      "render_delta": {
+        "dirty_ranges": 0,
+        "dirty_slots": 0,
+        "full": false,
+        "removed_slots": 0,
+        "render_full_rebuilds": 0,
+        "scene_full_rebuilds": 0,
+        "upload_bytes": 0
+      },
+      "render_encoding": {
+        "diagnostics": [],
+        "gpu_omitted_items": 0
+      },
+      "work_counters": {
+        "allocation_growth_count": 0,
+        "cpu_update_ms": 0,
+        "culling_candidates": 2,
+        "document_nodes": 3,
+        "document_nodes_scanned": 0,
+        "fallback_rebuild_count": 0,
+        "full_render_model_scans": 0,
+        "gpu_encode_attempted": 0,
+        "gpu_encode_omitted": 0,
+        "indexed_nodes": 2,
+        "instance_upload_bytes": 0,
+        "invalid_derived_nodes": 0,
+        "order_nodes_visited": 4,
+        "render_items_cloned": 0,
+        "render_items_planned": 0,
+        "render_items_read": 2,
+        "render_items_written": 0,
+        "scene_nodes_visited": 0,
+        "sibling_search_steps": 0,
+        "visible_items": 2,
+        "visible_slot_upload_bytes": 8
+      },
+      "gpu": {
+        "draw_calls": 1,
+        "batches": 1,
+        "submitted_instances": 2,
+        "buffer_count": 3,
+        "buffer_bytes": 4840032,
+        "upload_calls": 2,
+        "frame_upload_bytes": 40,
+        "render_submit_ms": 2.2999999970197678,
+        "frame_ms": 2.3999999910593033,
+        "validation_errors": 0,
+        "frame_sequence": 76,
+        "gpu_encode_attempted": 0,
+        "gpu_encode_omitted": 0,
+        "instance_upload_bytes": 0,
+        "visible_slot_upload_bytes": 8,
+        "allocation_growth_count": 8
+      },
+      "engine_sequence": 76,
+      "latest_engine_sequence": 76,
+      "gpu_frame_sequence": 76,
+      "response_gpu_sequence_match": true,
+      "hit_test_topmost": "00000000-0000-0000-0000-000000000003",
+      "fallback_rebuild_count": 0,
+      "gpu_validation_errors": 0,
+      "last_typed_error": null,
+      "console_errors": 0,
+      "worker_restarts": 1,
+      "worker_generation": 1,
+      "stale_frames_discarded": 0,
+      "camera_raw_intents": 292,
+      "camera_requests_sent": 41,
+      "camera_requests_coalesced": 259,
+      "camera_requests_dropped": 251,
+      "camera_request_in_flight": false
+    },
+    "pointer_burst": {
+      "dispatched_pointer_moves": 500,
+      "dispatched_wheel_events": 120,
+      "final": {
+        "protocol_version": 1,
+        "render_binary_schema_version": 1,
+        "wasm_initialized": true,
+        "worker_runtime_owner": "dedicated-worker",
+        "worker_heartbeat": 5,
+        "main_thread_document_mutation_api": false,
+        "actual_webgpu": true,
+        "adapter": "maxwell",
+        "vendor": "nvidia",
+        "architecture": "maxwell",
+        "device": "Phase 0D WebGPU device",
+        "backend": "browser-webgpu (implementation backend not exposed by Web API)",
+        "fixture": "PREVIEW",
+        "revisions": {
+          "document": 15,
+          "render": 15,
+          "scene": 15
+        },
+        "culling": {
+          "culled": 0,
+          "spatial_candidates": 2,
+          "submitted_instances": 2,
+          "total": 2,
+          "visible": 2
+        },
+        "render_delta": {
+          "dirty_ranges": 0,
+          "dirty_slots": 0,
+          "full": false,
+          "removed_slots": 0,
+          "render_full_rebuilds": 0,
+          "scene_full_rebuilds": 0,
+          "upload_bytes": 0
+        },
+        "render_encoding": {
+          "diagnostics": [],
+          "gpu_omitted_items": 0
+        },
+        "work_counters": {
+          "allocation_growth_count": 0,
+          "cpu_update_ms": 0,
+          "culling_candidates": 2,
+          "document_nodes": 3,
+          "document_nodes_scanned": 0,
+          "fallback_rebuild_count": 0,
+          "full_render_model_scans": 0,
+          "gpu_encode_attempted": 0,
+          "gpu_encode_omitted": 0,
+          "indexed_nodes": 2,
+          "instance_upload_bytes": 0,
+          "invalid_derived_nodes": 0,
+          "order_nodes_visited": 4,
+          "render_items_cloned": 0,
+          "render_items_planned": 0,
+          "render_items_read": 2,
+          "render_items_written": 0,
+          "scene_nodes_visited": 0,
+          "sibling_search_steps": 0,
+          "visible_items": 2,
+          "visible_slot_upload_bytes": 8
+        },
+        "gpu": {
+          "draw_calls": 1,
+          "batches": 1,
+          "submitted_instances": 2,
+          "buffer_count": 3,
+          "buffer_bytes": 4840032,
+          "upload_calls": 2,
+          "frame_upload_bytes": 40,
+          "render_submit_ms": 2.4000000059604645,
+          "frame_ms": 2.4000000059604645,
+          "validation_errors": 0,
+          "frame_sequence": 70,
+          "gpu_encode_attempted": 0,
+          "gpu_encode_omitted": 0,
+          "instance_upload_bytes": 0,
+          "visible_slot_upload_bytes": 8,
+          "allocation_growth_count": 8
+        },
+        "engine_sequence": 70,
+        "latest_engine_sequence": 70,
+        "gpu_frame_sequence": 70,
+        "response_gpu_sequence_match": true,
+        "hit_test_topmost": "00000000-0000-0000-0000-000000000003",
+        "fallback_rebuild_count": 0,
+        "gpu_validation_errors": 0,
+        "last_typed_error": null,
+        "console_errors": 0,
+        "worker_restarts": 1,
+        "worker_generation": 1,
+        "stale_frames_discarded": 0,
+        "camera_raw_intents": 284,
+        "camera_requests_sent": 37,
+        "camera_requests_coalesced": 253,
+        "camera_requests_dropped": 247,
+        "camera_request_in_flight": false
+      }
+    },
+    "heartbeat_during_camera": {
+      "response": {
+        "binary": {
+          "dirty_instances": false,
+          "full_instances": false,
+          "removed_slots": false,
+          "visible_slots": false
+        },
+        "camera": {
+          "center": [
+            -27.566371681415927,
+            25.396240213723377
+          ],
+          "dpr": 1,
+          "viewport": [
+            984,
+            603
+          ],
+          "zoom": 2.782005862215905
+        },
+        "culling": {
+          "culled": 0,
+          "spatial_candidates": 2,
+          "submitted_instances": 2,
+          "total": 2,
+          "visible": 2
+        },
+        "engine_sequence": 67,
+        "error": null,
+        "fixture": "PREVIEW",
+        "history": {
+          "redo_depth": 0,
+          "transaction_active": false,
+          "undo_depth": 0
+        },
+        "metrics": {
+          "allocation_growth_count": 0,
+          "cpu_update_ms": 0,
+          "culling_candidates": 0,
+          "document_nodes": 3,
+          "document_nodes_scanned": 0,
+          "fallback_rebuild_count": 0,
+          "full_render_model_scans": 0,
+          "gpu_encode_attempted": 0,
+          "gpu_encode_omitted": 0,
+          "indexed_nodes": 2,
+          "instance_upload_bytes": 0,
+          "invalid_derived_nodes": 0,
+          "order_nodes_visited": 0,
+          "render_items_cloned": 0,
+          "render_items_planned": 0,
+          "render_items_read": 0,
+          "render_items_written": 0,
+          "scene_nodes_visited": 0,
+          "sibling_search_steps": 0,
+          "visible_items": 0,
+          "visible_slot_upload_bytes": 0
+        },
+        "ok": true,
+        "protocol_version": 1,
+        "render_binary_schema_version": 1,
+        "render_delta": {
+          "dirty_ranges": 0,
+          "dirty_slots": 0,
+          "full": false,
+          "removed_slots": 0,
+          "render_full_rebuilds": 0,
+          "scene_full_rebuilds": 0,
+          "upload_bytes": 0
+        },
+        "render_encoding": {
+          "diagnostics": [],
+          "gpu_omitted_items": 0
+        },
+        "request_id": "heartbeat-1786291590030-63",
+        "resources": {
+          "allocated_slots": 2,
+          "dirty_record_stride_bytes": 52,
+          "free_slots": 0,
+          "gpu_encodable_items": 2,
+          "gpu_omitted_items": 0,
+          "instance_capacity": 2,
+          "instance_stride_bytes": 48,
+          "renderable_items": 2,
+          "total_render_items": 2
+        },
+        "result": {
+          "heartbeat": true
+        },
+        "revisions": {
+          "document": 15,
+          "render": 15,
+          "scene": 15
+        },
+        "runtime_owner": "dedicated-worker",
+        "type": "engine_response"
+      },
+      "proof": {
+        "protocol_version": 1,
+        "render_binary_schema_version": 1,
+        "wasm_initialized": true,
+        "worker_runtime_owner": "dedicated-worker",
+        "worker_heartbeat": 5,
+        "main_thread_document_mutation_api": false,
+        "actual_webgpu": true,
+        "adapter": "maxwell",
+        "vendor": "nvidia",
+        "architecture": "maxwell",
+        "device": "Phase 0D WebGPU device",
+        "backend": "browser-webgpu (implementation backend not exposed by Web API)",
+        "fixture": "PREVIEW",
+        "revisions": {
+          "document": 15,
+          "render": 15,
+          "scene": 15
+        },
+        "culling": {
+          "culled": 0,
+          "spatial_candidates": 2,
+          "submitted_instances": 2,
+          "total": 2,
+          "visible": 2
+        },
+        "render_delta": {
+          "dirty_ranges": 0,
+          "dirty_slots": 0,
+          "full": false,
+          "removed_slots": 0,
+          "render_full_rebuilds": 0,
+          "scene_full_rebuilds": 0,
+          "upload_bytes": 0
+        },
+        "render_encoding": {
+          "diagnostics": [],
+          "gpu_omitted_items": 0
+        },
+        "work_counters": {
+          "allocation_growth_count": 0,
+          "cpu_update_ms": 0,
+          "culling_candidates": 2,
+          "document_nodes": 3,
+          "document_nodes_scanned": 0,
+          "fallback_rebuild_count": 0,
+          "full_render_model_scans": 0,
+          "gpu_encode_attempted": 0,
+          "gpu_encode_omitted": 0,
+          "indexed_nodes": 2,
+          "instance_upload_bytes": 0,
+          "invalid_derived_nodes": 0,
+          "order_nodes_visited": 4,
+          "render_items_cloned": 0,
+          "render_items_planned": 0,
+          "render_items_read": 2,
+          "render_items_written": 0,
+          "scene_nodes_visited": 0,
+          "sibling_search_steps": 0,
+          "visible_items": 2,
+          "visible_slot_upload_bytes": 8
+        },
+        "gpu": {
+          "draw_calls": 1,
+          "batches": 1,
+          "submitted_instances": 2,
+          "buffer_count": 3,
+          "buffer_bytes": 4840032,
+          "upload_calls": 2,
+          "frame_upload_bytes": 40,
+          "render_submit_ms": 1.7999999970197678,
+          "frame_ms": 1.7999999970197678,
+          "validation_errors": 0,
+          "frame_sequence": 66,
+          "gpu_encode_attempted": 0,
+          "gpu_encode_omitted": 0,
+          "instance_upload_bytes": 0,
+          "visible_slot_upload_bytes": 8,
+          "allocation_growth_count": 8
+        },
+        "engine_sequence": 66,
+        "latest_engine_sequence": 67,
+        "gpu_frame_sequence": 66,
+        "response_gpu_sequence_match": true,
+        "hit_test_topmost": "00000000-0000-0000-0000-000000000003",
+        "fallback_rebuild_count": 0,
+        "gpu_validation_errors": 0,
+        "last_typed_error": null,
+        "console_errors": 0,
+        "worker_restarts": 1,
+        "worker_generation": 1,
+        "stale_frames_discarded": 0,
+        "camera_raw_intents": 280,
+        "camera_requests_sent": 35,
+        "camera_requests_coalesced": 251,
+        "camera_requests_dropped": 245,
+        "camera_request_in_flight": false
+      }
+    },
+    "f32_omitted": {
+      "response": {
+        "binary": {
+          "dirty_instances": true,
+          "full_instances": false,
+          "removed_slots": false,
+          "visible_slots": true
+        },
+        "camera": {
+          "center": [
+            45,
+            24.936260359904367
+          ],
+          "dpr": 1,
+          "viewport": [
+            984,
+            603
+          ],
+          "zoom": 3.066915093003058
+        },
+        "culling": {
+          "culled": 1,
+          "spatial_candidates": 1,
+          "submitted_instances": 1,
+          "total": 2,
+          "visible": 1
+        },
+        "engine_sequence": 79,
+        "error": null,
+        "fixture": "PREVIEW",
+        "history": {
+          "redo_depth": 0,
+          "transaction_active": false,
+          "undo_depth": 1
+        },
+        "metrics": {
+          "allocation_growth_count": 0,
+          "cpu_update_ms": 0,
+          "culling_candidates": 1,
+          "document_nodes": 3,
+          "document_nodes_scanned": 1,
+          "fallback_rebuild_count": 0,
+          "full_render_model_scans": 0,
+          "gpu_encode_attempted": 1,
+          "gpu_encode_omitted": 1,
+          "indexed_nodes": 1,
+          "instance_upload_bytes": 48,
+          "invalid_derived_nodes": 0,
+          "order_nodes_visited": 0,
+          "render_items_cloned": 0,
+          "render_items_planned": 1,
+          "render_items_read": 2,
+          "render_items_written": 1,
+          "scene_nodes_visited": 2,
+          "sibling_search_steps": 0,
+          "visible_items": 1,
+          "visible_slot_upload_bytes": 4
+        },
+        "ok": true,
+        "protocol_version": 1,
+        "render_binary_schema_version": 1,
+        "render_delta": {
+          "dirty_ranges": 1,
+          "dirty_slots": 1,
+          "full": false,
+          "removed_slots": 0,
+          "render_full_rebuilds": 0,
+          "scene_full_rebuilds": 0,
+          "upload_bytes": 52
+        },
+        "render_encoding": {
+          "diagnostics": [
+            {
+              "node_id": "00000000-0000-0000-0000-000000000002",
+              "reason": "translation_outside_f32"
+            }
+          ],
+          "gpu_omitted_items": 1
+        },
+        "request_id": "command-1786291590153-75",
+        "resources": {
+          "allocated_slots": 2,
+          "dirty_record_stride_bytes": 52,
+          "free_slots": 0,
+          "gpu_encodable_items": 1,
+          "gpu_omitted_items": 1,
+          "instance_capacity": 2,
+          "instance_stride_bytes": 48,
+          "renderable_items": 2,
+          "total_render_items": 2
+        },
+        "result": {
+          "changed": true
+        },
+        "revisions": {
+          "document": 16,
+          "render": 16,
+          "scene": 16
+        },
+        "runtime_owner": "dedicated-worker",
+        "type": "engine_response"
+      },
+      "proof": {
+        "protocol_version": 1,
+        "render_binary_schema_version": 1,
+        "wasm_initialized": true,
+        "worker_runtime_owner": "dedicated-worker",
+        "worker_heartbeat": 5,
+        "main_thread_document_mutation_api": false,
+        "actual_webgpu": true,
+        "adapter": "maxwell",
+        "vendor": "nvidia",
+        "architecture": "maxwell",
+        "device": "Phase 0D WebGPU device",
+        "backend": "browser-webgpu (implementation backend not exposed by Web API)",
+        "fixture": "PREVIEW",
+        "revisions": {
+          "document": 16,
+          "render": 16,
+          "scene": 16
+        },
+        "culling": {
+          "culled": 1,
+          "spatial_candidates": 1,
+          "submitted_instances": 1,
+          "total": 2,
+          "visible": 1
+        },
+        "render_delta": {
+          "dirty_ranges": 1,
+          "dirty_slots": 1,
+          "full": false,
+          "removed_slots": 0,
+          "render_full_rebuilds": 0,
+          "scene_full_rebuilds": 0,
+          "upload_bytes": 52
+        },
+        "render_encoding": {
+          "diagnostics": [
+            {
+              "node_id": "00000000-0000-0000-0000-000000000002",
+              "reason": "translation_outside_f32"
+            }
+          ],
+          "gpu_omitted_items": 1
+        },
+        "work_counters": {
+          "allocation_growth_count": 0,
+          "cpu_update_ms": 0,
+          "culling_candidates": 1,
+          "document_nodes": 3,
+          "document_nodes_scanned": 1,
+          "fallback_rebuild_count": 0,
+          "full_render_model_scans": 0,
+          "gpu_encode_attempted": 1,
+          "gpu_encode_omitted": 1,
+          "indexed_nodes": 1,
+          "instance_upload_bytes": 48,
+          "invalid_derived_nodes": 0,
+          "order_nodes_visited": 0,
+          "render_items_cloned": 0,
+          "render_items_planned": 1,
+          "render_items_read": 2,
+          "render_items_written": 1,
+          "scene_nodes_visited": 2,
+          "sibling_search_steps": 0,
+          "visible_items": 1,
+          "visible_slot_upload_bytes": 4
+        },
+        "gpu": {
+          "draw_calls": 1,
+          "batches": 1,
+          "submitted_instances": 1,
+          "buffer_count": 3,
+          "buffer_bytes": 4840032,
+          "upload_calls": 3,
+          "frame_upload_bytes": 84,
+          "render_submit_ms": 4.199999988079071,
+          "frame_ms": 4.199999988079071,
+          "validation_errors": 0,
+          "frame_sequence": 79,
+          "gpu_encode_attempted": 1,
+          "gpu_encode_omitted": 1,
+          "instance_upload_bytes": 48,
+          "visible_slot_upload_bytes": 4,
+          "allocation_growth_count": 8
+        },
+        "engine_sequence": 79,
+        "latest_engine_sequence": 79,
+        "gpu_frame_sequence": 79,
+        "response_gpu_sequence_match": true,
+        "hit_test_topmost": "00000000-0000-0000-0000-000000000003",
+        "fallback_rebuild_count": 0,
+        "gpu_validation_errors": 0,
+        "last_typed_error": null,
+        "console_errors": 0,
+        "worker_restarts": 1,
+        "worker_generation": 1,
+        "stale_frames_discarded": 0,
+        "camera_raw_intents": 296,
+        "camera_requests_sent": 43,
+        "camera_requests_coalesced": 262,
+        "camera_requests_dropped": 253,
+        "camera_request_in_flight": true
+      }
+    },
+    "f32_recovered": {
+      "response": {
+        "binary": {
+          "dirty_instances": true,
+          "full_instances": false,
+          "removed_slots": false,
+          "visible_slots": true
+        },
+        "camera": {
+          "center": [
+            45,
+            24.932633138065487
+          ],
+          "dpr": 1,
+          "viewport": [
+            984,
+            603
+          ],
+          "zoom": 3.136702850723797
+        },
+        "culling": {
+          "culled": 0,
+          "spatial_candidates": 2,
+          "submitted_instances": 2,
+          "total": 2,
+          "visible": 2
+        },
+        "engine_sequence": 81,
+        "error": null,
+        "fixture": "PREVIEW",
+        "history": {
+          "redo_depth": 0,
+          "transaction_active": false,
+          "undo_depth": 2
+        },
+        "metrics": {
+          "allocation_growth_count": 0,
+          "cpu_update_ms": 1,
+          "culling_candidates": 2,
+          "document_nodes": 3,
+          "document_nodes_scanned": 1,
+          "fallback_rebuild_count": 0,
+          "full_render_model_scans": 0,
+          "gpu_encode_attempted": 1,
+          "gpu_encode_omitted": 0,
+          "indexed_nodes": 2,
+          "instance_upload_bytes": 48,
+          "invalid_derived_nodes": 0,
+          "order_nodes_visited": 4,
+          "render_items_cloned": 0,
+          "render_items_planned": 1,
+          "render_items_read": 3,
+          "render_items_written": 1,
+          "scene_nodes_visited": 2,
+          "sibling_search_steps": 0,
+          "visible_items": 2,
+          "visible_slot_upload_bytes": 8
+        },
+        "ok": true,
+        "protocol_version": 1,
+        "render_binary_schema_version": 1,
+        "render_delta": {
+          "dirty_ranges": 1,
+          "dirty_slots": 1,
+          "full": false,
+          "removed_slots": 0,
+          "render_full_rebuilds": 0,
+          "scene_full_rebuilds": 0,
+          "upload_bytes": 52
+        },
+        "render_encoding": {
+          "diagnostics": [],
+          "gpu_omitted_items": 0
+        },
+        "request_id": "command-1786291590171-77",
+        "resources": {
+          "allocated_slots": 2,
+          "dirty_record_stride_bytes": 52,
+          "free_slots": 0,
+          "gpu_encodable_items": 2,
+          "gpu_omitted_items": 0,
+          "instance_capacity": 2,
+          "instance_stride_bytes": 48,
+          "renderable_items": 2,
+          "total_render_items": 2
+        },
+        "result": {
+          "changed": true
+        },
+        "revisions": {
+          "document": 17,
+          "render": 17,
+          "scene": 17
+        },
+        "runtime_owner": "dedicated-worker",
+        "type": "engine_response"
+      },
+      "proof": {
+        "protocol_version": 1,
+        "render_binary_schema_version": 1,
+        "wasm_initialized": true,
+        "worker_runtime_owner": "dedicated-worker",
+        "worker_heartbeat": 5,
+        "main_thread_document_mutation_api": false,
+        "actual_webgpu": true,
+        "adapter": "maxwell",
+        "vendor": "nvidia",
+        "architecture": "maxwell",
+        "device": "Phase 0D WebGPU device",
+        "backend": "browser-webgpu (implementation backend not exposed by Web API)",
+        "fixture": "PREVIEW",
+        "revisions": {
+          "document": 17,
+          "render": 17,
+          "scene": 17
+        },
+        "culling": {
+          "culled": 0,
+          "spatial_candidates": 2,
+          "submitted_instances": 2,
+          "total": 2,
+          "visible": 2
+        },
+        "render_delta": {
+          "dirty_ranges": 1,
+          "dirty_slots": 1,
+          "full": false,
+          "removed_slots": 0,
+          "render_full_rebuilds": 0,
+          "scene_full_rebuilds": 0,
+          "upload_bytes": 52
+        },
+        "render_encoding": {
+          "diagnostics": [],
+          "gpu_omitted_items": 0
+        },
+        "work_counters": {
+          "allocation_growth_count": 0,
+          "cpu_update_ms": 1,
+          "culling_candidates": 2,
+          "document_nodes": 3,
+          "document_nodes_scanned": 1,
+          "fallback_rebuild_count": 0,
+          "full_render_model_scans": 0,
+          "gpu_encode_attempted": 1,
+          "gpu_encode_omitted": 0,
+          "indexed_nodes": 2,
+          "instance_upload_bytes": 48,
+          "invalid_derived_nodes": 0,
+          "order_nodes_visited": 4,
+          "render_items_cloned": 0,
+          "render_items_planned": 1,
+          "render_items_read": 3,
+          "render_items_written": 1,
+          "scene_nodes_visited": 2,
+          "sibling_search_steps": 0,
+          "visible_items": 2,
+          "visible_slot_upload_bytes": 8
+        },
+        "gpu": {
+          "draw_calls": 1,
+          "batches": 1,
+          "submitted_instances": 2,
+          "buffer_count": 3,
+          "buffer_bytes": 4840032,
+          "upload_calls": 3,
+          "frame_upload_bytes": 88,
+          "render_submit_ms": 0.9000000059604645,
+          "frame_ms": 0.9000000059604645,
+          "validation_errors": 0,
+          "frame_sequence": 81,
+          "gpu_encode_attempted": 1,
+          "gpu_encode_omitted": 0,
+          "instance_upload_bytes": 48,
+          "visible_slot_upload_bytes": 8,
+          "allocation_growth_count": 8
+        },
+        "engine_sequence": 81,
+        "latest_engine_sequence": 81,
+        "gpu_frame_sequence": 81,
+        "response_gpu_sequence_match": true,
+        "hit_test_topmost": "00000000-0000-0000-0000-000000000003",
+        "fallback_rebuild_count": 0,
+        "gpu_validation_errors": 0,
+        "last_typed_error": null,
+        "console_errors": 0,
+        "worker_restarts": 1,
+        "worker_generation": 1,
+        "stale_frames_discarded": 0,
+        "camera_raw_intents": 296,
+        "camera_requests_sent": 43,
+        "camera_requests_coalesced": 262,
+        "camera_requests_dropped": 253,
+        "camera_request_in_flight": false
+      }
+    },
+    "worker_restart": {
+      "waiter_outcome": "worker_restarted",
+      "state": {
+        "protocol_version": 1,
+        "render_binary_schema_version": 1,
+        "wasm_initialized": true,
+        "worker_runtime_owner": "dedicated-worker",
+        "worker_heartbeat": 1,
+        "main_thread_document_mutation_api": false,
+        "actual_webgpu": true,
+        "adapter": "maxwell",
+        "vendor": "nvidia",
+        "architecture": "maxwell",
+        "device": "Phase 0D WebGPU device",
+        "backend": "browser-webgpu (implementation backend not exposed by Web API)",
+        "fixture": "PREVIEW",
+        "revisions": {
+          "document": 0,
+          "render": 0,
+          "scene": 0
+        },
+        "culling": {
+          "culled": 0,
+          "spatial_candidates": 2,
+          "submitted_instances": 2,
+          "total": 2,
+          "visible": 2
+        },
+        "render_delta": {
+          "dirty_ranges": 0,
+          "dirty_slots": 0,
+          "full": false,
+          "removed_slots": 0,
+          "render_full_rebuilds": 0,
+          "scene_full_rebuilds": 0,
+          "upload_bytes": 0
+        },
+        "render_encoding": {
+          "diagnostics": [],
+          "gpu_omitted_items": 0
+        },
+        "work_counters": {
+          "allocation_growth_count": 0,
+          "cpu_update_ms": 0,
+          "culling_candidates": 2,
+          "document_nodes": 3,
+          "document_nodes_scanned": 0,
+          "fallback_rebuild_count": 0,
+          "full_render_model_scans": 0,
+          "gpu_encode_attempted": 0,
+          "gpu_encode_omitted": 0,
+          "indexed_nodes": 2,
+          "instance_upload_bytes": 0,
+          "invalid_derived_nodes": 0,
+          "order_nodes_visited": 4,
+          "render_items_cloned": 0,
+          "render_items_planned": 0,
+          "render_items_read": 2,
+          "render_items_written": 0,
+          "scene_nodes_visited": 0,
+          "sibling_search_steps": 0,
+          "visible_items": 2,
+          "visible_slot_upload_bytes": 8
+        },
+        "gpu": {
+          "draw_calls": 1,
+          "batches": 1,
+          "submitted_instances": 2,
+          "buffer_count": 3,
+          "buffer_bytes": 4840032,
+          "upload_calls": 2,
+          "frame_upload_bytes": 40,
+          "render_submit_ms": 6,
+          "frame_ms": 6.0999999940395355,
+          "validation_errors": 0,
+          "frame_sequence": 10,
+          "gpu_encode_attempted": 0,
+          "gpu_encode_omitted": 0,
+          "instance_upload_bytes": 0,
+          "visible_slot_upload_bytes": 8,
+          "allocation_growth_count": 8
+        },
+        "engine_sequence": 10,
+        "latest_engine_sequence": 11,
+        "gpu_frame_sequence": 10,
+        "response_gpu_sequence_match": true,
+        "hit_test_topmost": "00000000-0000-0000-0000-000000000003",
+        "fallback_rebuild_count": 0,
+        "gpu_validation_errors": 0,
+        "last_typed_error": null,
+        "console_errors": 0,
+        "worker_restarts": 2,
+        "worker_generation": 2,
+        "stale_frames_discarded": 0,
+        "camera_raw_intents": 309,
+        "camera_requests_sent": 52,
+        "camera_requests_coalesced": 267,
+        "camera_requests_dropped": 257,
+        "camera_request_in_flight": false
+      }
+    },
+    "ordered_frames": {
+      "outcome": "resolved",
+      "sequences": [
+        13,
+        14
+      ]
+    }
+  },
+  "request_sequences": {
+    "resize": 4,
+    "fit": 5,
+    "reorder": 6,
+    "reorder_undo": 7,
+    "reorder_redo": 8,
+    "pan": 10,
+    "zoom": 11,
+    "command": 13,
+    "undo": 14,
+    "redo": 15,
+    "heartbeat_during_camera": 67,
+    "f32_omitted": 79,
+    "f32_recovered": 81,
+    "ordered_frames": [
+      13,
+      14
+    ],
+    "final_gpu_frame": 14
+  },
+  "cpu_update_ms": {
+    "ten_thousand_fit": 21,
+    "sparse_hundred_thousand_load": 5093,
+    "f32_omitted": 0,
+    "f32_recovered": 1
+  },
+  "screenshot": "docs/verification/phase0d-r1-preview.png",
+  "pixel_readback_artifact": "docs/verification/PHASE_0D_R1_PIXEL_READBACK.json",
+  "console_errors": [],
+  "checks": {
+    "worker_wasm_initialized": true,
+    "main_thread_has_no_document_mutation": true,
+    "worker_heartbeat_and_restart": true,
+    "actual_webgpu_device": true,
+    "render_schema_agreement": true,
+    "actual_pixel_readback": true,
+    "resize_and_dpr": true,
+    "pan_zoom_hit_test": true,
+    "command_scene_render_delta": true,
+    "undo_redo": true,
+    "reorder_pixel_undo_redo": true,
+    "offscreen_culling_and_pixel": true,
+    "ten_thousand_instanced": true,
+    "sparse_hundred_thousand_pruned": true,
+    "f32_omission_and_recovery": true,
+    "actual_dom_controls": true,
+    "camera_burst_coalesced": true,
+    "heartbeat_does_not_replace_frame": true,
+    "restart_rejects_waiter": true,
+    "ordered_gpu_frames": true,
+    "revisions_match": true,
+    "fallback_rebuilds_zero": true,
+    "gpu_validation_errors_zero": true,
+    "browser_console_errors_zero": true
+  },
+  "all_passed": true
+}

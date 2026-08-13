@@ -1,0 +1,18 @@
+[package]
+name = "visual_authoring_renderer_wgpu"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+bytemuck.workspace = true
+thiserror.workspace = true
+visual_authoring_core_math = { path = "../core_math" }
+visual_authoring_document = { path = "../document" }
+visual_authoring_render_model = { path = "../render_model" }
+wgpu.workspace = true
+
+[dev-dependencies]
+pollster.workspace = true
+visual_authoring_scene = { path = "../scene" }

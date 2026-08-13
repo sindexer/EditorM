@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "endianness": "little",
+  "instance_stride_bytes": 48,
+  "dirty_record_stride_bytes": 52,
+  "uniform_stride_bytes": 32,
+  "primitive": {
+    "rectangle": 0,
+    "ellipse": 1
+  },
+  "instance_fields": {
+    "linear": 0,
+    "translation_hi": 16,
+    "translation_lo": 24,
+    "size": 32,
+    "opacity": 40,
+    "primitive": 44
+  }
+}

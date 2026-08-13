@@ -1,0 +1,12 @@
+Phase 0E-R2 structural source audit
+captured_at_utc=2026-08-11T03:27:27.6908480Z
+PASS Document edit clone - matches=0
+PASS React incremental large-array operations - matches=0
+PASS Scene cached order_key - matches=0
+PASS Scene sibling_index only in semantic snapshot - matches=2; expected public snapshot field plus snapshot derivation
+PASS Scene children copy only in semantic snapshot - matches=1
+PASS Document command copies bounded or snapshot data only - matches=2; k-child Ungroup plus explicit subtree snapshot
+PASS Legacy group metadata removed from product state - matches=2; both remaining references are negative assertions
+PASS UI dense order limited to explicit full initialization - matches=1; rebuildHierarchy full boundary
+allowed_boundaries=Document semantic snapshot; explicit subtree snapshot; Scene semantic snapshot; persistence; UI initial full projection
+FINAL_STATUS=PASS
