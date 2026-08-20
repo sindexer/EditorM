@@ -3,10 +3,43 @@
 import { WebGpuRenderer } from "../../phase0d-preview/src/renderer.js";
 import { RankedSequence, emptySequenceWork } from "./rankedSequence";
 import type { SequenceFragment, SequenceWork } from "./rankedSequence";
-import type { BinaryPayload, EngineResponse, ProjectionNode, StructuralProjectionOperation, UiCounters } from "./types";
+import type { BinaryPayload, EngineResponse, ProjectionNode, SlideSummary, StructuralProjectionOperation, UiCounters } from "./types";
 
 const PROTOCOL_VERSION = 1;
 
+function splitFloat64(value: number): [number, number] {
+  const high = Math.fround(value);
+  return [high, value - high];
+}
+
+export interface ThumbnailState {
+  revision: number;
+  status: "pending" | "ready" | "error";
+  url?: string;
+  error?: string;
+}
+
+export interface ThumbnailQueueDecision {
+  writePending: boolean;
+  enqueue: boolean;
+}
+
+export function decideThumbnailQueueUpdate(
+  current: Pick<ThumbnailState, "revision" | "status"> | undefined,
+  requestedRevision: number,
+  queued: boolean,
+  sameRevisionIsRendering: boolean,
+): ThumbnailQueueDecision {
+  if (
+    current?.revision === requestedRevision &&
+    (current.status === "ready" || current.status === "error")
+  ) {
+    return { writePending: false, enqueue: false };
+  }
+  if (queued) return { writePending: true, enqueue: false };
+  if (sameRevisionIsRendering) return { writePending: false, enqueue: false };
+  return { writePending: true, enqueue: true };
+}
 export class EngineFailure extends Error {
   constructor(public readonly code: string, message: string) {
     super(message);
@@ -366,6 +399,16 @@ export class EngineClient {
   private heartbeat = 0;
   capabilities: Record<string, unknown> = {};
   gpuMetrics: Record<string, number> = {};
+  readonly thumbnails = new Map<string, ThumbnailState>();
+  thumbnailCaptures = 0;
+  thumbnailInvalidations = 0;
+  private thumbnailQueue: string[] = [];
+  private readonly thumbnailQueued = new Set<string>();
+  private readonly visibleThumbnailIds = new Set<string>();
+  private thumbnailRunning: string | null = null;
+  private thumbnailScheduled = false;
+  private latestResponse: EngineResponse | null = null;
+  private activeVisibleSlots = new Uint32Array();
 
   async initialize(canvas: HTMLCanvasElement): Promise<EngineResponse> {
     this.canvas = canvas;
@@ -480,18 +523,254 @@ export class EngineClient {
       pending?.reject(failure);
       return;
     }
+    if (response.result?.kind === "thumbnail_slots") {
+      pending?.resolve(response);
+      return;
+    }
     if (response.engine_sequence <= this.lastFrameSequence) {
       pending?.reject(new EngineFailure("stale_engine_frame", "Stale engine frame rejected"));
       return;
     }
     if (!this.renderer) throw new EngineFailure("renderer_not_ready", "WebGPU renderer is not ready");
+    if (typed.payload?.visibleSlots) {
+      this.activeVisibleSlots = new Uint32Array(typed.payload.visibleSlots).slice();
+    }
     this.gpuMetrics = await this.renderer.applyEngineFrame(response, typed.payload ?? {});
     this.lastFrameSequence = response.engine_sequence;
     this.projection.apply(response);
+    this.updateThumbnailQueue(response);
     for (const listener of this.listeners) listener(response);
     pending?.resolve(response);
   }
 
+  setThumbnailVisibility(slideId: string, visible: boolean): void {
+    if (visible) this.visibleThumbnailIds.add(slideId);
+    else this.visibleThumbnailIds.delete(slideId);
+    this.sortThumbnailQueue();
+    this.scheduleThumbnailDrain();
+  }
+
+  private updateThumbnailQueue(response: EngineResponse): void {
+    this.latestResponse = response;
+    const validSlides = new Set(response.editor_session.slides.map((slide) => slide.id));
+    for (const [slideId, cached] of this.thumbnails) {
+      if (!validSlides.has(slideId)) {
+        if (cached.url) URL.revokeObjectURL(cached.url);
+        this.thumbnails.delete(slideId);
+        this.thumbnailQueued.delete(slideId);
+        this.visibleThumbnailIds.delete(slideId);
+      }
+    }
+    this.thumbnailQueue = this.thumbnailQueue.filter((slideId) => validSlides.has(slideId));
+    for (const slide of response.editor_session.slides) {
+      const cached = this.thumbnails.get(slide.id);
+      if (cached && cached.revision !== slide.thumbnail_revision) {
+        if (cached.url) URL.revokeObjectURL(cached.url);
+        this.thumbnails.delete(slide.id);
+        this.thumbnailInvalidations += 1;
+      }
+      const current = this.thumbnails.get(slide.id);
+      const sameRevisionIsRendering =
+        this.thumbnailRunning === slide.id &&
+        current?.revision === slide.thumbnail_revision &&
+        current.status === "pending";
+      const decision = decideThumbnailQueueUpdate(
+        current,
+        slide.thumbnail_revision,
+        this.thumbnailQueued.has(slide.id),
+        sameRevisionIsRendering,
+      );
+      if (!decision.writePending) continue;
+      this.thumbnails.set(slide.id, { revision: slide.thumbnail_revision, status: "pending" });
+      if (!decision.enqueue) continue;
+      this.thumbnailQueue.push(slide.id);
+      this.thumbnailQueued.add(slide.id);
+    }
+    this.sortThumbnailQueue();
+    this.scheduleThumbnailDrain();
+  }
+
+  private sortThumbnailQueue(): void {
+    const response = this.latestResponse;
+    if (!response) return;
+    this.thumbnailQueue = orderThumbnailQueue(this.thumbnailQueue, response.editor_session.slides, this.visibleThumbnailIds);
+  }
+
+  private scheduleThumbnailDrain(): void {
+    if (this.thumbnailRunning || this.thumbnailScheduled || this.thumbnailQueue.length === 0) return;
+    this.thumbnailScheduled = true;
+    requestAnimationFrame(() => {
+      this.thumbnailScheduled = false;
+      void this.drainOneThumbnail();
+    });
+  }
+
+  private async drainOneThumbnail(): Promise<void> {
+    if (this.thumbnailRunning) return;
+    const slideId = this.thumbnailQueue.shift();
+    if (!slideId) return;
+    this.thumbnailQueued.delete(slideId);
+    const response = this.latestResponse;
+    const slide = response?.editor_session.slides.find((candidate) => candidate.id === slideId);
+    const cached = this.thumbnails.get(slideId);
+    if (!response || !slide || cached?.revision !== slide.thumbnail_revision) {
+      this.scheduleThumbnailDrain();
+      return;
+    }
+    this.thumbnailRunning = slideId;
+    try {
+      const slotsResponse = await this.send("thumbnail_slots", { slide_id: slideId });
+      const rawSlots = slotsResponse.result?.slots;
+      if (!Array.isArray(rawSlots) || rawSlots.some((slot) => !Number.isInteger(slot) || slot < 0)) {
+        throw new EngineFailure("thumbnail_slots_invalid", `Slide ${slideId} returned invalid RenderModel slots`);
+      }
+      const slots = Uint32Array.from(rawSlots as number[]);
+      const serializedCapture = this.messageChain.then(() =>
+        this.captureSlideThumbnail(response, slide, slots)
+      );
+      this.messageChain = serializedCapture.then(() => undefined, () => undefined);
+      const url = await serializedCapture;
+      const latest = this.latestResponse?.editor_session.slides.find((candidate) => candidate.id === slideId);
+      if (!latest || latest.thumbnail_revision !== slide.thumbnail_revision) {
+        URL.revokeObjectURL(url);
+        return;
+      }
+      this.thumbnails.set(slideId, {
+        revision: slide.thumbnail_revision,
+        status: "ready",
+        url,
+      });
+      this.thumbnailCaptures += 1;
+    } catch (error) {
+      const latest = this.latestResponse?.editor_session.slides.find((candidate) => candidate.id === slideId);
+      if (latest?.thumbnail_revision === slide.thumbnail_revision) {
+        this.thumbnails.set(slideId, {
+          revision: slide.thumbnail_revision,
+          status: "error",
+          error: error instanceof Error ? error.message : String(error),
+        });
+      }
+    } finally {
+      this.thumbnailRunning = null;
+      this.scheduleThumbnailDrain();
+    }
+  }
+
+  private viewUniform(
+    center: [number, number],
+    viewport: [number, number],
+    zoom: number,
+  ): Float32Array {
+    const [centerXHigh, centerXLow] = splitFloat64(center[0]);
+    const [centerYHigh, centerYLow] = splitFloat64(center[1]);
+    return new Float32Array([
+      centerXHigh,
+      centerYHigh,
+      centerXLow,
+      centerYLow,
+      viewport[0],
+      viewport[1],
+      zoom,
+      0,
+    ]);
+  }
+
+  private async captureSlideThumbnail(
+    response: EngineResponse,
+    slide: SlideSummary,
+    slots: Uint32Array,
+  ): Promise<string> {
+    const node = this.projection.nodes.get(slide.id);
+    const bounds = node?.world_bounds;
+    if (!bounds) {
+      throw new EngineFailure("thumbnail_bounds_unavailable", `Slide ${slide.id} has no finite bounds`);
+    }
+    if (typeof OffscreenCanvas === "undefined") {
+      throw new EngineFailure("thumbnail_offscreen_unavailable", "WebGPU OffscreenCanvas is unavailable");
+    }
+    const renderer = this.renderer as unknown as Record<string, any>;
+    const device = renderer.device;
+    const queue = renderer.queue;
+    if (!device || !queue || !renderer.pipeline || !renderer.bindGroup || !renderer.viewBuffer) {
+      throw new EngineFailure("thumbnail_renderer_unavailable", "WebGPU thumbnail renderer state is unavailable");
+    }
+    const width = 320;
+    const height = 180;
+    const canvas = new OffscreenCanvas(width, height);
+    const context = canvas.getContext("webgpu") as unknown as Record<string, any> | null;
+    if (!context) {
+      throw new EngineFailure("thumbnail_surface_unavailable", "WebGPU thumbnail surface creation failed");
+    }
+    context.configure({
+      device,
+      format: renderer.surfaceBaseFormat,
+      viewFormats: [renderer.pipelineViewFormat],
+      alphaMode: "premultiplied",
+    });
+    const contentWidth = Math.max(1e-9, bounds.max[0] - bounds.min[0]);
+    const contentHeight = Math.max(1e-9, bounds.max[1] - bounds.min[1]);
+    const center: [number, number] = [
+      (bounds.min[0] + bounds.max[0]) * 0.5,
+      (bounds.min[1] + bounds.max[1]) * 0.5,
+    ];
+    const zoom = Math.min((width - 16) / contentWidth, (height - 16) / contentHeight);
+    const thumbnailView = this.viewUniform(center, [width, height], zoom);
+    const editorView = this.viewUniform(response.camera.center, response.camera.viewport, response.camera.zoom);
+    const activeSlots = this.activeVisibleSlots.slice();
+    renderer.ensureVisibleBuffer(Math.max(4, slots.byteLength, activeSlots.byteLength));
+    if (slots.byteLength > 0) {
+      queue.writeBuffer(renderer.visibleBuffer, 0, slots);
+    }
+    let renderFailure: unknown = null;
+    device.pushErrorScope("validation");
+    try {
+      queue.writeBuffer(renderer.viewBuffer, 0, thumbnailView);
+      const textureView = context
+        .getCurrentTexture()
+        .createView({ format: renderer.pipelineViewFormat });
+      const encoder = device.createCommandEncoder({ label: "Phase 1B thumbnail encoder" });
+      const pass = encoder.beginRenderPass({
+        label: "Phase 1B WebGPU thumbnail pass",
+        colorAttachments: [{
+          view: textureView,
+          clearValue: { r: 0.035, g: 0.055, b: 0.08, a: 1 },
+          loadOp: "clear",
+          storeOp: "store",
+        }],
+      });
+      if (slots.length > 0) {
+        pass.setPipeline(renderer.pipeline);
+        pass.setBindGroup(0, renderer.bindGroup);
+        pass.draw(6, slots.length);
+      }
+      pass.end();
+      queue.submit([encoder.finish()]);
+      await queue.onSubmittedWorkDone();
+    } catch (error) {
+      renderFailure = error;
+    } finally {
+      queue.writeBuffer(renderer.viewBuffer, 0, editorView);
+      if (activeSlots.byteLength > 0) {
+        queue.writeBuffer(renderer.visibleBuffer, 0, activeSlots);
+      }
+    }
+    const validation = await device.popErrorScope();
+    if (validation) {
+      context.unconfigure?.();
+      throw new EngineFailure("thumbnail_gpu_validation_error", validation.message);
+    }
+    if (renderFailure) {
+      context.unconfigure?.();
+      throw renderFailure;
+    }
+    let blob: Blob;
+    try {
+      blob = await canvas.convertToBlob({ type: "image/png" });
+    } finally {
+      context.unconfigure?.();
+    }
+    return URL.createObjectURL(blob);
+  }
 
   async readPixel(x: number, y: number) {
     if (!this.renderer) throw new EngineFailure("renderer_not_ready", "WebGPU renderer is not ready");
@@ -520,10 +799,43 @@ export class EngineClient {
       gpu: this.gpuMetrics,
       ui: { ...this.projection.counters },
       selection: [...this.projection.selection],
+      thumbnails: {
+        captures: this.thumbnailCaptures,
+        invalidations: this.thumbnailInvalidations,
+        cached: [...this.thumbnails.values()].filter((entry) => entry.status === "ready").length,
+        pending: [...this.thumbnails.values()].filter((entry) => entry.status === "pending").length,
+        errors: [...this.thumbnails.values()].filter((entry) => entry.status === "error").length,
+        queue_depth: this.thumbnailQueue.length,
+        queue_running: this.thumbnailRunning,
+        priority_policy: "active-visible-remaining",
+        render_source: "rust-render-model-slots",
+        max_renders_per_engine_frame: 1,
+        canvas2d_fallback_count: 0,
+      },
       response_gpu_overlay_sequence_match:
         this.lastFrameSequence > 0 &&
         this.gpuMetrics.frame_sequence === this.lastFrameSequence,
       ...state,
     };
   }
+}
+
+export function orderThumbnailQueue(
+  slideIds: string[],
+  slides: SlideSummary[],
+  visibleSlideIds: ReadonlySet<string>,
+): string[] {
+  const byId = new Map(slides.map((slide) => [slide.id, slide]));
+  const priority = (slideId: string) => {
+    const slide = byId.get(slideId);
+    if (slide?.active) return 0;
+    if (visibleSlideIds.has(slideId)) return 1;
+    return 2;
+  };
+  return [...slideIds].sort((left, right) => {
+    const priorityDelta = priority(left) - priority(right);
+    return priorityDelta !== 0
+      ? priorityDelta
+      : (byId.get(left)?.index ?? 0) - (byId.get(right)?.index ?? 0);
+  });
 }

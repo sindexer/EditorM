@@ -19,7 +19,7 @@ use visual_authoring_render_model::{
 use visual_authoring_runtime::fixtures::{build_fixture, fixture_node_id, FixtureKind};
 use visual_authoring_runtime::{
     Camera, CameraError, EngineRuntime, RenderSyncStatus, RuntimeCommandOutcome, RuntimeError,
-    RuntimeSceneOutcome, SceneSyncStatus, ViewportPoint, WorldPoint,
+    RuntimeSceneOutcome, SceneSyncStatus, SlideSessionError, ViewportPoint, WorldPoint,
 };
 use wasm_bindgen::prelude::*;
 
@@ -56,6 +56,12 @@ enum HostRequest {
     Redo,
     Camera {
         camera: CameraRequest,
+    },
+    Slide {
+        slide: SlideRequest,
+    },
+    ThumbnailSlots {
+        slide_id: String,
     },
     HitTest {
         x: f64,
@@ -169,6 +175,38 @@ enum CameraRequest {
     FitSelection { node_id: String },
 }
 
+#[derive(Debug, Deserialize)]
+#[serde(tag = "kind", rename_all = "snake_case")]
+enum SlideRequest {
+    Activate {
+        slide_id: String,
+    },
+    Create {
+        slide_id: String,
+        index: usize,
+        name: Option<String>,
+        width: Option<f64>,
+        height: Option<f64>,
+    },
+    Duplicate {
+        source_id: String,
+        slide_id: String,
+        index: usize,
+        name: Option<String>,
+    },
+    Rename {
+        slide_id: String,
+        name: String,
+    },
+    Reorder {
+        slide_id: String,
+        index: usize,
+    },
+    Delete {
+        slide_id: String,
+    },
+}
+
 #[derive(Clone, Debug, Default)]
 struct DeltaReport {
     full: bool,
@@ -269,7 +307,23 @@ impl HostFailure {
 
 impl From<RuntimeError> for HostFailure {
     fn from(error: RuntimeError) -> Self {
-        Self::new("runtime_error", error.to_string())
+        let code = match &error {
+            RuntimeError::SlideSession(SlideSessionError::NodeOutsideActiveSlide { .. }) => {
+                "node_outside_active_slide"
+            }
+            RuntimeError::SlideSession(SlideSessionError::NoSlides) => "no_slides",
+            RuntimeError::SlideSession(SlideSessionError::NodeNotFound(_)) => "node_not_found",
+            RuntimeError::SlideSession(SlideSessionError::NotSlide(_)) => "invalid_slide",
+            RuntimeError::SlideSession(SlideSessionError::EmptySlideName) => "invalid_slide_name",
+            RuntimeError::SlideSession(SlideSessionError::InvalidSlideIndex { .. }) => {
+                "invalid_slide_index"
+            }
+            RuntimeError::SlideSession(SlideSessionError::LastSlideDeletion) => {
+                "last_slide_deletion"
+            }
+            _ => "runtime_error",
+        };
+        Self::new(code, error.to_string())
     }
 }
 
@@ -437,6 +491,7 @@ impl EngineHost {
             }
             HostRequest::Command { command } => {
                 let structural = command.structural_nodes_touched().is_some();
+                command.validate_active_slide_scope(&self.runtime)?;
                 let command = command.into_command(self.runtime.document())?;
                 let outcome = self.runtime.dispatch(command)?;
                 if structural {
@@ -454,6 +509,7 @@ impl EngineHost {
             }
             HostRequest::UpdateTransaction { command } => {
                 let structural = command.structural_nodes_touched().is_some();
+                command.validate_active_slide_scope(&self.runtime)?;
                 let command = command.into_command(self.runtime.document())?;
                 let outcome = self.runtime.update_transaction(command)?;
                 if structural {
@@ -501,6 +557,24 @@ impl EngineHost {
                 self.prepare_visibility_frame()?;
                 Ok(json!({ "camera_changed": true }))
             }
+            HostRequest::Slide { slide } => self.execute_slide_request(slide),
+            HostRequest::ThumbnailSlots { slide_id } => {
+                let slide = parse_node_id(&slide_id)?;
+                let culling = self.runtime.cull_slide_thumbnail(slide)?;
+                self.request_metrics.render_items_read += culling.render_items_read as u64;
+                self.request_metrics.order_nodes_visited += culling.order_nodes_visited;
+                self.request_metrics.sibling_search_steps += culling.sibling_search_steps;
+                self.request_metrics.full_render_model_scans += culling.full_render_model_scans;
+                self.request_metrics.culling_candidates += culling.spatial_candidates as u64;
+                self.request_metrics.visible_items += culling.exact_visible as u64;
+                Ok(json!({
+                    "kind": "thumbnail_slots",
+                    "slide_id": slide_id,
+                    "slots": culling.slots_bottom_to_top,
+                    "render_items_read": culling.render_items_read,
+                    "full_render_model_scans": culling.full_render_model_scans,
+                }))
+            }
             HostRequest::HitTest { x, y } => {
                 let hit = self
                     .runtime
@@ -539,6 +613,109 @@ impl EngineHost {
             }
             HostRequest::Heartbeat => Ok(json!({ "heartbeat": true })),
         }
+    }
+
+    fn execute_slide_request(&mut self, request: SlideRequest) -> Result<Value, HostFailure> {
+        match request {
+            SlideRequest::Activate { slide_id } => {
+                let slide = parse_node_id(&slide_id)?;
+                let changed = self.runtime.activate_slide(slide)?;
+                self.prepare_visibility_frame()?;
+                Ok(json!({ "active_slide_changed": changed }))
+            }
+            SlideRequest::Create {
+                slide_id,
+                index,
+                name,
+                width,
+                height,
+            } => {
+                let width = width.unwrap_or(1920.0);
+                let height = height.unwrap_or(1080.0);
+                require_positive_size(width, height)?;
+                let base = name.unwrap_or_else(|| {
+                    format!("Slide {}", self.runtime.slide_ids().len().saturating_add(1))
+                });
+                let name = self.unique_slide_name(&base);
+                let outcome = self.runtime.create_slide(
+                    parse_node_id(&slide_id)?,
+                    name,
+                    index,
+                    Vec2::new(width, height),
+                )?;
+                self.finish_slide_command(outcome)
+            }
+            SlideRequest::Duplicate {
+                source_id,
+                slide_id,
+                index,
+                name,
+            } => {
+                let source = parse_node_id(&source_id)?;
+                let source_name = self
+                    .runtime
+                    .document()
+                    .node(source)
+                    .ok_or_else(|| {
+                        HostFailure::new("slide_not_found", format!("Slide {source} is missing"))
+                    })?
+                    .name();
+                let base = name.unwrap_or_else(|| format!("{source_name} Copy"));
+                let name = self.unique_slide_name(&base);
+                let outcome =
+                    self.runtime
+                        .duplicate_slide(source, parse_node_id(&slide_id)?, name, index)?;
+                self.finish_slide_command(outcome)
+            }
+            SlideRequest::Rename { slide_id, name } => {
+                let outcome = self.runtime.rename_slide(parse_node_id(&slide_id)?, name)?;
+                self.finish_slide_command(outcome)
+            }
+            SlideRequest::Reorder { slide_id, index } => {
+                let outcome = self
+                    .runtime
+                    .reorder_slide(parse_node_id(&slide_id)?, index)?;
+                self.finish_slide_command(outcome)
+            }
+            SlideRequest::Delete { slide_id } => {
+                let outcome = self.runtime.delete_slide(parse_node_id(&slide_id)?)?;
+                self.finish_slide_command(outcome)
+            }
+        }
+    }
+
+    fn finish_slide_command(
+        &mut self,
+        outcome: RuntimeCommandOutcome,
+    ) -> Result<Value, HostFailure> {
+        let changed = outcome.command.changed();
+        self.request_metrics.document_nodes_touched = outcome.command.affected().len() as u64;
+        self.track_command_outcome(&outcome);
+        self.prepare_incremental_frame(&outcome.render)?;
+        self.prepare_projection_delta(outcome.command.change_set())?;
+        Ok(json!({ "changed": changed }))
+    }
+
+    fn unique_slide_name(&self, requested: &str) -> String {
+        let base = requested.trim();
+        let base = if base.is_empty() { "Slide" } else { base };
+        let names = self
+            .runtime
+            .slide_ids()
+            .into_iter()
+            .filter_map(|id| self.runtime.document().node(id))
+            .map(|node| node.name())
+            .collect::<BTreeSet<_>>();
+        if !names.contains(base) {
+            return base.to_owned();
+        }
+        for suffix in 2_u64.. {
+            let candidate = format!("{base} {suffix}");
+            if !names.contains(candidate.as_str()) {
+                return candidate;
+            }
+        }
+        unreachable!("finite Slide names always admit a unique suffix")
     }
 
     fn update_selection(&mut self, target: Option<&str>, mode: &str) -> Result<(), HostFailure> {
@@ -916,16 +1093,20 @@ impl EngineHost {
             }
             CameraRequest::Reset => self.reset_camera()?,
             CameraRequest::Fit => {
-                let root = self.runtime.scene().root_id();
-                let bounds = self
-                    .runtime
-                    .scene()
-                    .node(root)
-                    .and_then(|node| node.subtree_world_bounds())
-                    .ok_or_else(|| {
-                        HostFailure::new("fit_unavailable", "fixture has no finite bounds")
-                    })?;
-                self.runtime.camera_mut().fit_world_bounds(bounds, 40.0)?;
+                if self.runtime.active_slide_id().is_some() {
+                    self.runtime.fit_active_slide(40.0)?;
+                } else {
+                    let root = self.runtime.scene().root_id();
+                    let bounds = self
+                        .runtime
+                        .scene()
+                        .node(root)
+                        .and_then(|node| node.subtree_world_bounds())
+                        .ok_or_else(|| {
+                            HostFailure::new("fit_unavailable", "fixture has no finite bounds")
+                        })?;
+                    self.runtime.camera_mut().fit_world_bounds(bounds, 40.0)?;
+                }
             }
             CameraRequest::FitSelection { node_id } => {
                 let target = parse_node_id(&node_id)?;
@@ -1045,6 +1226,30 @@ impl EngineHost {
                 })
             })
             .collect::<Vec<_>>();
+        let active_slide = self.runtime.active_slide_id();
+        let slides = self
+            .runtime
+            .slide_ids()
+            .into_iter()
+            .enumerate()
+            .filter_map(|(index, id)| {
+                let node = self.runtime.document().node(id)?;
+                let size = node.geometry().map(Geometry::size)?;
+                let revision = self.runtime.editor_session().thumbnail_revision(id);
+                Some(json!({
+                    "id": id.to_string(),
+                    "index": index,
+                    "name": node.name(),
+                    "width": size.x,
+                    "height": size.y,
+                    "aspect_ratio": size.x / size.y,
+                    "active": active_slide == Some(id),
+                    "thumbnail_revision": revision,
+                    "child_count": node.children().len(),
+                }))
+            })
+            .collect::<Vec<_>>();
+        let preserved_root_items = self.runtime.preserved_root_items();
         let work = &self.request_metrics;
         let last_error = error.or(self.last_error.as_ref());
         let value = json!({
@@ -1072,6 +1277,14 @@ impl EngineHost {
                 "upserts": self.projection.upserts,
                 "removed": self.projection.removed,
                 "structural_ops": self.projection.structural_ops,
+            },
+            "editor_session": {
+                "active_slide_id": active_slide.map(|id| id.to_string()),
+                "slides": slides,
+                "preserved_root_items": preserved_root_items
+                    .iter()
+                    .map(ToString::to_string)
+                    .collect::<Vec<_>>(),
             },
             "selection": {
                 "ordered": self.runtime.selection().ordered().iter().map(ToString::to_string).collect::<Vec<_>>(),
@@ -1192,6 +1405,25 @@ impl EngineHost {
 }
 
 impl CommandRequest {
+    fn validate_active_slide_scope(&self, runtime: &EngineRuntime) -> Result<(), HostFailure> {
+        let Self::CreateShape { parent_id, .. } = self else {
+            return Ok(());
+        };
+        let parent = parse_node_id(parent_id)?;
+        if runtime.node_belongs_to_active_slide(parent) {
+            return Ok(());
+        }
+        Err(HostFailure::new(
+            "node_outside_active_slide",
+            match runtime.active_slide_id() {
+                Some(active) => format!(
+                    "new objects must be created below active Slide {active}; parent {parent} is outside it"
+                ),
+                None => format!("parent {parent} is outside the active Slide"),
+            },
+        ))
+    }
+
     fn structural_nodes_touched(&self) -> Option<u64> {
         match self {
             Self::Group { targets, .. } => Some(targets.len() as u64 + 2),

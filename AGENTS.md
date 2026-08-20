@@ -4,7 +4,8 @@ These instructions apply to the entire repository.
 
 ## Authorization boundary
 
-- Phase 0E-R3 is the approved baseline. Phase 0 is complete and Phase 1 is not authorized.
+- Phase 0E-R3 and Phase 1A are approved baselines. Phase 1B multislide workspace development is authorized from merge commit `8f5a5515eafa0eed8f1f9199f6b73dd51d351f0b`.
+- Phase 1C and the Phase 5 motion engine are not authorized. Phase 1B may build a synchronized Timeline shell but must not add keyframes, playback, duration, easing, timebase, auto-key, or animation interpolation.
 - Preserve the Phase 1 through Phase 8 order in `docs/ROADMAP.md`; do not pull later requirements into an earlier phase.
 - Treat `CHECKSUMS.sha256` and the Phase 0 files that existed at approved commit `39085167a1b9d2ce1ba78060b3fee4d9327aaf27` as immutable history. Add a new ADR instead of rewriting ADR-001 through ADR-041.
 

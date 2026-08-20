@@ -40,6 +40,11 @@ The Figma output is a reference, not code to paste. Phase 0E uses semantic React
 | Selection overlay | Editor-specific extension derived from primary blue, radii, and 18-20 px icon rhythm | DOM/SVG overlay above actual WebGPU canvas; never a Document node | pointer handles, focusable canvas, visible tool state |
 | Debug panel | Card/List Cell, Badge, Tabs, and Switch composition | Collapsible metric grid; mounted-row and projection counters exposed | disclosure semantics and copyable values |
 | Component showcase | All mapped primitives | Dedicated in-product audit surface showing default/hover/focus/pressed/disabled | keyboard reachable; stable selectors for browser proof |
+| Slides panel | Card/List Cell, Badge, Button, and Textfield composition | Resizable/collapsible vertical panel with 16:9 derived thumbnails, order, name, active state, and explicit pending/error previews | labelled listbox, keyboard navigation/reorder, selected option, accessible create/duplicate/rename/delete actions |
+| Panel splitter | Wanted focus, border, and neutral interaction tokens | 4-8 px draggable separator between Slides, Canvas, Inspector, and Layers/Timeline; compact visual line with a larger hit target | `role=separator`, orientation, value text, arrow-key adjustment, focus-visible, collapse threshold |
+| Timeline shell | Layers row and Tab composition | Track cells share NodeId, row order, hierarchy order, selection, and vertical scroll with the virtualized Layers tree | labelled grid/tree relationship; no fake transport or keyframe controls |
+| Context Inspector | Card section, Tabs, Textfield, Select, and Button composition | Routes to selected-object, active-tool, active-Slide, or recoverable-error content without changing the persistent document | stable heading/fieldset structure, collapsible sections, contextual accessible name |
+| Slide thumbnail state | Card media, Skeleton/loading, and Error state composition | Actual WebGPU-derived preview with pending/error states and slide-scoped invalidation; no static-success image fallback | status text is not color-only; retry/recovery action only when supported |
 
 ## Editor-specific extensions
 
@@ -50,6 +55,7 @@ Wanted does not define a graphics-editor Layers tree, transform overlay, numeric
 - selected tools and overlays use `Primary/Normal`; destructive or invalid states use `Status/Negative`;
 - floating menus/tooltips use Wanted elevated/inverse backgrounds and shadows;
 - persistent interactions dispatch stable-`NodeId` typed requests to the Worker. React does not own a second node graph.
+- Slides and Timeline reuse the same stable-`NodeId` projection. React does not own a parallel Slide document, layer graph, timeline graph, or static thumbnail scene.
 
 ## Icon system
 

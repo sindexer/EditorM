@@ -450,6 +450,58 @@ impl RenderModel {
         })
     }
 
+    pub fn cull_subtree(
+        &self,
+        scene: &mut ComputedScene,
+        world_viewport: Rect,
+        root: NodeId,
+    ) -> Result<CullingResult, RenderModelError> {
+        let query = scene.query_rect_candidates_in_subtree(world_viewport, root)?;
+        let mut render_items_read = 0_usize;
+        let mut gpu_encode_attempted = 0_usize;
+        let mut gpu_encode_omitted = 0_usize;
+        let ids_top_to_bottom = query
+            .ids()
+            .iter()
+            .copied()
+            .filter(|id| {
+                render_items_read += 1;
+                let Some(item) = self.item(*id) else {
+                    return false;
+                };
+                if !item.renderable {
+                    return false;
+                }
+                gpu_encode_attempted += 1;
+                if !item.gpu_encodable {
+                    gpu_encode_omitted += 1;
+                    return false;
+                }
+                true
+            })
+            .collect::<Vec<_>>();
+        let slots_bottom_to_top = ids_top_to_bottom
+            .iter()
+            .rev()
+            .filter_map(|id| self.by_id.get(id).copied())
+            .collect::<Vec<_>>();
+        let exact_visible = ids_top_to_bottom.len();
+        Ok(CullingResult {
+            ids_top_to_bottom,
+            slots_bottom_to_top,
+            spatial_candidates: query.candidate_count(),
+            exact_visible,
+            culled: self.renderable_count().saturating_sub(exact_visible),
+            submitted_instances: exact_visible,
+            render_items_read,
+            gpu_encode_attempted,
+            gpu_encode_omitted,
+            order_nodes_visited: query.order_nodes_visited(),
+            sibling_search_steps: query.sibling_search_steps(),
+            full_render_model_scans: 0,
+        })
+    }
+
     fn commit_prepared(
         &mut self,
         id: NodeId,

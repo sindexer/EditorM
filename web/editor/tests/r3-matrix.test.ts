@@ -30,6 +30,7 @@ function response(full: boolean, upserts: ProjectionNode[], removed: string[] = 
     request_id: "r3-matrix", ok: true, result: {}, error: null, runtime_owner: "dedicated-worker", fixture: "r3",
     revisions: { document: 1, scene: 1, render: 1 },
     projection: { schema_version: 2, full, upserts, removed, structural_ops: structuralOps },
+    editor_session: { active_slide_id: null, slides: [], preserved_root_items: [] },
     selection: { ordered: [], primary: null }, history: { undo_depth: 0, redo_depth: 0, transaction_active: false },
     camera: { center: [0, 0], zoom: 1, viewport: [100, 100], dpr: 1 }, culling: {},
     render_delta: { full: false, dirty_slots: 0, dirty_ranges: 0, removed_slots: 0, upload_bytes: 0, scene_full_rebuilds: 0, render_full_rebuilds: 0 },

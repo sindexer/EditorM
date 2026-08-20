@@ -1,12 +1,14 @@
 # EditorM Product Roadmap
 
-This roadmap restores and preserves the approved development order. Phase 0 is complete. Phase 1 is not approved, and none of the capabilities below are implemented by this GitHub-governance correction.
+This roadmap preserves the approved development order. Phase 0 and Phase 1A are complete. Phase 1B multislide workspace development is authorized; Phase 1C and later phases remain unapproved.
 
 ## Completed baseline: Phase 0
 
 Phase 0A through Phase 0E-R3 established finite math, typed reversible document mutation, scene/spatial derivation, render-model deltas, Worker-owned WASM execution, actual WebGPU rendering, the professional editor shell, structural group/ungroup, exact ordering, bounded diagnostics, and actual hardware evidence. Gate 0E-R3 remains the approved baseline.
 
-## Phase 1 — Direct-manipulation editor foundation
+## Phase 1 — Direct-manipulation and multislide editor foundation
+
+### Phase 1A — Approved baseline
 
 - analytic coverage anti-aliasing for circles and ellipses;
 - MSAA only where its need is demonstrated;
@@ -21,6 +23,19 @@ Phase 0A through Phase 0E-R3 established finite math, typed reversible document 
 - corner radius;
 - default stroke;
 - fully undoable and redoable human direct editing.
+
+### Phase 1B — Authorized multislide workspace
+
+- one file containing ordered top-level Frame Slides;
+- a default 1920x1080, 16:9 Slide and a minimum-one-Slide invariant;
+- create, deep duplicate, rename, reorder, and recoverable delete with global undo/redo;
+- Worker-owned active Slide, per-Slide selection, and per-Slide camera session state;
+- active-Slide render, hit-test, marquee, Layers, and Inspector isolation;
+- real derived WebGPU thumbnails with slide-scoped invalidation and bounded scheduling;
+- professional top menu, horizontal Tools bar, Slides panel, active Canvas, synchronized Layers/Timeline shell, and Context Inspector;
+- accessible resizable/collapsible panels whose presentation state is not serialized in the Document.
+
+The Phase 1B Timeline is structure only. Keyframes, playback, duration, easing, timebase, auto-key, animated properties, transport controls, and interpolation remain Phase 5 work.
 
 ## Phase 2 — Vector and text
 

@@ -1,0 +1,3967 @@
+{
+  "phase": "1B",
+  "proof_kind": "actual-hardware-browser",
+  "captured_at_utc": "2026-08-20T09:43:40.099Z",
+  "browser": "Chrome/151.0.7922.138",
+  "chrome_process_id": 21748,
+  "chrome_profile": "C:\\Users\\thdwl\\AppData\\Local\\Temp\\phase1b-chrome-20520-1787219014396",
+  "browser_mode": "fresh Chrome; actual Dedicated Worker + WASM EngineHost + WebGPU; no mock; no Canvas2D fallback",
+  "execution": {
+    "command": "npm run test:browser:phase1b",
+    "started_at_utc": "2026-08-20T09:43:34.396Z",
+    "finished_at_utc": "2026-08-20T09:43:40.099Z"
+  },
+  "gpu": {
+    "active_device": {
+      "vendorId": 4318,
+      "deviceId": 5058,
+      "subSysId": 913970264,
+      "revision": 161,
+      "vendorString": "",
+      "deviceString": "NVIDIA GeForce GTX 970",
+      "driverVendor": "NVIDIA",
+      "driverVersion": "32.0.15.8157"
+    },
+    "surface_base_format": "bgra8unorm",
+    "pipeline_view_format": "bgra8unorm-srgb",
+    "readback_view_format": "bgra8unorm-srgb"
+  },
+  "preview": {
+    "url": "http://127.0.0.1:49480/",
+    "health": {
+      "ok": true,
+      "status": 200,
+      "body": {
+        "ok": true,
+        "phase": "0E"
+      }
+    },
+    "assets": {
+      "/index.html": {
+        "status": 200,
+        "content_type": "text/html; charset=utf-8"
+      },
+      "/worker.js": {
+        "status": 200,
+        "content_type": "text/javascript; charset=utf-8"
+      },
+      "/pkg/engine_host.js": {
+        "status": 200,
+        "content_type": "text/javascript; charset=utf-8"
+      },
+      "/pkg/engine_host_bg.wasm": {
+        "status": 200,
+        "content_type": "application/wasm"
+      }
+    }
+  },
+  "initial": {
+    "phase": "0E",
+    "ready": true,
+    "actual_webgpu": true,
+    "adapter": "maxwell",
+    "backend": "browser-webgpu (implementation backend not exposed by Web API)",
+    "surface_base_format": "bgra8unorm",
+    "pipeline_view_format": "bgra8unorm-srgb",
+    "readback_view_format": "bgra8unorm-srgb",
+    "worker_runtime_owner": "dedicated-worker",
+    "wasm_initialized": true,
+    "heartbeat": 1,
+    "engine_sequence": 6,
+    "gpu_frame_sequence": 6,
+    "overlay_sequence": 6,
+    "revisions": {
+      "document": 1,
+      "render": 1,
+      "scene": 1
+    },
+    "fixture": "EDITOR",
+    "metrics": {
+      "allocation_growth_count": 0,
+      "cpu_update_ms": 0,
+      "culling_candidates": 1,
+      "document_full_clones": 0,
+      "document_nodes": 2,
+      "document_nodes_scanned": 0,
+      "document_nodes_touched": 0,
+      "document_sequence_allocated_bytes": 0,
+      "document_sequence_dense_index_rewrites": 0,
+      "document_sequence_entries_copied": 0,
+      "document_sequence_entries_examined": 0,
+      "document_sequence_entries_moved_or_shifted": 0,
+      "document_sequence_fallback_or_rebuild_count": 0,
+      "document_sequence_full_copies": 0,
+      "document_sequence_full_scans": 0,
+      "document_sequence_maximum_depth": 0,
+      "document_sequence_nodes_allocated": 0,
+      "document_sequence_rank_order_comparisons": 0,
+      "document_sequence_tree_rebalances": 0,
+      "fallback_rebuild_count": 0,
+      "full_render_model_scans": 0,
+      "gpu_encode_attempted": 0,
+      "gpu_encode_omitted": 0,
+      "indexed_nodes": 1,
+      "instance_upload_bytes": 0,
+      "invalid_derived_nodes": 0,
+      "order_nodes_visited": 0,
+      "render_items_cloned": 0,
+      "render_items_planned": 0,
+      "render_items_read": 1,
+      "render_items_written": 0,
+      "scene_nodes_visited": 0,
+      "scene_sequence_allocated_bytes": 0,
+      "scene_sequence_dense_index_rewrites": 0,
+      "scene_sequence_entries_copied": 0,
+      "scene_sequence_entries_examined": 0,
+      "scene_sequence_entries_moved_or_shifted": 0,
+      "scene_sequence_fallback_or_rebuild_count": 0,
+      "scene_sequence_full_copies": 0,
+      "scene_sequence_full_scans": 0,
+      "scene_sequence_maximum_depth": 0,
+      "scene_sequence_nodes_allocated": 0,
+      "scene_sequence_rank_order_comparisons": 0,
+      "scene_sequence_tree_rebalances": 0,
+      "sibling_search_steps": 0,
+      "ui_child_ids_serialized": 0,
+      "ui_delta_nodes": 0,
+      "ui_full_snapshots": 0,
+      "ui_nodes_serialized": 0,
+      "ui_projection_payload_bytes": 0,
+      "ui_structural_operations": 0,
+      "visible_items": 1,
+      "visible_slot_upload_bytes": 4
+    },
+    "gpu": {
+      "draw_calls": 1,
+      "batches": 1,
+      "submitted_instances": 1,
+      "buffer_count": 3,
+      "buffer_bytes": 264,
+      "upload_calls": 2,
+      "frame_upload_bytes": 36,
+      "render_submit_ms": 0.5999999940395355,
+      "frame_ms": 0.699999988079071,
+      "validation_errors": 0,
+      "frame_sequence": 6,
+      "gpu_encode_attempted": 0,
+      "gpu_encode_omitted": 0,
+      "instance_upload_bytes": 0,
+      "visible_slot_upload_bytes": 4,
+      "allocation_growth_count": 4
+    },
+    "ui": {
+      "projectionFullSnapshots": 2,
+      "projectionDeltaNodes": 0,
+      "layersFullSerializes": 2,
+      "hierarchyRebuilds": 2,
+      "hierarchyNodesVisited": 5,
+      "hierarchyFullRebuilds": 2,
+      "projectionStructuralOperations": 0,
+      "layersFlattenedNodesVisited": 14,
+      "mountedRows": 1,
+      "pointerRawIntents": 0,
+      "pointerRequestsSent": 0,
+      "pointerRequestsCoalesced": 0,
+      "sequenceEntriesExamined": 14,
+      "sequenceEntriesCopied": 14,
+      "sequenceEntriesMovedOrShifted": 8,
+      "sequenceRankOrderComparisons": 0,
+      "sequenceNodesAllocated": 8,
+      "sequenceAllocatedBytes": 640,
+      "sequenceTreeRebalances": 0,
+      "sequenceMaximumDepth": 2,
+      "sequenceFallbackOrRebuildCount": 0,
+      "sequenceFullScans": 0,
+      "sequenceFullCopies": 0,
+      "sequenceDenseIndexRewrites": 0
+    },
+    "selection": [],
+    "thumbnails": {
+      "captures": 1,
+      "invalidations": 0,
+      "cached": 1,
+      "pending": 0,
+      "errors": 0,
+      "queue_depth": 0,
+      "queue_running": null,
+      "priority_policy": "active-visible-remaining",
+      "render_source": "rust-render-model-slots",
+      "max_renders_per_engine_frame": 1,
+      "canvas2d_fallback_count": 0
+    },
+    "response_gpu_overlay_sequence_match": true,
+    "fsm": "Idle",
+    "tool": "select",
+    "nested_edit_root": null,
+    "console_errors": 0,
+    "fallback_rebuild_count": 0,
+    "gpu_validation_errors": 0,
+    "history": {
+      "redo_depth": 0,
+      "transaction_active": false,
+      "undo_depth": 0
+    },
+    "editor_session": {
+      "active_slide_id": "00000000-0000-0000-0000-000000000002",
+      "preserved_root_items": [],
+      "slides": [
+        {
+          "active": true,
+          "aspect_ratio": 1.7777777777777777,
+          "child_count": 0,
+          "height": 1080,
+          "id": "00000000-0000-0000-0000-000000000002",
+          "index": 0,
+          "name": "Frame 1920×1080",
+          "thumbnail_revision": 0,
+          "width": 1920
+        }
+      ]
+    },
+    "camera": {
+      "center": [
+        0,
+        0
+      ],
+      "dpr": 1,
+      "viewport": [
+        894,
+        582
+      ],
+      "zoom": 0.4237376366475794
+    },
+    "projection_nodes": 2,
+    "projection_schema_version": 2,
+    "primary_node": null,
+    "render_delta": {
+      "dirty_ranges": 0,
+      "dirty_slots": 0,
+      "full": false,
+      "removed_slots": 0,
+      "render_full_rebuilds": 0,
+      "scene_full_rebuilds": 0,
+      "upload_bytes": 0
+    },
+    "render_binary_schema_version": 2,
+    "resources": {
+      "allocated_slots": 1,
+      "dirty_record_stride_bytes": 116,
+      "free_slots": 0,
+      "gpu_encodable_items": 1,
+      "gpu_omitted_items": 0,
+      "instance_capacity": 1,
+      "instance_stride_bytes": 112,
+      "renderable_items": 1,
+      "total_render_items": 1
+    },
+    "binary": {
+      "dirty_instances": false,
+      "full_instances": false,
+      "removed_slots": false,
+      "visible_slots": true
+    },
+    "workspace": {
+      "slidesWidth": 248,
+      "inspectorWidth": 288,
+      "bottomHeight": 248,
+      "slidesCollapsed": false,
+      "inspectorCollapsed": false,
+      "bottomCollapsed": false
+    },
+    "interaction_active": null,
+    "interaction_queue": {
+      "generation": 0,
+      "in_flight": false,
+      "scheduled": false,
+      "latest": false
+    }
+  },
+  "final": {
+    "phase": "0E",
+    "ready": true,
+    "actual_webgpu": true,
+    "adapter": "maxwell",
+    "backend": "browser-webgpu (implementation backend not exposed by Web API)",
+    "surface_base_format": "bgra8unorm",
+    "pipeline_view_format": "bgra8unorm-srgb",
+    "readback_view_format": "bgra8unorm-srgb",
+    "worker_runtime_owner": "dedicated-worker",
+    "wasm_initialized": true,
+    "heartbeat": 3,
+    "engine_sequence": 35,
+    "gpu_frame_sequence": 35,
+    "overlay_sequence": 35,
+    "revisions": {
+      "document": 12,
+      "render": 12,
+      "scene": 12
+    },
+    "fixture": "EDITOR",
+    "metrics": {
+      "allocation_growth_count": 0,
+      "cpu_update_ms": 1,
+      "culling_candidates": 5,
+      "document_full_clones": 0,
+      "document_nodes": 7,
+      "document_nodes_scanned": 1,
+      "document_nodes_touched": 0,
+      "document_sequence_allocated_bytes": 0,
+      "document_sequence_dense_index_rewrites": 0,
+      "document_sequence_entries_copied": 0,
+      "document_sequence_entries_examined": 0,
+      "document_sequence_entries_moved_or_shifted": 0,
+      "document_sequence_fallback_or_rebuild_count": 0,
+      "document_sequence_full_copies": 0,
+      "document_sequence_full_scans": 0,
+      "document_sequence_maximum_depth": 0,
+      "document_sequence_nodes_allocated": 0,
+      "document_sequence_rank_order_comparisons": 0,
+      "document_sequence_tree_rebalances": 0,
+      "fallback_rebuild_count": 0,
+      "full_render_model_scans": 0,
+      "gpu_encode_attempted": 1,
+      "gpu_encode_omitted": 0,
+      "indexed_nodes": 6,
+      "instance_upload_bytes": 112,
+      "invalid_derived_nodes": 0,
+      "order_nodes_visited": 5,
+      "render_items_cloned": 0,
+      "render_items_planned": 1,
+      "render_items_read": 3,
+      "render_items_written": 1,
+      "scene_nodes_visited": 2,
+      "scene_sequence_allocated_bytes": 0,
+      "scene_sequence_dense_index_rewrites": 0,
+      "scene_sequence_entries_copied": 0,
+      "scene_sequence_entries_examined": 0,
+      "scene_sequence_entries_moved_or_shifted": 0,
+      "scene_sequence_fallback_or_rebuild_count": 0,
+      "scene_sequence_full_copies": 0,
+      "scene_sequence_full_scans": 0,
+      "scene_sequence_maximum_depth": 0,
+      "scene_sequence_nodes_allocated": 0,
+      "scene_sequence_rank_order_comparisons": 0,
+      "scene_sequence_tree_rebalances": 0,
+      "sibling_search_steps": 0,
+      "ui_child_ids_serialized": 0,
+      "ui_delta_nodes": 1,
+      "ui_full_snapshots": 0,
+      "ui_nodes_serialized": 1,
+      "ui_projection_payload_bytes": 600,
+      "ui_structural_operations": 0,
+      "visible_items": 2,
+      "visible_slot_upload_bytes": 8
+    },
+    "gpu": {
+      "draw_calls": 1,
+      "batches": 1,
+      "submitted_instances": 2,
+      "buffer_count": 3,
+      "buffer_bytes": 712,
+      "upload_calls": 3,
+      "frame_upload_bytes": 152,
+      "render_submit_ms": 0.9000000059604645,
+      "frame_ms": 1,
+      "validation_errors": 0,
+      "frame_sequence": 35,
+      "gpu_encode_attempted": 1,
+      "gpu_encode_omitted": 0,
+      "instance_upload_bytes": 112,
+      "visible_slot_upload_bytes": 8,
+      "allocation_growth_count": 7
+    },
+    "ui": {
+      "projectionFullSnapshots": 3,
+      "projectionDeltaNodes": 10,
+      "layersFullSerializes": 3,
+      "hierarchyRebuilds": 3,
+      "hierarchyNodesVisited": 12,
+      "hierarchyFullRebuilds": 3,
+      "projectionStructuralOperations": 8,
+      "layersFlattenedNodesVisited": 76,
+      "mountedRows": 2,
+      "pointerRawIntents": 0,
+      "pointerRequestsSent": 0,
+      "pointerRequestsCoalesced": 0,
+      "sequenceEntriesExamined": 207,
+      "sequenceEntriesCopied": 50,
+      "sequenceEntriesMovedOrShifted": 61,
+      "sequenceRankOrderComparisons": 112,
+      "sequenceNodesAllocated": 36,
+      "sequenceAllocatedBytes": 2880,
+      "sequenceTreeRebalances": 5,
+      "sequenceMaximumDepth": 4,
+      "sequenceFallbackOrRebuildCount": 0,
+      "sequenceFullScans": 0,
+      "sequenceFullCopies": 0,
+      "sequenceDenseIndexRewrites": 0
+    },
+    "selection": [],
+    "thumbnails": {
+      "captures": 8,
+      "invalidations": 7,
+      "cached": 3,
+      "pending": 0,
+      "errors": 0,
+      "queue_depth": 0,
+      "queue_running": null,
+      "priority_policy": "active-visible-remaining",
+      "render_source": "rust-render-model-slots",
+      "max_renders_per_engine_frame": 1,
+      "canvas2d_fallback_count": 0
+    },
+    "response_gpu_overlay_sequence_match": true,
+    "fsm": "Idle",
+    "tool": "select",
+    "nested_edit_root": null,
+    "console_errors": 0,
+    "fallback_rebuild_count": 0,
+    "gpu_validation_errors": 0,
+    "history": {
+      "redo_depth": 0,
+      "transaction_active": false,
+      "undo_depth": 1
+    },
+    "editor_session": {
+      "active_slide_id": "82f54793-2183-4c7c-9204-59fec3a5e58c",
+      "preserved_root_items": [],
+      "slides": [
+        {
+          "active": false,
+          "aspect_ratio": 1.7777777777777777,
+          "child_count": 1,
+          "height": 1080,
+          "id": "30000000-0000-0000-0000-000000000003",
+          "index": 0,
+          "name": "Opening copy",
+          "thumbnail_revision": 0,
+          "width": 1920
+        },
+        {
+          "active": false,
+          "aspect_ratio": 1.7777777777777777,
+          "child_count": 1,
+          "height": 1080,
+          "id": "00000000-0000-0000-0000-000000000002",
+          "index": 1,
+          "name": "Frame 1920×1080",
+          "thumbnail_revision": 0,
+          "width": 1920
+        },
+        {
+          "active": true,
+          "aspect_ratio": 1.7777777777777777,
+          "child_count": 1,
+          "height": 1080,
+          "id": "82f54793-2183-4c7c-9204-59fec3a5e58c",
+          "index": 2,
+          "name": "Slide 2",
+          "thumbnail_revision": 12,
+          "width": 1920
+        }
+      ]
+    },
+    "camera": {
+      "center": [
+        960,
+        540
+      ],
+      "dpr": 1,
+      "viewport": [
+        894,
+        582
+      ],
+      "zoom": 0.415625
+    },
+    "projection_nodes": 7,
+    "projection_schema_version": 2,
+    "primary_node": null,
+    "render_delta": {
+      "dirty_ranges": 1,
+      "dirty_slots": 1,
+      "full": false,
+      "removed_slots": 0,
+      "render_full_rebuilds": 0,
+      "scene_full_rebuilds": 0,
+      "upload_bytes": 116
+    },
+    "render_binary_schema_version": 2,
+    "resources": {
+      "allocated_slots": 6,
+      "dirty_record_stride_bytes": 116,
+      "free_slots": 0,
+      "gpu_encodable_items": 6,
+      "gpu_omitted_items": 0,
+      "instance_capacity": 6,
+      "instance_stride_bytes": 112,
+      "renderable_items": 6,
+      "total_render_items": 6
+    },
+    "binary": {
+      "dirty_instances": true,
+      "full_instances": false,
+      "removed_slots": false,
+      "visible_slots": true
+    },
+    "workspace": {
+      "slidesWidth": 248,
+      "inspectorWidth": 288,
+      "bottomHeight": 248,
+      "slidesCollapsed": false,
+      "inspectorCollapsed": false,
+      "bottomCollapsed": false
+    },
+    "interaction_active": null,
+    "interaction_queue": {
+      "generation": 0,
+      "in_flight": false,
+      "scheduled": false,
+      "latest": false
+    }
+  },
+  "interactions": {
+    "firstCreated": {
+      "binary": {
+        "dirty_instances": true,
+        "full_instances": false,
+        "removed_slots": false,
+        "visible_slots": true
+      },
+      "camera": {
+        "center": [
+          0,
+          0
+        ],
+        "dpr": 1,
+        "viewport": [
+          894,
+          582
+        ],
+        "zoom": 0.4237376366475794
+      },
+      "culling": {
+        "culled": 0,
+        "spatial_candidates": 2,
+        "submitted_instances": 2,
+        "total": 2,
+        "visible": 2
+      },
+      "editor_session": {
+        "active_slide_id": "00000000-0000-0000-0000-000000000002",
+        "preserved_root_items": [],
+        "slides": [
+          {
+            "active": true,
+            "aspect_ratio": 1.7777777777777777,
+            "child_count": 1,
+            "height": 1080,
+            "id": "00000000-0000-0000-0000-000000000002",
+            "index": 0,
+            "name": "Frame 1920×1080",
+            "thumbnail_revision": 2,
+            "width": 1920
+          }
+        ]
+      },
+      "engine_sequence": 8,
+      "error": null,
+      "fixture": "EDITOR",
+      "history": {
+        "redo_depth": 0,
+        "transaction_active": false,
+        "undo_depth": 1
+      },
+      "metrics": {
+        "allocation_growth_count": 0,
+        "cpu_update_ms": 9,
+        "culling_candidates": 2,
+        "document_full_clones": 0,
+        "document_nodes": 3,
+        "document_nodes_scanned": 1,
+        "document_nodes_touched": 0,
+        "document_sequence_allocated_bytes": 64,
+        "document_sequence_dense_index_rewrites": 0,
+        "document_sequence_entries_copied": 0,
+        "document_sequence_entries_examined": 0,
+        "document_sequence_entries_moved_or_shifted": 1,
+        "document_sequence_fallback_or_rebuild_count": 0,
+        "document_sequence_full_copies": 0,
+        "document_sequence_full_scans": 0,
+        "document_sequence_maximum_depth": 1,
+        "document_sequence_nodes_allocated": 1,
+        "document_sequence_rank_order_comparisons": 0,
+        "document_sequence_tree_rebalances": 0,
+        "fallback_rebuild_count": 0,
+        "full_render_model_scans": 0,
+        "gpu_encode_attempted": 1,
+        "gpu_encode_omitted": 0,
+        "indexed_nodes": 2,
+        "instance_upload_bytes": 112,
+        "invalid_derived_nodes": 0,
+        "order_nodes_visited": 5,
+        "render_items_cloned": 0,
+        "render_items_planned": 1,
+        "render_items_read": 2,
+        "render_items_written": 1,
+        "scene_nodes_visited": 2,
+        "scene_sequence_allocated_bytes": 64,
+        "scene_sequence_dense_index_rewrites": 0,
+        "scene_sequence_entries_copied": 0,
+        "scene_sequence_entries_examined": 0,
+        "scene_sequence_entries_moved_or_shifted": 1,
+        "scene_sequence_fallback_or_rebuild_count": 0,
+        "scene_sequence_full_copies": 0,
+        "scene_sequence_full_scans": 0,
+        "scene_sequence_maximum_depth": 1,
+        "scene_sequence_nodes_allocated": 1,
+        "scene_sequence_rank_order_comparisons": 0,
+        "scene_sequence_tree_rebalances": 0,
+        "sibling_search_steps": 0,
+        "ui_child_ids_serialized": 0,
+        "ui_delta_nodes": 1,
+        "ui_full_snapshots": 0,
+        "ui_nodes_serialized": 1,
+        "ui_projection_payload_bytes": 734,
+        "ui_structural_operations": 1,
+        "visible_items": 2,
+        "visible_slot_upload_bytes": 8
+      },
+      "ok": true,
+      "projection": {
+        "full": false,
+        "removed": [],
+        "schema_version": 2,
+        "structural_ops": [
+          {
+            "index": 0,
+            "kind": "attach",
+            "node_id": "30000000-0000-0000-0000-000000000001",
+            "parent_id": "00000000-0000-0000-0000-000000000002"
+          }
+        ],
+        "upserts": [
+          {
+            "appearance": {
+              "corner_radii": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "fill": [
+                0.2,
+                0.58,
+                0.96,
+                1
+              ],
+              "stroke": {
+                "color": [
+                  0.08,
+                  0.11,
+                  0.16,
+                  1
+                ],
+                "width": 0
+              }
+            },
+            "children": [],
+            "geometry": {
+              "height": 80,
+              "width": 160
+            },
+            "id": "30000000-0000-0000-0000-000000000001",
+            "kind": "rectangle",
+            "local_transform": [
+              1,
+              0,
+              0,
+              1,
+              120,
+              120
+            ],
+            "locked": false,
+            "name": "First slide object",
+            "opacity": 1,
+            "parent_id": "00000000-0000-0000-0000-000000000002",
+            "visible": true,
+            "world_bounds": {
+              "max": [
+                -680,
+                -340
+              ],
+              "min": [
+                -840,
+                -420
+              ]
+            },
+            "world_transform": [
+              1,
+              0,
+              0,
+              1,
+              -840,
+              -420
+            ]
+          }
+        ]
+      },
+      "protocol_version": 1,
+      "render_binary_schema_version": 2,
+      "render_delta": {
+        "dirty_ranges": 1,
+        "dirty_slots": 1,
+        "full": false,
+        "removed_slots": 0,
+        "render_full_rebuilds": 0,
+        "scene_full_rebuilds": 0,
+        "upload_bytes": 116
+      },
+      "render_encoding": {
+        "diagnostics": [],
+        "gpu_omitted_items": 0
+      },
+      "request_id": "command-1787219017931-7",
+      "resources": {
+        "allocated_slots": 2,
+        "dirty_record_stride_bytes": 116,
+        "free_slots": 0,
+        "gpu_encodable_items": 2,
+        "gpu_omitted_items": 0,
+        "instance_capacity": 2,
+        "instance_stride_bytes": 112,
+        "renderable_items": 2,
+        "total_render_items": 2
+      },
+      "result": {
+        "changed": true
+      },
+      "revisions": {
+        "document": 2,
+        "render": 2,
+        "scene": 2
+      },
+      "runtime_owner": "dedicated-worker",
+      "selection": {
+        "ordered": [],
+        "primary": null
+      },
+      "type": "engine_response"
+    },
+    "secondCreated": {
+      "binary": {
+        "dirty_instances": true,
+        "full_instances": false,
+        "removed_slots": false,
+        "visible_slots": true
+      },
+      "camera": {
+        "center": [
+          960,
+          540
+        ],
+        "dpr": 1,
+        "viewport": [
+          894,
+          582
+        ],
+        "zoom": 0.415625
+      },
+      "culling": {
+        "culled": 2,
+        "spatial_candidates": 3,
+        "submitted_instances": 2,
+        "total": 4,
+        "visible": 2
+      },
+      "editor_session": {
+        "active_slide_id": "82f54793-2183-4c7c-9204-59fec3a5e58c",
+        "preserved_root_items": [],
+        "slides": [
+          {
+            "active": false,
+            "aspect_ratio": 1.7777777777777777,
+            "child_count": 1,
+            "height": 1080,
+            "id": "00000000-0000-0000-0000-000000000002",
+            "index": 0,
+            "name": "Frame 1920×1080",
+            "thumbnail_revision": 2,
+            "width": 1920
+          },
+          {
+            "active": true,
+            "aspect_ratio": 1.7777777777777777,
+            "child_count": 1,
+            "height": 1080,
+            "id": "82f54793-2183-4c7c-9204-59fec3a5e58c",
+            "index": 1,
+            "name": "Slide 2",
+            "thumbnail_revision": 4,
+            "width": 1920
+          }
+        ]
+      },
+      "engine_sequence": 14,
+      "error": null,
+      "fixture": "EDITOR",
+      "history": {
+        "redo_depth": 0,
+        "transaction_active": false,
+        "undo_depth": 3
+      },
+      "metrics": {
+        "allocation_growth_count": 0,
+        "cpu_update_ms": 0,
+        "culling_candidates": 3,
+        "document_full_clones": 0,
+        "document_nodes": 5,
+        "document_nodes_scanned": 1,
+        "document_nodes_touched": 0,
+        "document_sequence_allocated_bytes": 64,
+        "document_sequence_dense_index_rewrites": 0,
+        "document_sequence_entries_copied": 0,
+        "document_sequence_entries_examined": 0,
+        "document_sequence_entries_moved_or_shifted": 1,
+        "document_sequence_fallback_or_rebuild_count": 0,
+        "document_sequence_full_copies": 0,
+        "document_sequence_full_scans": 0,
+        "document_sequence_maximum_depth": 1,
+        "document_sequence_nodes_allocated": 1,
+        "document_sequence_rank_order_comparisons": 0,
+        "document_sequence_tree_rebalances": 0,
+        "fallback_rebuild_count": 0,
+        "full_render_model_scans": 0,
+        "gpu_encode_attempted": 1,
+        "gpu_encode_omitted": 0,
+        "indexed_nodes": 4,
+        "instance_upload_bytes": 112,
+        "invalid_derived_nodes": 0,
+        "order_nodes_visited": 5,
+        "render_items_cloned": 0,
+        "render_items_planned": 1,
+        "render_items_read": 2,
+        "render_items_written": 1,
+        "scene_nodes_visited": 2,
+        "scene_sequence_allocated_bytes": 64,
+        "scene_sequence_dense_index_rewrites": 0,
+        "scene_sequence_entries_copied": 0,
+        "scene_sequence_entries_examined": 0,
+        "scene_sequence_entries_moved_or_shifted": 1,
+        "scene_sequence_fallback_or_rebuild_count": 0,
+        "scene_sequence_full_copies": 0,
+        "scene_sequence_full_scans": 0,
+        "scene_sequence_maximum_depth": 1,
+        "scene_sequence_nodes_allocated": 1,
+        "scene_sequence_rank_order_comparisons": 0,
+        "scene_sequence_tree_rebalances": 0,
+        "sibling_search_steps": 0,
+        "ui_child_ids_serialized": 0,
+        "ui_delta_nodes": 1,
+        "ui_full_snapshots": 0,
+        "ui_nodes_serialized": 1,
+        "ui_projection_payload_bytes": 727,
+        "ui_structural_operations": 1,
+        "visible_items": 2,
+        "visible_slot_upload_bytes": 8
+      },
+      "ok": true,
+      "projection": {
+        "full": false,
+        "removed": [],
+        "schema_version": 2,
+        "structural_ops": [
+          {
+            "index": 0,
+            "kind": "attach",
+            "node_id": "30000000-0000-0000-0000-000000000002",
+            "parent_id": "82f54793-2183-4c7c-9204-59fec3a5e58c"
+          }
+        ],
+        "upserts": [
+          {
+            "appearance": {
+              "corner_radii": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "fill": [
+                0.2,
+                0.58,
+                0.96,
+                1
+              ],
+              "stroke": {
+                "color": [
+                  0.08,
+                  0.11,
+                  0.16,
+                  1
+                ],
+                "width": 0
+              }
+            },
+            "children": [],
+            "geometry": {
+              "height": 80,
+              "width": 160
+            },
+            "id": "30000000-0000-0000-0000-000000000002",
+            "kind": "ellipse",
+            "local_transform": [
+              1,
+              0,
+              0,
+              1,
+              120,
+              120
+            ],
+            "locked": false,
+            "name": "Second slide object",
+            "opacity": 1,
+            "parent_id": "82f54793-2183-4c7c-9204-59fec3a5e58c",
+            "visible": true,
+            "world_bounds": {
+              "max": [
+                280,
+                200
+              ],
+              "min": [
+                120,
+                120
+              ]
+            },
+            "world_transform": [
+              1,
+              0,
+              0,
+              1,
+              120,
+              120
+            ]
+          }
+        ]
+      },
+      "protocol_version": 1,
+      "render_binary_schema_version": 2,
+      "render_delta": {
+        "dirty_ranges": 1,
+        "dirty_slots": 1,
+        "full": false,
+        "removed_slots": 0,
+        "render_full_rebuilds": 0,
+        "scene_full_rebuilds": 0,
+        "upload_bytes": 116
+      },
+      "render_encoding": {
+        "diagnostics": [],
+        "gpu_omitted_items": 0
+      },
+      "request_id": "command-1787219018190-13",
+      "resources": {
+        "allocated_slots": 4,
+        "dirty_record_stride_bytes": 116,
+        "free_slots": 0,
+        "gpu_encodable_items": 4,
+        "gpu_omitted_items": 0,
+        "instance_capacity": 4,
+        "instance_stride_bytes": 112,
+        "renderable_items": 4,
+        "total_render_items": 4
+      },
+      "result": {
+        "changed": true
+      },
+      "revisions": {
+        "document": 4,
+        "render": 4,
+        "scene": 4
+      },
+      "runtime_owner": "dedicated-worker",
+      "selection": {
+        "ordered": [],
+        "primary": null
+      },
+      "type": "engine_response"
+    },
+    "firstState": {
+      "binary": {
+        "dirty_instances": false,
+        "full_instances": false,
+        "removed_slots": false,
+        "visible_slots": true
+      },
+      "camera": {
+        "center": [
+          -84.95823095823096,
+          56.63882063882063
+        ],
+        "dpr": 1,
+        "viewport": [
+          894,
+          582
+        ],
+        "zoom": 0.4237376366475794
+      },
+      "culling": {
+        "culled": 0,
+        "spatial_candidates": 2,
+        "submitted_instances": 2,
+        "total": 2,
+        "visible": 2
+      },
+      "editor_session": {
+        "active_slide_id": "00000000-0000-0000-0000-000000000002",
+        "preserved_root_items": [],
+        "slides": [
+          {
+            "active": true,
+            "aspect_ratio": 1.7777777777777777,
+            "child_count": 1,
+            "height": 1080,
+            "id": "00000000-0000-0000-0000-000000000002",
+            "index": 0,
+            "name": "Frame 1920×1080",
+            "thumbnail_revision": 2,
+            "width": 1920
+          }
+        ]
+      },
+      "engine_sequence": 11,
+      "error": null,
+      "fixture": "EDITOR",
+      "history": {
+        "redo_depth": 0,
+        "transaction_active": false,
+        "undo_depth": 1
+      },
+      "metrics": {
+        "allocation_growth_count": 0,
+        "cpu_update_ms": 0,
+        "culling_candidates": 2,
+        "document_full_clones": 0,
+        "document_nodes": 3,
+        "document_nodes_scanned": 0,
+        "document_nodes_touched": 0,
+        "document_sequence_allocated_bytes": 0,
+        "document_sequence_dense_index_rewrites": 0,
+        "document_sequence_entries_copied": 0,
+        "document_sequence_entries_examined": 0,
+        "document_sequence_entries_moved_or_shifted": 0,
+        "document_sequence_fallback_or_rebuild_count": 0,
+        "document_sequence_full_copies": 0,
+        "document_sequence_full_scans": 0,
+        "document_sequence_maximum_depth": 0,
+        "document_sequence_nodes_allocated": 0,
+        "document_sequence_rank_order_comparisons": 0,
+        "document_sequence_tree_rebalances": 0,
+        "fallback_rebuild_count": 0,
+        "full_render_model_scans": 0,
+        "gpu_encode_attempted": 0,
+        "gpu_encode_omitted": 0,
+        "indexed_nodes": 2,
+        "instance_upload_bytes": 0,
+        "invalid_derived_nodes": 0,
+        "order_nodes_visited": 5,
+        "render_items_cloned": 0,
+        "render_items_planned": 0,
+        "render_items_read": 2,
+        "render_items_written": 0,
+        "scene_nodes_visited": 0,
+        "scene_sequence_allocated_bytes": 0,
+        "scene_sequence_dense_index_rewrites": 0,
+        "scene_sequence_entries_copied": 0,
+        "scene_sequence_entries_examined": 0,
+        "scene_sequence_entries_moved_or_shifted": 0,
+        "scene_sequence_fallback_or_rebuild_count": 0,
+        "scene_sequence_full_copies": 0,
+        "scene_sequence_full_scans": 0,
+        "scene_sequence_maximum_depth": 0,
+        "scene_sequence_nodes_allocated": 0,
+        "scene_sequence_rank_order_comparisons": 0,
+        "scene_sequence_tree_rebalances": 0,
+        "sibling_search_steps": 0,
+        "ui_child_ids_serialized": 0,
+        "ui_delta_nodes": 0,
+        "ui_full_snapshots": 0,
+        "ui_nodes_serialized": 0,
+        "ui_projection_payload_bytes": 0,
+        "ui_structural_operations": 0,
+        "visible_items": 2,
+        "visible_slot_upload_bytes": 8
+      },
+      "ok": true,
+      "projection": {
+        "full": false,
+        "removed": [],
+        "schema_version": 2,
+        "structural_ops": [],
+        "upserts": []
+      },
+      "protocol_version": 1,
+      "render_binary_schema_version": 2,
+      "render_delta": {
+        "dirty_ranges": 0,
+        "dirty_slots": 0,
+        "full": false,
+        "removed_slots": 0,
+        "render_full_rebuilds": 0,
+        "scene_full_rebuilds": 0,
+        "upload_bytes": 0
+      },
+      "render_encoding": {
+        "diagnostics": [],
+        "gpu_omitted_items": 0
+      },
+      "request_id": "camera-1787219017969-10",
+      "resources": {
+        "allocated_slots": 2,
+        "dirty_record_stride_bytes": 116,
+        "free_slots": 0,
+        "gpu_encodable_items": 2,
+        "gpu_omitted_items": 0,
+        "instance_capacity": 2,
+        "instance_stride_bytes": 112,
+        "renderable_items": 2,
+        "total_render_items": 2
+      },
+      "result": {
+        "camera_changed": true
+      },
+      "revisions": {
+        "document": 2,
+        "render": 2,
+        "scene": 2
+      },
+      "runtime_owner": "dedicated-worker",
+      "selection": {
+        "ordered": [
+          "30000000-0000-0000-0000-000000000001"
+        ],
+        "primary": "30000000-0000-0000-0000-000000000001"
+      },
+      "type": "engine_response"
+    },
+    "secondState": {
+      "binary": {
+        "dirty_instances": false,
+        "full_instances": false,
+        "removed_slots": false,
+        "visible_slots": true
+      },
+      "camera": {
+        "center": [
+          1075.4887218045112,
+          467.81954887218046
+        ],
+        "dpr": 1,
+        "viewport": [
+          894,
+          582
+        ],
+        "zoom": 0.415625
+      },
+      "culling": {
+        "culled": 2,
+        "spatial_candidates": 3,
+        "submitted_instances": 2,
+        "total": 4,
+        "visible": 2
+      },
+      "editor_session": {
+        "active_slide_id": "82f54793-2183-4c7c-9204-59fec3a5e58c",
+        "preserved_root_items": [],
+        "slides": [
+          {
+            "active": false,
+            "aspect_ratio": 1.7777777777777777,
+            "child_count": 1,
+            "height": 1080,
+            "id": "00000000-0000-0000-0000-000000000002",
+            "index": 0,
+            "name": "Frame 1920×1080",
+            "thumbnail_revision": 2,
+            "width": 1920
+          },
+          {
+            "active": true,
+            "aspect_ratio": 1.7777777777777777,
+            "child_count": 1,
+            "height": 1080,
+            "id": "82f54793-2183-4c7c-9204-59fec3a5e58c",
+            "index": 1,
+            "name": "Slide 2",
+            "thumbnail_revision": 4,
+            "width": 1920
+          }
+        ]
+      },
+      "engine_sequence": 16,
+      "error": null,
+      "fixture": "EDITOR",
+      "history": {
+        "redo_depth": 0,
+        "transaction_active": false,
+        "undo_depth": 3
+      },
+      "metrics": {
+        "allocation_growth_count": 0,
+        "cpu_update_ms": 0,
+        "culling_candidates": 3,
+        "document_full_clones": 0,
+        "document_nodes": 5,
+        "document_nodes_scanned": 0,
+        "document_nodes_touched": 0,
+        "document_sequence_allocated_bytes": 0,
+        "document_sequence_dense_index_rewrites": 0,
+        "document_sequence_entries_copied": 0,
+        "document_sequence_entries_examined": 0,
+        "document_sequence_entries_moved_or_shifted": 0,
+        "document_sequence_fallback_or_rebuild_count": 0,
+        "document_sequence_full_copies": 0,
+        "document_sequence_full_scans": 0,
+        "document_sequence_maximum_depth": 0,
+        "document_sequence_nodes_allocated": 0,
+        "document_sequence_rank_order_comparisons": 0,
+        "document_sequence_tree_rebalances": 0,
+        "fallback_rebuild_count": 0,
+        "full_render_model_scans": 0,
+        "gpu_encode_attempted": 0,
+        "gpu_encode_omitted": 0,
+        "indexed_nodes": 4,
+        "instance_upload_bytes": 0,
+        "invalid_derived_nodes": 0,
+        "order_nodes_visited": 5,
+        "render_items_cloned": 0,
+        "render_items_planned": 0,
+        "render_items_read": 2,
+        "render_items_written": 0,
+        "scene_nodes_visited": 0,
+        "scene_sequence_allocated_bytes": 0,
+        "scene_sequence_dense_index_rewrites": 0,
+        "scene_sequence_entries_copied": 0,
+        "scene_sequence_entries_examined": 0,
+        "scene_sequence_entries_moved_or_shifted": 0,
+        "scene_sequence_fallback_or_rebuild_count": 0,
+        "scene_sequence_full_copies": 0,
+        "scene_sequence_full_scans": 0,
+        "scene_sequence_maximum_depth": 0,
+        "scene_sequence_nodes_allocated": 0,
+        "scene_sequence_rank_order_comparisons": 0,
+        "scene_sequence_tree_rebalances": 0,
+        "sibling_search_steps": 0,
+        "ui_child_ids_serialized": 0,
+        "ui_delta_nodes": 0,
+        "ui_full_snapshots": 0,
+        "ui_nodes_serialized": 0,
+        "ui_projection_payload_bytes": 0,
+        "ui_structural_operations": 0,
+        "visible_items": 2,
+        "visible_slot_upload_bytes": 8
+      },
+      "ok": true,
+      "projection": {
+        "full": false,
+        "removed": [],
+        "schema_version": 2,
+        "structural_ops": [],
+        "upserts": []
+      },
+      "protocol_version": 1,
+      "render_binary_schema_version": 2,
+      "render_delta": {
+        "dirty_ranges": 0,
+        "dirty_slots": 0,
+        "full": false,
+        "removed_slots": 0,
+        "render_full_rebuilds": 0,
+        "scene_full_rebuilds": 0,
+        "upload_bytes": 0
+      },
+      "render_encoding": {
+        "diagnostics": [],
+        "gpu_omitted_items": 0
+      },
+      "request_id": "camera-1787219018209-15",
+      "resources": {
+        "allocated_slots": 4,
+        "dirty_record_stride_bytes": 116,
+        "free_slots": 0,
+        "gpu_encodable_items": 4,
+        "gpu_omitted_items": 0,
+        "instance_capacity": 4,
+        "instance_stride_bytes": 112,
+        "renderable_items": 4,
+        "total_render_items": 4
+      },
+      "result": {
+        "camera_changed": true
+      },
+      "revisions": {
+        "document": 4,
+        "render": 4,
+        "scene": 4
+      },
+      "runtime_owner": "dedicated-worker",
+      "selection": {
+        "ordered": [
+          "30000000-0000-0000-0000-000000000002"
+        ],
+        "primary": "30000000-0000-0000-0000-000000000002"
+      },
+      "type": "engine_response"
+    },
+    "restoredFirst": {
+      "binary": {
+        "dirty_instances": false,
+        "full_instances": false,
+        "removed_slots": false,
+        "visible_slots": true
+      },
+      "camera": {
+        "center": [
+          -84.95823095823096,
+          56.63882063882063
+        ],
+        "dpr": 1,
+        "viewport": [
+          894,
+          582
+        ],
+        "zoom": 0.4237376366475794
+      },
+      "culling": {
+        "culled": 2,
+        "spatial_candidates": 4,
+        "submitted_instances": 2,
+        "total": 4,
+        "visible": 2
+      },
+      "editor_session": {
+        "active_slide_id": "00000000-0000-0000-0000-000000000002",
+        "preserved_root_items": [],
+        "slides": [
+          {
+            "active": true,
+            "aspect_ratio": 1.7777777777777777,
+            "child_count": 1,
+            "height": 1080,
+            "id": "00000000-0000-0000-0000-000000000002",
+            "index": 0,
+            "name": "Frame 1920×1080",
+            "thumbnail_revision": 2,
+            "width": 1920
+          },
+          {
+            "active": false,
+            "aspect_ratio": 1.7777777777777777,
+            "child_count": 1,
+            "height": 1080,
+            "id": "82f54793-2183-4c7c-9204-59fec3a5e58c",
+            "index": 1,
+            "name": "Slide 2",
+            "thumbnail_revision": 4,
+            "width": 1920
+          }
+        ]
+      },
+      "engine_sequence": 19,
+      "error": null,
+      "fixture": "EDITOR",
+      "history": {
+        "redo_depth": 0,
+        "transaction_active": false,
+        "undo_depth": 3
+      },
+      "metrics": {
+        "allocation_growth_count": 0,
+        "cpu_update_ms": 0,
+        "culling_candidates": 4,
+        "document_full_clones": 0,
+        "document_nodes": 5,
+        "document_nodes_scanned": 0,
+        "document_nodes_touched": 0,
+        "document_sequence_allocated_bytes": 0,
+        "document_sequence_dense_index_rewrites": 0,
+        "document_sequence_entries_copied": 0,
+        "document_sequence_entries_examined": 0,
+        "document_sequence_entries_moved_or_shifted": 0,
+        "document_sequence_fallback_or_rebuild_count": 0,
+        "document_sequence_full_copies": 0,
+        "document_sequence_full_scans": 0,
+        "document_sequence_maximum_depth": 0,
+        "document_sequence_nodes_allocated": 0,
+        "document_sequence_rank_order_comparisons": 0,
+        "document_sequence_tree_rebalances": 0,
+        "fallback_rebuild_count": 0,
+        "full_render_model_scans": 0,
+        "gpu_encode_attempted": 0,
+        "gpu_encode_omitted": 0,
+        "indexed_nodes": 4,
+        "instance_upload_bytes": 0,
+        "invalid_derived_nodes": 0,
+        "order_nodes_visited": 5,
+        "render_items_cloned": 0,
+        "render_items_planned": 0,
+        "render_items_read": 2,
+        "render_items_written": 0,
+        "scene_nodes_visited": 0,
+        "scene_sequence_allocated_bytes": 0,
+        "scene_sequence_dense_index_rewrites": 0,
+        "scene_sequence_entries_copied": 0,
+        "scene_sequence_entries_examined": 0,
+        "scene_sequence_entries_moved_or_shifted": 0,
+        "scene_sequence_fallback_or_rebuild_count": 0,
+        "scene_sequence_full_copies": 0,
+        "scene_sequence_full_scans": 0,
+        "scene_sequence_maximum_depth": 0,
+        "scene_sequence_nodes_allocated": 0,
+        "scene_sequence_rank_order_comparisons": 0,
+        "scene_sequence_tree_rebalances": 0,
+        "sibling_search_steps": 0,
+        "ui_child_ids_serialized": 0,
+        "ui_delta_nodes": 0,
+        "ui_full_snapshots": 0,
+        "ui_nodes_serialized": 0,
+        "ui_projection_payload_bytes": 0,
+        "ui_structural_operations": 0,
+        "visible_items": 2,
+        "visible_slot_upload_bytes": 8
+      },
+      "ok": true,
+      "projection": {
+        "full": false,
+        "removed": [],
+        "schema_version": 2,
+        "structural_ops": [],
+        "upserts": []
+      },
+      "protocol_version": 1,
+      "render_binary_schema_version": 2,
+      "render_delta": {
+        "dirty_ranges": 0,
+        "dirty_slots": 0,
+        "full": false,
+        "removed_slots": 0,
+        "render_full_rebuilds": 0,
+        "scene_full_rebuilds": 0,
+        "upload_bytes": 0
+      },
+      "render_encoding": {
+        "diagnostics": [],
+        "gpu_omitted_items": 0
+      },
+      "request_id": "slide-1787219018976-17",
+      "resources": {
+        "allocated_slots": 4,
+        "dirty_record_stride_bytes": 116,
+        "free_slots": 0,
+        "gpu_encodable_items": 4,
+        "gpu_omitted_items": 0,
+        "instance_capacity": 4,
+        "instance_stride_bytes": 112,
+        "renderable_items": 4,
+        "total_render_items": 4
+      },
+      "result": {
+        "active_slide_changed": true
+      },
+      "revisions": {
+        "document": 4,
+        "render": 4,
+        "scene": 4
+      },
+      "runtime_owner": "dedicated-worker",
+      "selection": {
+        "ordered": [
+          "30000000-0000-0000-0000-000000000001"
+        ],
+        "primary": "30000000-0000-0000-0000-000000000001"
+      },
+      "type": "engine_response"
+    },
+    "firstHit": {
+      "binary": {
+        "dirty_instances": false,
+        "full_instances": false,
+        "removed_slots": false,
+        "visible_slots": false
+      },
+      "camera": {
+        "center": [
+          -84.95823095823096,
+          56.63882063882063
+        ],
+        "dpr": 1,
+        "viewport": [
+          894,
+          582
+        ],
+        "zoom": 0.4237376366475794
+      },
+      "culling": {
+        "culled": 2,
+        "spatial_candidates": 4,
+        "submitted_instances": 2,
+        "total": 4,
+        "visible": 2
+      },
+      "editor_session": {
+        "active_slide_id": "00000000-0000-0000-0000-000000000002",
+        "preserved_root_items": [],
+        "slides": [
+          {
+            "active": true,
+            "aspect_ratio": 1.7777777777777777,
+            "child_count": 1,
+            "height": 1080,
+            "id": "00000000-0000-0000-0000-000000000002",
+            "index": 0,
+            "name": "Frame 1920×1080",
+            "thumbnail_revision": 2,
+            "width": 1920
+          },
+          {
+            "active": false,
+            "aspect_ratio": 1.7777777777777777,
+            "child_count": 1,
+            "height": 1080,
+            "id": "82f54793-2183-4c7c-9204-59fec3a5e58c",
+            "index": 1,
+            "name": "Slide 2",
+            "thumbnail_revision": 4,
+            "width": 1920
+          }
+        ]
+      },
+      "engine_sequence": 20,
+      "error": null,
+      "fixture": "EDITOR",
+      "history": {
+        "redo_depth": 0,
+        "transaction_active": false,
+        "undo_depth": 3
+      },
+      "metrics": {
+        "allocation_growth_count": 0,
+        "cpu_update_ms": 1,
+        "culling_candidates": 0,
+        "document_full_clones": 0,
+        "document_nodes": 5,
+        "document_nodes_scanned": 0,
+        "document_nodes_touched": 0,
+        "document_sequence_allocated_bytes": 0,
+        "document_sequence_dense_index_rewrites": 0,
+        "document_sequence_entries_copied": 0,
+        "document_sequence_entries_examined": 0,
+        "document_sequence_entries_moved_or_shifted": 0,
+        "document_sequence_fallback_or_rebuild_count": 0,
+        "document_sequence_full_copies": 0,
+        "document_sequence_full_scans": 0,
+        "document_sequence_maximum_depth": 0,
+        "document_sequence_nodes_allocated": 0,
+        "document_sequence_rank_order_comparisons": 0,
+        "document_sequence_tree_rebalances": 0,
+        "fallback_rebuild_count": 0,
+        "full_render_model_scans": 0,
+        "gpu_encode_attempted": 0,
+        "gpu_encode_omitted": 0,
+        "indexed_nodes": 4,
+        "instance_upload_bytes": 0,
+        "invalid_derived_nodes": 0,
+        "order_nodes_visited": 0,
+        "render_items_cloned": 0,
+        "render_items_planned": 0,
+        "render_items_read": 0,
+        "render_items_written": 0,
+        "scene_nodes_visited": 0,
+        "scene_sequence_allocated_bytes": 0,
+        "scene_sequence_dense_index_rewrites": 0,
+        "scene_sequence_entries_copied": 0,
+        "scene_sequence_entries_examined": 0,
+        "scene_sequence_entries_moved_or_shifted": 0,
+        "scene_sequence_fallback_or_rebuild_count": 0,
+        "scene_sequence_full_copies": 0,
+        "scene_sequence_full_scans": 0,
+        "scene_sequence_maximum_depth": 0,
+        "scene_sequence_nodes_allocated": 0,
+        "scene_sequence_rank_order_comparisons": 0,
+        "scene_sequence_tree_rebalances": 0,
+        "sibling_search_steps": 0,
+        "ui_child_ids_serialized": 0,
+        "ui_delta_nodes": 0,
+        "ui_full_snapshots": 0,
+        "ui_nodes_serialized": 0,
+        "ui_projection_payload_bytes": 0,
+        "ui_structural_operations": 0,
+        "visible_items": 0,
+        "visible_slot_upload_bytes": 0
+      },
+      "ok": true,
+      "projection": {
+        "full": false,
+        "removed": [],
+        "schema_version": 2,
+        "structural_ops": [],
+        "upserts": []
+      },
+      "protocol_version": 1,
+      "render_binary_schema_version": 2,
+      "render_delta": {
+        "dirty_ranges": 0,
+        "dirty_slots": 0,
+        "full": false,
+        "removed_slots": 0,
+        "render_full_rebuilds": 0,
+        "scene_full_rebuilds": 0,
+        "upload_bytes": 0
+      },
+      "render_encoding": {
+        "diagnostics": [],
+        "gpu_omitted_items": 0
+      },
+      "request_id": "hit_test-1787219018981-18",
+      "resources": {
+        "allocated_slots": 4,
+        "dirty_record_stride_bytes": 116,
+        "free_slots": 0,
+        "gpu_encodable_items": 4,
+        "gpu_omitted_items": 0,
+        "instance_capacity": 4,
+        "instance_stride_bytes": 112,
+        "renderable_items": 4,
+        "total_render_items": 4
+      },
+      "result": {
+        "all": [
+          "30000000-0000-0000-0000-000000000001",
+          "00000000-0000-0000-0000-000000000002"
+        ],
+        "candidates": 2,
+        "exact_geometry_tests": 2,
+        "topmost": "30000000-0000-0000-0000-000000000001"
+      },
+      "revisions": {
+        "document": 4,
+        "render": 4,
+        "scene": 4
+      },
+      "runtime_owner": "dedicated-worker",
+      "selection": {
+        "ordered": [
+          "30000000-0000-0000-0000-000000000001"
+        ],
+        "primary": "30000000-0000-0000-0000-000000000001"
+      },
+      "type": "engine_response"
+    },
+    "outsideSelection": {
+      "code": "node_outside_active_slide",
+      "message": "node 30000000-0000-0000-0000-000000000002 is outside active Slide 00000000-0000-0000-0000-000000000002"
+    },
+    "restoredSecond": {
+      "binary": {
+        "dirty_instances": false,
+        "full_instances": false,
+        "removed_slots": false,
+        "visible_slots": true
+      },
+      "camera": {
+        "center": [
+          1075.4887218045112,
+          467.81954887218046
+        ],
+        "dpr": 1,
+        "viewport": [
+          894,
+          582
+        ],
+        "zoom": 0.415625
+      },
+      "culling": {
+        "culled": 2,
+        "spatial_candidates": 3,
+        "submitted_instances": 2,
+        "total": 4,
+        "visible": 2
+      },
+      "editor_session": {
+        "active_slide_id": "82f54793-2183-4c7c-9204-59fec3a5e58c",
+        "preserved_root_items": [],
+        "slides": [
+          {
+            "active": false,
+            "aspect_ratio": 1.7777777777777777,
+            "child_count": 1,
+            "height": 1080,
+            "id": "00000000-0000-0000-0000-000000000002",
+            "index": 0,
+            "name": "Frame 1920×1080",
+            "thumbnail_revision": 2,
+            "width": 1920
+          },
+          {
+            "active": true,
+            "aspect_ratio": 1.7777777777777777,
+            "child_count": 1,
+            "height": 1080,
+            "id": "82f54793-2183-4c7c-9204-59fec3a5e58c",
+            "index": 1,
+            "name": "Slide 2",
+            "thumbnail_revision": 4,
+            "width": 1920
+          }
+        ]
+      },
+      "engine_sequence": 22,
+      "error": null,
+      "fixture": "EDITOR",
+      "history": {
+        "redo_depth": 0,
+        "transaction_active": false,
+        "undo_depth": 3
+      },
+      "metrics": {
+        "allocation_growth_count": 0,
+        "cpu_update_ms": 0,
+        "culling_candidates": 3,
+        "document_full_clones": 0,
+        "document_nodes": 5,
+        "document_nodes_scanned": 0,
+        "document_nodes_touched": 0,
+        "document_sequence_allocated_bytes": 0,
+        "document_sequence_dense_index_rewrites": 0,
+        "document_sequence_entries_copied": 0,
+        "document_sequence_entries_examined": 0,
+        "document_sequence_entries_moved_or_shifted": 0,
+        "document_sequence_fallback_or_rebuild_count": 0,
+        "document_sequence_full_copies": 0,
+        "document_sequence_full_scans": 0,
+        "document_sequence_maximum_depth": 0,
+        "document_sequence_nodes_allocated": 0,
+        "document_sequence_rank_order_comparisons": 0,
+        "document_sequence_tree_rebalances": 0,
+        "fallback_rebuild_count": 0,
+        "full_render_model_scans": 0,
+        "gpu_encode_attempted": 0,
+        "gpu_encode_omitted": 0,
+        "indexed_nodes": 4,
+        "instance_upload_bytes": 0,
+        "invalid_derived_nodes": 0,
+        "order_nodes_visited": 5,
+        "render_items_cloned": 0,
+        "render_items_planned": 0,
+        "render_items_read": 2,
+        "render_items_written": 0,
+        "scene_nodes_visited": 0,
+        "scene_sequence_allocated_bytes": 0,
+        "scene_sequence_dense_index_rewrites": 0,
+        "scene_sequence_entries_copied": 0,
+        "scene_sequence_entries_examined": 0,
+        "scene_sequence_entries_moved_or_shifted": 0,
+        "scene_sequence_fallback_or_rebuild_count": 0,
+        "scene_sequence_full_copies": 0,
+        "scene_sequence_full_scans": 0,
+        "scene_sequence_maximum_depth": 0,
+        "scene_sequence_nodes_allocated": 0,
+        "scene_sequence_rank_order_comparisons": 0,
+        "scene_sequence_tree_rebalances": 0,
+        "sibling_search_steps": 0,
+        "ui_child_ids_serialized": 0,
+        "ui_delta_nodes": 0,
+        "ui_full_snapshots": 0,
+        "ui_nodes_serialized": 0,
+        "ui_projection_payload_bytes": 0,
+        "ui_structural_operations": 0,
+        "visible_items": 2,
+        "visible_slot_upload_bytes": 8
+      },
+      "ok": true,
+      "projection": {
+        "full": false,
+        "removed": [],
+        "schema_version": 2,
+        "structural_ops": [],
+        "upserts": []
+      },
+      "protocol_version": 1,
+      "render_binary_schema_version": 2,
+      "render_delta": {
+        "dirty_ranges": 0,
+        "dirty_slots": 0,
+        "full": false,
+        "removed_slots": 0,
+        "render_full_rebuilds": 0,
+        "scene_full_rebuilds": 0,
+        "upload_bytes": 0
+      },
+      "render_encoding": {
+        "diagnostics": [],
+        "gpu_omitted_items": 0
+      },
+      "request_id": "slide-1787219018987-20",
+      "resources": {
+        "allocated_slots": 4,
+        "dirty_record_stride_bytes": 116,
+        "free_slots": 0,
+        "gpu_encodable_items": 4,
+        "gpu_omitted_items": 0,
+        "instance_capacity": 4,
+        "instance_stride_bytes": 112,
+        "renderable_items": 4,
+        "total_render_items": 4
+      },
+      "result": {
+        "active_slide_changed": true
+      },
+      "revisions": {
+        "document": 4,
+        "render": 4,
+        "scene": 4
+      },
+      "runtime_owner": "dedicated-worker",
+      "selection": {
+        "ordered": [
+          "30000000-0000-0000-0000-000000000002"
+        ],
+        "primary": "30000000-0000-0000-0000-000000000002"
+      },
+      "type": "engine_response"
+    },
+    "secondHit": {
+      "binary": {
+        "dirty_instances": false,
+        "full_instances": false,
+        "removed_slots": false,
+        "visible_slots": false
+      },
+      "camera": {
+        "center": [
+          1075.4887218045112,
+          467.81954887218046
+        ],
+        "dpr": 1,
+        "viewport": [
+          894,
+          582
+        ],
+        "zoom": 0.415625
+      },
+      "culling": {
+        "culled": 2,
+        "spatial_candidates": 3,
+        "submitted_instances": 2,
+        "total": 4,
+        "visible": 2
+      },
+      "editor_session": {
+        "active_slide_id": "82f54793-2183-4c7c-9204-59fec3a5e58c",
+        "preserved_root_items": [],
+        "slides": [
+          {
+            "active": false,
+            "aspect_ratio": 1.7777777777777777,
+            "child_count": 1,
+            "height": 1080,
+            "id": "00000000-0000-0000-0000-000000000002",
+            "index": 0,
+            "name": "Frame 1920×1080",
+            "thumbnail_revision": 2,
+            "width": 1920
+          },
+          {
+            "active": true,
+            "aspect_ratio": 1.7777777777777777,
+            "child_count": 1,
+            "height": 1080,
+            "id": "82f54793-2183-4c7c-9204-59fec3a5e58c",
+            "index": 1,
+            "name": "Slide 2",
+            "thumbnail_revision": 4,
+            "width": 1920
+          }
+        ]
+      },
+      "engine_sequence": 23,
+      "error": null,
+      "fixture": "EDITOR",
+      "history": {
+        "redo_depth": 0,
+        "transaction_active": false,
+        "undo_depth": 3
+      },
+      "metrics": {
+        "allocation_growth_count": 0,
+        "cpu_update_ms": 0,
+        "culling_candidates": 0,
+        "document_full_clones": 0,
+        "document_nodes": 5,
+        "document_nodes_scanned": 0,
+        "document_nodes_touched": 0,
+        "document_sequence_allocated_bytes": 0,
+        "document_sequence_dense_index_rewrites": 0,
+        "document_sequence_entries_copied": 0,
+        "document_sequence_entries_examined": 0,
+        "document_sequence_entries_moved_or_shifted": 0,
+        "document_sequence_fallback_or_rebuild_count": 0,
+        "document_sequence_full_copies": 0,
+        "document_sequence_full_scans": 0,
+        "document_sequence_maximum_depth": 0,
+        "document_sequence_nodes_allocated": 0,
+        "document_sequence_rank_order_comparisons": 0,
+        "document_sequence_tree_rebalances": 0,
+        "fallback_rebuild_count": 0,
+        "full_render_model_scans": 0,
+        "gpu_encode_attempted": 0,
+        "gpu_encode_omitted": 0,
+        "indexed_nodes": 4,
+        "instance_upload_bytes": 0,
+        "invalid_derived_nodes": 0,
+        "order_nodes_visited": 0,
+        "render_items_cloned": 0,
+        "render_items_planned": 0,
+        "render_items_read": 0,
+        "render_items_written": 0,
+        "scene_nodes_visited": 0,
+        "scene_sequence_allocated_bytes": 0,
+        "scene_sequence_dense_index_rewrites": 0,
+        "scene_sequence_entries_copied": 0,
+        "scene_sequence_entries_examined": 0,
+        "scene_sequence_entries_moved_or_shifted": 0,
+        "scene_sequence_fallback_or_rebuild_count": 0,
+        "scene_sequence_full_copies": 0,
+        "scene_sequence_full_scans": 0,
+        "scene_sequence_maximum_depth": 0,
+        "scene_sequence_nodes_allocated": 0,
+        "scene_sequence_rank_order_comparisons": 0,
+        "scene_sequence_tree_rebalances": 0,
+        "sibling_search_steps": 0,
+        "ui_child_ids_serialized": 0,
+        "ui_delta_nodes": 0,
+        "ui_full_snapshots": 0,
+        "ui_nodes_serialized": 0,
+        "ui_projection_payload_bytes": 0,
+        "ui_structural_operations": 0,
+        "visible_items": 0,
+        "visible_slot_upload_bytes": 0
+      },
+      "ok": true,
+      "projection": {
+        "full": false,
+        "removed": [],
+        "schema_version": 2,
+        "structural_ops": [],
+        "upserts": []
+      },
+      "protocol_version": 1,
+      "render_binary_schema_version": 2,
+      "render_delta": {
+        "dirty_ranges": 0,
+        "dirty_slots": 0,
+        "full": false,
+        "removed_slots": 0,
+        "render_full_rebuilds": 0,
+        "scene_full_rebuilds": 0,
+        "upload_bytes": 0
+      },
+      "render_encoding": {
+        "diagnostics": [],
+        "gpu_omitted_items": 0
+      },
+      "request_id": "hit_test-1787219018995-21",
+      "resources": {
+        "allocated_slots": 4,
+        "dirty_record_stride_bytes": 116,
+        "free_slots": 0,
+        "gpu_encodable_items": 4,
+        "gpu_omitted_items": 0,
+        "instance_capacity": 4,
+        "instance_stride_bytes": 112,
+        "renderable_items": 4,
+        "total_render_items": 4
+      },
+      "result": {
+        "all": [
+          "30000000-0000-0000-0000-000000000002",
+          "82f54793-2183-4c7c-9204-59fec3a5e58c"
+        ],
+        "candidates": 3,
+        "exact_geometry_tests": 2,
+        "topmost": "30000000-0000-0000-0000-000000000002"
+      },
+      "revisions": {
+        "document": 4,
+        "render": 4,
+        "scene": 4
+      },
+      "runtime_owner": "dedicated-worker",
+      "selection": {
+        "ordered": [
+          "30000000-0000-0000-0000-000000000002"
+        ],
+        "primary": "30000000-0000-0000-0000-000000000002"
+      },
+      "type": "engine_response"
+    },
+    "duplicated": {
+      "binary": {
+        "dirty_instances": true,
+        "full_instances": false,
+        "removed_slots": false,
+        "visible_slots": true
+      },
+      "camera": {
+        "center": [
+          960,
+          540
+        ],
+        "dpr": 1,
+        "viewport": [
+          894,
+          582
+        ],
+        "zoom": 0.415625
+      },
+      "culling": {
+        "culled": 4,
+        "spatial_candidates": 5,
+        "submitted_instances": 2,
+        "total": 6,
+        "visible": 2
+      },
+      "editor_session": {
+        "active_slide_id": "30000000-0000-0000-0000-000000000003",
+        "preserved_root_items": [],
+        "slides": [
+          {
+            "active": false,
+            "aspect_ratio": 1.7777777777777777,
+            "child_count": 1,
+            "height": 1080,
+            "id": "00000000-0000-0000-0000-000000000002",
+            "index": 0,
+            "name": "Frame 1920×1080",
+            "thumbnail_revision": 2,
+            "width": 1920
+          },
+          {
+            "active": false,
+            "aspect_ratio": 1.7777777777777777,
+            "child_count": 1,
+            "height": 1080,
+            "id": "82f54793-2183-4c7c-9204-59fec3a5e58c",
+            "index": 1,
+            "name": "Slide 2",
+            "thumbnail_revision": 4,
+            "width": 1920
+          },
+          {
+            "active": true,
+            "aspect_ratio": 1.7777777777777777,
+            "child_count": 1,
+            "height": 1080,
+            "id": "30000000-0000-0000-0000-000000000003",
+            "index": 2,
+            "name": "Slide 2 Copy",
+            "thumbnail_revision": 5,
+            "width": 1920
+          }
+        ]
+      },
+      "engine_sequence": 24,
+      "error": null,
+      "fixture": "EDITOR",
+      "history": {
+        "redo_depth": 0,
+        "transaction_active": false,
+        "undo_depth": 4
+      },
+      "metrics": {
+        "allocation_growth_count": 1,
+        "cpu_update_ms": 4,
+        "culling_candidates": 5,
+        "document_full_clones": 0,
+        "document_nodes": 7,
+        "document_nodes_scanned": 2,
+        "document_nodes_touched": 2,
+        "document_sequence_allocated_bytes": 128,
+        "document_sequence_dense_index_rewrites": 0,
+        "document_sequence_entries_copied": 1,
+        "document_sequence_entries_examined": 7,
+        "document_sequence_entries_moved_or_shifted": 6,
+        "document_sequence_fallback_or_rebuild_count": 0,
+        "document_sequence_full_copies": 0,
+        "document_sequence_full_scans": 0,
+        "document_sequence_maximum_depth": 2,
+        "document_sequence_nodes_allocated": 2,
+        "document_sequence_rank_order_comparisons": 3,
+        "document_sequence_tree_rebalances": 1,
+        "fallback_rebuild_count": 0,
+        "full_render_model_scans": 0,
+        "gpu_encode_attempted": 2,
+        "gpu_encode_omitted": 0,
+        "indexed_nodes": 6,
+        "instance_upload_bytes": 224,
+        "invalid_derived_nodes": 0,
+        "order_nodes_visited": 5,
+        "render_items_cloned": 0,
+        "render_items_planned": 2,
+        "render_items_read": 2,
+        "render_items_written": 2,
+        "scene_nodes_visited": 3,
+        "scene_sequence_allocated_bytes": 128,
+        "scene_sequence_dense_index_rewrites": 0,
+        "scene_sequence_entries_copied": 1,
+        "scene_sequence_entries_examined": 5,
+        "scene_sequence_entries_moved_or_shifted": 6,
+        "scene_sequence_fallback_or_rebuild_count": 0,
+        "scene_sequence_full_copies": 0,
+        "scene_sequence_full_scans": 0,
+        "scene_sequence_maximum_depth": 2,
+        "scene_sequence_nodes_allocated": 2,
+        "scene_sequence_rank_order_comparisons": 2,
+        "scene_sequence_tree_rebalances": 1,
+        "sibling_search_steps": 0,
+        "ui_child_ids_serialized": 1,
+        "ui_delta_nodes": 2,
+        "ui_full_snapshots": 0,
+        "ui_nodes_serialized": 2,
+        "ui_projection_payload_bytes": 1271,
+        "ui_structural_operations": 1,
+        "visible_items": 2,
+        "visible_slot_upload_bytes": 8
+      },
+      "ok": true,
+      "projection": {
+        "full": false,
+        "removed": [],
+        "schema_version": 2,
+        "structural_ops": [
+          {
+            "index": 2,
+            "kind": "attach",
+            "node_id": "30000000-0000-0000-0000-000000000003",
+            "parent_id": "00000000-0000-0000-0000-000000000001"
+          }
+        ],
+        "upserts": [
+          {
+            "appearance": {
+              "corner_radii": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "fill": [
+                0.2,
+                0.58,
+                0.96,
+                1
+              ],
+              "stroke": {
+                "color": [
+                  0.08,
+                  0.11,
+                  0.16,
+                  1
+                ],
+                "width": 0
+              }
+            },
+            "children": [],
+            "geometry": {
+              "height": 80,
+              "width": 160
+            },
+            "id": "24a2ad80-7bf2-4cc3-9099-c2af1215a63d",
+            "kind": "ellipse",
+            "local_transform": [
+              1,
+              0,
+              0,
+              1,
+              120,
+              120
+            ],
+            "locked": false,
+            "name": "Second slide object",
+            "opacity": 1,
+            "parent_id": "30000000-0000-0000-0000-000000000003",
+            "visible": true,
+            "world_bounds": {
+              "max": [
+                280,
+                200
+              ],
+              "min": [
+                120,
+                120
+              ]
+            },
+            "world_transform": [
+              1,
+              0,
+              0,
+              1,
+              120,
+              120
+            ]
+          },
+          {
+            "appearance": {
+              "corner_radii": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "fill": [
+                0.2,
+                0.58,
+                0.96,
+                1
+              ],
+              "stroke": {
+                "color": [
+                  0.08,
+                  0.11,
+                  0.16,
+                  1
+                ],
+                "width": 0
+              }
+            },
+            "children": [
+              "24a2ad80-7bf2-4cc3-9099-c2af1215a63d"
+            ],
+            "geometry": {
+              "height": 1080,
+              "width": 1920
+            },
+            "id": "30000000-0000-0000-0000-000000000003",
+            "kind": "frame",
+            "local_transform": [
+              1,
+              0,
+              0,
+              1,
+              0,
+              0
+            ],
+            "locked": false,
+            "name": "Slide 2 Copy",
+            "opacity": 1,
+            "parent_id": "00000000-0000-0000-0000-000000000001",
+            "visible": true,
+            "world_bounds": {
+              "max": [
+                1920,
+                1080
+              ],
+              "min": [
+                0,
+                0
+              ]
+            },
+            "world_transform": [
+              1,
+              0,
+              0,
+              1,
+              0,
+              0
+            ]
+          }
+        ]
+      },
+      "protocol_version": 1,
+      "render_binary_schema_version": 2,
+      "render_delta": {
+        "dirty_ranges": 1,
+        "dirty_slots": 2,
+        "full": false,
+        "removed_slots": 0,
+        "render_full_rebuilds": 0,
+        "scene_full_rebuilds": 0,
+        "upload_bytes": 232
+      },
+      "render_encoding": {
+        "diagnostics": [],
+        "gpu_omitted_items": 0
+      },
+      "request_id": "slide-1787219019001-22",
+      "resources": {
+        "allocated_slots": 6,
+        "dirty_record_stride_bytes": 116,
+        "free_slots": 0,
+        "gpu_encodable_items": 6,
+        "gpu_omitted_items": 0,
+        "instance_capacity": 6,
+        "instance_stride_bytes": 112,
+        "renderable_items": 6,
+        "total_render_items": 6
+      },
+      "result": {
+        "changed": true
+      },
+      "revisions": {
+        "document": 5,
+        "render": 5,
+        "scene": 5
+      },
+      "runtime_owner": "dedicated-worker",
+      "selection": {
+        "ordered": [],
+        "primary": null
+      },
+      "type": "engine_response"
+    },
+    "reordered": {
+      "binary": {
+        "dirty_instances": false,
+        "full_instances": false,
+        "removed_slots": false,
+        "visible_slots": true
+      },
+      "camera": {
+        "center": [
+          960,
+          540
+        ],
+        "dpr": 1,
+        "viewport": [
+          894,
+          582
+        ],
+        "zoom": 0.415625
+      },
+      "culling": {
+        "culled": 4,
+        "spatial_candidates": 5,
+        "submitted_instances": 2,
+        "total": 6,
+        "visible": 2
+      },
+      "editor_session": {
+        "active_slide_id": "30000000-0000-0000-0000-000000000003",
+        "preserved_root_items": [],
+        "slides": [
+          {
+            "active": true,
+            "aspect_ratio": 1.7777777777777777,
+            "child_count": 1,
+            "height": 1080,
+            "id": "30000000-0000-0000-0000-000000000003",
+            "index": 0,
+            "name": "Opening copy",
+            "thumbnail_revision": 7,
+            "width": 1920
+          },
+          {
+            "active": false,
+            "aspect_ratio": 1.7777777777777777,
+            "child_count": 1,
+            "height": 1080,
+            "id": "00000000-0000-0000-0000-000000000002",
+            "index": 1,
+            "name": "Frame 1920×1080",
+            "thumbnail_revision": 2,
+            "width": 1920
+          },
+          {
+            "active": false,
+            "aspect_ratio": 1.7777777777777777,
+            "child_count": 1,
+            "height": 1080,
+            "id": "82f54793-2183-4c7c-9204-59fec3a5e58c",
+            "index": 2,
+            "name": "Slide 2",
+            "thumbnail_revision": 4,
+            "width": 1920
+          }
+        ]
+      },
+      "engine_sequence": 26,
+      "error": null,
+      "fixture": "EDITOR",
+      "history": {
+        "redo_depth": 0,
+        "transaction_active": false,
+        "undo_depth": 6
+      },
+      "metrics": {
+        "allocation_growth_count": 0,
+        "cpu_update_ms": 1,
+        "culling_candidates": 5,
+        "document_full_clones": 0,
+        "document_nodes": 7,
+        "document_nodes_scanned": 2,
+        "document_nodes_touched": 1,
+        "document_sequence_allocated_bytes": 0,
+        "document_sequence_dense_index_rewrites": 0,
+        "document_sequence_entries_copied": 0,
+        "document_sequence_entries_examined": 11,
+        "document_sequence_entries_moved_or_shifted": 7,
+        "document_sequence_fallback_or_rebuild_count": 0,
+        "document_sequence_full_copies": 0,
+        "document_sequence_full_scans": 0,
+        "document_sequence_maximum_depth": 2,
+        "document_sequence_nodes_allocated": 0,
+        "document_sequence_rank_order_comparisons": 6,
+        "document_sequence_tree_rebalances": 1,
+        "fallback_rebuild_count": 0,
+        "full_render_model_scans": 0,
+        "gpu_encode_attempted": 0,
+        "gpu_encode_omitted": 0,
+        "indexed_nodes": 6,
+        "instance_upload_bytes": 0,
+        "invalid_derived_nodes": 0,
+        "order_nodes_visited": 5,
+        "render_items_cloned": 0,
+        "render_items_planned": 2,
+        "render_items_read": 4,
+        "render_items_written": 0,
+        "scene_nodes_visited": 2,
+        "scene_sequence_allocated_bytes": 0,
+        "scene_sequence_dense_index_rewrites": 0,
+        "scene_sequence_entries_copied": 0,
+        "scene_sequence_entries_examined": 7,
+        "scene_sequence_entries_moved_or_shifted": 7,
+        "scene_sequence_fallback_or_rebuild_count": 0,
+        "scene_sequence_full_copies": 0,
+        "scene_sequence_full_scans": 0,
+        "scene_sequence_maximum_depth": 2,
+        "scene_sequence_nodes_allocated": 0,
+        "scene_sequence_rank_order_comparisons": 3,
+        "scene_sequence_tree_rebalances": 1,
+        "sibling_search_steps": 0,
+        "ui_child_ids_serialized": 1,
+        "ui_delta_nodes": 1,
+        "ui_full_snapshots": 0,
+        "ui_nodes_serialized": 1,
+        "ui_projection_payload_bytes": 822,
+        "ui_structural_operations": 1,
+        "visible_items": 2,
+        "visible_slot_upload_bytes": 8
+      },
+      "ok": true,
+      "projection": {
+        "full": false,
+        "removed": [],
+        "schema_version": 2,
+        "structural_ops": [
+          {
+            "before_index": 2,
+            "before_parent_id": "00000000-0000-0000-0000-000000000001",
+            "index": 0,
+            "kind": "move",
+            "node_id": "30000000-0000-0000-0000-000000000003",
+            "parent_id": "00000000-0000-0000-0000-000000000001"
+          }
+        ],
+        "upserts": [
+          {
+            "appearance": {
+              "corner_radii": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "fill": [
+                0.2,
+                0.58,
+                0.96,
+                1
+              ],
+              "stroke": {
+                "color": [
+                  0.08,
+                  0.11,
+                  0.16,
+                  1
+                ],
+                "width": 0
+              }
+            },
+            "children": [
+              "24a2ad80-7bf2-4cc3-9099-c2af1215a63d"
+            ],
+            "geometry": {
+              "height": 1080,
+              "width": 1920
+            },
+            "id": "30000000-0000-0000-0000-000000000003",
+            "kind": "frame",
+            "local_transform": [
+              1,
+              0,
+              0,
+              1,
+              0,
+              0
+            ],
+            "locked": false,
+            "name": "Opening copy",
+            "opacity": 1,
+            "parent_id": "00000000-0000-0000-0000-000000000001",
+            "visible": true,
+            "world_bounds": {
+              "max": [
+                1920,
+                1080
+              ],
+              "min": [
+                0,
+                0
+              ]
+            },
+            "world_transform": [
+              1,
+              0,
+              0,
+              1,
+              0,
+              0
+            ]
+          }
+        ]
+      },
+      "protocol_version": 1,
+      "render_binary_schema_version": 2,
+      "render_delta": {
+        "dirty_ranges": 0,
+        "dirty_slots": 0,
+        "full": false,
+        "removed_slots": 0,
+        "render_full_rebuilds": 0,
+        "scene_full_rebuilds": 0,
+        "upload_bytes": 0
+      },
+      "render_encoding": {
+        "diagnostics": [],
+        "gpu_omitted_items": 0
+      },
+      "request_id": "slide-1787219019021-24",
+      "resources": {
+        "allocated_slots": 6,
+        "dirty_record_stride_bytes": 116,
+        "free_slots": 0,
+        "gpu_encodable_items": 6,
+        "gpu_omitted_items": 0,
+        "instance_capacity": 6,
+        "instance_stride_bytes": 112,
+        "renderable_items": 6,
+        "total_render_items": 6
+      },
+      "result": {
+        "changed": true
+      },
+      "revisions": {
+        "document": 7,
+        "render": 7,
+        "scene": 7
+      },
+      "runtime_owner": "dedicated-worker",
+      "selection": {
+        "ordered": [],
+        "primary": null
+      },
+      "type": "engine_response"
+    },
+    "deleted": {
+      "binary": {
+        "dirty_instances": false,
+        "full_instances": false,
+        "removed_slots": true,
+        "visible_slots": true
+      },
+      "camera": {
+        "center": [
+          -84.95823095823096,
+          56.63882063882063
+        ],
+        "dpr": 1,
+        "viewport": [
+          894,
+          582
+        ],
+        "zoom": 0.4237376366475794
+      },
+      "culling": {
+        "culled": 2,
+        "spatial_candidates": 4,
+        "submitted_instances": 2,
+        "total": 4,
+        "visible": 2
+      },
+      "editor_session": {
+        "active_slide_id": "00000000-0000-0000-0000-000000000002",
+        "preserved_root_items": [],
+        "slides": [
+          {
+            "active": true,
+            "aspect_ratio": 1.7777777777777777,
+            "child_count": 1,
+            "height": 1080,
+            "id": "00000000-0000-0000-0000-000000000002",
+            "index": 0,
+            "name": "Frame 1920×1080",
+            "thumbnail_revision": 2,
+            "width": 1920
+          },
+          {
+            "active": false,
+            "aspect_ratio": 1.7777777777777777,
+            "child_count": 1,
+            "height": 1080,
+            "id": "82f54793-2183-4c7c-9204-59fec3a5e58c",
+            "index": 1,
+            "name": "Slide 2",
+            "thumbnail_revision": 4,
+            "width": 1920
+          }
+        ]
+      },
+      "engine_sequence": 29,
+      "error": null,
+      "fixture": "EDITOR",
+      "history": {
+        "redo_depth": 0,
+        "transaction_active": false,
+        "undo_depth": 7
+      },
+      "metrics": {
+        "allocation_growth_count": 0,
+        "cpu_update_ms": 1,
+        "culling_candidates": 4,
+        "document_full_clones": 0,
+        "document_nodes": 5,
+        "document_nodes_scanned": 0,
+        "document_nodes_touched": 2,
+        "document_sequence_allocated_bytes": 0,
+        "document_sequence_dense_index_rewrites": 0,
+        "document_sequence_entries_copied": 0,
+        "document_sequence_entries_examined": 7,
+        "document_sequence_entries_moved_or_shifted": 2,
+        "document_sequence_fallback_or_rebuild_count": 0,
+        "document_sequence_full_copies": 0,
+        "document_sequence_full_scans": 0,
+        "document_sequence_maximum_depth": 2,
+        "document_sequence_nodes_allocated": 0,
+        "document_sequence_rank_order_comparisons": 4,
+        "document_sequence_tree_rebalances": 0,
+        "fallback_rebuild_count": 0,
+        "full_render_model_scans": 0,
+        "gpu_encode_attempted": 0,
+        "gpu_encode_omitted": 0,
+        "indexed_nodes": 4,
+        "instance_upload_bytes": 0,
+        "invalid_derived_nodes": 0,
+        "order_nodes_visited": 5,
+        "render_items_cloned": 0,
+        "render_items_planned": 0,
+        "render_items_read": 4,
+        "render_items_written": 2,
+        "scene_nodes_visited": 3,
+        "scene_sequence_allocated_bytes": 0,
+        "scene_sequence_dense_index_rewrites": 0,
+        "scene_sequence_entries_copied": 0,
+        "scene_sequence_entries_examined": 3,
+        "scene_sequence_entries_moved_or_shifted": 2,
+        "scene_sequence_fallback_or_rebuild_count": 0,
+        "scene_sequence_full_copies": 0,
+        "scene_sequence_full_scans": 0,
+        "scene_sequence_maximum_depth": 2,
+        "scene_sequence_nodes_allocated": 0,
+        "scene_sequence_rank_order_comparisons": 1,
+        "scene_sequence_tree_rebalances": 0,
+        "sibling_search_steps": 0,
+        "ui_child_ids_serialized": 0,
+        "ui_delta_nodes": 0,
+        "ui_full_snapshots": 0,
+        "ui_nodes_serialized": 0,
+        "ui_projection_payload_bytes": 283,
+        "ui_structural_operations": 1,
+        "visible_items": 2,
+        "visible_slot_upload_bytes": 8
+      },
+      "ok": true,
+      "projection": {
+        "full": false,
+        "removed": [
+          "24a2ad80-7bf2-4cc3-9099-c2af1215a63d",
+          "30000000-0000-0000-0000-000000000003"
+        ],
+        "schema_version": 2,
+        "structural_ops": [
+          {
+            "index": 0,
+            "kind": "detach",
+            "node_id": "30000000-0000-0000-0000-000000000003",
+            "parent_id": "00000000-0000-0000-0000-000000000001"
+          }
+        ],
+        "upserts": []
+      },
+      "protocol_version": 1,
+      "render_binary_schema_version": 2,
+      "render_delta": {
+        "dirty_ranges": 0,
+        "dirty_slots": 0,
+        "full": false,
+        "removed_slots": 2,
+        "render_full_rebuilds": 0,
+        "scene_full_rebuilds": 0,
+        "upload_bytes": 0
+      },
+      "render_encoding": {
+        "diagnostics": [],
+        "gpu_omitted_items": 0
+      },
+      "request_id": "slide-1787219019047-27",
+      "resources": {
+        "allocated_slots": 6,
+        "dirty_record_stride_bytes": 116,
+        "free_slots": 2,
+        "gpu_encodable_items": 4,
+        "gpu_omitted_items": 0,
+        "instance_capacity": 6,
+        "instance_stride_bytes": 112,
+        "renderable_items": 4,
+        "total_render_items": 4
+      },
+      "result": {
+        "changed": true
+      },
+      "revisions": {
+        "document": 8,
+        "render": 8,
+        "scene": 8
+      },
+      "runtime_owner": "dedicated-worker",
+      "selection": {
+        "ordered": [
+          "30000000-0000-0000-0000-000000000001"
+        ],
+        "primary": "30000000-0000-0000-0000-000000000001"
+      },
+      "type": "engine_response"
+    },
+    "undone": {
+      "binary": {
+        "dirty_instances": true,
+        "full_instances": false,
+        "removed_slots": false,
+        "visible_slots": true
+      },
+      "camera": {
+        "center": [
+          -84.95823095823096,
+          56.63882063882063
+        ],
+        "dpr": 1,
+        "viewport": [
+          894,
+          582
+        ],
+        "zoom": 0.4237376366475794
+      },
+      "culling": {
+        "culled": 4,
+        "spatial_candidates": 6,
+        "submitted_instances": 2,
+        "total": 6,
+        "visible": 2
+      },
+      "editor_session": {
+        "active_slide_id": "00000000-0000-0000-0000-000000000002",
+        "preserved_root_items": [],
+        "slides": [
+          {
+            "active": false,
+            "aspect_ratio": 1.7777777777777777,
+            "child_count": 1,
+            "height": 1080,
+            "id": "30000000-0000-0000-0000-000000000003",
+            "index": 0,
+            "name": "Opening copy",
+            "thumbnail_revision": 9,
+            "width": 1920
+          },
+          {
+            "active": true,
+            "aspect_ratio": 1.7777777777777777,
+            "child_count": 1,
+            "height": 1080,
+            "id": "00000000-0000-0000-0000-000000000002",
+            "index": 1,
+            "name": "Frame 1920×1080",
+            "thumbnail_revision": 2,
+            "width": 1920
+          },
+          {
+            "active": false,
+            "aspect_ratio": 1.7777777777777777,
+            "child_count": 1,
+            "height": 1080,
+            "id": "82f54793-2183-4c7c-9204-59fec3a5e58c",
+            "index": 2,
+            "name": "Slide 2",
+            "thumbnail_revision": 4,
+            "width": 1920
+          }
+        ]
+      },
+      "engine_sequence": 30,
+      "error": null,
+      "fixture": "EDITOR",
+      "history": {
+        "redo_depth": 1,
+        "transaction_active": false,
+        "undo_depth": 6
+      },
+      "metrics": {
+        "allocation_growth_count": 0,
+        "cpu_update_ms": 1,
+        "culling_candidates": 6,
+        "document_full_clones": 0,
+        "document_nodes": 7,
+        "document_nodes_scanned": 2,
+        "document_nodes_touched": 0,
+        "document_sequence_allocated_bytes": 64,
+        "document_sequence_dense_index_rewrites": 0,
+        "document_sequence_entries_copied": 1,
+        "document_sequence_entries_examined": 3,
+        "document_sequence_entries_moved_or_shifted": 3,
+        "document_sequence_fallback_or_rebuild_count": 0,
+        "document_sequence_full_copies": 0,
+        "document_sequence_full_scans": 0,
+        "document_sequence_maximum_depth": 2,
+        "document_sequence_nodes_allocated": 1,
+        "document_sequence_rank_order_comparisons": 1,
+        "document_sequence_tree_rebalances": 0,
+        "fallback_rebuild_count": 0,
+        "full_render_model_scans": 0,
+        "gpu_encode_attempted": 2,
+        "gpu_encode_omitted": 0,
+        "indexed_nodes": 6,
+        "instance_upload_bytes": 224,
+        "invalid_derived_nodes": 0,
+        "order_nodes_visited": 5,
+        "render_items_cloned": 0,
+        "render_items_planned": 2,
+        "render_items_read": 2,
+        "render_items_written": 2,
+        "scene_nodes_visited": 3,
+        "scene_sequence_allocated_bytes": 64,
+        "scene_sequence_dense_index_rewrites": 0,
+        "scene_sequence_entries_copied": 1,
+        "scene_sequence_entries_examined": 3,
+        "scene_sequence_entries_moved_or_shifted": 3,
+        "scene_sequence_fallback_or_rebuild_count": 0,
+        "scene_sequence_full_copies": 0,
+        "scene_sequence_full_scans": 0,
+        "scene_sequence_maximum_depth": 2,
+        "scene_sequence_nodes_allocated": 1,
+        "scene_sequence_rank_order_comparisons": 1,
+        "scene_sequence_tree_rebalances": 0,
+        "sibling_search_steps": 0,
+        "ui_child_ids_serialized": 1,
+        "ui_delta_nodes": 2,
+        "ui_full_snapshots": 0,
+        "ui_nodes_serialized": 2,
+        "ui_projection_payload_bytes": 1271,
+        "ui_structural_operations": 1,
+        "visible_items": 2,
+        "visible_slot_upload_bytes": 8
+      },
+      "ok": true,
+      "projection": {
+        "full": false,
+        "removed": [],
+        "schema_version": 2,
+        "structural_ops": [
+          {
+            "index": 0,
+            "kind": "attach",
+            "node_id": "30000000-0000-0000-0000-000000000003",
+            "parent_id": "00000000-0000-0000-0000-000000000001"
+          }
+        ],
+        "upserts": [
+          {
+            "appearance": {
+              "corner_radii": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "fill": [
+                0.2,
+                0.58,
+                0.96,
+                1
+              ],
+              "stroke": {
+                "color": [
+                  0.08,
+                  0.11,
+                  0.16,
+                  1
+                ],
+                "width": 0
+              }
+            },
+            "children": [],
+            "geometry": {
+              "height": 80,
+              "width": 160
+            },
+            "id": "24a2ad80-7bf2-4cc3-9099-c2af1215a63d",
+            "kind": "ellipse",
+            "local_transform": [
+              1,
+              0,
+              0,
+              1,
+              120,
+              120
+            ],
+            "locked": false,
+            "name": "Second slide object",
+            "opacity": 1,
+            "parent_id": "30000000-0000-0000-0000-000000000003",
+            "visible": true,
+            "world_bounds": {
+              "max": [
+                280,
+                200
+              ],
+              "min": [
+                120,
+                120
+              ]
+            },
+            "world_transform": [
+              1,
+              0,
+              0,
+              1,
+              120,
+              120
+            ]
+          },
+          {
+            "appearance": {
+              "corner_radii": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "fill": [
+                0.2,
+                0.58,
+                0.96,
+                1
+              ],
+              "stroke": {
+                "color": [
+                  0.08,
+                  0.11,
+                  0.16,
+                  1
+                ],
+                "width": 0
+              }
+            },
+            "children": [
+              "24a2ad80-7bf2-4cc3-9099-c2af1215a63d"
+            ],
+            "geometry": {
+              "height": 1080,
+              "width": 1920
+            },
+            "id": "30000000-0000-0000-0000-000000000003",
+            "kind": "frame",
+            "local_transform": [
+              1,
+              0,
+              0,
+              1,
+              0,
+              0
+            ],
+            "locked": false,
+            "name": "Opening copy",
+            "opacity": 1,
+            "parent_id": "00000000-0000-0000-0000-000000000001",
+            "visible": true,
+            "world_bounds": {
+              "max": [
+                1920,
+                1080
+              ],
+              "min": [
+                0,
+                0
+              ]
+            },
+            "world_transform": [
+              1,
+              0,
+              0,
+              1,
+              0,
+              0
+            ]
+          }
+        ]
+      },
+      "protocol_version": 1,
+      "render_binary_schema_version": 2,
+      "render_delta": {
+        "dirty_ranges": 1,
+        "dirty_slots": 2,
+        "full": false,
+        "removed_slots": 0,
+        "render_full_rebuilds": 0,
+        "scene_full_rebuilds": 0,
+        "upload_bytes": 232
+      },
+      "render_encoding": {
+        "diagnostics": [],
+        "gpu_omitted_items": 0
+      },
+      "request_id": "undo-1787219019055-28",
+      "resources": {
+        "allocated_slots": 6,
+        "dirty_record_stride_bytes": 116,
+        "free_slots": 0,
+        "gpu_encodable_items": 6,
+        "gpu_omitted_items": 0,
+        "instance_capacity": 6,
+        "instance_stride_bytes": 112,
+        "renderable_items": 6,
+        "total_render_items": 6
+      },
+      "result": {
+        "changed": true
+      },
+      "revisions": {
+        "document": 9,
+        "render": 9,
+        "scene": 9
+      },
+      "runtime_owner": "dedicated-worker",
+      "selection": {
+        "ordered": [
+          "30000000-0000-0000-0000-000000000001"
+        ],
+        "primary": "30000000-0000-0000-0000-000000000001"
+      },
+      "type": "engine_response"
+    },
+    "redone": {
+      "binary": {
+        "dirty_instances": false,
+        "full_instances": false,
+        "removed_slots": true,
+        "visible_slots": true
+      },
+      "camera": {
+        "center": [
+          -84.95823095823096,
+          56.63882063882063
+        ],
+        "dpr": 1,
+        "viewport": [
+          894,
+          582
+        ],
+        "zoom": 0.4237376366475794
+      },
+      "culling": {
+        "culled": 2,
+        "spatial_candidates": 4,
+        "submitted_instances": 2,
+        "total": 4,
+        "visible": 2
+      },
+      "editor_session": {
+        "active_slide_id": "00000000-0000-0000-0000-000000000002",
+        "preserved_root_items": [],
+        "slides": [
+          {
+            "active": true,
+            "aspect_ratio": 1.7777777777777777,
+            "child_count": 1,
+            "height": 1080,
+            "id": "00000000-0000-0000-0000-000000000002",
+            "index": 0,
+            "name": "Frame 1920×1080",
+            "thumbnail_revision": 2,
+            "width": 1920
+          },
+          {
+            "active": false,
+            "aspect_ratio": 1.7777777777777777,
+            "child_count": 1,
+            "height": 1080,
+            "id": "82f54793-2183-4c7c-9204-59fec3a5e58c",
+            "index": 1,
+            "name": "Slide 2",
+            "thumbnail_revision": 4,
+            "width": 1920
+          }
+        ]
+      },
+      "engine_sequence": 31,
+      "error": null,
+      "fixture": "EDITOR",
+      "history": {
+        "redo_depth": 0,
+        "transaction_active": false,
+        "undo_depth": 7
+      },
+      "metrics": {
+        "allocation_growth_count": 0,
+        "cpu_update_ms": 0,
+        "culling_candidates": 4,
+        "document_full_clones": 0,
+        "document_nodes": 5,
+        "document_nodes_scanned": 0,
+        "document_nodes_touched": 0,
+        "document_sequence_allocated_bytes": 0,
+        "document_sequence_dense_index_rewrites": 0,
+        "document_sequence_entries_copied": 0,
+        "document_sequence_entries_examined": 5,
+        "document_sequence_entries_moved_or_shifted": 2,
+        "document_sequence_fallback_or_rebuild_count": 0,
+        "document_sequence_full_copies": 0,
+        "document_sequence_full_scans": 0,
+        "document_sequence_maximum_depth": 2,
+        "document_sequence_nodes_allocated": 0,
+        "document_sequence_rank_order_comparisons": 3,
+        "document_sequence_tree_rebalances": 0,
+        "fallback_rebuild_count": 0,
+        "full_render_model_scans": 0,
+        "gpu_encode_attempted": 0,
+        "gpu_encode_omitted": 0,
+        "indexed_nodes": 4,
+        "instance_upload_bytes": 0,
+        "invalid_derived_nodes": 0,
+        "order_nodes_visited": 5,
+        "render_items_cloned": 0,
+        "render_items_planned": 0,
+        "render_items_read": 4,
+        "render_items_written": 2,
+        "scene_nodes_visited": 3,
+        "scene_sequence_allocated_bytes": 0,
+        "scene_sequence_dense_index_rewrites": 0,
+        "scene_sequence_entries_copied": 0,
+        "scene_sequence_entries_examined": 3,
+        "scene_sequence_entries_moved_or_shifted": 2,
+        "scene_sequence_fallback_or_rebuild_count": 0,
+        "scene_sequence_full_copies": 0,
+        "scene_sequence_full_scans": 0,
+        "scene_sequence_maximum_depth": 2,
+        "scene_sequence_nodes_allocated": 0,
+        "scene_sequence_rank_order_comparisons": 1,
+        "scene_sequence_tree_rebalances": 0,
+        "sibling_search_steps": 0,
+        "ui_child_ids_serialized": 0,
+        "ui_delta_nodes": 0,
+        "ui_full_snapshots": 0,
+        "ui_nodes_serialized": 0,
+        "ui_projection_payload_bytes": 283,
+        "ui_structural_operations": 1,
+        "visible_items": 2,
+        "visible_slot_upload_bytes": 8
+      },
+      "ok": true,
+      "projection": {
+        "full": false,
+        "removed": [
+          "24a2ad80-7bf2-4cc3-9099-c2af1215a63d",
+          "30000000-0000-0000-0000-000000000003"
+        ],
+        "schema_version": 2,
+        "structural_ops": [
+          {
+            "index": 0,
+            "kind": "detach",
+            "node_id": "30000000-0000-0000-0000-000000000003",
+            "parent_id": "00000000-0000-0000-0000-000000000001"
+          }
+        ],
+        "upserts": []
+      },
+      "protocol_version": 1,
+      "render_binary_schema_version": 2,
+      "render_delta": {
+        "dirty_ranges": 0,
+        "dirty_slots": 0,
+        "full": false,
+        "removed_slots": 2,
+        "render_full_rebuilds": 0,
+        "scene_full_rebuilds": 0,
+        "upload_bytes": 0
+      },
+      "render_encoding": {
+        "diagnostics": [],
+        "gpu_omitted_items": 0
+      },
+      "request_id": "redo-1787219019060-29",
+      "resources": {
+        "allocated_slots": 6,
+        "dirty_record_stride_bytes": 116,
+        "free_slots": 2,
+        "gpu_encodable_items": 4,
+        "gpu_omitted_items": 0,
+        "instance_capacity": 6,
+        "instance_stride_bytes": 112,
+        "renderable_items": 4,
+        "total_render_items": 4
+      },
+      "result": {
+        "changed": true
+      },
+      "revisions": {
+        "document": 10,
+        "render": 10,
+        "scene": 10
+      },
+      "runtime_owner": "dedicated-worker",
+      "selection": {
+        "ordered": [
+          "30000000-0000-0000-0000-000000000001"
+        ],
+        "primary": "30000000-0000-0000-0000-000000000001"
+      },
+      "type": "engine_response"
+    },
+    "restored": {
+      "binary": {
+        "dirty_instances": false,
+        "full_instances": true,
+        "removed_slots": false,
+        "visible_slots": true
+      },
+      "camera": {
+        "center": [
+          -84.95823095823096,
+          56.63882063882063
+        ],
+        "dpr": 1,
+        "viewport": [
+          894,
+          582
+        ],
+        "zoom": 0.4237376366475794
+      },
+      "culling": {
+        "culled": 4,
+        "spatial_candidates": 6,
+        "submitted_instances": 2,
+        "total": 6,
+        "visible": 2
+      },
+      "editor_session": {
+        "active_slide_id": "30000000-0000-0000-0000-000000000003",
+        "preserved_root_items": [],
+        "slides": [
+          {
+            "active": true,
+            "aspect_ratio": 1.7777777777777777,
+            "child_count": 1,
+            "height": 1080,
+            "id": "30000000-0000-0000-0000-000000000003",
+            "index": 0,
+            "name": "Opening copy",
+            "thumbnail_revision": 0,
+            "width": 1920
+          },
+          {
+            "active": false,
+            "aspect_ratio": 1.7777777777777777,
+            "child_count": 1,
+            "height": 1080,
+            "id": "00000000-0000-0000-0000-000000000002",
+            "index": 1,
+            "name": "Frame 1920×1080",
+            "thumbnail_revision": 0,
+            "width": 1920
+          },
+          {
+            "active": false,
+            "aspect_ratio": 1.7777777777777777,
+            "child_count": 1,
+            "height": 1080,
+            "id": "82f54793-2183-4c7c-9204-59fec3a5e58c",
+            "index": 2,
+            "name": "Slide 2",
+            "thumbnail_revision": 0,
+            "width": 1920
+          }
+        ]
+      },
+      "engine_sequence": 33,
+      "error": null,
+      "fixture": "EDITOR",
+      "history": {
+        "redo_depth": 0,
+        "transaction_active": false,
+        "undo_depth": 0
+      },
+      "metrics": {
+        "allocation_growth_count": 2,
+        "cpu_update_ms": 4,
+        "culling_candidates": 6,
+        "document_full_clones": 0,
+        "document_nodes": 7,
+        "document_nodes_scanned": 7,
+        "document_nodes_touched": 0,
+        "document_sequence_allocated_bytes": 384,
+        "document_sequence_dense_index_rewrites": 0,
+        "document_sequence_entries_copied": 6,
+        "document_sequence_entries_examined": 6,
+        "document_sequence_entries_moved_or_shifted": 6,
+        "document_sequence_fallback_or_rebuild_count": 0,
+        "document_sequence_full_copies": 0,
+        "document_sequence_full_scans": 0,
+        "document_sequence_maximum_depth": 2,
+        "document_sequence_nodes_allocated": 6,
+        "document_sequence_rank_order_comparisons": 0,
+        "document_sequence_tree_rebalances": 0,
+        "fallback_rebuild_count": 0,
+        "full_render_model_scans": 2,
+        "gpu_encode_attempted": 6,
+        "gpu_encode_omitted": 0,
+        "indexed_nodes": 6,
+        "instance_upload_bytes": 672,
+        "invalid_derived_nodes": 0,
+        "order_nodes_visited": 5,
+        "render_items_cloned": 0,
+        "render_items_planned": 7,
+        "render_items_read": 2,
+        "render_items_written": 6,
+        "scene_nodes_visited": 7,
+        "scene_sequence_allocated_bytes": 384,
+        "scene_sequence_dense_index_rewrites": 0,
+        "scene_sequence_entries_copied": 6,
+        "scene_sequence_entries_examined": 6,
+        "scene_sequence_entries_moved_or_shifted": 6,
+        "scene_sequence_fallback_or_rebuild_count": 0,
+        "scene_sequence_full_copies": 0,
+        "scene_sequence_full_scans": 0,
+        "scene_sequence_maximum_depth": 2,
+        "scene_sequence_nodes_allocated": 6,
+        "scene_sequence_rank_order_comparisons": 0,
+        "scene_sequence_tree_rebalances": 0,
+        "sibling_search_steps": 0,
+        "ui_child_ids_serialized": 6,
+        "ui_delta_nodes": 0,
+        "ui_full_snapshots": 1,
+        "ui_nodes_serialized": 7,
+        "ui_projection_payload_bytes": 3823,
+        "ui_structural_operations": 0,
+        "visible_items": 2,
+        "visible_slot_upload_bytes": 8
+      },
+      "ok": true,
+      "projection": {
+        "full": true,
+        "removed": [],
+        "schema_version": 2,
+        "structural_ops": [],
+        "upserts": [
+          {
+            "appearance": {
+              "corner_radii": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "fill": [
+                0.2,
+                0.58,
+                0.96,
+                1
+              ],
+              "stroke": {
+                "color": [
+                  0.08,
+                  0.11,
+                  0.16,
+                  1
+                ],
+                "width": 0
+              }
+            },
+            "children": [
+              "30000000-0000-0000-0000-000000000003",
+              "00000000-0000-0000-0000-000000000002",
+              "82f54793-2183-4c7c-9204-59fec3a5e58c"
+            ],
+            "geometry": null,
+            "id": "00000000-0000-0000-0000-000000000001",
+            "kind": "document",
+            "local_transform": [
+              1,
+              0,
+              0,
+              1,
+              0,
+              0
+            ],
+            "locked": false,
+            "name": "EditorM",
+            "opacity": 1,
+            "parent_id": null,
+            "visible": true,
+            "world_bounds": null,
+            "world_transform": [
+              1,
+              0,
+              0,
+              1,
+              0,
+              0
+            ]
+          },
+          {
+            "appearance": {
+              "corner_radii": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "fill": [
+                0.2,
+                0.58,
+                0.96,
+                1
+              ],
+              "stroke": {
+                "color": [
+                  0.08,
+                  0.11,
+                  0.16,
+                  1
+                ],
+                "width": 0
+              }
+            },
+            "children": [
+              "24a2ad80-7bf2-4cc3-9099-c2af1215a63d"
+            ],
+            "geometry": {
+              "height": 1080,
+              "width": 1920
+            },
+            "id": "30000000-0000-0000-0000-000000000003",
+            "kind": "frame",
+            "local_transform": [
+              1,
+              0,
+              0,
+              1,
+              0,
+              0
+            ],
+            "locked": false,
+            "name": "Opening copy",
+            "opacity": 1,
+            "parent_id": "00000000-0000-0000-0000-000000000001",
+            "visible": true,
+            "world_bounds": {
+              "max": [
+                1920,
+                1080
+              ],
+              "min": [
+                0,
+                0
+              ]
+            },
+            "world_transform": [
+              1,
+              0,
+              0,
+              1,
+              0,
+              0
+            ]
+          },
+          {
+            "appearance": {
+              "corner_radii": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "fill": [
+                0.2,
+                0.58,
+                0.96,
+                1
+              ],
+              "stroke": {
+                "color": [
+                  0.08,
+                  0.11,
+                  0.16,
+                  1
+                ],
+                "width": 0
+              }
+            },
+            "children": [],
+            "geometry": {
+              "height": 80,
+              "width": 160
+            },
+            "id": "24a2ad80-7bf2-4cc3-9099-c2af1215a63d",
+            "kind": "ellipse",
+            "local_transform": [
+              1,
+              0,
+              0,
+              1,
+              120,
+              120
+            ],
+            "locked": false,
+            "name": "Second slide object",
+            "opacity": 1,
+            "parent_id": "30000000-0000-0000-0000-000000000003",
+            "visible": true,
+            "world_bounds": {
+              "max": [
+                280,
+                200
+              ],
+              "min": [
+                120,
+                120
+              ]
+            },
+            "world_transform": [
+              1,
+              0,
+              0,
+              1,
+              120,
+              120
+            ]
+          },
+          {
+            "appearance": {
+              "corner_radii": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "fill": [
+                0.97,
+                0.975,
+                0.985,
+                1
+              ],
+              "stroke": {
+                "color": [
+                  0.08,
+                  0.11,
+                  0.16,
+                  1
+                ],
+                "width": 1
+              }
+            },
+            "children": [
+              "30000000-0000-0000-0000-000000000001"
+            ],
+            "geometry": {
+              "height": 1080,
+              "width": 1920
+            },
+            "id": "00000000-0000-0000-0000-000000000002",
+            "kind": "frame",
+            "local_transform": [
+              1,
+              0,
+              0,
+              1,
+              -960,
+              -540
+            ],
+            "locked": false,
+            "name": "Frame 1920×1080",
+            "opacity": 1,
+            "parent_id": "00000000-0000-0000-0000-000000000001",
+            "visible": true,
+            "world_bounds": {
+              "max": [
+                960.5,
+                540.5
+              ],
+              "min": [
+                -960.5,
+                -540.5
+              ]
+            },
+            "world_transform": [
+              1,
+              0,
+              0,
+              1,
+              -960,
+              -540
+            ]
+          },
+          {
+            "appearance": {
+              "corner_radii": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "fill": [
+                0.2,
+                0.58,
+                0.96,
+                1
+              ],
+              "stroke": {
+                "color": [
+                  0.08,
+                  0.11,
+                  0.16,
+                  1
+                ],
+                "width": 0
+              }
+            },
+            "children": [],
+            "geometry": {
+              "height": 80,
+              "width": 160
+            },
+            "id": "30000000-0000-0000-0000-000000000001",
+            "kind": "rectangle",
+            "local_transform": [
+              1,
+              0,
+              0,
+              1,
+              120,
+              120
+            ],
+            "locked": false,
+            "name": "First slide object",
+            "opacity": 1,
+            "parent_id": "00000000-0000-0000-0000-000000000002",
+            "visible": true,
+            "world_bounds": {
+              "max": [
+                -680,
+                -340
+              ],
+              "min": [
+                -840,
+                -420
+              ]
+            },
+            "world_transform": [
+              1,
+              0,
+              0,
+              1,
+              -840,
+              -420
+            ]
+          },
+          {
+            "appearance": {
+              "corner_radii": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "fill": [
+                0.2,
+                0.58,
+                0.96,
+                1
+              ],
+              "stroke": {
+                "color": [
+                  0.08,
+                  0.11,
+                  0.16,
+                  1
+                ],
+                "width": 0
+              }
+            },
+            "children": [
+              "30000000-0000-0000-0000-000000000002"
+            ],
+            "geometry": {
+              "height": 1080,
+              "width": 1920
+            },
+            "id": "82f54793-2183-4c7c-9204-59fec3a5e58c",
+            "kind": "frame",
+            "local_transform": [
+              1,
+              0,
+              0,
+              1,
+              0,
+              0
+            ],
+            "locked": false,
+            "name": "Slide 2",
+            "opacity": 1,
+            "parent_id": "00000000-0000-0000-0000-000000000001",
+            "visible": true,
+            "world_bounds": {
+              "max": [
+                1920,
+                1080
+              ],
+              "min": [
+                0,
+                0
+              ]
+            },
+            "world_transform": [
+              1,
+              0,
+              0,
+              1,
+              0,
+              0
+            ]
+          },
+          {
+            "appearance": {
+              "corner_radii": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "fill": [
+                0.2,
+                0.58,
+                0.96,
+                1
+              ],
+              "stroke": {
+                "color": [
+                  0.08,
+                  0.11,
+                  0.16,
+                  1
+                ],
+                "width": 0
+              }
+            },
+            "children": [],
+            "geometry": {
+              "height": 80,
+              "width": 160
+            },
+            "id": "30000000-0000-0000-0000-000000000002",
+            "kind": "ellipse",
+            "local_transform": [
+              1,
+              0,
+              0,
+              1,
+              120,
+              120
+            ],
+            "locked": false,
+            "name": "Second slide object",
+            "opacity": 1,
+            "parent_id": "82f54793-2183-4c7c-9204-59fec3a5e58c",
+            "visible": true,
+            "world_bounds": {
+              "max": [
+                280,
+                200
+              ],
+              "min": [
+                120,
+                120
+              ]
+            },
+            "world_transform": [
+              1,
+              0,
+              0,
+              1,
+              120,
+              120
+            ]
+          }
+        ]
+      },
+      "protocol_version": 1,
+      "render_binary_schema_version": 2,
+      "render_delta": {
+        "dirty_ranges": 1,
+        "dirty_slots": 6,
+        "full": true,
+        "removed_slots": 0,
+        "render_full_rebuilds": 1,
+        "scene_full_rebuilds": 0,
+        "upload_bytes": 672
+      },
+      "render_encoding": {
+        "diagnostics": [],
+        "gpu_omitted_items": 0
+      },
+      "request_id": "load_document-1787219019079-31",
+      "resources": {
+        "allocated_slots": 6,
+        "dirty_record_stride_bytes": 116,
+        "free_slots": 0,
+        "gpu_encodable_items": 6,
+        "gpu_omitted_items": 0,
+        "instance_capacity": 6,
+        "instance_stride_bytes": 112,
+        "renderable_items": 6,
+        "total_render_items": 6
+      },
+      "result": {
+        "document_bytes": 7988,
+        "loaded": true
+      },
+      "revisions": {
+        "document": 11,
+        "render": 11,
+        "scene": 11
+      },
+      "runtime_owner": "dedicated-worker",
+      "selection": {
+        "ordered": [
+          "30000000-0000-0000-0000-000000000001"
+        ],
+        "primary": "30000000-0000-0000-0000-000000000001"
+      },
+      "type": "engine_response"
+    },
+    "panelState": {
+      "splitter_count": 3,
+      "before": {
+        "slidesWidth": 248,
+        "inspectorWidth": 288,
+        "bottomHeight": 248,
+        "slidesCollapsed": false,
+        "inspectorCollapsed": false,
+        "bottomCollapsed": false
+      },
+      "after": {
+        "slidesWidth": 256,
+        "inspectorWidth": 288,
+        "bottomHeight": 248,
+        "slidesCollapsed": false,
+        "inspectorCollapsed": false,
+        "bottomCollapsed": false
+      },
+      "layer_ids": [
+        "30000000-0000-0000-0000-000000000003",
+        "24a2ad80-7bf2-4cc3-9099-c2af1215a63d"
+      ],
+      "timeline_ids": [
+        "30000000-0000-0000-0000-000000000003",
+        "24a2ad80-7bf2-4cc3-9099-c2af1215a63d"
+      ]
+    }
+  },
+  "screenshots": {
+    "workspace": {
+      "path": "docs/verification/phase1b-multislide-workspace.png",
+      "bytes": 60888
+    },
+    "timeline": {
+      "path": "docs/verification/phase1b-layers-timeline.png",
+      "bytes": 62465
+    }
+  },
+  "console_errors": [],
+  "chrome_stderr_tail": "\r\nDevTools listening on ws://127.0.0.1:49485/devtools/browser/898fb107-7bdd-40d6-b8b7-aa0576a8c10a\r\n[21748:16120:0820/184338.905:ERROR:google_apis\\gcm\\engine\\registration_request.cc:291] Registration response error message: DEPRECATED_ENDPOINT\r\n",
+  "max_fallback_rebuild_count_seen": 0,
+  "fallback_checkpoints": [
+    {
+      "engine_sequence": 6,
+      "fixture": "EDITOR",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 12,
+      "fixture": "EDITOR",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 34,
+      "fixture": "EDITOR",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 35,
+      "fixture": "EDITOR",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 43,
+      "fixture": "EDITOR",
+      "fallback_rebuild_count": 0
+    }
+  ],
+  "checks": {
+    "server_health": true,
+    "fresh_chrome_process": true,
+    "fresh_temporary_profile": true,
+    "actual_webgpu": true,
+    "dedicated_worker_wasm": true,
+    "hardware_device": true,
+    "full_hd_default_slide": true,
+    "slide_add_and_active_state": true,
+    "per_slide_selection_camera_restore": true,
+    "active_slide_hit_isolation": true,
+    "other_slide_selection_blocked": true,
+    "deep_duplicate_independent_ids": true,
+    "rename_reorder_persisted": true,
+    "delete_undo_redo_global_history": true,
+    "isolated_thumbnail_invalidation": true,
+    "bounded_thumbnail_queue": true,
+    "actual_webgpu_thumbnails": true,
+    "three_accessible_splitters": true,
+    "splitter_preferences_not_document": true,
+    "layers_timeline_row_sync": true,
+    "contextual_inspector": true,
+    "worker_gpu_overlay_sequence_match": true,
+    "no_console_errors": true,
+    "no_gpu_validation_errors": true,
+    "no_fallback_rebuilds": true
+  },
+  "assertion_count": 25,
+  "passed_assertion_count": 25,
+  "all_passed": true
+}

@@ -1,0 +1,46 @@
+{
+  "phase": "1B",
+  "record_kind": "github-bootstrap-and-branch-protection-change",
+  "captured_at_utc": "2026-08-20T06:44:41Z",
+  "repository": "sindexer/EditorM",
+  "pull_request": 2,
+  "approved_head_sha": "ce291c768735de493c1ab98a90fa33ac684a552a",
+  "actions_run": {
+    "id": 32337282229,
+    "status": "completed",
+    "conclusion": "success"
+  },
+  "review_threads_unresolved": 0,
+  "merge": {
+    "method": "merge",
+    "merge_commit_sha": "8f5a5515eafa0eed8f1f9199f6b73dd51d351f0b",
+    "merged_at_utc": "2026-08-20T06:44:41Z",
+    "expected_head_sha_enforced": true
+  },
+  "main_protection_before": {
+    "required_approving_review_count": 1,
+    "dismiss_stale_reviews": true,
+    "require_code_owner_reviews": false,
+    "require_last_push_approval": false,
+    "required_status_checks_strict": true,
+    "required_status_check_contexts": ["PR Decision"],
+    "required_conversation_resolution": true,
+    "enforce_admins": true,
+    "allow_force_pushes": false,
+    "allow_deletions": false
+  },
+  "main_protection_after": {
+    "required_approving_review_count": 0,
+    "dismiss_stale_reviews": true,
+    "require_code_owner_reviews": false,
+    "require_last_push_approval": false,
+    "required_status_checks_strict": true,
+    "required_status_check_contexts": ["PR Decision"],
+    "required_conversation_resolution": true,
+    "enforce_admins": true,
+    "allow_force_pushes": false,
+    "allow_deletions": false
+  },
+  "unchanged_protection_contract": true,
+  "phase_1b_base_sha": "8f5a5515eafa0eed8f1f9199f6b73dd51d351f0b"
+}

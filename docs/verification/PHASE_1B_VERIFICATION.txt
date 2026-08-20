@@ -1,0 +1,112 @@
+EditorM Phase 1B Verification Record
+====================================
+
+Disposition
+-----------
+Implementation and evidence are complete for external review. This record does not claim Gate 1B approval. PR #3 remains unmerged. Phase 1C was not started. No review ZIP was created.
+
+Baseline
+--------
+- main merge commit: 8f5a5515eafa0eed8f1f9199f6b73dd51d351f0b
+- approved Phase 0E-R3 payload: 39085167a1b9d2ce1ba78060b3fee4d9327aaf27
+- approved tag: phase-0e-r3-approved
+- working branch: feat/phase1b-multislide-workspace
+- PR: https://github.com/sindexer/EditorM/pull/3
+
+Final Rust validation (Windows)
+-------------------------------
+1. powershell -NoProfile -ExecutionPolicy Bypass -File tools/cargo.ps1 fmt --all -- --check
+   PASS, exit 0.
+2. powershell -NoProfile -ExecutionPolicy Bypass -File tools/cargo.ps1 clippy --workspace --all-targets -- -D warnings
+   PASS, exit 0, warnings treated as errors.
+3. powershell -NoProfile -ExecutionPolicy Bypass -File tools/cargo.ps1 build --workspace --all-targets
+   PASS, exit 0.
+4. powershell -NoProfile -ExecutionPolicy Bypass -File tools/cargo.ps1 test --workspace --all-targets -- --quiet
+   PASS, exit 0, 195 passed, 0 failed, 0 ignored.
+
+The final workspace/all-targets run includes 61 runtime tests, 14 WASM bridge unit tests, 4 Phase 1B WASM integration tests, and every existing workspace test. The existing direct EngineHost 10k/100k test passes in 160.83 seconds inside the full run.
+
+Performance regression correction
+---------------------------------
+- A pre-fix full workspace run failed the existing direct EngineHost 100k timing bound. The failure was preserved in the work log and was not reported as passing.
+- Cause: Phase 1B response/session code rediscovered root-level Slides by walking all root children on every response and mutation, including legacy fixtures with 100,000 root items.
+- Correction: `EditorSession` caches ordered Slide IDs and preserved root items. It refreshes classification only for full reset or relevant root structure changes. Ordinary no-Slide fixture mutations do not scan the root.
+- Corrected targeted command: `tools/cargo.ps1 test -p visual_authoring_wasm_bridge --lib tests::phase0e_r2_direct_engine_host_is_bounded_at_10k_and_100k -- --exact --nocapture`.
+- Result: PASS, 1 passed, 0 failed, 13 filtered out, 161.16 seconds.
+- 100k/10k median-time ratios: group 0.5271, undo 0.4516, redo 0.4971, ungroup 0.4825, edited ungroup 0.4659.
+- 100k/10k work ratios: group 1.1456, undo 1.2524, redo 1.1308, ungroup 1.2366, edited ungroup 1.2803.
+
+WASM validation
+---------------
+- Checked-in package EngineHost initialization: PASS.
+- Rebuilt pinned package SHA-256: 151a6c9dea41445495547acd287bde326a026df3a5172b9e196c2b9caeb2ad4c.
+- Rebuilt pinned package size: 1,483,024 bytes.
+- Fresh `target/ci-wasm-pkg` build and ABI initialization: PASS.
+- Protocol version 1 and render binary schema version 2 match. WebAssembly.Module and EngineHost creation both pass.
+
+Preview validation
+------------------
+- `npm test`: PASS, 7 passed, 0 failed, 0 skipped.
+- `npm run build`: PASS, 9 verified assets.
+
+Editor validation
+-----------------
+- `npm test`: PASS, 25 passed, 0 failed.
+- `npm run build`: PASS, TypeScript project build and Vite production build.
+- `npm run test:react:r3`: PASS, 1 large complexity-matrix test.
+- `npm run test:browser:phase1b`: PASS, production build, fresh actual hardware proof, and 5 stored-proof fail-closed tests.
+- Scope classifier self-test: PASS, 9/9 cases; web/editor/src/engine.ts requires full software and hardware evidence.
+- PR hardware evidence validator: PASS, 1 tracked fresh Phase 1B proof.
+- Phase 1B focused workspace tests: 8 passed, including stale queued thumbnail revision recovery.
+
+Fresh actual hardware browser proof
+-----------------------------------
+- captured_at_utc: 2026-08-20T09:43:40.099Z
+- browser: Chrome/151.0.7922.138
+- Chrome process id: 21748
+- new temporary Chrome profile: true
+- GPU: NVIDIA GeForce GTX 970
+- driver: 32.0.15.8157
+- actual WebGPU: true
+- runtime owner: Dedicated Worker
+- WASM initialized: true
+- heartbeat: initial 1, final 3
+- surface base format: bgra8unorm
+- pipeline view format: bgra8unorm-srgb
+- readback view format: bgra8unorm-srgb
+- browser assertions: 25/25
+- thumbnail captures/invalidations: 8/7
+- ready/pending/error thumbnails: 3/0/0
+- thumbnail queue depth: 0
+- maximum thumbnail renders per animation frame: 1
+- Canvas2D fallback count: 0
+- console errors: 0
+- GPU validation errors: 0
+- maximum fallback rebuild count: 0
+- all_passed: true
+
+The harness allocated an available localhost port, started and health-checked the server, validated HTML/Worker/JS/WASM assets and WASM MIME, launched a new Chrome process/profile, used the real Dedicated Worker + WASM EngineHost + WebGPU path, recorded proof/screenshots, and cleaned up its server/profile.
+
+Structural work-counter proof
+-----------------------------
+- fixture: 30 Slides x 100 primitives, 3,031 Document nodes
+- active switch: Document/Scene/Render revision delta 0, clones/rebuilds 0
+- thumbnail cull: 101 items read, 101 exact visible, 0 full RenderModel scans
+- single node edit: 1 changed thumbnail revision, 0 Render rebuilds/scans/clones
+- UI cap: 25 mounted Layer/Timeline rows
+- thumbnail cap: 1 render per animation frame; active-visible-remaining priority
+
+Preserved failed evidence
+-------------------------
+- PHASE_1B_BROWSER_FAILURE_PRE_FIX_QUEUE_RACE.json: earlier running-revision queue race.
+- PHASE_1B_BROWSER_FAILURE.json: queued stale-revision timeout at 2026-08-20T09:27:05.078Z.
+- PHASE_1B_BROWSER_FAILURE_PRE_FIX_STALE_QUEUED_REVISION.json: byte-identical named preservation of the 09:27 failure.
+
+The failed runs remain failed evidence. They were not converted into passing records. The final proof was freshly executed after both queue-state corrections.
+
+Scope integrity
+---------------
+- Phase 0 protected evidence changes: 0.
+- Existing Phase 1A evidence changes: 0.
+- Phase 1C and later features: not started.
+- ZIP created: no.

@@ -3,17 +3,19 @@
 
 mod camera;
 pub mod fixtures;
+mod session;
 
 #[cfg(test)]
 mod tests;
 
 pub use camera::{Camera, CameraError, DevicePoint, ViewportPoint, WorldPoint};
+pub use session::{EditorSession, SlideSessionError};
 
 use thiserror::Error;
-use visual_authoring_core_math::Rect;
+use visual_authoring_core_math::{Rect, Vec2};
 use visual_authoring_document::{
     Command, CommandOutcome, Document, DocumentChangeSet, EditorError, HeadlessEditorCore,
-    HistoryState, NodeId, Selection, SelectionError, SequenceWork,
+    HistoryState, NodeId, NodeSpec, Selection, SelectionError, SequenceWork,
 };
 use visual_authoring_render_model::{
     CullingResult, DirtySlotRange, RenderDelta, RenderModel, RenderModelError,
@@ -74,6 +76,8 @@ pub enum RuntimeError {
     Camera(#[from] CameraError),
     #[error(transparent)]
     Selection(#[from] SelectionError),
+    #[error(transparent)]
+    SlideSession(#[from] SlideSessionError),
 }
 
 /// Owns the headless editor core, computed scene/spatial cache, camera, revisions, and metrics.
@@ -82,6 +86,7 @@ pub struct EngineRuntime {
     scene: ComputedScene,
     render: RenderModel,
     camera: Camera,
+    session: EditorSession,
 }
 
 impl EngineRuntime {
@@ -89,11 +94,13 @@ impl EngineRuntime {
         let core = HeadlessEditorCore::new(document)?;
         let scene = ComputedScene::build(core.document(), core.revision())?;
         let render = RenderModel::build(core.document(), &scene, core.revision())?;
+        let session = EditorSession::new(core.document());
         Ok(Self {
             core,
             scene,
             render,
             camera,
+            session,
         })
     }
 
@@ -131,6 +138,32 @@ impl EngineRuntime {
     }
 
     #[must_use]
+    pub const fn editor_session(&self) -> &EditorSession {
+        &self.session
+    }
+
+    #[must_use]
+    pub const fn active_slide_id(&self) -> Option<NodeId> {
+        self.session.active_slide_id()
+    }
+
+    #[must_use]
+    pub fn slide_ids(&self) -> Vec<NodeId> {
+        self.session.slide_ids().to_vec()
+    }
+
+    #[must_use]
+    pub fn preserved_root_items(&self) -> Vec<NodeId> {
+        self.session.preserved_root_items().to_vec()
+    }
+
+    #[must_use]
+    pub fn node_belongs_to_active_slide(&self, id: NodeId) -> bool {
+        self.active_slide_id().map_or(true, |slide| {
+            EditorSession::node_belongs_to_slide(self.document(), id, slide)
+        })
+    }
+    #[must_use]
     pub const fn history_state(&self) -> HistoryState {
         self.core.history_state()
     }
@@ -149,6 +182,7 @@ impl EngineRuntime {
         let outcome = self.core.dispatch(command)?;
         let change_set = outcome.change_set().clone();
         let (scene, sync, render, render_sync) = self.synchronize(&change_set)?;
+        self.reconcile_slide_session()?;
         Ok(RuntimeCommandOutcome {
             command: outcome,
             scene,
@@ -170,6 +204,7 @@ impl EngineRuntime {
         let outcome = self.core.update_transaction(command)?;
         let change_set = outcome.change_set().clone();
         let (scene, sync, render, render_sync) = self.synchronize(&change_set)?;
+        self.reconcile_slide_session()?;
         Ok(RuntimeCommandOutcome {
             command: outcome,
             scene,
@@ -188,6 +223,7 @@ impl EngineRuntime {
         let change_set = self.core.rollback_transaction()?;
         let sequence_work = self.core.document().sequence_work();
         let (scene, sync, render, render_sync) = self.synchronize(&change_set)?;
+        self.reconcile_slide_session()?;
         Ok(RuntimeSceneOutcome {
             sequence_work,
             change_set,
@@ -204,6 +240,7 @@ impl EngineRuntime {
         };
         let sequence_work = self.core.document().sequence_work();
         let (scene, sync, render, render_sync) = self.synchronize(&change_set)?;
+        self.reconcile_slide_session()?;
         Ok(Some(RuntimeSceneOutcome {
             sequence_work,
             change_set,
@@ -220,6 +257,7 @@ impl EngineRuntime {
         };
         let sequence_work = self.core.document().sequence_work();
         let (scene, sync, render, render_sync) = self.synchronize(&change_set)?;
+        self.reconcile_slide_session()?;
         Ok(Some(RuntimeSceneOutcome {
             sequence_work,
             change_set,
@@ -237,6 +275,7 @@ impl EngineRuntime {
         let change_set = self.core.replace_document(document)?;
         let sequence_work = self.core.document().sequence_work();
         let (scene, sync, render, render_sync) = self.synchronize(&change_set)?;
+        self.session = EditorSession::new(self.document());
         Ok(RuntimeSceneOutcome {
             sequence_work,
             change_set,
@@ -252,26 +291,56 @@ impl EngineRuntime {
         point: ViewportPoint,
     ) -> Result<HitTestResult, RuntimeError> {
         let world = self.camera.viewport_to_world(point)?;
-        Ok(self
-            .scene
-            .hit_test_world_point(self.core.document(), world.0)?)
+        let active = self.active_slide_id();
+        Ok(if let Some(slide) = active {
+            self.scene
+                .hit_test_world_point_in_subtree(self.core.document(), world.0, slide)?
+        } else {
+            self.scene
+                .hit_test_world_point(self.core.document(), world.0)?
+        })
     }
 
     pub fn query_world_rect(&mut self, bounds: Rect) -> Result<SceneQueryResult, RuntimeError> {
-        Ok(self.scene.query_rect_candidates(bounds)?)
+        let active = self.active_slide_id();
+        Ok(if let Some(slide) = active {
+            self.scene.query_rect_candidates_in_subtree(bounds, slide)?
+        } else {
+            self.scene.query_rect_candidates(bounds)?
+        })
     }
 
     pub fn cull_viewport(&mut self) -> Result<CullingResult, RuntimeError> {
         let world_viewport = self.camera.world_viewport_bounds()?;
-        Ok(self.render.cull(&mut self.scene, world_viewport)?)
+        Ok(if let Some(slide) = self.active_slide_id() {
+            self.render
+                .cull_subtree(&mut self.scene, world_viewport, slide)?
+        } else {
+            self.render.cull(&mut self.scene, world_viewport)?
+        })
+    }
+
+    pub fn cull_slide_thumbnail(&mut self, slide: NodeId) -> Result<CullingResult, RuntimeError> {
+        EditorSession::validate_slide(self.document(), slide)?;
+        let bounds = self
+            .scene
+            .node(slide)
+            .and_then(|node| {
+                node.subtree_world_bounds()
+                    .or_else(|| node.own_world_bounds())
+            })
+            .ok_or(CameraError::InvalidFitBounds)?;
+        Ok(self.render.cull_subtree(&mut self.scene, bounds, slide)?)
     }
 
     pub fn select_only(&mut self, id: NodeId) -> Result<(), RuntimeError> {
+        self.require_active_slide_node(id)?;
         self.core.select_only(id)?;
         Ok(())
     }
 
     pub fn add_to_selection(&mut self, id: NodeId) -> Result<bool, RuntimeError> {
+        self.require_active_slide_node(id)?;
         Ok(self.core.add_to_selection(id)?)
     }
 
@@ -280,11 +349,245 @@ impl EngineRuntime {
     }
 
     pub fn toggle_selection(&mut self, id: NodeId) -> Result<bool, RuntimeError> {
+        self.require_active_slide_node(id)?;
         Ok(self.core.toggle_selection(id)?)
     }
 
     pub fn clear_selection(&mut self) {
         self.core.clear_selection();
+    }
+
+    pub fn create_slide(
+        &mut self,
+        slide: NodeId,
+        name: String,
+        index: usize,
+        size: Vec2,
+    ) -> Result<RuntimeCommandOutcome, RuntimeError> {
+        let name = Self::validated_slide_name(name)?;
+        let root = self.document().root_id();
+        let root_index = self.slide_root_insertion_index(None, index)?;
+        let outcome = self.dispatch(Command::CreateNode {
+            spec: NodeSpec::frame(slide, name, size),
+            parent: root,
+            index: root_index,
+        })?;
+        self.activate_slide(slide)?;
+        Ok(outcome)
+    }
+
+    pub fn duplicate_slide(
+        &mut self,
+        source: NodeId,
+        duplicate: NodeId,
+        name: String,
+        index: usize,
+    ) -> Result<RuntimeCommandOutcome, RuntimeError> {
+        EditorSession::validate_slide(self.document(), source)?;
+        let name = Self::validated_slide_name(name)?;
+        let root = self.document().root_id();
+        let root_index = self.slide_root_insertion_index(None, index)?;
+        let outcome = self.dispatch(Command::DuplicateSubtree {
+            source,
+            new_root: duplicate,
+            parent: root,
+            index: root_index,
+            name,
+        })?;
+        self.activate_slide(duplicate)?;
+        Ok(outcome)
+    }
+
+    pub fn rename_slide(
+        &mut self,
+        slide: NodeId,
+        name: String,
+    ) -> Result<RuntimeCommandOutcome, RuntimeError> {
+        EditorSession::validate_slide(self.document(), slide)?;
+        let name = Self::validated_slide_name(name)?;
+        self.dispatch(Command::SetName {
+            target: slide,
+            name,
+        })
+    }
+
+    pub fn reorder_slide(
+        &mut self,
+        slide: NodeId,
+        index: usize,
+    ) -> Result<RuntimeCommandOutcome, RuntimeError> {
+        EditorSession::validate_slide(self.document(), slide)?;
+        let root = self.document().root_id();
+        let root_index = self.slide_root_insertion_index(Some(slide), index)?;
+        self.dispatch(Command::Reparent {
+            child: slide,
+            new_parent: root,
+            index: root_index,
+        })
+    }
+
+    pub fn delete_slide(&mut self, slide: NodeId) -> Result<RuntimeCommandOutcome, RuntimeError> {
+        EditorSession::validate_slide(self.document(), slide)?;
+        let slides = self.slide_ids();
+        if slides.len() == 1 {
+            return Err(SlideSessionError::LastSlideDeletion.into());
+        }
+        let position = slides
+            .iter()
+            .position(|candidate| *candidate == slide)
+            .expect("validated Slide belongs to slide_ids");
+        let adjacent = if position + 1 < slides.len() {
+            slides[position + 1]
+        } else {
+            slides[position - 1]
+        };
+        let was_active = self.active_slide_id() == Some(slide);
+        let outcome = self.dispatch(Command::DeleteSubtree { target: slide })?;
+        if was_active && self.active_slide_id() != Some(adjacent) {
+            self.activate_slide(adjacent)?;
+        }
+        Ok(outcome)
+    }
+
+    fn validated_slide_name(name: String) -> Result<String, SlideSessionError> {
+        let name = name.trim();
+        if name.is_empty() {
+            return Err(SlideSessionError::EmptySlideName);
+        }
+        Ok(name.to_owned())
+    }
+
+    fn slide_root_insertion_index(
+        &self,
+        moving: Option<NodeId>,
+        slide_index: usize,
+    ) -> Result<usize, SlideSessionError> {
+        let slides = self
+            .slide_ids()
+            .into_iter()
+            .filter(|id| Some(*id) != moving)
+            .collect::<Vec<_>>();
+        if slide_index > slides.len() {
+            return Err(SlideSessionError::InvalidSlideIndex {
+                index: slide_index,
+                maximum: slides.len(),
+            });
+        }
+        let root = self
+            .document()
+            .node(self.document().root_id())
+            .expect("Document root must exist");
+        let children = root
+            .children()
+            .iter()
+            .copied()
+            .filter(|id| Some(*id) != moving)
+            .collect::<Vec<_>>();
+        if let Some(next) = slides.get(slide_index) {
+            return Ok(children
+                .iter()
+                .position(|id| id == next)
+                .expect("Slide is a root child"));
+        }
+        Ok(slides
+            .last()
+            .and_then(|last| children.iter().position(|id| id == last))
+            .map_or(0, |position| position + 1))
+    }
+
+    pub fn activate_slide(&mut self, slide: NodeId) -> Result<bool, RuntimeError> {
+        EditorSession::validate_slide(self.document(), slide)?;
+        if self.active_slide_id() == Some(slide) {
+            return Ok(false);
+        }
+
+        if let Some(current) = self.active_slide_id() {
+            self.session
+                .remember(current, self.core.selection().clone(), self.camera.clone());
+        }
+
+        let stored_selection = self
+            .session
+            .stored_selection(slide)
+            .cloned()
+            .unwrap_or_default();
+        let stored_camera = self.session.stored_camera(slide).cloned();
+        let viewport = self.camera.viewport_size();
+        let dpr = self.camera.device_pixel_ratio();
+        self.session.set_active(Some(slide));
+
+        self.core.clear_selection();
+        for selected in stored_selection.ordered() {
+            if EditorSession::node_belongs_to_slide(self.document(), *selected, slide) {
+                self.core.add_to_selection(*selected)?;
+            }
+        }
+        if let Some(primary) = stored_selection.primary() {
+            if EditorSession::node_belongs_to_slide(self.document(), primary, slide) {
+                self.core.add_to_selection(primary)?;
+            }
+        }
+
+        if let Some(mut camera) = stored_camera {
+            camera.resize_viewport(viewport)?;
+            camera.set_device_pixel_ratio(dpr)?;
+            self.camera = camera;
+        } else {
+            self.camera = Camera::new(WorldPoint(Vec2::ZERO), 1.0, viewport, dpr)?;
+            self.fit_active_slide(48.0)?;
+        }
+        Ok(true)
+    }
+
+    pub fn fit_active_slide(&mut self, padding: f64) -> Result<(), RuntimeError> {
+        let slide = self.active_slide_id().ok_or(SlideSessionError::NoSlides)?;
+        let bounds = self
+            .scene
+            .node(slide)
+            .and_then(|node| {
+                node.subtree_world_bounds()
+                    .or_else(|| node.own_world_bounds())
+            })
+            .ok_or(CameraError::InvalidFitBounds)?;
+        self.camera.fit_world_bounds(bounds, padding)?;
+        Ok(())
+    }
+
+    fn require_active_slide_node(&self, id: NodeId) -> Result<(), RuntimeError> {
+        if let Some(active_slide) = self.active_slide_id() {
+            if !EditorSession::node_belongs_to_slide(self.document(), id, active_slide) {
+                return Err(SlideSessionError::NodeOutsideActiveSlide {
+                    node: id,
+                    active_slide,
+                }
+                .into());
+            }
+        }
+        Ok(())
+    }
+
+    fn reconcile_slide_session(&mut self) -> Result<(), RuntimeError> {
+        let previous_active = self.active_slide_id();
+        self.session.retain_valid_slides();
+        if self.active_slide_id().is_none() {
+            self.core.clear_selection();
+            if let Some(first) = self.slide_ids().first().copied() {
+                self.activate_slide(first)?;
+            }
+            return Ok(());
+        }
+
+        let active = self.active_slide_id().expect("active Slide was checked");
+        let selected = self.core.selection().ordered().to_vec();
+        for id in selected {
+            if !EditorSession::node_belongs_to_slide(self.document(), id, active) {
+                self.core.remove_from_selection(id);
+            }
+        }
+        if previous_active != self.active_slide_id() {
+            self.fit_active_slide(48.0)?;
+        }
+        Ok(())
     }
 
     fn synchronize(&mut self, change_set: &DocumentChangeSet) -> Result<SyncOutcome, RuntimeError> {
@@ -352,6 +655,8 @@ impl EngineRuntime {
                     )
                 }
             };
+        self.session
+            .record_changes(self.core.document(), change_set);
         Ok((scene, sync, render, render_sync))
     }
 

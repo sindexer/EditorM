@@ -60,6 +60,7 @@ foreach ($path in $paths) {
     $isRender = $path -match "\.wgsl$" -or
         $path -match "^crates/renderer_wgpu/" -or
         $path -eq "shared/render_binary_schema.json" -or
+        $path -eq "web/editor/src/engine.ts" -or
         $path -match "^web/(editor|phase0d-preview)/.+(renderer|render_contract|webgpu|gpu)"
 
     if ($isDoc) {

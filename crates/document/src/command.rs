@@ -32,6 +32,13 @@ pub enum Command {
     DeleteSubtree {
         target: NodeId,
     },
+    DuplicateSubtree {
+        source: NodeId,
+        new_root: NodeId,
+        parent: NodeId,
+        index: usize,
+        name: String,
+    },
     Reparent {
         child: NodeId,
         new_parent: NodeId,
@@ -88,6 +95,7 @@ impl Command {
             Self::Attach { .. } => "attach",
             Self::Detach { .. } => "detach",
             Self::DeleteSubtree { .. } => "delete_subtree",
+            Self::DuplicateSubtree { .. } => "duplicate_subtree",
             Self::Reparent { .. } => "reparent",
             Self::ReparentPreservingWorld { .. } => "reparent_preserving_world",
             Self::Group { .. } => "group",
@@ -214,6 +222,9 @@ pub(crate) enum ReversibleEffect {
     DeleteSubtree {
         record: SubtreeRecord,
     },
+    InsertSubtree {
+        record: SubtreeRecord,
+    },
     MoveNode {
         target: NodeId,
         subtree: Vec<NodeId>,
@@ -337,6 +348,24 @@ impl ReversibleEffect {
                     }
                 }
             }
+            Self::InsertSubtree { record } => {
+                let root = record.root_id();
+                let nodes = record.node_ids();
+                let placement = record.placement.map(Placement::public);
+                if forward {
+                    DocumentChange::NodesInserted {
+                        root,
+                        nodes,
+                        placement,
+                    }
+                } else {
+                    DocumentChange::NodesRemoved {
+                        root,
+                        nodes,
+                        placement,
+                    }
+                }
+            }
             Self::MoveNode {
                 target,
                 subtree,
@@ -405,6 +434,12 @@ impl ReversibleEffect {
             Self::DeleteSubtree { record } => {
                 document.delete_subtree(record.root_id())?;
             }
+            Self::InsertSubtree { record } => {
+                document.restore_subtree(
+                    &record.nodes,
+                    record.placement.map(|place| (place.parent, place.index)),
+                )?;
+            }
             Self::MoveNode {
                 target,
                 after,
@@ -460,6 +495,9 @@ impl ReversibleEffect {
                     &record.nodes,
                     record.placement.map(|place| (place.parent, place.index)),
                 )?;
+            }
+            Self::InsertSubtree { record } => {
+                document.delete_subtree(record.root_id())?;
             }
             Self::MoveNode {
                 target,
@@ -557,9 +595,10 @@ impl ReversibleEffect {
 
     pub(crate) fn is_noop(&self) -> bool {
         match self {
-            Self::StructuralGroup { .. } | Self::InsertNode { .. } | Self::DeleteSubtree { .. } => {
-                false
-            }
+            Self::StructuralGroup { .. }
+            | Self::InsertNode { .. }
+            | Self::DeleteSubtree { .. }
+            | Self::InsertSubtree { .. } => false,
             Self::MoveNode {
                 before,
                 after,
@@ -672,6 +711,13 @@ pub(crate) fn execute_command(
             document.delete_subtree(target)?;
             changed(affected, ReversibleEffect::DeleteSubtree { record })
         }
+        Command::DuplicateSubtree {
+            source,
+            new_root,
+            parent,
+            index,
+            name,
+        } => duplicate_subtree(document, source, new_root, parent, index, name),
         Command::Reparent {
             child,
             new_parent,
@@ -1161,6 +1207,79 @@ fn optional_placement(
         .ok_or(crate::InvariantViolation::ParentChildMismatch { parent, child: id })
         .map_err(DocumentError::from)?;
     Ok(Some(Placement { parent, index }))
+}
+
+fn duplicate_subtree(
+    document: &mut Document,
+    source: NodeId,
+    new_root: NodeId,
+    parent: NodeId,
+    index: usize,
+    name: String,
+) -> Result<Execution, CommandError> {
+    ensure_subtree_editable(document, source)?;
+    ensure_editable(document, parent)?;
+    let source_record = capture_subtree(document, source)?;
+    let mut mapping = HashMap::with_capacity(source_record.nodes.len());
+    for snapshot in &source_record.nodes {
+        let duplicated = if snapshot.spec.id == source {
+            new_root
+        } else {
+            NodeId::new()
+        };
+        mapping.insert(snapshot.spec.id, duplicated);
+    }
+
+    let nodes = source_record
+        .nodes
+        .iter()
+        .map(|snapshot| {
+            let mut spec = snapshot.spec.clone();
+            spec.id = mapping[&snapshot.spec.id];
+            if snapshot.spec.id == source {
+                spec.name.clone_from(&name);
+            }
+            let mapped_parent = if snapshot.spec.id == source {
+                Some(parent)
+            } else {
+                snapshot.parent.map(|id| mapping[&id])
+            };
+            let children = snapshot.children.iter().map(|id| mapping[id]).collect();
+            let group_restoration =
+                snapshot
+                    .group_restoration
+                    .as_ref()
+                    .map(|restoration| GroupRestoration {
+                        version: restoration.version,
+                        runs: restoration
+                            .runs
+                            .iter()
+                            .map(|run| GroupRestorationRun {
+                                children: run.children.iter().map(|id| mapping[id]).collect(),
+                                before_anchor: run
+                                    .before_anchor
+                                    .and_then(|id| mapping.get(&id).copied()),
+                                after_anchor: run
+                                    .after_anchor
+                                    .and_then(|id| mapping.get(&id).copied()),
+                            })
+                            .collect(),
+                    });
+            NodeSnapshot {
+                spec,
+                parent: mapped_parent,
+                children,
+                group_restoration,
+            }
+        })
+        .collect();
+    let record = SubtreeRecord {
+        nodes,
+        placement: Some(Placement { parent, index }),
+    };
+    let affected = record.node_ids();
+    document.restore_subtree(&record.nodes, Some((parent, index)))?;
+    changed(affected, ReversibleEffect::InsertSubtree { record })
 }
 
 fn capture_subtree(document: &mut Document, target: NodeId) -> Result<SubtreeRecord, CommandError> {
