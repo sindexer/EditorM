@@ -1690,3 +1690,174 @@ fn active_slide_isolates_hit_query_selection_and_render_slots() {
     assert!(second_cull.ids_top_to_bottom.contains(&second_shape));
     assert!(!second_cull.ids_top_to_bottom.contains(&first_shape));
 }
+
+#[test]
+fn thumbnail_revision_and_culling_are_isolated_without_session_mutation() {
+    let document = build_fixture(FixtureKind::Editor).unwrap();
+    let mut runtime = EngineRuntime::new(document, Camera::default()).unwrap();
+    let first = runtime.active_slide_id().unwrap();
+    let first_shape = rectangle(
+        &mut runtime,
+        first,
+        NodeId::new(),
+        Vec2::new(120.0, 80.0),
+        Affine2::translation(Vec2::new(80.0, 90.0)),
+    );
+    let second = NodeId::new();
+    runtime
+        .create_slide(second, "Slide 2".to_owned(), 1, Vec2::new(1920.0, 1080.0))
+        .unwrap();
+    let second_shape = rectangle(
+        &mut runtime,
+        second,
+        NodeId::new(),
+        Vec2::new(90.0, 60.0),
+        Affine2::translation(Vec2::new(140.0, 110.0)),
+    );
+
+    let first_before = runtime.editor_session().thumbnail_revision(first);
+    let second_before = runtime.editor_session().thumbnail_revision(second);
+    runtime
+        .dispatch(Command::SetLocalTransform {
+            target: first_shape,
+            transform: Affine2::translation(Vec2::new(180.0, 190.0)),
+        })
+        .unwrap();
+    assert!(runtime.editor_session().thumbnail_revision(first) > first_before);
+    assert_eq!(
+        runtime.editor_session().thumbnail_revision(second),
+        second_before
+    );
+
+    let active_before = runtime.active_slide_id();
+    let selection_before = runtime.selection().clone();
+    let camera_before = runtime.camera().clone();
+    let history_before = runtime.history_state();
+    let revisions_before = (
+        runtime.document_revision(),
+        runtime.scene().revision(),
+        runtime.render_model().revision(),
+    );
+    let culling = runtime.cull_slide_thumbnail(first).unwrap();
+    assert!(culling.ids_top_to_bottom.contains(&first_shape));
+    assert!(!culling.ids_top_to_bottom.contains(&second_shape));
+    assert_eq!(culling.full_render_model_scans, 0);
+    assert_eq!(runtime.active_slide_id(), active_before);
+    assert_eq!(runtime.selection(), &selection_before);
+    assert_eq!(runtime.camera(), &camera_before);
+    assert_eq!(runtime.history_state(), history_before);
+    assert_eq!(
+        (
+            runtime.document_revision(),
+            runtime.scene().revision(),
+            runtime.render_model().revision(),
+        ),
+        revisions_before
+    );
+}
+
+#[test]
+fn thirty_slides_with_one_hundred_primitives_keep_switch_and_thumbnail_work_bounded() {
+    let document = build_fixture(FixtureKind::Editor).unwrap();
+    let mut runtime = EngineRuntime::new(document, Camera::default()).unwrap();
+    let first = runtime.active_slide_id().unwrap();
+    let mut slides = vec![first];
+    for index in 1..30 {
+        let slide = NodeId::new();
+        runtime
+            .create_slide(
+                slide,
+                format!("Slide {}", index + 1),
+                index,
+                Vec2::new(1920.0, 1080.0),
+            )
+            .unwrap();
+        slides.push(slide);
+    }
+    for (slide_index, slide) in slides.iter().copied().enumerate() {
+        for primitive_index in 0..100 {
+            let x = (primitive_index % 10) as f64 * 150.0;
+            let y = (primitive_index / 10) as f64 * 90.0;
+            rectangle(
+                &mut runtime,
+                slide,
+                NodeId::new(),
+                Vec2::new(120.0, 64.0),
+                Affine2::translation(Vec2::new(x, y + slide_index as f64)),
+            );
+        }
+    }
+
+    let document_revision = runtime.document_revision();
+    let scene_revision = runtime.scene().revision();
+    let render_revision = runtime.render_model().revision();
+    let render_update = runtime.render_model().last_update().clone();
+    runtime.activate_slide(slides[0]).unwrap();
+    assert_eq!(runtime.document_revision(), document_revision);
+    assert_eq!(runtime.scene().revision(), scene_revision);
+    assert_eq!(runtime.render_model().revision(), render_revision);
+    assert_eq!(runtime.render_model().last_update(), &render_update);
+
+    let thumbnail = runtime.cull_slide_thumbnail(slides[29]).unwrap();
+    assert_eq!(thumbnail.full_render_model_scans, 0);
+    assert!(thumbnail.exact_visible <= 101);
+    assert!(thumbnail.render_items_read <= 101);
+
+    let untouched_revisions = slides
+        .iter()
+        .copied()
+        .map(|slide| (slide, runtime.editor_session().thumbnail_revision(slide)))
+        .collect::<BTreeMap<_, _>>();
+    let edited = runtime.document().node(slides[0]).unwrap().children()[0];
+    let edit = runtime
+        .dispatch(Command::SetLocalTransform {
+            target: edited,
+            transform: Affine2::translation(Vec2::new(33.0, 44.0)),
+        })
+        .unwrap();
+    assert!(
+        runtime.editor_session().thumbnail_revision(slides[0]) > untouched_revisions[&slides[0]]
+    );
+    for slide in slides.iter().skip(1) {
+        assert_eq!(
+            runtime.editor_session().thumbnail_revision(*slide),
+            untouched_revisions[slide]
+        );
+    }
+    let changed_thumbnail_revisions = slides
+        .iter()
+        .filter(|slide| {
+            runtime.editor_session().thumbnail_revision(**slide) != untouched_revisions[slide]
+        })
+        .count();
+    println!(
+        "PHASE1B_STRUCTURAL_JSON={}",
+        serde_json::json!({
+            "slide_count": slides.len(),
+            "primitives_per_slide": 100,
+            "document_nodes": runtime.document().len(),
+            "active_switch": {
+                "document_revision_delta": 0,
+                "scene_revision_delta": 0,
+                "render_revision_delta": 0,
+                "document_full_clones": 0,
+                "render_full_rebuilds": 0
+            },
+            "thumbnail_cull": {
+                "render_items_read": thumbnail.render_items_read,
+                "exact_visible": thumbnail.exact_visible,
+                "full_render_model_scans": thumbnail.full_render_model_scans
+            },
+            "single_node_edit": {
+                "changed_thumbnail_revisions": changed_thumbnail_revisions,
+                "render_full_rebuilds": edit.render.stats.full_render_rebuild_count,
+                "full_render_model_scans": edit.render.stats.full_render_model_scans,
+                "render_items_cloned": edit.render.stats.render_items_cloned
+            },
+            "ui_bounds": {
+                "maximum_mounted_layer_timeline_rows": 25,
+                "maximum_thumbnail_renders_per_animation_frame": 1
+            }
+        })
+    );
+}

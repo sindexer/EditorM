@@ -149,12 +149,12 @@ impl EngineRuntime {
 
     #[must_use]
     pub fn slide_ids(&self) -> Vec<NodeId> {
-        EditorSession::slide_ids(self.document())
+        self.session.slide_ids().to_vec()
     }
 
     #[must_use]
     pub fn preserved_root_items(&self) -> Vec<NodeId> {
-        EditorSession::preserved_root_items(self.document())
+        self.session.preserved_root_items().to_vec()
     }
 
     #[must_use]
@@ -318,6 +318,19 @@ impl EngineRuntime {
         } else {
             self.render.cull(&mut self.scene, world_viewport)?
         })
+    }
+
+    pub fn cull_slide_thumbnail(&mut self, slide: NodeId) -> Result<CullingResult, RuntimeError> {
+        EditorSession::validate_slide(self.document(), slide)?;
+        let bounds = self
+            .scene
+            .node(slide)
+            .and_then(|node| {
+                node.subtree_world_bounds()
+                    .or_else(|| node.own_world_bounds())
+            })
+            .ok_or(CameraError::InvalidFitBounds)?;
+        Ok(self.render.cull_subtree(&mut self.scene, bounds, slide)?)
     }
 
     pub fn select_only(&mut self, id: NodeId) -> Result<(), RuntimeError> {
@@ -555,8 +568,7 @@ impl EngineRuntime {
 
     fn reconcile_slide_session(&mut self) -> Result<(), RuntimeError> {
         let previous_active = self.active_slide_id();
-        let document = self.core.document();
-        self.session.retain_valid_slides(document);
+        self.session.retain_valid_slides();
         if self.active_slide_id().is_none() {
             self.core.clear_selection();
             if let Some(first) = self.slide_ids().first().copied() {
@@ -643,6 +655,8 @@ impl EngineRuntime {
                     )
                 }
             };
+        self.session
+            .record_changes(self.core.document(), change_set);
         Ok((scene, sync, render, render_sync))
     }
 
