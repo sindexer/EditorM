@@ -20,6 +20,15 @@ export class RendererFailure extends Error {
   }
 }
 
+export function srgbViewFormat(baseFormat) {
+  if (baseFormat === "bgra8unorm") return "bgra8unorm-srgb";
+  if (baseFormat === "rgba8unorm") return "rgba8unorm-srgb";
+  throw new RendererFailure(
+    "srgb_view_format_unavailable",
+    `Preferred canvas format ${baseFormat} has no supported sRGB view format`,
+  );
+}
+
 export class WebGpuRenderer {
   static async create(canvas) {
     if (!globalThis.navigator?.gpu) {
@@ -47,7 +56,9 @@ export class WebGpuRenderer {
     if (!this.context) {
       throw new RendererFailure("surface_unavailable", "Canvas WebGPU context creation failed");
     }
-    this.format = navigator.gpu.getPreferredCanvasFormat();
+    this.surfaceBaseFormat = navigator.gpu.getPreferredCanvasFormat();
+    this.pipelineViewFormat = srgbViewFormat(this.surfaceBaseFormat);
+    this.readbackViewFormat = this.pipelineViewFormat;
     this.instanceBuffer = null;
     this.visibleBuffer = null;
     this.instanceBufferBytes = 0;
@@ -137,7 +148,7 @@ export class WebGpuRenderer {
         entryPoint: "fs_main",
         targets: [
           {
-            format: this.format,
+            format: this.pipelineViewFormat,
             blend: {
               color: { srcFactor: "one", dstFactor: "one-minus-src-alpha", operation: "add" },
               alpha: { srcFactor: "one", dstFactor: "one-minus-src-alpha", operation: "add" },
@@ -172,7 +183,10 @@ export class WebGpuRenderer {
       architecture: this.adapterInfo.architecture || "privacy-redacted",
       device: this.deviceLabel,
       backend: this.backend,
-      format: this.format,
+      format: this.surfaceBaseFormat,
+      surface_base_format: this.surfaceBaseFormat,
+      pipeline_view_format: this.pipelineViewFormat,
+      readback_view_format: this.readbackViewFormat,
     };
   }
 
@@ -180,7 +194,8 @@ export class WebGpuRenderer {
     try {
       this.context.configure({
         device: this.device,
-        format: this.format,
+        format: this.surfaceBaseFormat,
+        viewFormats: [this.pipelineViewFormat],
         alphaMode: "opaque",
       });
     } catch (error) {
@@ -342,11 +357,15 @@ export class WebGpuRenderer {
     this.device.pushErrorScope("validation");
     let textureView;
     try {
-      textureView = this.context.getCurrentTexture().createView();
+      textureView = this.context
+        .getCurrentTexture()
+        .createView({ format: this.pipelineViewFormat });
     } catch (error) {
       this.configureSurface();
       try {
-        textureView = this.context.getCurrentTexture().createView();
+        textureView = this.context
+          .getCurrentTexture()
+          .createView({ format: this.pipelineViewFormat });
       } catch (secondError) {
         throw new RendererFailure(
           "surface_lost_or_outdated",
@@ -408,7 +427,8 @@ export class WebGpuRenderer {
         height: this.canvas.height,
         depthOrArrayLayers: 1,
       },
-      format: this.format,
+      format: this.surfaceBaseFormat,
+      viewFormats: [this.readbackViewFormat],
       usage: TEXTURE_USAGE.RENDER_ATTACHMENT | TEXTURE_USAGE.COPY_SRC,
     });
     const readback = this.device.createBuffer({
@@ -424,7 +444,7 @@ export class WebGpuRenderer {
       label: "Phase 0D-R1 pixel proof pass",
       colorAttachments: [
         {
-          view: texture.createView(),
+          view: texture.createView({ format: this.readbackViewFormat }),
           clearValue: { r: 0.035, g: 0.055, b: 0.08, a: 1 },
           loadOp: "clear",
           storeOp: "store",
@@ -465,10 +485,20 @@ export class WebGpuRenderer {
       this.metrics.validation_errors = this.validationErrors;
       throw new RendererFailure("gpu_validation_error", validation.message);
     }
-    const rgba = this.format.startsWith("bgra")
+    const rgba = this.surfaceBaseFormat.startsWith("bgra")
       ? [raw[2], raw[1], raw[0], raw[3]]
       : [...raw];
-    return { x, y, physical_x: physicalX, physical_y: physicalY, format: this.format, rgba };
+    return {
+      x,
+      y,
+      physical_x: physicalX,
+      physical_y: physicalY,
+      surface_base_format: this.surfaceBaseFormat,
+      readback_view_format: this.readbackViewFormat,
+      raw_channel_order: this.surfaceBaseFormat.startsWith("bgra") ? "BGRA" : "RGBA",
+      normalized_channel_order: "RGBA",
+      rgba,
+    };
   }
 
   async applyEngineFrame(response, payload) {

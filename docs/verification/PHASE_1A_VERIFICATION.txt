@@ -21,41 +21,55 @@ Final Rust validation (Windows)
 3. powershell -NoProfile -ExecutionPolicy Bypass -File tools/cargo.ps1 build --workspace --all-targets
    PASS, exit 0.
 4. powershell -NoProfile -ExecutionPolicy Bypass -File tools/cargo.ps1 test --workspace --all-targets
-   PASS, exit 0, 182 passed, 0 failed, 0 ignored.
+   PASS, exit 0, 183 passed, 0 failed, 0 ignored.
 
-The 182 count was confirmed with the same workspace/all-targets test enumeration after the successful run. The successful test run took 381.8 seconds. It was not retried and target was not deleted after a failure.
+The 183 count was taken from the single successful workspace/all-targets run. It was not retried and target was not deleted after a failure.
 
 WASM and generated contract
 ---------------------------
 - powershell -NoProfile -ExecutionPolicy Bypass -File tools/build-phase0e-wasm.ps1
   PASS. Release wasm and wasm-bindgen web module were generated.
-- Checked-in and fresh pinned packages: SHA-256 5a543298efef4ce276a4dab100727b09b57f856c2447e9e4db7237c7e4ae78d0, 1,285,981 bytes; protocol v1, render schema v2, EngineHost initialize PASS.
+- Rebuilt pinned package: SHA-256 aa8444cc8a5120b6d9c97ebeafc401cac2b53152f69e6451f5b4f73b4b45f492, 1,284,737 bytes; protocol v1, render schema v2, EngineHost initialize PASS in the fresh Dedicated Worker run.
 - node web/phase0d-preview/scripts/generate-render-contract.mjs --check
   PASS. The generated browser WGSL string matches shared/render_contract.wgsl.
 - A legacy direct-wasm R3 script was intentionally not rerun because it writes a Phase 0E-R3 historical evidence path. Current WASM initialization is proven by the fresh Phase 1A Dedicated Worker browser run below.
 
+Preview validation
+------------------
+- npm.cmd test
+  PASS: 7 tests, 0 failed, 0 skipped.
+- npm.cmd run build
+  PASS: 9 verified build assets.
+
 Editor validation
 -----------------
 - npm.cmd test
-  PASS: 3 files, 15 tests, 0 failed.
+  PASS: 3 files, 17 tests, 0 failed.
 - npm.cmd run build
   PASS: TypeScript and Vite production build.
 - npm.cmd run test:browser:phase1a
-  PASS: production build, fresh actual hardware browser proof, and 4 stored-proof integrity tests.
+  PASS: production build, fresh actual hardware browser proof, and 5 stored-proof integrity tests.
 
-A first attempt through npm.ps1 did not execute because Windows PowerShell execution policy blocked npm.ps1. It was not counted as a pass; the executable npm.cmd entrypoint was then used. While authoring the new stored-proof test, one TypeScript type error and one overly narrow temporary-profile assertion failed and were corrected before the final passing runs.
+Failed browser/readback runs were copied to timestamped failure artifacts and remain non-passing evidence. A targeted Rust compile initially failed on a nonexistent Vec2::length method and was corrected to f64::hypot. The final commands were not represented as passing until their actual exit code was zero.
 
 Fresh actual hardware browser proof
 -----------------------------------
-- captured_at_utc: 2026-08-13T17:50:42.777Z
-- browser: Chrome/151.0.7922.110
+- captured_at_utc: 2026-08-20T05:22:10.457Z
+- browser: Chrome/151.0.7922.138
+- Chrome process id: 17468; new temporary profile: true
 - GPU: NVIDIA GeForce GTX 970
+- driver: 32.0.15.8157
 - runtime owner: Dedicated Worker
 - WASM initialized: true
 - actual WebGPU device: true
 - initial heartbeat: 1
-- checks: 18/18
-- pixel cases: 17/17
+- surface base format: bgra8unorm
+- pipeline view format: bgra8unorm-srgb
+- readback view format: bgra8unorm-srgb
+- browser checks: 26/26
+- pixel assertions: 16/16
+- ellipse stroke measurements: 48/48
+- maximum linear color channel error: 0.00553961 (tolerance 0.055)
 - console errors: 0
 - GPU validation errors: 0
 - maximum fallback rebuild count: 0
@@ -65,10 +79,15 @@ The browser harness allocates an available localhost port, starts the preview se
 
 Pixel coverage matrix
 ---------------------
-- ellipse at DPR 1, 1.25, 1.5, and 2
+- circle 64x64, ellipse 80x48, ellipse 160x32, and ellipse 160x32 rotated 33 degrees
+- DPR 1, 1.25, 1.5, and 2
 - zoom 25%, 100%, and 400% at every DPR
-- circle
-- rotated nonuniform ellipse
+- 48/48 major/minor stroke measurements pass
+- integrated connected linear coverage, isolated black backdrop, 1 physical pixel tolerance
+- maximum stroke measurement error: 0.714316 physical pixel
+- fill-only, stroke-only, and same-color fill+stroke at 70% opacity
+- black/white paired samples; maximum linear channel error 0.00553961
+- asymmetric affine render/hit-test/selection-overlay parity
 - rounded rectangle
 - black and white backgrounds
 - opacity with simultaneous fill and centered stroke
@@ -86,33 +105,35 @@ Required 1,000 visible primitive case:
 - warmup frames: 30
 - measured frames: 300
 - draw calls/batches: 1/1
-- median: 0.3838 ms
-- p95: 0.6052 ms
-- maximum: 1.0244 ms
+- median: 0.2962 ms
+- p95: 0.7028 ms
+- maximum: 1.8826 ms
 - threshold: p95 <= 16.7 ms, PASS
 
 Comparative 10,000 visible primitive case:
 - warmup frames: 10
 - measured frames: 60
-- median: 0.5000 ms
-- p95: 0.6535 ms
-- maximum: 0.7359 ms
+- median: 0.6036 ms
+- p95: 0.7990 ms
+- maximum: 1.6970 ms
 - comparative evidence only; it is not represented as the Gate threshold.
 
 Evidence SHA-256
 ---------------
-ee9584bf0f2e2c9863c473fe7b938e25d1f775de4ffe3c0e2d036e2db78e2815  docs/verification/PHASE_1A_BROWSER_PROOF.json
-f884312db341e8c8c9f3d0726ab1fe017792ca5df89bcbd17ca2017098624a98  docs/verification/PHASE_1A_PIXEL_READBACK.json
-b74162be5fc66ca84c363c5decf53bd30fba1bd6387a0da684738986c1cbb777  docs/PHASE_1A_METRICS.json
+86f795f2b95911d7f0a0d91bc13d66630886b7b45f6928b34b4fed9baa6f9bc6  docs/verification/PHASE_1A_BROWSER_PROOF.json
+0379f046e97495cbb0199b41fc8371815c7f325ff13cfa2d6f01e26a23708894  docs/verification/PHASE_1A_PIXEL_READBACK.json
+9a4882a67a53f099776b3e20ea0b06f9882d17cbaffb32db9f3f5ae42b556a66  docs/PHASE_1A_METRICS.json
 6353bb842f7f474b38012a052969df2962e1108734bdb0ac26b73c10509e1668  docs/verification/PHASE_1A_BROWSER_INCIDENT_PRE_FIX.json
-5ceec717d942e439dbb0d9ed630283869ff01bb4d0bd666a8651d2c1c5686859  docs/verification/phase1a-editor-default.png
-19151523b81ca6e899cd28e08d79a3f3a74453b4df40c9309c83d9895cabbd7d  docs/verification/phase1a-frame-4k.png
-dbc39099074844cb249bdfac5b15a22b6c54a1ce2ca928f249ae07448ed6d6cb  docs/verification/phase1a-appearance-aa.png
-720fc23556c4f3dbccd5c59a944b195026111868b83ed331a2ce215c815b9dc1  docs/verification/phase1a-dpr-zoom-matrix.png
+a7c4923378db301d567220135c884e69d0347bd533f9c2281bedb7298301c816  docs/verification/phase1a-editor-default.png
+8b89c7ca12a90652caf08e66b8c81f0df4466e7aec896f4e9cc772aa07bc8dfc  docs/verification/phase1a-frame-4k.png
+637130bb0e62894fc29463ccf69d9ab61b635f1fbd3b608e2539281d2a23e0b1  docs/verification/phase1a-appearance-aa.png
+740bd2655a0f72ec31cba540fcbe023864525b707fb08d9212ec0ddf2f71d609  docs/verification/phase1a-dpr-zoom-matrix.png
+d74d6e9139b6c574f10b9414764727e747f29ae07c7416977034776dbad70610  docs/verification/phase1a-color-contract.png
+9c69a6b2f530d84e0e3b28c270f969ecfffb1c6129b093a9feba2b7023942f9e  docs/verification/phase1a-affine-parity.png
 
 Preserved incident
 ------------------
-PHASE_1A_BROWSER_INCIDENT_PRE_FIX.json records the pre-fix condition_timeout while waiting for the Resizing FSM. It remains evidence of a failed run and is not represented as a current pass. Hardware proof development also exposed and led to correction of a nonuniform ellipse centered-stroke quad clipping defect and an affine selection-overlay mapping defect.
+PHASE_1A_BROWSER_INCIDENT_PRE_FIX.json and all PHASE_1A_BROWSER_FAILURE / BROWSER_PROOF_FAILED / PIXEL_READBACK_FAILED artifacts remain failed-run evidence and are not represented as current passes. They record the affine viewport sample, async pointer-up, non-isolated backdrop, threshold-width, opposite-edge, and inward-AA harness corrections that preceded the final passing proof.
 
 CI first-run incident and correction
 ------------------------------------

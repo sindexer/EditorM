@@ -55,17 +55,11 @@ fn vs_main(
     let slot = visible_slots[visible_index];
     let item = instances[slot];
     let half_stroke = item.stroke_width * 0.5;
-    let ellipse_axis_ratio = max(item.size.x, item.size.y) /
-        max(min(item.size.x, item.size.y), 0.000001);
-    let expansion = select(
-        half_stroke,
-        half_stroke * ellipse_axis_ratio,
-        item.primitive == 1u,
-    );
-    let local = uv * (item.size + vec2<f32>(expansion * 2.0)) - vec2<f32>(expansion);
+    let expansion = vec2<f32>(half_stroke);
+    let local = uv * (item.size + expansion * 2.0) - expansion;
     let transformed = vec2<f32>(
-        item.linear.x * local.x + item.linear.z * local.y,
-        item.linear.y * local.x + item.linear.w * local.y,
+        item.linear.x * local.x + item.linear.y * local.y,
+        item.linear.z * local.x + item.linear.w * local.y,
     );
     let relative_translation =
         (item.translation_hi - view.center_hi) +
@@ -123,7 +117,12 @@ fn rounded_rectangle_distance(
 fn ellipse_distance(local: vec2<f32>, size: vec2<f32>) -> f32 {
     let radii = max(size * 0.5, vec2<f32>(0.000001));
     let normalized = (local - size * 0.5) / radii;
-    return (length(normalized) - 1.0) * min(radii.x, radii.y);
+    let normalized_length = length(normalized);
+    if normalized_length < 0.000001 {
+        return -min(radii.x, radii.y);
+    }
+    let gradient_length = length(normalized / radii) / normalized_length;
+    return (normalized_length - 1.0) / max(gradient_length, 0.000001);
 }
 
 fn coverage(distance: f32) -> f32 {
@@ -149,11 +148,11 @@ fn fs_main(input: VertexOutput) -> @location(0) vec4<f32> {
     let fill_coverage = mix(outer_coverage, inner_coverage, stroke_enabled);
     let stroke_coverage = max(outer_coverage - fill_coverage, 0.0);
 
-    let fill_alpha = input.fill_linear.a * input.opacity * fill_coverage;
-    let stroke_alpha = input.stroke_linear.a * input.opacity * stroke_coverage;
-    let alpha = stroke_alpha + fill_alpha * (1.0 - stroke_alpha);
+    let fill_alpha = input.fill_linear.a * fill_coverage;
+    let stroke_alpha = input.stroke_linear.a * stroke_coverage;
+    let alpha = fill_alpha + stroke_alpha;
     let premultiplied =
-        input.stroke_linear.rgb * stroke_alpha +
-        input.fill_linear.rgb * fill_alpha * (1.0 - stroke_alpha);
-    return vec4<f32>(premultiplied, alpha);
+        input.fill_linear.rgb * fill_alpha +
+        input.stroke_linear.rgb * stroke_alpha;
+    return vec4<f32>(premultiplied, alpha) * input.opacity;
 }

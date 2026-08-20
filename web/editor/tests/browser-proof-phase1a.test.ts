@@ -12,6 +12,17 @@ function readJson(relativePath: string) {
 const browser = readJson("docs/verification/PHASE_1A_BROWSER_PROOF.json");
 const pixels = readJson("docs/verification/PHASE_1A_PIXEL_READBACK.json");
 const metrics = readJson("docs/PHASE_1A_METRICS.json");
+const requiredAssertions = [
+  "affine_semantic_parity",
+  "srgb_render_view_active",
+  "expected_color_contract_match",
+  "halo_free_black_background",
+  "halo_free_white_background",
+  "fill_stroke_boundary_has_no_alpha_dip",
+  "ellipse_stroke_width_uniform",
+  "render_hit_test_overlay_parity",
+];
+
 
 describe("Phase 1A stored proof integrity", () => {
   test("browser proof records a fresh real Chrome Worker/WASM/WebGPU run", () => {
@@ -31,12 +42,19 @@ describe("Phase 1A stored proof integrity", () => {
     expect(browser.initial.wasm_initialized).toBe(true);
     expect(browser.initial.actual_webgpu).toBe(true);
     expect(Object.values(browser.checks).every(Boolean)).toBe(true);
+    expect(browser.gpu.surface_base_format).toMatch(/^(bgra|rgba)8unorm$/);
+    expect(browser.gpu.pipeline_view_format).toBe(`${browser.gpu.surface_base_format}-srgb`);
+    expect(browser.gpu.readback_view_format).toBe(browser.gpu.pipeline_view_format);
+    for (const assertion of requiredAssertions) {
+      expect(browser.checks[assertion]).toBe(true);
+    }
+    expect(browser.passed_assertion_count).toBe(browser.assertion_count);
     expect(browser.console_errors).toEqual([]);
     expect(browser.max_fallback_rebuild_count_seen).toBe(0);
   });
 
   test("every screenshot in the browser proof exists with the recorded byte size", () => {
-    expect(Object.keys(browser.screenshots)).toHaveLength(4);
+    expect(Object.keys(browser.screenshots)).toHaveLength(6);
     for (const screenshot of Object.values(browser.screenshots) as Array<{ path: string; bytes: number }>) {
       const screenshotPath = path.join(workspace, screenshot.path);
       expect(existsSync(screenshotPath)).toBe(true);
@@ -70,6 +88,37 @@ describe("Phase 1A stored proof integrity", () => {
     }
     expect(Object.values(pixels.assertions).every(Boolean)).toBe(true);
   });
+  test("pixel proof is fail-closed for sRGB, affine, color, and ellipse contracts", () => {
+    expect(pixels.surface_base_format).toMatch(/^(bgra|rgba)8unorm$/);
+    expect(pixels.pipeline_view_format).toBe(`${pixels.surface_base_format}-srgb`);
+    expect(pixels.readback_view_format).toBe(pixels.pipeline_view_format);
+    expect(pixels.ellipse_stroke_measurement_count).toBe(48);
+    expect(pixels.ellipse_stroke_measurements).toHaveLength(48);
+    expect(pixels.color_contract_cases).toHaveLength(3);
+    expect(pixels.color_contract_max_channel_error).toBeLessThanOrEqual(
+      pixels.color_channel_tolerance_linear,
+    );
+    for (const assertion of requiredAssertions) {
+      expect(pixels.assertions[assertion]).toBe(true);
+    }
+    expect(pixels.passed_assertion_count).toBe(pixels.assertion_count);
+    expect(pixels.affine_parity.m12_not_equal_m21).toBe(true);
+    expect(pixels.affine_parity.transposed_click_does_not_select_shape).toBe(true);
+    expect(pixels.ellipse_stroke_measurements.every((entry: { passed: boolean }) => entry.passed)).toBe(true);
+    expect(pixels.ellipse_stroke_measurement_method).toBe(
+      "integrated connected linear coverage over an isolated black backdrop",
+    );
+    expect(pixels.ellipse_stroke_tolerance_physical).toBe(1);
+    expect(pixels.ellipse_stroke_max_error_physical).toBeLessThanOrEqual(1);
+    for (const entry of pixels.ellipse_stroke_measurements as Array<{
+      major: { absolute_error_physical: number; tolerance_physical: number };
+      minor: { absolute_error_physical: number; tolerance_physical: number };
+    }>) {
+      expect(entry.major.absolute_error_physical).toBeLessThanOrEqual(entry.major.tolerance_physical);
+      expect(entry.minor.absolute_error_physical).toBeLessThanOrEqual(entry.minor.tolerance_physical);
+    }
+  });
+
 
   test("native GTX 970 performance proof preserves raw samples and required threshold", () => {
     const required = metrics.required_1000_visible;

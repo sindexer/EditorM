@@ -1,17 +1,17 @@
 {
   "phase": "1A",
   "proof_kind": "actual-hardware-browser",
-  "captured_at_utc": "2026-08-20T05:22:10.457Z",
-  "browser": "Chrome/151.0.7922.138",
+  "captured_at_utc": "2026-08-14T01:09:32.951Z",
+  "browser": "Chrome/151.0.7922.110",
   "browser_mode": "actual Chrome; no mock; no Canvas2D fallback",
   "execution": {
     "command": "npm run test:browser:phase1a",
-    "started_at_utc": "2026-08-20T05:21:32.832Z",
-    "finished_at_utc": "2026-08-20T05:22:10.457Z"
+    "started_at_utc": "2026-08-14T01:08:59.326Z",
+    "finished_at_utc": "2026-08-14T01:09:32.951Z"
   },
   "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/151.0.0.0 Safari/537.36",
-  "chrome_process_id": 17468,
-  "chrome_profile": "C:\\Users\\thdwl\\AppData\\Local\\Temp\\phase1a-chrome-12372-1787203292832",
+  "chrome_process_id": 2472,
+  "chrome_profile": "C:\\Users\\thdwl\\AppData\\Local\\Temp\\phase1a-chrome-6740-1786669739326",
   "gpu": {
     "adapter": "maxwell",
     "backend": "browser-webgpu (implementation backend not exposed by Web API)",
@@ -30,7 +30,7 @@
     }
   },
   "preview": {
-    "url": "http://127.0.0.1:61355/",
+    "url": "http://127.0.0.1:51885/",
     "health": {
       "ok": true,
       "status": 200,
@@ -57,7 +57,7 @@
         "content_type": "application/wasm"
       }
     },
-    "stdout": "Phase 0E editor: http://127.0.0.1:61355/\n",
+    "stdout": "Phase 0E editor: http://127.0.0.1:51885/\n",
     "stderr": ""
   },
   "initial": {
@@ -144,8 +144,8 @@
       "buffer_bytes": 264,
       "upload_calls": 2,
       "frame_upload_bytes": 36,
-      "render_submit_ms": 0.800000011920929,
-      "frame_ms": 0.9000000059604645,
+      "render_submit_ms": 2.2000000001862645,
+      "frame_ms": 2.2999999998137355,
       "validation_errors": 0,
       "frame_sequence": 5,
       "gpu_encode_attempted": 0,
@@ -328,8 +328,8 @@
         "buffer_bytes": 264,
         "upload_calls": 1,
         "frame_upload_bytes": 32,
-        "render_submit_ms": 53.80000001192093,
-        "frame_ms": 53.80000001192093,
+        "render_submit_ms": 0.8000000002793968,
+        "frame_ms": 0.8999999999068677,
         "validation_errors": 0,
         "frame_sequence": 7,
         "gpu_encode_attempted": 0,
@@ -576,8 +576,8 @@
         "buffer_bytes": 264,
         "upload_calls": 1,
         "frame_upload_bytes": 32,
-        "render_submit_ms": 0.800000011920929,
-        "frame_ms": 0.9000000059604645,
+        "render_submit_ms": 0.900000000372529,
+        "frame_ms": 1,
         "validation_errors": 0,
         "frame_sequence": 9,
         "gpu_encode_attempted": 0,
@@ -613,7 +613,7 @@
         "sequenceDenseIndexRewrites": 0
       },
       "selection": [
-        "c8f97f7a-8cfa-42b5-8dd6-175b96b93d53"
+        "6b27222f-b153-4461-ac27-c9849f8231b0"
       ],
       "response_gpu_overlay_sequence_match": true,
       "fsm": "Idle",
@@ -669,7 +669,7 @@
           "height": 2160,
           "width": 3840
         },
-        "id": "c8f97f7a-8cfa-42b5-8dd6-175b96b93d53",
+        "id": "6b27222f-b153-4461-ac27-c9849f8231b0",
         "kind": "frame",
         "local_transform": [
           1,
@@ -763,7 +763,7 @@
       "fixture": "EDITOR",
       "metrics": {
         "allocation_growth_count": 0,
-        "cpu_update_ms": 4,
+        "cpu_update_ms": 2,
         "culling_candidates": 1,
         "document_full_clones": 0,
         "document_nodes": 2,
@@ -824,8 +824,8 @@
         "buffer_bytes": 264,
         "upload_calls": 3,
         "frame_upload_bytes": 148,
-        "render_submit_ms": 1.0999999940395355,
-        "frame_ms": 1.4000000059604645,
+        "render_submit_ms": 1.3999999999068677,
+        "frame_ms": 1.5,
         "validation_errors": 0,
         "frame_sequence": 10,
         "gpu_encode_attempted": 0,
@@ -1007,8 +1007,8 @@
         "buffer_bytes": 264,
         "upload_calls": 2,
         "frame_upload_bytes": 40,
-        "render_submit_ms": 2.5,
-        "frame_ms": 2.5999999940395355,
+        "render_submit_ms": 1.6000000000931323,
+        "frame_ms": 1.6000000000931323,
         "validation_errors": 0,
         "frame_sequence": 14,
         "gpu_encode_attempted": 0,
@@ -1044,7 +1044,7 @@
         "sequenceDenseIndexRewrites": 0
       },
       "selection": [
-        "c8f97f7a-8cfa-42b5-8dd6-175b96b93d53"
+        "6b27222f-b153-4461-ac27-c9849f8231b0"
       ],
       "response_gpu_overlay_sequence_match": true,
       "fsm": "Idle",
@@ -1100,7 +1100,7 @@
           "height": 2160,
           "width": 3840
         },
-        "id": "c8f97f7a-8cfa-42b5-8dd6-175b96b93d53",
+        "id": "6b27222f-b153-4461-ac27-c9849f8231b0",
         "kind": "frame",
         "local_transform": [
           1,
@@ -1194,7 +1194,7 @@
       "fixture": "EDITOR",
       "metrics": {
         "allocation_growth_count": 0,
-        "cpu_update_ms": 1,
+        "cpu_update_ms": 0,
         "culling_candidates": 2,
         "document_full_clones": 0,
         "document_nodes": 3,
@@ -1255,8 +1255,8 @@
         "buffer_bytes": 264,
         "upload_calls": 3,
         "frame_upload_bytes": 152,
-        "render_submit_ms": 2.300000011920929,
-        "frame_ms": 2.5,
+        "render_submit_ms": 5.5,
+        "frame_ms": 5.5,
         "validation_errors": 0,
         "frame_sequence": 19,
         "gpu_encode_attempted": 1,
@@ -1292,7 +1292,7 @@
         "sequenceDenseIndexRewrites": 0
       },
       "selection": [
-        "c8f97f7a-8cfa-42b5-8dd6-175b96b93d53"
+        "6b27222f-b153-4461-ac27-c9849f8231b0"
       ],
       "response_gpu_overlay_sequence_match": true,
       "fsm": "Idle",
@@ -1348,7 +1348,7 @@
           "height": 2160,
           "width": 3840
         },
-        "id": "c8f97f7a-8cfa-42b5-8dd6-175b96b93d53",
+        "id": "6b27222f-b153-4461-ac27-c9849f8231b0",
         "kind": "frame",
         "local_transform": [
           1,
@@ -1452,7 +1452,7 @@
           430.69103383271795,
           307.80871667070977
         ],
-        "hit_topmost": "d3c90c45-b2ab-427b-939c-ddcf8ab7f16e",
+        "hit_topmost": "b75519c7-8872-4746-bc83-3d49ce9bafa9",
         "pixel": {
           "x": 430.69103383271795,
           "y": 307.80871667070977,
@@ -1469,7 +1469,7 @@
             255
           ]
         },
-        "click_selected": "d3c90c45-b2ab-427b-939c-ddcf8ab7f16e"
+        "click_selected": "b75519c7-8872-4746-bc83-3d49ce9bafa9"
       },
       "transposed_only": {
         "local": [
@@ -1485,7 +1485,7 @@
           418.9337907199665,
           236.29881492690595
         ],
-        "hit_topmost": "c8f97f7a-8cfa-42b5-8dd6-175b96b93d53",
+        "hit_topmost": "6b27222f-b153-4461-ac27-c9849f8231b0",
         "pixel": {
           "x": 418.9337907199665,
           "y": 236.29881492690595,
@@ -1496,13 +1496,13 @@
           "raw_channel_order": "BGRA",
           "normalized_channel_order": "RGBA",
           "rgba": [
-            0,
-            0,
-            0,
+            114,
+            115,
+            116,
             255
           ]
         },
-        "click_selected": "c8f97f7a-8cfa-42b5-8dd6-175b96b93d53"
+        "click_selected": "6b27222f-b153-4461-ac27-c9849f8231b0"
       },
       "expected_overlay_points": [
         [
@@ -1559,14 +1559,14 @@
       "readback_view_format": "bgra8unorm-srgb",
       "worker_runtime_owner": "dedicated-worker",
       "wasm_initialized": true,
-      "heartbeat": 33,
-      "engine_sequence": 362,
-      "gpu_frame_sequence": 362,
-      "overlay_sequence": 362,
+      "heartbeat": 30,
+      "engine_sequence": 356,
+      "gpu_frame_sequence": 356,
+      "overlay_sequence": 356,
       "revisions": {
-        "document": 77,
-        "render": 77,
-        "scene": 77
+        "document": 74,
+        "render": 74,
+        "scene": 74
       },
       "fixture": "EDITOR",
       "metrics": {
@@ -1593,7 +1593,7 @@
         "full_render_model_scans": 0,
         "gpu_encode_attempted": 0,
         "gpu_encode_omitted": 0,
-        "indexed_nodes": 3,
+        "indexed_nodes": 4,
         "instance_upload_bytes": 0,
         "invalid_derived_nodes": 0,
         "order_nodes_visited": 0,
@@ -1627,30 +1627,30 @@
       "gpu": {
         "draw_calls": 1,
         "batches": 1,
-        "submitted_instances": 3,
+        "submitted_instances": 4,
         "buffer_count": 3,
-        "buffer_bytes": 492,
+        "buffer_bytes": 496,
         "upload_calls": 1,
         "frame_upload_bytes": 32,
-        "render_submit_ms": 1.4000000059604645,
-        "frame_ms": 1.4000000059604645,
+        "render_submit_ms": 1.3999999999068677,
+        "frame_ms": 1.5,
         "validation_errors": 0,
-        "frame_sequence": 362,
+        "frame_sequence": 356,
         "gpu_encode_attempted": 0,
         "gpu_encode_omitted": 0,
         "instance_upload_bytes": 0,
         "visible_slot_upload_bytes": 0,
-        "allocation_growth_count": 7
+        "allocation_growth_count": 8
       },
       "ui": {
         "projectionFullSnapshots": 2,
-        "projectionDeltaNodes": 75,
+        "projectionDeltaNodes": 72,
         "layersFullSerializes": 2,
         "hierarchyRebuilds": 2,
         "hierarchyNodesVisited": 5,
         "hierarchyFullRebuilds": 2,
         "projectionStructuralOperations": 5,
-        "layersFlattenedNodesVisited": 1520,
+        "layersFlattenedNodesVisited": 1493,
         "mountedRows": 5,
         "pointerRawIntents": 34,
         "pointerRequestsSent": 21,
@@ -1669,7 +1669,7 @@
         "sequenceDenseIndexRewrites": 0
       },
       "selection": [
-        "d3c90c45-b2ab-427b-939c-ddcf8ab7f16e"
+        "b75519c7-8872-4746-bc83-3d49ce9bafa9"
       ],
       "response_gpu_overlay_sequence_match": true,
       "fsm": "Idle",
@@ -1681,7 +1681,7 @@
       "history": {
         "redo_depth": 0,
         "transaction_active": false,
-        "undo_depth": 56
+        "undo_depth": 53
       },
       "camera": {
         "center": [
@@ -1725,7 +1725,7 @@
           "height": 60,
           "width": 160
         },
-        "id": "d3c90c45-b2ab-427b-939c-ddcf8ab7f16e",
+        "id": "b75519c7-8872-4746-bc83-3d49ce9bafa9",
         "kind": "rectangle",
         "local_transform": [
           0.838670567945424,
@@ -1775,11 +1775,11 @@
         "allocated_slots": 4,
         "dirty_record_stride_bytes": 116,
         "free_slots": 0,
-        "gpu_encodable_items": 3,
+        "gpu_encodable_items": 4,
         "gpu_omitted_items": 0,
         "instance_capacity": 4,
         "instance_stride_bytes": 112,
-        "renderable_items": 3,
+        "renderable_items": 4,
         "total_render_items": 4
       },
       "binary": {
@@ -1807,14 +1807,14 @@
       "readback_view_format": "bgra8unorm-srgb",
       "worker_runtime_owner": "dedicated-worker",
       "wasm_initialized": true,
-      "heartbeat": 34,
-      "engine_sequence": 372,
-      "gpu_frame_sequence": 372,
-      "overlay_sequence": 372,
+      "heartbeat": 30,
+      "engine_sequence": 365,
+      "gpu_frame_sequence": 365,
+      "overlay_sequence": 365,
       "revisions": {
-        "document": 84,
-        "render": 84,
-        "scene": 84
+        "document": 81,
+        "render": 81,
+        "scene": 81
       },
       "fixture": "EDITOR",
       "metrics": {
@@ -1841,7 +1841,7 @@
         "full_render_model_scans": 0,
         "gpu_encode_attempted": 0,
         "gpu_encode_omitted": 0,
-        "indexed_nodes": 3,
+        "indexed_nodes": 4,
         "instance_upload_bytes": 0,
         "invalid_derived_nodes": 0,
         "order_nodes_visited": 0,
@@ -1875,30 +1875,30 @@
       "gpu": {
         "draw_calls": 1,
         "batches": 1,
-        "submitted_instances": 3,
+        "submitted_instances": 4,
         "buffer_count": 3,
-        "buffer_bytes": 492,
+        "buffer_bytes": 496,
         "upload_calls": 1,
         "frame_upload_bytes": 32,
-        "render_submit_ms": 1.199999988079071,
-        "frame_ms": 1.199999988079071,
+        "render_submit_ms": 0.8999999999068677,
+        "frame_ms": 1,
         "validation_errors": 0,
-        "frame_sequence": 372,
+        "frame_sequence": 365,
         "gpu_encode_attempted": 0,
         "gpu_encode_omitted": 0,
         "instance_upload_bytes": 0,
         "visible_slot_upload_bytes": 0,
-        "allocation_growth_count": 7
+        "allocation_growth_count": 8
       },
       "ui": {
         "projectionFullSnapshots": 2,
-        "projectionDeltaNodes": 82,
+        "projectionDeltaNodes": 79,
         "layersFullSerializes": 2,
         "hierarchyRebuilds": 2,
         "hierarchyNodesVisited": 5,
         "hierarchyFullRebuilds": 2,
         "projectionStructuralOperations": 5,
-        "layersFlattenedNodesVisited": 1565,
+        "layersFlattenedNodesVisited": 1538,
         "mountedRows": 5,
         "pointerRawIntents": 46,
         "pointerRequestsSent": 28,
@@ -1917,7 +1917,7 @@
         "sequenceDenseIndexRewrites": 0
       },
       "selection": [
-        "d3c90c45-b2ab-427b-939c-ddcf8ab7f16e"
+        "b75519c7-8872-4746-bc83-3d49ce9bafa9"
       ],
       "response_gpu_overlay_sequence_match": true,
       "fsm": "Idle",
@@ -1929,7 +1929,7 @@
       "history": {
         "redo_depth": 0,
         "transaction_active": false,
-        "undo_depth": 57
+        "undo_depth": 54
       },
       "camera": {
         "center": [
@@ -1973,7 +1973,7 @@
           "height": 62.9797434459316,
           "width": 164.68245398646394
         },
-        "id": "d3c90c45-b2ab-427b-939c-ddcf8ab7f16e",
+        "id": "b75519c7-8872-4746-bc83-3d49ce9bafa9",
         "kind": "rectangle",
         "local_transform": [
           0.838670567945424,
@@ -2023,11 +2023,11 @@
         "allocated_slots": 4,
         "dirty_record_stride_bytes": 116,
         "free_slots": 0,
-        "gpu_encodable_items": 3,
+        "gpu_encodable_items": 4,
         "gpu_omitted_items": 0,
         "instance_capacity": 4,
         "instance_stride_bytes": 112,
-        "renderable_items": 3,
+        "renderable_items": 4,
         "total_render_items": 4
       },
       "binary": {
@@ -2055,20 +2055,20 @@
       "readback_view_format": "bgra8unorm-srgb",
       "worker_runtime_owner": "dedicated-worker",
       "wasm_initialized": true,
-      "heartbeat": 34,
-      "engine_sequence": 373,
-      "gpu_frame_sequence": 373,
-      "overlay_sequence": 373,
+      "heartbeat": 30,
+      "engine_sequence": 366,
+      "gpu_frame_sequence": 366,
+      "overlay_sequence": 366,
       "revisions": {
-        "document": 85,
-        "render": 85,
-        "scene": 85
+        "document": 82,
+        "render": 82,
+        "scene": 82
       },
       "fixture": "EDITOR",
       "metrics": {
         "allocation_growth_count": 0,
         "cpu_update_ms": 0,
-        "culling_candidates": 3,
+        "culling_candidates": 4,
         "document_full_clones": 0,
         "document_nodes": 5,
         "document_nodes_scanned": 1,
@@ -2089,13 +2089,13 @@
         "full_render_model_scans": 0,
         "gpu_encode_attempted": 1,
         "gpu_encode_omitted": 0,
-        "indexed_nodes": 3,
+        "indexed_nodes": 4,
         "instance_upload_bytes": 112,
         "invalid_derived_nodes": 0,
-        "order_nodes_visited": 12,
+        "order_nodes_visited": 24,
         "render_items_cloned": 0,
         "render_items_planned": 1,
-        "render_items_read": 4,
+        "render_items_read": 5,
         "render_items_written": 1,
         "scene_nodes_visited": 2,
         "scene_sequence_allocated_bytes": 0,
@@ -2117,36 +2117,36 @@
         "ui_nodes_serialized": 1,
         "ui_projection_payload_bytes": 845,
         "ui_structural_operations": 0,
-        "visible_items": 3,
-        "visible_slot_upload_bytes": 12
+        "visible_items": 4,
+        "visible_slot_upload_bytes": 16
       },
       "gpu": {
         "draw_calls": 1,
         "batches": 1,
-        "submitted_instances": 3,
+        "submitted_instances": 4,
         "buffer_count": 3,
-        "buffer_bytes": 492,
+        "buffer_bytes": 496,
         "upload_calls": 3,
-        "frame_upload_bytes": 156,
-        "render_submit_ms": 3.4000000059604645,
-        "frame_ms": 3.4000000059604645,
+        "frame_upload_bytes": 160,
+        "render_submit_ms": 2.6999999997206032,
+        "frame_ms": 2.7999999998137355,
         "validation_errors": 0,
-        "frame_sequence": 373,
+        "frame_sequence": 366,
         "gpu_encode_attempted": 1,
         "gpu_encode_omitted": 0,
         "instance_upload_bytes": 112,
-        "visible_slot_upload_bytes": 12,
-        "allocation_growth_count": 7
+        "visible_slot_upload_bytes": 16,
+        "allocation_growth_count": 8
       },
       "ui": {
         "projectionFullSnapshots": 2,
-        "projectionDeltaNodes": 83,
+        "projectionDeltaNodes": 80,
         "layersFullSerializes": 2,
         "hierarchyRebuilds": 2,
         "hierarchyNodesVisited": 5,
         "hierarchyFullRebuilds": 2,
         "projectionStructuralOperations": 5,
-        "layersFlattenedNodesVisited": 1570,
+        "layersFlattenedNodesVisited": 1543,
         "mountedRows": 5,
         "pointerRawIntents": 46,
         "pointerRequestsSent": 28,
@@ -2165,7 +2165,7 @@
         "sequenceDenseIndexRewrites": 0
       },
       "selection": [
-        "d3c90c45-b2ab-427b-939c-ddcf8ab7f16e"
+        "b75519c7-8872-4746-bc83-3d49ce9bafa9"
       ],
       "response_gpu_overlay_sequence_match": true,
       "fsm": "Idle",
@@ -2177,7 +2177,7 @@
       "history": {
         "redo_depth": 0,
         "transaction_active": false,
-        "undo_depth": 58
+        "undo_depth": 55
       },
       "camera": {
         "center": [
@@ -2221,7 +2221,7 @@
           "height": 62.9797434459316,
           "width": 165.68245398646394
         },
-        "id": "d3c90c45-b2ab-427b-939c-ddcf8ab7f16e",
+        "id": "b75519c7-8872-4746-bc83-3d49ce9bafa9",
         "kind": "rectangle",
         "local_transform": [
           0.838670567945424,
@@ -2271,11 +2271,11 @@
         "allocated_slots": 4,
         "dirty_record_stride_bytes": 116,
         "free_slots": 0,
-        "gpu_encodable_items": 3,
+        "gpu_encodable_items": 4,
         "gpu_omitted_items": 0,
         "instance_capacity": 4,
         "instance_stride_bytes": 112,
-        "renderable_items": 3,
+        "renderable_items": 4,
         "total_render_items": 4
       },
       "binary": {
@@ -2303,20 +2303,20 @@
       "readback_view_format": "bgra8unorm-srgb",
       "worker_runtime_owner": "dedicated-worker",
       "wasm_initialized": true,
-      "heartbeat": 34,
-      "engine_sequence": 374,
-      "gpu_frame_sequence": 374,
-      "overlay_sequence": 374,
+      "heartbeat": 30,
+      "engine_sequence": 367,
+      "gpu_frame_sequence": 367,
+      "overlay_sequence": 367,
       "revisions": {
-        "document": 86,
-        "render": 86,
-        "scene": 86
+        "document": 83,
+        "render": 83,
+        "scene": 83
       },
       "fixture": "EDITOR",
       "metrics": {
         "allocation_growth_count": 0,
         "cpu_update_ms": 0,
-        "culling_candidates": 3,
+        "culling_candidates": 4,
         "document_full_clones": 0,
         "document_nodes": 5,
         "document_nodes_scanned": 1,
@@ -2337,13 +2337,13 @@
         "full_render_model_scans": 0,
         "gpu_encode_attempted": 1,
         "gpu_encode_omitted": 0,
-        "indexed_nodes": 3,
+        "indexed_nodes": 4,
         "instance_upload_bytes": 112,
         "invalid_derived_nodes": 0,
-        "order_nodes_visited": 12,
+        "order_nodes_visited": 24,
         "render_items_cloned": 0,
         "render_items_planned": 1,
-        "render_items_read": 4,
+        "render_items_read": 5,
         "render_items_written": 1,
         "scene_nodes_visited": 2,
         "scene_sequence_allocated_bytes": 0,
@@ -2365,36 +2365,36 @@
         "ui_nodes_serialized": 1,
         "ui_projection_payload_bytes": 846,
         "ui_structural_operations": 0,
-        "visible_items": 3,
-        "visible_slot_upload_bytes": 12
+        "visible_items": 4,
+        "visible_slot_upload_bytes": 16
       },
       "gpu": {
         "draw_calls": 1,
         "batches": 1,
-        "submitted_instances": 3,
+        "submitted_instances": 4,
         "buffer_count": 3,
-        "buffer_bytes": 492,
+        "buffer_bytes": 496,
         "upload_calls": 3,
-        "frame_upload_bytes": 156,
-        "render_submit_ms": 5.299999982118607,
-        "frame_ms": 5.299999982118607,
+        "frame_upload_bytes": 160,
+        "render_submit_ms": 1,
+        "frame_ms": 1.2000000001862645,
         "validation_errors": 0,
-        "frame_sequence": 374,
+        "frame_sequence": 367,
         "gpu_encode_attempted": 1,
         "gpu_encode_omitted": 0,
         "instance_upload_bytes": 112,
-        "visible_slot_upload_bytes": 12,
-        "allocation_growth_count": 7
+        "visible_slot_upload_bytes": 16,
+        "allocation_growth_count": 8
       },
       "ui": {
         "projectionFullSnapshots": 2,
-        "projectionDeltaNodes": 84,
+        "projectionDeltaNodes": 81,
         "layersFullSerializes": 2,
         "hierarchyRebuilds": 2,
         "hierarchyNodesVisited": 5,
         "hierarchyFullRebuilds": 2,
         "projectionStructuralOperations": 5,
-        "layersFlattenedNodesVisited": 1575,
+        "layersFlattenedNodesVisited": 1548,
         "mountedRows": 5,
         "pointerRawIntents": 46,
         "pointerRequestsSent": 28,
@@ -2413,7 +2413,7 @@
         "sequenceDenseIndexRewrites": 0
       },
       "selection": [
-        "d3c90c45-b2ab-427b-939c-ddcf8ab7f16e"
+        "b75519c7-8872-4746-bc83-3d49ce9bafa9"
       ],
       "response_gpu_overlay_sequence_match": true,
       "fsm": "Idle",
@@ -2425,7 +2425,7 @@
       "history": {
         "redo_depth": 1,
         "transaction_active": false,
-        "undo_depth": 57
+        "undo_depth": 54
       },
       "camera": {
         "center": [
@@ -2469,7 +2469,7 @@
           "height": 62.9797434459316,
           "width": 164.68245398646394
         },
-        "id": "d3c90c45-b2ab-427b-939c-ddcf8ab7f16e",
+        "id": "b75519c7-8872-4746-bc83-3d49ce9bafa9",
         "kind": "rectangle",
         "local_transform": [
           0.838670567945424,
@@ -2519,11 +2519,11 @@
         "allocated_slots": 4,
         "dirty_record_stride_bytes": 116,
         "free_slots": 0,
-        "gpu_encodable_items": 3,
+        "gpu_encodable_items": 4,
         "gpu_omitted_items": 0,
         "instance_capacity": 4,
         "instance_stride_bytes": 112,
-        "renderable_items": 3,
+        "renderable_items": 4,
         "total_render_items": 4
       },
       "binary": {
@@ -2551,20 +2551,20 @@
       "readback_view_format": "bgra8unorm-srgb",
       "worker_runtime_owner": "dedicated-worker",
       "wasm_initialized": true,
-      "heartbeat": 34,
-      "engine_sequence": 375,
-      "gpu_frame_sequence": 375,
-      "overlay_sequence": 375,
+      "heartbeat": 31,
+      "engine_sequence": 368,
+      "gpu_frame_sequence": 368,
+      "overlay_sequence": 368,
       "revisions": {
-        "document": 87,
-        "render": 87,
-        "scene": 87
+        "document": 84,
+        "render": 84,
+        "scene": 84
       },
       "fixture": "EDITOR",
       "metrics": {
         "allocation_growth_count": 0,
         "cpu_update_ms": 0,
-        "culling_candidates": 3,
+        "culling_candidates": 4,
         "document_full_clones": 0,
         "document_nodes": 5,
         "document_nodes_scanned": 1,
@@ -2585,13 +2585,13 @@
         "full_render_model_scans": 0,
         "gpu_encode_attempted": 1,
         "gpu_encode_omitted": 0,
-        "indexed_nodes": 3,
+        "indexed_nodes": 4,
         "instance_upload_bytes": 112,
         "invalid_derived_nodes": 0,
-        "order_nodes_visited": 12,
+        "order_nodes_visited": 24,
         "render_items_cloned": 0,
         "render_items_planned": 1,
-        "render_items_read": 4,
+        "render_items_read": 5,
         "render_items_written": 1,
         "scene_nodes_visited": 2,
         "scene_sequence_allocated_bytes": 0,
@@ -2613,36 +2613,36 @@
         "ui_nodes_serialized": 1,
         "ui_projection_payload_bytes": 845,
         "ui_structural_operations": 0,
-        "visible_items": 3,
-        "visible_slot_upload_bytes": 12
+        "visible_items": 4,
+        "visible_slot_upload_bytes": 16
       },
       "gpu": {
         "draw_calls": 1,
         "batches": 1,
-        "submitted_instances": 3,
+        "submitted_instances": 4,
         "buffer_count": 3,
-        "buffer_bytes": 492,
+        "buffer_bytes": 496,
         "upload_calls": 3,
-        "frame_upload_bytes": 156,
-        "render_submit_ms": 1.2999999821186066,
-        "frame_ms": 1.2999999821186066,
+        "frame_upload_bytes": 160,
+        "render_submit_ms": 1.5,
+        "frame_ms": 1.599999999627471,
         "validation_errors": 0,
-        "frame_sequence": 375,
+        "frame_sequence": 368,
         "gpu_encode_attempted": 1,
         "gpu_encode_omitted": 0,
         "instance_upload_bytes": 112,
-        "visible_slot_upload_bytes": 12,
-        "allocation_growth_count": 7
+        "visible_slot_upload_bytes": 16,
+        "allocation_growth_count": 8
       },
       "ui": {
         "projectionFullSnapshots": 2,
-        "projectionDeltaNodes": 85,
+        "projectionDeltaNodes": 82,
         "layersFullSerializes": 2,
         "hierarchyRebuilds": 2,
         "hierarchyNodesVisited": 5,
         "hierarchyFullRebuilds": 2,
         "projectionStructuralOperations": 5,
-        "layersFlattenedNodesVisited": 1580,
+        "layersFlattenedNodesVisited": 1558,
         "mountedRows": 5,
         "pointerRawIntents": 46,
         "pointerRequestsSent": 28,
@@ -2661,7 +2661,7 @@
         "sequenceDenseIndexRewrites": 0
       },
       "selection": [
-        "d3c90c45-b2ab-427b-939c-ddcf8ab7f16e"
+        "b75519c7-8872-4746-bc83-3d49ce9bafa9"
       ],
       "response_gpu_overlay_sequence_match": true,
       "fsm": "Idle",
@@ -2673,7 +2673,7 @@
       "history": {
         "redo_depth": 0,
         "transaction_active": false,
-        "undo_depth": 58
+        "undo_depth": 55
       },
       "camera": {
         "center": [
@@ -2717,7 +2717,7 @@
           "height": 62.9797434459316,
           "width": 165.68245398646394
         },
-        "id": "d3c90c45-b2ab-427b-939c-ddcf8ab7f16e",
+        "id": "b75519c7-8872-4746-bc83-3d49ce9bafa9",
         "kind": "rectangle",
         "local_transform": [
           0.838670567945424,
@@ -2767,11 +2767,11 @@
         "allocated_slots": 4,
         "dirty_record_stride_bytes": 116,
         "free_slots": 0,
-        "gpu_encodable_items": 3,
+        "gpu_encodable_items": 4,
         "gpu_omitted_items": 0,
         "instance_capacity": 4,
         "instance_stride_bytes": 112,
-        "renderable_items": 3,
+        "renderable_items": 4,
         "total_render_items": 4
       },
       "binary": {
@@ -2795,36 +2795,36 @@
     "default": {
       "path": "docs/verification/phase1a-editor-default.png",
       "bytes": 33432,
-      "modified_utc": "2026-08-20T05:21:36.939Z"
+      "modified_utc": "2026-08-14T01:09:02.938Z"
     },
     "selection": {
       "path": "docs/verification/phase1a-frame-4k.png",
       "bytes": 63734,
-      "modified_utc": "2026-08-20T05:21:37.298Z"
+      "modified_utc": "2026-08-14T01:09:03.364Z"
     },
     "nested_group": {
       "path": "docs/verification/phase1a-appearance-aa.png",
-      "bytes": 78319,
-      "modified_utc": "2026-08-20T05:22:10.380Z"
+      "bytes": 80015,
+      "modified_utc": "2026-08-14T01:09:32.903Z"
     },
     "component_showcase": {
       "path": "docs/verification/phase1a-dpr-zoom-matrix.png",
-      "bytes": 60083,
-      "modified_utc": "2026-08-20T05:21:44.161Z"
+      "bytes": 60011,
+      "modified_utc": "2026-08-14T01:09:10.010Z"
     },
     "color_contract": {
       "path": "docs/verification/phase1a-color-contract.png",
-      "bytes": 55627,
-      "modified_utc": "2026-08-20T05:22:06.473Z"
+      "bytes": 55772,
+      "modified_utc": "2026-08-14T01:09:29.163Z"
     },
     "affine_parity": {
       "path": "docs/verification/phase1a-affine-parity.png",
-      "bytes": 77276,
-      "modified_utc": "2026-08-20T05:22:09.078Z"
+      "bytes": 78690,
+      "modified_utc": "2026-08-14T01:09:31.565Z"
     }
   },
   "console_errors": [],
-  "chrome_stderr_tail": "\r\nDevTools listening on ws://127.0.0.1:61361/devtools/browser/660c78e2-7b69-495a-8595-2b273e2aa09b\r\n[17468:5404:0820/142137.530:ERROR:google_apis\\gcm\\engine\\registration_request.cc:291] Registration response error message: DEPRECATED_ENDPOINT\r\nCreated TensorFlow Lite XNNPACK delegate for CPU.\r\n[17468:5404:0820/142201.266:ERROR:google_apis\\gcm\\engine\\registration_request.cc:291] Registration response error message: DEPRECATED_ENDPOINT\r\n",
+  "chrome_stderr_tail": "\r\nDevTools listening on ws://127.0.0.1:51890/devtools/browser/150d4169-6946-4905-80b1-4af4c097a71c\r\n[2472:15224:0814/100903.836:ERROR:google_apis\\gcm\\engine\\registration_request.cc:291] Registration response error message: DEPRECATED_ENDPOINT\r\nCreated TensorFlow Lite XNNPACK delegate for CPU.\r\n[2472:15224:0814/100924.928:ERROR:google_apis\\gcm\\engine\\registration_request.cc:291] Registration response error message: DEPRECATED_ENDPOINT\r\n",
   "max_fallback_rebuild_count_seen": 0,
   "fallback_checkpoints": [
     {
@@ -2988,12 +2988,12 @@
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 66,
+      "engine_sequence": 65,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 67,
+      "engine_sequence": 66,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
@@ -3073,17 +3073,27 @@
       "fallback_rebuild_count": 0
     },
     {
+      "engine_sequence": 90,
+      "fixture": "EDITOR",
+      "fallback_rebuild_count": 0
+    },
+    {
       "engine_sequence": 91,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 92,
+      "engine_sequence": 91,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 92,
+      "engine_sequence": 101,
+      "fixture": "EDITOR",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 102,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
@@ -3188,22 +3198,27 @@
       "fallback_rebuild_count": 0
     },
     {
+      "engine_sequence": 137,
+      "fixture": "EDITOR",
+      "fallback_rebuild_count": 0
+    },
+    {
       "engine_sequence": 138,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 139,
+      "engine_sequence": 144,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 141,
+      "engine_sequence": 145,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 142,
+      "engine_sequence": 147,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
@@ -3213,17 +3228,12 @@
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 149,
+      "engine_sequence": 150,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
       "engine_sequence": 151,
-      "fixture": "EDITOR",
-      "fallback_rebuild_count": 0
-    },
-    {
-      "engine_sequence": 152,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
@@ -3238,22 +3248,22 @@
       "fallback_rebuild_count": 0
     },
     {
+      "engine_sequence": 157,
+      "fixture": "EDITOR",
+      "fallback_rebuild_count": 0
+    },
+    {
       "engine_sequence": 158,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 159,
+      "engine_sequence": 160,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
       "engine_sequence": 161,
-      "fixture": "EDITOR",
-      "fallback_rebuild_count": 0
-    },
-    {
-      "engine_sequence": 162,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
@@ -3268,12 +3278,17 @@
       "fallback_rebuild_count": 0
     },
     {
+      "engine_sequence": 167,
+      "fixture": "EDITOR",
+      "fallback_rebuild_count": 0
+    },
+    {
       "engine_sequence": 168,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 169,
+      "engine_sequence": 170,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
@@ -3283,7 +3298,7 @@
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 172,
+      "engine_sequence": 174,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
@@ -3293,7 +3308,7 @@
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 176,
+      "engine_sequence": 177,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
@@ -3303,7 +3318,7 @@
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 179,
+      "engine_sequence": 181,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
@@ -3313,17 +3328,17 @@
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 183,
+      "engine_sequence": 188,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 185,
+      "engine_sequence": 189,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 186,
+      "engine_sequence": 191,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
@@ -3333,7 +3348,7 @@
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 193,
+      "engine_sequence": 194,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
@@ -3343,12 +3358,12 @@
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 196,
+      "engine_sequence": 197,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 199,
+      "engine_sequence": 198,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
@@ -3358,12 +3373,12 @@
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 202,
+      "engine_sequence": 201,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 203,
+      "engine_sequence": 204,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
@@ -3373,12 +3388,12 @@
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 206,
+      "engine_sequence": 207,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 209,
+      "engine_sequence": 208,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
@@ -3388,17 +3403,17 @@
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 212,
+      "engine_sequence": 211,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 213,
+      "engine_sequence": 214,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 216,
+      "engine_sequence": 215,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
@@ -3408,17 +3423,17 @@
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 219,
+      "engine_sequence": 218,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 220,
+      "engine_sequence": 221,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 223,
+      "engine_sequence": 222,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
@@ -3428,22 +3443,27 @@
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 226,
+      "engine_sequence": 225,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 227,
+      "engine_sequence": 231,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 229,
+      "engine_sequence": 232,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 230,
+      "engine_sequence": 234,
+      "fixture": "EDITOR",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 235,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
@@ -3458,17 +3478,12 @@
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 240,
-      "fixture": "EDITOR",
-      "fallback_rebuild_count": 0
-    },
-    {
       "engine_sequence": 241,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 243,
+      "engine_sequence": 242,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
@@ -3478,7 +3493,7 @@
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 246,
+      "engine_sequence": 245,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
@@ -3488,7 +3503,7 @@
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 250,
+      "engine_sequence": 248,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
@@ -3498,12 +3513,17 @@
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 253,
+      "engine_sequence": 252,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
       "engine_sequence": 254,
+      "fixture": "EDITOR",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 255,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
@@ -3518,17 +3538,12 @@
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 260,
-      "fixture": "EDITOR",
-      "fallback_rebuild_count": 0
-    },
-    {
       "engine_sequence": 261,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 263,
+      "engine_sequence": 262,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
@@ -3538,7 +3553,7 @@
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 267,
+      "engine_sequence": 265,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
@@ -3548,17 +3563,7 @@
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 270,
-      "fixture": "EDITOR",
-      "fallback_rebuild_count": 0
-    },
-    {
-      "engine_sequence": 271,
-      "fixture": "EDITOR",
-      "fallback_rebuild_count": 0
-    },
-    {
-      "engine_sequence": 274,
+      "engine_sequence": 269,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
@@ -3569,6 +3574,11 @@
     },
     {
       "engine_sequence": 281,
+      "fixture": "EDITOR",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 282,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
@@ -3593,72 +3603,72 @@
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 299,
+      "engine_sequence": 296,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 300,
+      "engine_sequence": 298,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 302,
+      "engine_sequence": 315,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 305,
+      "engine_sequence": 316,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 321,
+      "engine_sequence": 317,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 322,
+      "engine_sequence": 318,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 323,
+      "engine_sequence": 319,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 324,
+      "engine_sequence": 320,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 325,
+      "engine_sequence": 320,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 327,
+      "engine_sequence": 320,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 327,
+      "engine_sequence": 329,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 327,
+      "engine_sequence": 331,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 335,
+      "engine_sequence": 338,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 337,
+      "engine_sequence": 343,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
@@ -3668,47 +3678,37 @@
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 350,
+      "engine_sequence": 356,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 351,
+      "engine_sequence": 365,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 362,
+      "engine_sequence": 365,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 372,
+      "engine_sequence": 366,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 372,
+      "engine_sequence": 367,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 373,
+      "engine_sequence": 368,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 374,
-      "fixture": "EDITOR",
-      "fallback_rebuild_count": 0
-    },
-    {
-      "engine_sequence": 375,
-      "fixture": "EDITOR",
-      "fallback_rebuild_count": 0
-    },
-    {
-      "engine_sequence": 375,
+      "engine_sequence": 368,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     }
@@ -3722,11 +3722,11 @@
     "actual_adapter_and_device": true,
     "affine_semantic_parity": true,
     "srgb_render_view_active": true,
-    "expected_color_contract_match": true,
-    "halo_free_black_background": true,
-    "halo_free_white_background": true,
+    "expected_color_contract_match": false,
+    "halo_free_black_background": false,
+    "halo_free_white_background": false,
     "fill_stroke_boundary_has_no_alpha_dip": true,
-    "ellipse_stroke_width_uniform": true,
+    "ellipse_stroke_width_uniform": false,
     "render_hit_test_overlay_parity": true,
     "dedicated_worker_wasm": true,
     "schema_v2": true,
@@ -3735,13 +3735,13 @@
     "appearance_projection_synchronized": true,
     "direct_move_resize_undo_redo": true,
     "incremental_single_item_edits": true,
-    "actual_pixel_readback": true,
+    "actual_pixel_readback": false,
     "console_errors_zero": true,
     "gpu_validation_errors_zero": true,
     "fallback_rebuild_zero": true,
     "latest_sequences_match": true
   },
   "assertion_count": 26,
-  "passed_assertion_count": 26,
-  "all_passed": true
+  "passed_assertion_count": 21,
+  "all_passed": false
 }

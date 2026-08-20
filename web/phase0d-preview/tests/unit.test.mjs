@@ -14,6 +14,7 @@ import {
   RENDER_BINARY_SCHEMA_VERSION,
   SHADER_SOURCE,
 } from "../src/render_contract.js";
+import { RendererFailure, srgbViewFormat } from "../src/renderer.js";
 import {
   EXPECTED_PREVIEW_ASSETS,
   HarnessFailure,
@@ -94,10 +95,28 @@ test("WGSL is geometry-aware and uses instanced analytic coverage", () => {
   assert.match(SHADER_SOURCE, /input\.primitive == 1u/);
   assert.match(SHADER_SOURCE, /fwidth\(distance\)/);
   assert.match(SHADER_SOURCE, /smoothstep\(-width, width, distance\)/);
-  assert.match(SHADER_SOURCE, /ellipse_axis_ratio/);
+  assert.doesNotMatch(SHADER_SOURCE, /ellipse_axis_ratio/);
+  assert.match(SHADER_SOURCE, /linear\.x \* local\.x \+ item\.linear\.y \* local\.y/);
+  assert.match(SHADER_SOURCE, /linear\.z \* local\.x \+ item\.linear\.w \* local\.y/);
+  assert.match(SHADER_SOURCE, /gradient_length/);
+  assert.match(SHADER_SOURCE, /vec4<f32>\(premultiplied, alpha\) \* input\.opacity/);
+  assert.doesNotMatch(SHADER_SOURCE, /fill_alpha \* \(1\.0 - stroke_alpha\)/);
+  assert.doesNotMatch(SHADER_SOURCE, /stroke_alpha \+ fill_alpha \* \(1\.0 - stroke_alpha\)/);
   assert.doesNotMatch(SHADER_SOURCE, /\bdiscard\b/);
   assert.match(SHADER_SOURCE, /switch vertex_index/);
 });
+
+test("sRGB render view mapping is explicit and fail-closed", () => {
+  assert.equal(srgbViewFormat("bgra8unorm"), "bgra8unorm-srgb");
+  assert.equal(srgbViewFormat("rgba8unorm"), "rgba8unorm-srgb");
+  assert.throws(
+    () => srgbViewFormat("rgba16float"),
+    (error) =>
+      error instanceof RendererFailure &&
+      error.code === "srgb_view_format_unavailable",
+  );
+});
+
 
 test("self-contained harness classifies asset status and MIME failures", () => {
   assert.deepEqual([...EXPECTED_PREVIEW_ASSETS], [

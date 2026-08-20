@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, test } from "vitest";
+import { transformAffinePoint } from "../src/affine";
 
 const editorRoot = path.resolve(process.cwd());
 const workspace = path.resolve(editorRoot, "../..");
@@ -10,6 +11,8 @@ const bridge = readFileSync(path.join(workspace, "crates/wasm_bridge/src/lib.rs"
 const shader = readFileSync(path.join(workspace, "shared/render_contract.wgsl"), "utf8");
 const schema = JSON.parse(readFileSync(path.join(workspace, "shared/render_binary_schema.json"), "utf8"));
 const generated = readFileSync(path.join(workspace, "web/phase0d-preview/src/render_contract.js"), "utf8");
+const renderer = readFileSync(path.join(workspace, "web/phase0d-preview/src/renderer.js"), "utf8");
+const browserProof = readFileSync(path.join(editorRoot, "scripts/browser-proof-phase1a.mjs"), "utf8");
 
 describe("Phase 1A visible frame and primitive appearance contract", () => {
   test("Frame tool exposes keyboard shortcut and every required preset", () => {
@@ -53,10 +56,34 @@ describe("Phase 1A visible frame and primitive appearance contract", () => {
     expect(shader).toContain("smoothstep(-width, width, distance)");
     expect(shader).toContain("ellipse_distance");
     expect(shader).toContain("rounded_rectangle_distance");
-    expect(shader).toContain("ellipse_axis_ratio");
-    expect(shader).toContain("item.size + vec2<f32>(expansion * 2.0)");
-    expect(shader).toContain("premultiplied");
+    expect(shader).not.toContain("ellipse_axis_ratio");
+    expect(shader).toContain("item.size + expansion * 2.0");
+    expect(shader).toContain("item.linear.x * local.x + item.linear.y * local.y");
+    expect(shader).toContain("item.linear.z * local.x + item.linear.w * local.y");
+    expect(shader).toContain("gradient_length");
+    expect(shader).toContain("vec4<f32>(premultiplied, alpha) * input.opacity");
+    expect(shader).not.toContain("fill_alpha * (1.0 - stroke_alpha)");
+    expect(shader).not.toContain("stroke_alpha + fill_alpha * (1.0 - stroke_alpha)");
+    expect(renderer).toContain('viewFormats: [this.pipelineViewFormat]');
+    expect(renderer).toContain('createView({ format: this.readbackViewFormat })');
+    expect(renderer).toContain('normalized_channel_order: "RGBA"');
     expect(shader).not.toMatch(/\bdiscard\b/);
     expect(generated).toContain(JSON.stringify(shader));
   });
+
+  test("asymmetric affine semantics match Rust row-major point transforms", () => {
+    const matrix: [number, number, number, number, number, number] = [2, 3, 5, 7, 11, 13];
+    const point: [number, number] = [17, 19];
+    const actual = transformAffinePoint(matrix, point);
+    expect(actual).toEqual([102, 231]);
+    expect(actual).not.toEqual([140, 197]);
+    expect(app).toContain("transformAffinePoint(currentNode.world_transform!");
+    expect(shader).toContain("item.linear.x * local.x + item.linear.y * local.y");
+    expect(shader).toContain("item.linear.z * local.x + item.linear.w * local.y");
+    expect(browserProof).toContain("matrix[0] * x + matrix[1] * y + matrix[4]");
+    expect(browserProof).toContain("matrix[2] * x + matrix[3] * y + matrix[5]");
+    expect(browserProof).toContain("render_hit_test_overlay_parity");
+    expect(browserProof).toContain("srgb_render_view_active");
+  });
+
 });

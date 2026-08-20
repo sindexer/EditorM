@@ -1,17 +1,17 @@
 {
   "phase": "1A",
   "proof_kind": "actual-hardware-browser",
-  "captured_at_utc": "2026-08-20T05:22:10.457Z",
+  "captured_at_utc": "2026-08-20T05:16:42.161Z",
   "browser": "Chrome/151.0.7922.138",
   "browser_mode": "actual Chrome; no mock; no Canvas2D fallback",
   "execution": {
     "command": "npm run test:browser:phase1a",
-    "started_at_utc": "2026-08-20T05:21:32.832Z",
-    "finished_at_utc": "2026-08-20T05:22:10.457Z"
+    "started_at_utc": "2026-08-20T05:16:01.333Z",
+    "finished_at_utc": "2026-08-20T05:16:42.161Z"
   },
   "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/151.0.0.0 Safari/537.36",
-  "chrome_process_id": 17468,
-  "chrome_profile": "C:\\Users\\thdwl\\AppData\\Local\\Temp\\phase1a-chrome-12372-1787203292832",
+  "chrome_process_id": 17096,
+  "chrome_profile": "C:\\Users\\thdwl\\AppData\\Local\\Temp\\phase1a-chrome-7008-1787202961333",
   "gpu": {
     "adapter": "maxwell",
     "backend": "browser-webgpu (implementation backend not exposed by Web API)",
@@ -30,7 +30,7 @@
     }
   },
   "preview": {
-    "url": "http://127.0.0.1:61355/",
+    "url": "http://127.0.0.1:61198/",
     "health": {
       "ok": true,
       "status": 200,
@@ -57,7 +57,7 @@
         "content_type": "application/wasm"
       }
     },
-    "stdout": "Phase 0E editor: http://127.0.0.1:61355/\n",
+    "stdout": "Phase 0E editor: http://127.0.0.1:61198/\n",
     "stderr": ""
   },
   "initial": {
@@ -144,8 +144,8 @@
       "buffer_bytes": 264,
       "upload_calls": 2,
       "frame_upload_bytes": 36,
-      "render_submit_ms": 0.800000011920929,
-      "frame_ms": 0.9000000059604645,
+      "render_submit_ms": 0.9000000059604645,
+      "frame_ms": 1,
       "validation_errors": 0,
       "frame_sequence": 5,
       "gpu_encode_attempted": 0,
@@ -328,8 +328,8 @@
         "buffer_bytes": 264,
         "upload_calls": 1,
         "frame_upload_bytes": 32,
-        "render_submit_ms": 53.80000001192093,
-        "frame_ms": 53.80000001192093,
+        "render_submit_ms": 46.5,
+        "frame_ms": 46.5,
         "validation_errors": 0,
         "frame_sequence": 7,
         "gpu_encode_attempted": 0,
@@ -576,7 +576,7 @@
         "buffer_bytes": 264,
         "upload_calls": 1,
         "frame_upload_bytes": 32,
-        "render_submit_ms": 0.800000011920929,
+        "render_submit_ms": 0.7999999821186066,
         "frame_ms": 0.9000000059604645,
         "validation_errors": 0,
         "frame_sequence": 9,
@@ -613,7 +613,7 @@
         "sequenceDenseIndexRewrites": 0
       },
       "selection": [
-        "c8f97f7a-8cfa-42b5-8dd6-175b96b93d53"
+        "cf338fa1-7787-4bc5-b732-8cfe5c9e063b"
       ],
       "response_gpu_overlay_sequence_match": true,
       "fsm": "Idle",
@@ -669,7 +669,7 @@
           "height": 2160,
           "width": 3840
         },
-        "id": "c8f97f7a-8cfa-42b5-8dd6-175b96b93d53",
+        "id": "cf338fa1-7787-4bc5-b732-8cfe5c9e063b",
         "kind": "frame",
         "local_transform": [
           1,
@@ -763,7 +763,7 @@
       "fixture": "EDITOR",
       "metrics": {
         "allocation_growth_count": 0,
-        "cpu_update_ms": 4,
+        "cpu_update_ms": 3,
         "culling_candidates": 1,
         "document_full_clones": 0,
         "document_nodes": 2,
@@ -824,8 +824,8 @@
         "buffer_bytes": 264,
         "upload_calls": 3,
         "frame_upload_bytes": 148,
-        "render_submit_ms": 1.0999999940395355,
-        "frame_ms": 1.4000000059604645,
+        "render_submit_ms": 1.300000011920929,
+        "frame_ms": 1.5,
         "validation_errors": 0,
         "frame_sequence": 10,
         "gpu_encode_attempted": 0,
@@ -1007,8 +1007,8 @@
         "buffer_bytes": 264,
         "upload_calls": 2,
         "frame_upload_bytes": 40,
-        "render_submit_ms": 2.5,
-        "frame_ms": 2.5999999940395355,
+        "render_submit_ms": 3.0999999940395355,
+        "frame_ms": 3.0999999940395355,
         "validation_errors": 0,
         "frame_sequence": 14,
         "gpu_encode_attempted": 0,
@@ -1044,7 +1044,7 @@
         "sequenceDenseIndexRewrites": 0
       },
       "selection": [
-        "c8f97f7a-8cfa-42b5-8dd6-175b96b93d53"
+        "cf338fa1-7787-4bc5-b732-8cfe5c9e063b"
       ],
       "response_gpu_overlay_sequence_match": true,
       "fsm": "Idle",
@@ -1100,7 +1100,7 @@
           "height": 2160,
           "width": 3840
         },
-        "id": "c8f97f7a-8cfa-42b5-8dd6-175b96b93d53",
+        "id": "cf338fa1-7787-4bc5-b732-8cfe5c9e063b",
         "kind": "frame",
         "local_transform": [
           1,
@@ -1194,7 +1194,7 @@
       "fixture": "EDITOR",
       "metrics": {
         "allocation_growth_count": 0,
-        "cpu_update_ms": 1,
+        "cpu_update_ms": 0,
         "culling_candidates": 2,
         "document_full_clones": 0,
         "document_nodes": 3,
@@ -1255,8 +1255,8 @@
         "buffer_bytes": 264,
         "upload_calls": 3,
         "frame_upload_bytes": 152,
-        "render_submit_ms": 2.300000011920929,
-        "frame_ms": 2.5,
+        "render_submit_ms": 2.0999999940395355,
+        "frame_ms": 2.2000000178813934,
         "validation_errors": 0,
         "frame_sequence": 19,
         "gpu_encode_attempted": 1,
@@ -1292,7 +1292,7 @@
         "sequenceDenseIndexRewrites": 0
       },
       "selection": [
-        "c8f97f7a-8cfa-42b5-8dd6-175b96b93d53"
+        "cf338fa1-7787-4bc5-b732-8cfe5c9e063b"
       ],
       "response_gpu_overlay_sequence_match": true,
       "fsm": "Idle",
@@ -1348,7 +1348,7 @@
           "height": 2160,
           "width": 3840
         },
-        "id": "c8f97f7a-8cfa-42b5-8dd6-175b96b93d53",
+        "id": "cf338fa1-7787-4bc5-b732-8cfe5c9e063b",
         "kind": "frame",
         "local_transform": [
           1,
@@ -1452,7 +1452,7 @@
           430.69103383271795,
           307.80871667070977
         ],
-        "hit_topmost": "d3c90c45-b2ab-427b-939c-ddcf8ab7f16e",
+        "hit_topmost": "b584db03-b86f-4362-b0d8-a5b5bb34c5b2",
         "pixel": {
           "x": 430.69103383271795,
           "y": 307.80871667070977,
@@ -1469,7 +1469,7 @@
             255
           ]
         },
-        "click_selected": "d3c90c45-b2ab-427b-939c-ddcf8ab7f16e"
+        "click_selected": "b584db03-b86f-4362-b0d8-a5b5bb34c5b2"
       },
       "transposed_only": {
         "local": [
@@ -1485,7 +1485,7 @@
           418.9337907199665,
           236.29881492690595
         ],
-        "hit_topmost": "c8f97f7a-8cfa-42b5-8dd6-175b96b93d53",
+        "hit_topmost": "cf338fa1-7787-4bc5-b732-8cfe5c9e063b",
         "pixel": {
           "x": 418.9337907199665,
           "y": 236.29881492690595,
@@ -1502,7 +1502,7 @@
             255
           ]
         },
-        "click_selected": "c8f97f7a-8cfa-42b5-8dd6-175b96b93d53"
+        "click_selected": "cf338fa1-7787-4bc5-b732-8cfe5c9e063b"
       },
       "expected_overlay_points": [
         [
@@ -1559,10 +1559,10 @@
       "readback_view_format": "bgra8unorm-srgb",
       "worker_runtime_owner": "dedicated-worker",
       "wasm_initialized": true,
-      "heartbeat": 33,
-      "engine_sequence": 362,
-      "gpu_frame_sequence": 362,
-      "overlay_sequence": 362,
+      "heartbeat": 37,
+      "engine_sequence": 366,
+      "gpu_frame_sequence": 366,
+      "overlay_sequence": 366,
       "revisions": {
         "document": 77,
         "render": 77,
@@ -1632,10 +1632,10 @@
         "buffer_bytes": 492,
         "upload_calls": 1,
         "frame_upload_bytes": 32,
-        "render_submit_ms": 1.4000000059604645,
-        "frame_ms": 1.4000000059604645,
+        "render_submit_ms": 4.300000011920929,
+        "frame_ms": 4.300000011920929,
         "validation_errors": 0,
-        "frame_sequence": 362,
+        "frame_sequence": 366,
         "gpu_encode_attempted": 0,
         "gpu_encode_omitted": 0,
         "instance_upload_bytes": 0,
@@ -1650,7 +1650,7 @@
         "hierarchyNodesVisited": 5,
         "hierarchyFullRebuilds": 2,
         "projectionStructuralOperations": 5,
-        "layersFlattenedNodesVisited": 1520,
+        "layersFlattenedNodesVisited": 1524,
         "mountedRows": 5,
         "pointerRawIntents": 34,
         "pointerRequestsSent": 21,
@@ -1669,7 +1669,7 @@
         "sequenceDenseIndexRewrites": 0
       },
       "selection": [
-        "d3c90c45-b2ab-427b-939c-ddcf8ab7f16e"
+        "b584db03-b86f-4362-b0d8-a5b5bb34c5b2"
       ],
       "response_gpu_overlay_sequence_match": true,
       "fsm": "Idle",
@@ -1725,7 +1725,7 @@
           "height": 60,
           "width": 160
         },
-        "id": "d3c90c45-b2ab-427b-939c-ddcf8ab7f16e",
+        "id": "b584db03-b86f-4362-b0d8-a5b5bb34c5b2",
         "kind": "rectangle",
         "local_transform": [
           0.838670567945424,
@@ -1807,10 +1807,10 @@
       "readback_view_format": "bgra8unorm-srgb",
       "worker_runtime_owner": "dedicated-worker",
       "wasm_initialized": true,
-      "heartbeat": 34,
-      "engine_sequence": 372,
-      "gpu_frame_sequence": 372,
-      "overlay_sequence": 372,
+      "heartbeat": 37,
+      "engine_sequence": 375,
+      "gpu_frame_sequence": 375,
+      "overlay_sequence": 375,
       "revisions": {
         "document": 84,
         "render": 84,
@@ -1880,10 +1880,10 @@
         "buffer_bytes": 492,
         "upload_calls": 1,
         "frame_upload_bytes": 32,
-        "render_submit_ms": 1.199999988079071,
-        "frame_ms": 1.199999988079071,
+        "render_submit_ms": 1.5,
+        "frame_ms": 1.5999999940395355,
         "validation_errors": 0,
-        "frame_sequence": 372,
+        "frame_sequence": 375,
         "gpu_encode_attempted": 0,
         "gpu_encode_omitted": 0,
         "instance_upload_bytes": 0,
@@ -1898,7 +1898,7 @@
         "hierarchyNodesVisited": 5,
         "hierarchyFullRebuilds": 2,
         "projectionStructuralOperations": 5,
-        "layersFlattenedNodesVisited": 1565,
+        "layersFlattenedNodesVisited": 1569,
         "mountedRows": 5,
         "pointerRawIntents": 46,
         "pointerRequestsSent": 28,
@@ -1917,7 +1917,7 @@
         "sequenceDenseIndexRewrites": 0
       },
       "selection": [
-        "d3c90c45-b2ab-427b-939c-ddcf8ab7f16e"
+        "b584db03-b86f-4362-b0d8-a5b5bb34c5b2"
       ],
       "response_gpu_overlay_sequence_match": true,
       "fsm": "Idle",
@@ -1973,7 +1973,7 @@
           "height": 62.9797434459316,
           "width": 164.68245398646394
         },
-        "id": "d3c90c45-b2ab-427b-939c-ddcf8ab7f16e",
+        "id": "b584db03-b86f-4362-b0d8-a5b5bb34c5b2",
         "kind": "rectangle",
         "local_transform": [
           0.838670567945424,
@@ -2055,10 +2055,10 @@
       "readback_view_format": "bgra8unorm-srgb",
       "worker_runtime_owner": "dedicated-worker",
       "wasm_initialized": true,
-      "heartbeat": 34,
-      "engine_sequence": 373,
-      "gpu_frame_sequence": 373,
-      "overlay_sequence": 373,
+      "heartbeat": 37,
+      "engine_sequence": 376,
+      "gpu_frame_sequence": 376,
+      "overlay_sequence": 376,
       "revisions": {
         "document": 85,
         "render": 85,
@@ -2092,7 +2092,7 @@
         "indexed_nodes": 3,
         "instance_upload_bytes": 112,
         "invalid_derived_nodes": 0,
-        "order_nodes_visited": 12,
+        "order_nodes_visited": 8,
         "render_items_cloned": 0,
         "render_items_planned": 1,
         "render_items_read": 4,
@@ -2128,10 +2128,10 @@
         "buffer_bytes": 492,
         "upload_calls": 3,
         "frame_upload_bytes": 156,
-        "render_submit_ms": 3.4000000059604645,
-        "frame_ms": 3.4000000059604645,
+        "render_submit_ms": 5,
+        "frame_ms": 5.200000017881393,
         "validation_errors": 0,
-        "frame_sequence": 373,
+        "frame_sequence": 376,
         "gpu_encode_attempted": 1,
         "gpu_encode_omitted": 0,
         "instance_upload_bytes": 112,
@@ -2146,7 +2146,7 @@
         "hierarchyNodesVisited": 5,
         "hierarchyFullRebuilds": 2,
         "projectionStructuralOperations": 5,
-        "layersFlattenedNodesVisited": 1570,
+        "layersFlattenedNodesVisited": 1574,
         "mountedRows": 5,
         "pointerRawIntents": 46,
         "pointerRequestsSent": 28,
@@ -2165,7 +2165,7 @@
         "sequenceDenseIndexRewrites": 0
       },
       "selection": [
-        "d3c90c45-b2ab-427b-939c-ddcf8ab7f16e"
+        "b584db03-b86f-4362-b0d8-a5b5bb34c5b2"
       ],
       "response_gpu_overlay_sequence_match": true,
       "fsm": "Idle",
@@ -2221,7 +2221,7 @@
           "height": 62.9797434459316,
           "width": 165.68245398646394
         },
-        "id": "d3c90c45-b2ab-427b-939c-ddcf8ab7f16e",
+        "id": "b584db03-b86f-4362-b0d8-a5b5bb34c5b2",
         "kind": "rectangle",
         "local_transform": [
           0.838670567945424,
@@ -2303,10 +2303,10 @@
       "readback_view_format": "bgra8unorm-srgb",
       "worker_runtime_owner": "dedicated-worker",
       "wasm_initialized": true,
-      "heartbeat": 34,
-      "engine_sequence": 374,
-      "gpu_frame_sequence": 374,
-      "overlay_sequence": 374,
+      "heartbeat": 37,
+      "engine_sequence": 377,
+      "gpu_frame_sequence": 377,
+      "overlay_sequence": 377,
       "revisions": {
         "document": 86,
         "render": 86,
@@ -2340,7 +2340,7 @@
         "indexed_nodes": 3,
         "instance_upload_bytes": 112,
         "invalid_derived_nodes": 0,
-        "order_nodes_visited": 12,
+        "order_nodes_visited": 8,
         "render_items_cloned": 0,
         "render_items_planned": 1,
         "render_items_read": 4,
@@ -2376,10 +2376,10 @@
         "buffer_bytes": 492,
         "upload_calls": 3,
         "frame_upload_bytes": 156,
-        "render_submit_ms": 5.299999982118607,
-        "frame_ms": 5.299999982118607,
+        "render_submit_ms": 1.4000000059604645,
+        "frame_ms": 1.5,
         "validation_errors": 0,
-        "frame_sequence": 374,
+        "frame_sequence": 377,
         "gpu_encode_attempted": 1,
         "gpu_encode_omitted": 0,
         "instance_upload_bytes": 112,
@@ -2394,7 +2394,7 @@
         "hierarchyNodesVisited": 5,
         "hierarchyFullRebuilds": 2,
         "projectionStructuralOperations": 5,
-        "layersFlattenedNodesVisited": 1575,
+        "layersFlattenedNodesVisited": 1579,
         "mountedRows": 5,
         "pointerRawIntents": 46,
         "pointerRequestsSent": 28,
@@ -2413,7 +2413,7 @@
         "sequenceDenseIndexRewrites": 0
       },
       "selection": [
-        "d3c90c45-b2ab-427b-939c-ddcf8ab7f16e"
+        "b584db03-b86f-4362-b0d8-a5b5bb34c5b2"
       ],
       "response_gpu_overlay_sequence_match": true,
       "fsm": "Idle",
@@ -2469,7 +2469,7 @@
           "height": 62.9797434459316,
           "width": 164.68245398646394
         },
-        "id": "d3c90c45-b2ab-427b-939c-ddcf8ab7f16e",
+        "id": "b584db03-b86f-4362-b0d8-a5b5bb34c5b2",
         "kind": "rectangle",
         "local_transform": [
           0.838670567945424,
@@ -2551,10 +2551,10 @@
       "readback_view_format": "bgra8unorm-srgb",
       "worker_runtime_owner": "dedicated-worker",
       "wasm_initialized": true,
-      "heartbeat": 34,
-      "engine_sequence": 375,
-      "gpu_frame_sequence": 375,
-      "overlay_sequence": 375,
+      "heartbeat": 37,
+      "engine_sequence": 378,
+      "gpu_frame_sequence": 378,
+      "overlay_sequence": 378,
       "revisions": {
         "document": 87,
         "render": 87,
@@ -2588,7 +2588,7 @@
         "indexed_nodes": 3,
         "instance_upload_bytes": 112,
         "invalid_derived_nodes": 0,
-        "order_nodes_visited": 12,
+        "order_nodes_visited": 8,
         "render_items_cloned": 0,
         "render_items_planned": 1,
         "render_items_read": 4,
@@ -2624,10 +2624,10 @@
         "buffer_bytes": 492,
         "upload_calls": 3,
         "frame_upload_bytes": 156,
-        "render_submit_ms": 1.2999999821186066,
-        "frame_ms": 1.2999999821186066,
+        "render_submit_ms": 1.5,
+        "frame_ms": 1.5,
         "validation_errors": 0,
-        "frame_sequence": 375,
+        "frame_sequence": 378,
         "gpu_encode_attempted": 1,
         "gpu_encode_omitted": 0,
         "instance_upload_bytes": 112,
@@ -2642,7 +2642,7 @@
         "hierarchyNodesVisited": 5,
         "hierarchyFullRebuilds": 2,
         "projectionStructuralOperations": 5,
-        "layersFlattenedNodesVisited": 1580,
+        "layersFlattenedNodesVisited": 1584,
         "mountedRows": 5,
         "pointerRawIntents": 46,
         "pointerRequestsSent": 28,
@@ -2661,7 +2661,7 @@
         "sequenceDenseIndexRewrites": 0
       },
       "selection": [
-        "d3c90c45-b2ab-427b-939c-ddcf8ab7f16e"
+        "b584db03-b86f-4362-b0d8-a5b5bb34c5b2"
       ],
       "response_gpu_overlay_sequence_match": true,
       "fsm": "Idle",
@@ -2717,7 +2717,7 @@
           "height": 62.9797434459316,
           "width": 165.68245398646394
         },
-        "id": "d3c90c45-b2ab-427b-939c-ddcf8ab7f16e",
+        "id": "b584db03-b86f-4362-b0d8-a5b5bb34c5b2",
         "kind": "rectangle",
         "local_transform": [
           0.838670567945424,
@@ -2795,36 +2795,36 @@
     "default": {
       "path": "docs/verification/phase1a-editor-default.png",
       "bytes": 33432,
-      "modified_utc": "2026-08-20T05:21:36.939Z"
+      "modified_utc": "2026-08-20T05:16:05.261Z"
     },
     "selection": {
       "path": "docs/verification/phase1a-frame-4k.png",
       "bytes": 63734,
-      "modified_utc": "2026-08-20T05:21:37.298Z"
+      "modified_utc": "2026-08-20T05:16:05.625Z"
     },
     "nested_group": {
       "path": "docs/verification/phase1a-appearance-aa.png",
-      "bytes": 78319,
-      "modified_utc": "2026-08-20T05:22:10.380Z"
+      "bytes": 78351,
+      "modified_utc": "2026-08-20T05:16:42.102Z"
     },
     "component_showcase": {
       "path": "docs/verification/phase1a-dpr-zoom-matrix.png",
-      "bytes": 60083,
-      "modified_utc": "2026-08-20T05:21:44.161Z"
+      "bytes": 60052,
+      "modified_utc": "2026-08-20T05:16:12.777Z"
     },
     "color_contract": {
       "path": "docs/verification/phase1a-color-contract.png",
-      "bytes": 55627,
-      "modified_utc": "2026-08-20T05:22:06.473Z"
+      "bytes": 55636,
+      "modified_utc": "2026-08-20T05:16:38.189Z"
     },
     "affine_parity": {
       "path": "docs/verification/phase1a-affine-parity.png",
-      "bytes": 77276,
-      "modified_utc": "2026-08-20T05:22:09.078Z"
+      "bytes": 77340,
+      "modified_utc": "2026-08-20T05:16:40.732Z"
     }
   },
   "console_errors": [],
-  "chrome_stderr_tail": "\r\nDevTools listening on ws://127.0.0.1:61361/devtools/browser/660c78e2-7b69-495a-8595-2b273e2aa09b\r\n[17468:5404:0820/142137.530:ERROR:google_apis\\gcm\\engine\\registration_request.cc:291] Registration response error message: DEPRECATED_ENDPOINT\r\nCreated TensorFlow Lite XNNPACK delegate for CPU.\r\n[17468:5404:0820/142201.266:ERROR:google_apis\\gcm\\engine\\registration_request.cc:291] Registration response error message: DEPRECATED_ENDPOINT\r\n",
+  "chrome_stderr_tail": "\r\nDevTools listening on ws://127.0.0.1:61203/devtools/browser/81ce79c0-2a1b-40a3-91fa-f245685fc385\r\n[17096:18152:0820/141606.434:ERROR:google_apis\\gcm\\engine\\registration_request.cc:291] Registration response error message: DEPRECATED_ENDPOINT\r\nCreated TensorFlow Lite XNNPACK delegate for CPU.\r\n[17096:18152:0820/141632.632:ERROR:google_apis\\gcm\\engine\\registration_request.cc:291] Registration response error message: DEPRECATED_ENDPOINT\r\n",
   "max_fallback_rebuild_count_seen": 0,
   "fallback_checkpoints": [
     {
@@ -2928,12 +2928,12 @@
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 46,
+      "engine_sequence": 45,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 47,
+      "engine_sequence": 46,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
@@ -2988,12 +2988,12 @@
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 66,
+      "engine_sequence": 65,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 67,
+      "engine_sequence": 66,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
@@ -3038,17 +3038,17 @@
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 82,
-      "fixture": "EDITOR",
-      "fallback_rebuild_count": 0
-    },
-    {
       "engine_sequence": 83,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 83,
+      "engine_sequence": 84,
+      "fixture": "EDITOR",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 84,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
@@ -3068,7 +3068,7 @@
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 89,
+      "engine_sequence": 90,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
@@ -3098,12 +3098,12 @@
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 107,
+      "engine_sequence": 108,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 108,
+      "engine_sequence": 109,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
@@ -3128,12 +3128,12 @@
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 117,
+      "engine_sequence": 118,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 118,
+      "engine_sequence": 119,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
@@ -3158,12 +3158,12 @@
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 127,
+      "engine_sequence": 128,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 128,
+      "engine_sequence": 129,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
@@ -3178,12 +3178,12 @@
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 134,
+      "engine_sequence": 135,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 135,
+      "engine_sequence": 136,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
@@ -3198,17 +3198,12 @@
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 141,
-      "fixture": "EDITOR",
-      "fallback_rebuild_count": 0
-    },
-    {
       "engine_sequence": 142,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 148,
+      "engine_sequence": 143,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
@@ -3218,7 +3213,7 @@
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 151,
+      "engine_sequence": 150,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
@@ -3228,7 +3223,7 @@
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 154,
+      "engine_sequence": 153,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
@@ -3238,7 +3233,7 @@
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 158,
+      "engine_sequence": 156,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
@@ -3248,7 +3243,7 @@
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 161,
+      "engine_sequence": 160,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
@@ -3258,7 +3253,7 @@
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 164,
+      "engine_sequence": 163,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
@@ -3268,7 +3263,7 @@
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 168,
+      "engine_sequence": 166,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
@@ -3278,7 +3273,7 @@
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 171,
+      "engine_sequence": 170,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
@@ -3288,7 +3283,7 @@
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 175,
+      "engine_sequence": 173,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
@@ -3298,7 +3293,7 @@
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 178,
+      "engine_sequence": 177,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
@@ -3308,7 +3303,7 @@
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 182,
+      "engine_sequence": 180,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
@@ -3318,7 +3313,7 @@
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 185,
+      "engine_sequence": 184,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
@@ -3328,12 +3323,12 @@
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 192,
+      "engine_sequence": 187,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 193,
+      "engine_sequence": 194,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
@@ -3343,12 +3338,12 @@
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 196,
+      "engine_sequence": 197,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 199,
+      "engine_sequence": 198,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
@@ -3358,12 +3353,12 @@
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 202,
+      "engine_sequence": 201,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 203,
+      "engine_sequence": 204,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
@@ -3373,12 +3368,12 @@
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 206,
+      "engine_sequence": 207,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 209,
+      "engine_sequence": 208,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
@@ -3388,17 +3383,17 @@
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 212,
+      "engine_sequence": 211,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 213,
+      "engine_sequence": 214,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 216,
+      "engine_sequence": 215,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
@@ -3408,22 +3403,22 @@
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 219,
+      "engine_sequence": 218,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 220,
+      "engine_sequence": 221,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 223,
+      "engine_sequence": 222,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 224,
+      "engine_sequence": 225,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
@@ -3433,7 +3428,7 @@
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 227,
+      "engine_sequence": 228,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
@@ -3443,17 +3438,17 @@
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 230,
+      "engine_sequence": 231,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 237,
+      "engine_sequence": 232,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 238,
+      "engine_sequence": 239,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
@@ -3463,7 +3458,7 @@
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 241,
+      "engine_sequence": 242,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
@@ -3473,7 +3468,7 @@
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 244,
+      "engine_sequence": 245,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
@@ -3483,7 +3478,7 @@
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 247,
+      "engine_sequence": 249,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
@@ -3493,7 +3488,7 @@
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 251,
+      "engine_sequence": 252,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
@@ -3503,17 +3498,17 @@
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 254,
+      "engine_sequence": 255,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 257,
+      "engine_sequence": 256,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 258,
+      "engine_sequence": 259,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
@@ -3523,7 +3518,7 @@
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 261,
+      "engine_sequence": 262,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
@@ -3533,17 +3528,12 @@
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 264,
+      "engine_sequence": 266,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
       "engine_sequence": 267,
-      "fixture": "EDITOR",
-      "fallback_rebuild_count": 0
-    },
-    {
-      "engine_sequence": 268,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
@@ -3558,47 +3548,47 @@
       "fallback_rebuild_count": 0
     },
     {
+      "engine_sequence": 273,
+      "fixture": "EDITOR",
+      "fallback_rebuild_count": 0
+    },
+    {
       "engine_sequence": 274,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 275,
+      "engine_sequence": 277,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 281,
+      "engine_sequence": 278,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 287,
+      "engine_sequence": 284,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 288,
+      "engine_sequence": 290,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 293,
+      "engine_sequence": 291,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 294,
+      "engine_sequence": 296,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 299,
-      "fixture": "EDITOR",
-      "fallback_rebuild_count": 0
-    },
-    {
-      "engine_sequence": 300,
+      "engine_sequence": 297,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
@@ -3608,22 +3598,17 @@
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 305,
+      "engine_sequence": 303,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 321,
+      "engine_sequence": 306,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 322,
-      "fixture": "EDITOR",
-      "fallback_rebuild_count": 0
-    },
-    {
-      "engine_sequence": 323,
+      "engine_sequence": 308,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
@@ -3643,62 +3628,57 @@
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 327,
+      "engine_sequence": 328,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 327,
+      "engine_sequence": 329,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 335,
+      "engine_sequence": 330,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 337,
+      "engine_sequence": 330,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 344,
+      "engine_sequence": 330,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 350,
+      "engine_sequence": 338,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 351,
+      "engine_sequence": 340,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 362,
+      "engine_sequence": 348,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 372,
+      "engine_sequence": 353,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 372,
+      "engine_sequence": 354,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 373,
-      "fixture": "EDITOR",
-      "fallback_rebuild_count": 0
-    },
-    {
-      "engine_sequence": 374,
+      "engine_sequence": 366,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     },
@@ -3709,6 +3689,26 @@
     },
     {
       "engine_sequence": 375,
+      "fixture": "EDITOR",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 376,
+      "fixture": "EDITOR",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 377,
+      "fixture": "EDITOR",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 378,
+      "fixture": "EDITOR",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 378,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     }
@@ -3726,7 +3726,7 @@
     "halo_free_black_background": true,
     "halo_free_white_background": true,
     "fill_stroke_boundary_has_no_alpha_dip": true,
-    "ellipse_stroke_width_uniform": true,
+    "ellipse_stroke_width_uniform": false,
     "render_hit_test_overlay_parity": true,
     "dedicated_worker_wasm": true,
     "schema_v2": true,
@@ -3735,13 +3735,13 @@
     "appearance_projection_synchronized": true,
     "direct_move_resize_undo_redo": true,
     "incremental_single_item_edits": true,
-    "actual_pixel_readback": true,
+    "actual_pixel_readback": false,
     "console_errors_zero": true,
     "gpu_validation_errors_zero": true,
     "fallback_rebuild_zero": true,
     "latest_sequences_match": true
   },
   "assertion_count": 26,
-  "passed_assertion_count": 26,
-  "all_passed": true
+  "passed_assertion_count": 24,
+  "all_passed": false
 }

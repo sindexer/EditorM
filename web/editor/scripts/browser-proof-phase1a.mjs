@@ -29,6 +29,8 @@ const screenshots = {
     verificationRoot,
     "phase1a-dpr-zoom-matrix.png",
   ),
+  color_contract: path.join(verificationRoot, "phase1a-color-contract.png"),
+  affine_parity: path.join(verificationRoot, "phase1a-affine-parity.png"),
   hundred_k_debug: path.join(verificationRoot, "phase1a-10k-comparison.png"),
 };
 const chrome =
@@ -420,7 +422,10 @@ async function boundsForText(selector, text, exact = false) {
   return bounds;
 }
 
-async function clickPoint(point, { modifiers = 0, clickCount = 1 } = {}) {
+async function clickPoint(
+  point,
+  { modifiers = 0, clickCount = 1, afterPressExpression = null } = {},
+) {
   await pageClient.send("Input.dispatchMouseEvent", {
     type: "mousePressed",
     x: point.center_x,
@@ -430,6 +435,7 @@ async function clickPoint(point, { modifiers = 0, clickCount = 1 } = {}) {
     clickCount,
     modifiers,
   });
+  if (afterPressExpression) await waitFor(afterPressExpression);
   await pageClient.send("Input.dispatchMouseEvent", {
     type: "mouseReleased",
     x: point.center_x,
@@ -592,6 +598,450 @@ function rgbDistance(left, right) {
   );
 }
 
+function transformPoint(matrix, point) {
+  return [
+    matrix[0] * point[0] + matrix[1] * point[1] + matrix[4],
+    matrix[2] * point[0] + matrix[3] * point[1] + matrix[5],
+  ];
+}
+
+function viewportPoint(proof, world) {
+  return [
+    (world[0] - proof.camera.center[0]) * proof.camera.zoom + proof.camera.viewport[0] / 2,
+    (world[1] - proof.camera.center[1]) * proof.camera.zoom + proof.camera.viewport[1] / 2,
+  ];
+}
+
+function srgbToLinear(value) {
+  const encoded = Math.max(0, Math.min(1, value));
+  return encoded <= 0.04045
+    ? encoded / 12.92
+    : Math.pow((encoded + 0.055) / 1.055, 2.4);
+}
+
+function pixelToLinear(pixel) {
+  return pixel.rgba.slice(0, 3).map((channel) => srgbToLinear(channel / 255));
+}
+
+function maximumAbsolute(values) {
+  return Math.max(...values.map((value) => Math.abs(value)));
+}
+
+function analyzeColorPair(label, blackPixel, whitePixel, sourceSrgb, tolerance = 0.055) {
+  const blackLinear = pixelToLinear(blackPixel);
+  const whiteLinear = pixelToLinear(whitePixel);
+  const sourceLinear = sourceSrgb.slice(0, 3).map(srgbToLinear);
+  const alphaChannels = whiteLinear.map((channel, index) => 1 - (channel - blackLinear[index]));
+  const alpha = alphaChannels.reduce((sum, value) => sum + value, 0) / alphaChannels.length;
+  const expectedBlack = sourceLinear.map((channel) => channel * alpha);
+  const expectedWhite = sourceLinear.map((channel) => channel * alpha + 1 - alpha);
+  const blackErrors = blackLinear.map((channel, index) => channel - expectedBlack[index]);
+  const whiteErrors = whiteLinear.map((channel, index) => channel - expectedWhite[index]);
+  const alphaSpread = Math.max(...alphaChannels) - Math.min(...alphaChannels);
+  const maxChannelError = Math.max(maximumAbsolute(blackErrors), maximumAbsolute(whiteErrors));
+  const rangeValid = [...blackLinear, ...whiteLinear, ...alphaChannels].every(
+    (value) => value >= -tolerance && value <= 1 + tolerance,
+  );
+  return {
+    label,
+    source_srgb: sourceSrgb,
+    source_linear: sourceLinear,
+    black: { pixel: blackPixel, linear: blackLinear, expected_linear: expectedBlack, error: blackErrors },
+    white: { pixel: whitePixel, linear: whiteLinear, expected_linear: expectedWhite, error: whiteErrors },
+    reconstructed_alpha_channels: alphaChannels,
+    reconstructed_alpha: alpha,
+    alpha_channel_spread: alphaSpread,
+    max_channel_error: maxChannelError,
+    tolerance,
+    black_halo_free: rangeValid && maximumAbsolute(blackErrors) <= tolerance,
+    white_halo_free: rangeValid && maximumAbsolute(whiteErrors) <= tolerance,
+    passed: rangeValid && alphaSpread <= tolerance && maxChannelError <= tolerance,
+  };
+}
+
+async function setNodeAppearance(nodeId, { fill, stroke, strokeWidth, opacity }) {
+  await send("command", {
+    command: { kind: "set_fill", node_id: nodeId, color: fill },
+  });
+  await send("command", {
+    command: { kind: "set_stroke", node_id: nodeId, color: stroke, width: strokeWidth },
+  });
+  await send("command", {
+    command: { kind: "set_opacity", node_id: nodeId, opacity },
+  });
+}
+
+async function readLocalSamples(proof, samples) {
+  const node = proof.primary_node;
+  const viewSamples = samples.map((sample) => ({
+    label: sample.label,
+    local: sample.local,
+    viewport: viewportPoint(proof, transformPoint(node.world_transform, sample.local)),
+  }));
+  const pixels = await evaluate(
+    "(async () => {" +
+      "const samples = " + JSON.stringify(viewSamples) + ";" +
+      "const result = [];" +
+      "for (const sample of samples) {" +
+        "result.push(await window.__phase0eReadPixel(sample.viewport[0], sample.viewport[1]));" +
+      "}" +
+      "return result;" +
+    "})()",
+  );
+  return viewSamples.map((sample, index) => ({ ...sample, pixel: pixels[index] }));
+}
+
+async function captureColorContractCase(frameId, ellipseId, definition) {
+  await send("selection", { target: ellipseId, mode: "replace" });
+  await setNodeAppearance(ellipseId, definition.appearance);
+  await send("command", {
+    command: { kind: "set_fill", node_id: frameId, color: [0, 0, 0, 1] },
+  });
+  const blackProof = await getProof();
+  const black = await readLocalSamples(blackProof, definition.samples);
+  await send("command", {
+    command: { kind: "set_fill", node_id: frameId, color: [1, 1, 1, 1] },
+  });
+  const whiteProof = await getProof();
+  const white = await readLocalSamples(whiteProof, definition.samples);
+  const analyses = definition.samples.map((sample, index) =>
+    analyzeColorPair(
+      sample.label,
+      black[index].pixel,
+      white[index].pixel,
+      definition.sourceSrgb,
+    ),
+  );
+  return {
+    label: definition.label,
+    appearance: definition.appearance,
+    samples: definition.samples,
+    black,
+    white,
+    analyses,
+    passed: analyses.every((analysis) => analysis.passed),
+  };
+}
+
+
+function centeredRotationMatrix(width, height, degrees, center) {
+  const radians = degrees * (Math.PI / 180);
+  const cosine = Math.cos(radians);
+  const sine = Math.sin(radians);
+  return [
+    cosine,
+    -sine,
+    sine,
+    cosine,
+    center[0] - cosine * width / 2 + sine * height / 2,
+    center[1] - sine * width / 2 - cosine * height / 2,
+  ];
+}
+
+async function configureEllipseGeometry(nodeId, definition, center) {
+  await send("command", {
+    command: {
+      kind: "set_geometry",
+      node_id: nodeId,
+      shape: "ellipse",
+      width: definition.width,
+      height: definition.height,
+    },
+  });
+  await send("command", {
+    command: {
+      kind: "set_transform",
+      node_id: nodeId,
+      matrix: centeredRotationMatrix(
+        definition.width,
+        definition.height,
+        definition.rotation,
+        center,
+      ),
+    },
+  });
+}
+
+async function measureEllipseAxis(proof, axis, dpr, zoom, requestedWidth) {
+  const node = proof.primary_node;
+  const matrix = node.world_transform;
+  const width = node.geometry.width;
+  const height = node.geometry.height;
+  const localEdge = axis === "major" ? [width, height / 2] : [width / 2, 0];
+  const worldDirection = axis === "major"
+    ? [matrix[0], matrix[2]]
+    : [-matrix[1], -matrix[3]];
+  const axisScale = Math.hypot(worldDirection[0], worldDirection[1]);
+  const normal = [worldDirection[0] / axisScale, worldDirection[1] / axisScale];
+  const edge = viewportPoint(proof, transformPoint(matrix, localEdge));
+  const physicalPixelsPerLocalUnit = dpr * zoom * axisScale;
+  const requestedPhysical = requestedWidth * physicalPixelsPerLocalUnit;
+  const outwardRadiusPhysical = Math.max(8, Math.ceil(requestedPhysical / 2 + 6));
+  const diameterPhysical = (axis === "major" ? width : height) * physicalPixelsPerLocalUnit;
+  const inwardRadiusPhysical = Math.max(
+    3,
+    Math.min(outwardRadiusPhysical, Math.floor(diameterPhysical / 2)),
+  );
+  const offsetsPhysical = Array.from(
+    { length: inwardRadiusPhysical + outwardRadiusPhysical + 1 },
+    (_, index) => index - inwardRadiusPhysical,
+  );
+  const pixels = await evaluate(
+    "(async () => {" +
+      "const edge = " + JSON.stringify(edge) + ";" +
+      "const normal = " + JSON.stringify(normal) + ";" +
+      "const dpr = " + JSON.stringify(dpr) + ";" +
+      "const offsets = " + JSON.stringify(offsetsPhysical) + ";" +
+      "const result = [];" +
+      "for (const offset of offsets) {" +
+        "result.push(await window.__phase0eReadPixel(" +
+          "edge[0] + normal[0] * offset / dpr," +
+          "edge[1] + normal[1] * offset / dpr" +
+        "));" +
+      "}" +
+      "return result;" +
+    "})()",
+  );
+  const profile = pixels.map((pixel, index) => ({
+    offset_physical: offsetsPhysical[index],
+    rgba: pixel.rgba,
+    linear_luminance: Math.max(...pixelToLinear(pixel)),
+  }));
+  const active = profile
+    .map((sample, index) => ({ sample, index }))
+    .filter(({ sample }) => sample.linear_luminance > 0.08);
+  const first = active.at(0)?.index ?? -1;
+  const last = active.at(-1)?.index ?? -1;
+  const centerIndex = offsetsPhysical.indexOf(0);
+  let connectedStart = centerIndex;
+  let connectedEnd = centerIndex;
+  while (
+    connectedStart > 0 &&
+    profile[connectedStart - 1].linear_luminance > 0.001
+  ) connectedStart -= 1;
+  while (
+    connectedEnd < profile.length - 1 &&
+    profile[connectedEnd + 1].linear_luminance > 0.001
+  ) connectedEnd += 1;
+  const measuredPhysical = profile.slice(connectedStart, connectedEnd + 1).reduce(
+    (sum, sample) => sum + sample.linear_luminance,
+    0,
+  );
+  const measuredLocal = measuredPhysical / physicalPixelsPerLocalUnit;
+  const tolerancePhysical = 1;
+  const toleranceLocal = tolerancePhysical / physicalPixelsPerLocalUnit;
+  const predictedOuter = [
+    edge[0] + normal[0] * requestedWidth * zoom * axisScale / 2,
+    edge[1] + normal[1] * requestedWidth * zoom * axisScale / 2,
+  ];
+  const clippingFree =
+    first >= 0 &&
+    last < profile.length - 1 &&
+    profile.at(-1).linear_luminance < 0.03 &&
+    predictedOuter[0] >= 1 &&
+    predictedOuter[0] < proof.camera.viewport[0] - 1 &&
+    predictedOuter[1] >= 1 &&
+    predictedOuter[1] < proof.camera.viewport[1] - 1;
+  return {
+    axis,
+    local_edge: localEdge,
+    viewport_edge: edge,
+    viewport_normal: normal,
+    physical_pixels_per_local_unit: physicalPixelsPerLocalUnit,
+    requested_local_width: requestedWidth,
+    requested_physical_width: requestedPhysical,
+    measured_local_width: measuredLocal,
+    measured_physical_width: measuredPhysical,
+    measurement_method: "integrated connected linear coverage over an isolated black backdrop",
+    tolerance_physical: tolerancePhysical,
+    tolerance_local: toleranceLocal,
+    absolute_error_physical: Math.abs(measuredPhysical - requestedPhysical),
+    absolute_error_local: Math.abs(measuredLocal - requestedWidth),
+    clipping_free: clippingFree,
+    uniform_within_tolerance:
+      clippingFree && Math.abs(measuredLocal - requestedWidth) <= toleranceLocal,
+    profile,
+  };
+}
+
+async function measureEllipseStroke(definition, dpr, zoom) {
+  await setSelectionZoom(dpr, zoom);
+  const proof = await getProof();
+  const requestedWidth = proof.primary_node.appearance.stroke.width;
+  const major = await measureEllipseAxis(proof, "major", dpr, zoom, requestedWidth);
+  const minor = await measureEllipseAxis(proof, "minor", dpr, zoom, requestedWidth);
+  return {
+    shape: definition.label,
+    size: [definition.width, definition.height],
+    rotation_degrees: definition.rotation,
+    dpr,
+    zoom,
+    requested_local_width: requestedWidth,
+    major,
+    minor,
+    major_minor_delta_local: Math.abs(major.measured_local_width - minor.measured_local_width),
+    passed: major.uniform_within_tolerance && minor.uniform_within_tolerance,
+  };
+}
+
+function inverseAffinePoint(matrix, point) {
+  const determinant = matrix[0] * matrix[3] - matrix[1] * matrix[2];
+  const x = point[0] - matrix[4];
+  const y = point[1] - matrix[5];
+  return [
+    (matrix[3] * x - matrix[1] * y) / determinant,
+    (-matrix[2] * x + matrix[0] * y) / determinant,
+  ];
+}
+
+function outsideRectangleDistance(point, width, height) {
+  return Math.max(-point[0], point[0] - width, -point[1], point[1] - height);
+}
+
+function discriminatingAffinePoints(matrix, width, height) {
+  const transposed = [matrix[0], matrix[2], matrix[1], matrix[3], matrix[4], matrix[5]];
+  let actualOnly = null;
+  let transposedOnly = null;
+  for (let xIndex = 1; xIndex < 20; xIndex += 1) {
+    for (let yIndex = 1; yIndex < 20; yIndex += 1) {
+      const local = [width * xIndex / 20, height * yIndex / 20];
+      const actualWorld = transformPoint(matrix, local);
+      const actualScore = outsideRectangleDistance(
+        inverseAffinePoint(transposed, actualWorld),
+        width,
+        height,
+      );
+      if (actualScore > 2 && (!actualOnly || actualScore < actualOnly.score)) {
+        actualOnly = { local, world: actualWorld, score: actualScore };
+      }
+      const transposedWorld = transformPoint(transposed, local);
+      const transposedScore = outsideRectangleDistance(
+        inverseAffinePoint(matrix, transposedWorld),
+        width,
+        height,
+      );
+      if (transposedScore > 2 && (!transposedOnly || transposedScore < transposedOnly.score)) {
+        transposedOnly = { local, world: transposedWorld, score: transposedScore };
+      }
+    }
+  }
+  if (!actualOnly || !transposedOnly) {
+    throw new HarnessFailure(
+      "affine_discriminating_point_unavailable",
+      "Rotation did not produce points that distinguish row-major and transposed semantics",
+      { matrix, width, height, actualOnly, transposedOnly },
+    );
+  }
+  return { transposed, actualOnly, transposedOnly };
+}
+
+async function proveAffineRenderHitOverlayParity(nodeId) {
+  await send("selection", { target: nodeId, mode: "replace" });
+  const proof = await getProof();
+  const node = proof.primary_node;
+  const matrix = node.world_transform;
+  const width = node.geometry.width;
+  const height = node.geometry.height;
+  const points = discriminatingAffinePoints(matrix, width, height);
+  const corners = [[0, 0], [width, 0], [width, height], [0, height]];
+  const expectedOverlay = corners.map((corner) =>
+    viewportPoint(proof, transformPoint(matrix, corner)),
+  );
+  const actualOverlay = await evaluate(`(() => {
+    const polygon = document.querySelector(".selection-outline");
+    if (!polygon) return null;
+    return Array.from({ length: polygon.points.numberOfItems }, (_, index) => {
+      const point = polygon.points.getItem(index);
+      return [point.x, point.y];
+    });
+  })()`);
+  if (!actualOverlay) {
+    throw new HarnessFailure("selection_overlay_missing", "Selection overlay was not rendered");
+  }
+  const overlayMaxError = Math.max(...actualOverlay.flatMap((point, index) => [
+    Math.abs(point[0] - expectedOverlay[index][0]),
+    Math.abs(point[1] - expectedOverlay[index][1]),
+  ]));
+  const actualViewport = viewportPoint(proof, points.actualOnly.world);
+  const transposedViewport = viewportPoint(proof, points.transposedOnly.world);
+  const viewportSamples = [actualViewport, transposedViewport];
+  const samplesInsideViewport = viewportSamples.every(
+    ([x, y]) =>
+      x >= 1 &&
+      x < proof.camera.viewport[0] - 1 &&
+      y >= 1 &&
+      y < proof.camera.viewport[1] - 1,
+  );
+  if (!samplesInsideViewport) {
+    throw new HarnessFailure(
+      "affine_sample_outside_viewport",
+      "Affine semantic parity samples must remain inside the render target",
+      { viewportSamples, camera: proof.camera, points },
+    );
+  }
+  const actualHit = await send("hit_test", { x: actualViewport[0], y: actualViewport[1] });
+  const transposedHit = await send("hit_test", {
+    x: transposedViewport[0],
+    y: transposedViewport[1],
+  });
+  const actualPixel = await evaluate(
+    `window.__phase0eReadPixel(${actualViewport[0]}, ${actualViewport[1]})`,
+  );
+  const transposedPixel = await evaluate(
+    `window.__phase0eReadPixel(${transposedViewport[0]}, ${transposedViewport[1]})`,
+  );
+  const canvas = await boundsForSelector(".webgpu-canvas");
+  await send("selection", { target: null, mode: "clear" });
+  await clickPoint({
+    center_x: canvas.x + actualViewport[0],
+    center_y: canvas.y + actualViewport[1],
+  }, {
+    afterPressExpression: `window.__PHASE0E_PROOF__?.fsm === "Moving"`,
+  });
+  await waitFor(
+    `window.__PHASE0E_PROOF__?.primary_node?.id === ${JSON.stringify(nodeId)} && window.__PHASE0E_PROOF__?.fsm === "Idle"`,
+  );
+  const actualClick = await getProof();
+  await send("selection", { target: null, mode: "clear" });
+  await clickPoint({
+    center_x: canvas.x + transposedViewport[0],
+    center_y: canvas.y + transposedViewport[1],
+  }, {
+    afterPressExpression: `window.__PHASE0E_PROOF__?.fsm === "Moving"`,
+  });
+  await waitFor(`window.__PHASE0E_PROOF__?.fsm === "Idle"`);
+  const transposedClick = await getProof();
+  return {
+    matrix_order: "[m11,m12,m21,m22,tx,ty]",
+    matrix,
+    transposed_matrix: points.transposed,
+    m12_not_equal_m21: matrix[1] !== matrix[2],
+    actual_only: {
+      ...points.actualOnly,
+      viewport: actualViewport,
+      hit_topmost: actualHit.result?.topmost ?? null,
+      pixel: actualPixel,
+      click_selected: actualClick.primary_node?.id ?? null,
+    },
+    transposed_only: {
+      ...points.transposedOnly,
+      viewport: transposedViewport,
+      hit_topmost: transposedHit.result?.topmost ?? null,
+      pixel: transposedPixel,
+      click_selected: transposedClick.primary_node?.id ?? null,
+    },
+    expected_overlay_points: expectedOverlay,
+    actual_overlay_points: actualOverlay,
+    overlay_max_error_css_px: overlayMaxError,
+    rust_semantic_hit_matches: actualHit.result?.topmost === nodeId,
+    transposed_semantic_rejected: transposedHit.result?.topmost !== nodeId,
+    render_pixels_distinguish_semantics:
+      rgbDistance(actualPixel.rgba.slice(0, 3), transposedPixel.rgba.slice(0, 3)) > 40,
+    overlay_matches_rust_semantics: overlayMaxError <= 0.75,
+    actual_click_selects_shape: actualClick.primary_node?.id === nodeId,
+    transposed_click_does_not_select_shape: transposedClick.primary_node?.id !== nodeId,
+  };
+}
 async function pressKey(key, code, keyCode, modifiers = 0) {
   await pageClient.send("Input.dispatchKeyEvent", {
     type: "rawKeyDown",
@@ -642,8 +1092,8 @@ async function selectedEdgeSample(label) {
   const height = node.geometry.height;
   const camera = proof.camera;
   const worldPoint = (x, y) => [
-    matrix[0] * x + matrix[2] * y + matrix[4],
-    matrix[1] * x + matrix[3] * y + matrix[5],
+    matrix[0] * x + matrix[1] * y + matrix[4],
+    matrix[2] * x + matrix[3] * y + matrix[5],
   ];
   const toViewport = (point) => [
     (point[0] - camera.center[0]) * camera.zoom + camera.viewport[0] / 2,
@@ -651,10 +1101,9 @@ async function selectedEdgeSample(label) {
   ];
   const center = toViewport(worldPoint(width / 2, height / 2));
   const edge = toViewport(worldPoint(width, height / 2));
-  const axisLength = Math.hypot(matrix[0], matrix[1]);
-  const normal = axisLength > 0 ? [matrix[0] / axisLength, matrix[1] / axisLength] : [1, 0];
-  const axisRatio = node.kind === "ellipse" ? Math.max(width, height) / Math.max(Math.min(width, height), 0.000001) : 1;
-  const strokeHalf = (node.appearance.stroke.width * camera.zoom * axisLength * axisRatio) / 2;
+  const axisLength = Math.hypot(matrix[0], matrix[2]);
+  const normal = axisLength > 0 ? [matrix[0] / axisLength, matrix[2] / axisLength] : [1, 0];
+  const strokeHalf = (node.appearance.stroke.width * camera.zoom * axisLength) / 2;
   const radius = Math.max(5, strokeHalf + 3);
   const samples = await evaluate("(async () => {" +
     "const edge = " + JSON.stringify(edge) + ";" +
@@ -706,11 +1155,13 @@ async function setSelectionZoom(dpr, zoom) {
   const proof = await getProof();
   const node = proof.primary_node;
   const matrix = node.world_transform;
-  const worldEdgeX = matrix[0] * node.geometry.width + matrix[2] * (node.geometry.height / 2) + matrix[4];
-  const axisScale = Math.hypot(matrix[0], matrix[1]);
-  const viewportEdgeX = (worldEdgeX - proof.camera.center[0]) * proof.camera.zoom + proof.camera.viewport[0] / 2;
-  const axisRatio = node.kind === "ellipse" ? Math.max(node.geometry.width, node.geometry.height) / Math.max(Math.min(node.geometry.width, node.geometry.height), 0.000001) : 1;
-  const outerPhysicalX = (viewportEdgeX + node.appearance.stroke.width * proof.camera.zoom * axisScale * axisRatio / 2) * dpr;
+  const worldEdge = [
+    matrix[0] * node.geometry.width + matrix[1] * (node.geometry.height / 2) + matrix[4],
+    matrix[2] * node.geometry.width + matrix[3] * (node.geometry.height / 2) + matrix[5],
+  ];
+  const axisScale = Math.hypot(matrix[0], matrix[2]);
+  const viewportEdgeX = (worldEdge[0] - proof.camera.center[0]) * proof.camera.zoom + proof.camera.viewport[0] / 2;
+  const outerPhysicalX = (viewportEdgeX + node.appearance.stroke.width * proof.camera.zoom * axisScale / 2) * dpr;
   const fraction = outerPhysicalX - Math.floor(outerPhysicalX);
   await send("camera", {
     camera: { kind: "pan", dx: (0.25 - fraction) / dpr, dy: 0 },
@@ -877,6 +1328,112 @@ try {
   await replaceNumeric("input[aria-label='Rotation']", 0);
   const circle = await selectedEdgeSample("circle");
 
+  const ellipseCenterProof = await getProof();
+  const ellipseCenter = transformPoint(
+    ellipseCenterProof.primary_node.world_transform,
+    [
+      ellipseCenterProof.primary_node.geometry.width / 2,
+      ellipseCenterProof.primary_node.geometry.height / 2,
+    ],
+  );
+  const ellipseDefinitions = [
+    { label: "circle-64x64", width: 64, height: 64, rotation: 0 },
+    { label: "ellipse-80x48", width: 80, height: 48, rotation: 0 },
+    { label: "ellipse-160x32", width: 160, height: 32, rotation: 0 },
+    { label: "ellipse-160x32-rotated-33", width: 160, height: 32, rotation: 33 },
+  ];
+  await setNodeAppearance(ellipseId, {
+    fill: [1, 1, 1, 0],
+    stroke: [1, 1, 1, 1],
+    strokeWidth: 8,
+    opacity: 1,
+  });
+  await send("command", {
+    command: { kind: "set_visible", node_id: defaultFrame.primary_node.id, visible: false },
+  });
+  await setNodeAppearance(frame4kId, {
+    fill: [0, 0, 0, 1],
+    stroke: [0, 0, 0, 0],
+    strokeWidth: 0,
+    opacity: 1,
+  });
+  const ellipseStrokeMeasurements = [];
+  for (const definition of ellipseDefinitions) {
+    await configureEllipseGeometry(ellipseId, definition, ellipseCenter);
+    await send("selection", { target: ellipseId, mode: "replace" });
+    for (const dpr of [1, 1.25, 1.5, 2]) {
+      for (const zoom of [0.25, 1, 4]) {
+        ellipseStrokeMeasurements.push(
+          await measureEllipseStroke(definition, dpr, zoom),
+        );
+      }
+    }
+  }
+
+  const colorEllipse = ellipseDefinitions[2];
+  await configureEllipseGeometry(ellipseId, colorEllipse, ellipseCenter);
+  await send("selection", { target: ellipseId, mode: "replace" });
+  await setSelectionZoom(1, 4);
+  const colorSource = [0.18, 0.62, 0.92, 1];
+  const colorContractCases = [];
+  colorContractCases.push(await captureColorContractCase(frame4kId, ellipseId, {
+    label: "fill-only-opacity-70",
+    sourceSrgb: colorSource,
+    appearance: {
+      fill: [colorSource[0], colorSource[1], colorSource[2], 0.55],
+      stroke: [colorSource[0], colorSource[1], colorSource[2], 0],
+      strokeWidth: 0,
+      opacity: 0.7,
+    },
+    samples: [
+      { label: "fill-internal", local: [80, 16] },
+      { label: "fill-outer-aa-edge", local: [160, 16] },
+    ],
+  }));
+  colorContractCases.push(await captureColorContractCase(frame4kId, ellipseId, {
+    label: "stroke-only-opacity-70",
+    sourceSrgb: colorSource,
+    appearance: {
+      fill: [colorSource[0], colorSource[1], colorSource[2], 0],
+      stroke: [colorSource[0], colorSource[1], colorSource[2], 0.65],
+      strokeWidth: 8,
+      opacity: 0.7,
+    },
+    samples: [
+      { label: "stroke-center", local: [160, 16] },
+      { label: "stroke-outer-aa-edge", local: [164, 16] },
+    ],
+  }));
+  colorContractCases.push(await captureColorContractCase(frame4kId, ellipseId, {
+    label: "same-color-fill-stroke-opacity-70",
+    sourceSrgb: colorSource,
+    appearance: {
+      fill: colorSource,
+      stroke: colorSource,
+      strokeWidth: 8,
+      opacity: 0.7,
+    },
+    samples: [
+      { label: "combined-fill-internal", local: [80, 16] },
+      { label: "combined-fill-stroke-boundary", local: [156, 16] },
+      { label: "combined-stroke-center", local: [160, 16] },
+      { label: "combined-outer-aa-edge", local: [164, 16] },
+    ],
+  }));
+  const combinedColorCase = colorContractCases.at(-1);
+  const combinedAnalysisByLabel = new Map(
+    combinedColorCase.analyses.map((analysis) => [analysis.label, analysis]),
+  );
+  const combinedFillAlpha = combinedAnalysisByLabel.get("combined-fill-internal").reconstructed_alpha;
+  const combinedBoundaryAlpha = combinedAnalysisByLabel.get("combined-fill-stroke-boundary").reconstructed_alpha;
+  const combinedStrokeAlpha = combinedAnalysisByLabel.get("combined-stroke-center").reconstructed_alpha;
+  const colorContractMaxChannelError = Math.max(
+    ...colorContractCases.flatMap((entry) =>
+      entry.analyses.map((analysis) => analysis.max_channel_error),
+    ),
+  );
+  await capture(screenshots.color_contract);
+
   await send("command", {
     command: {
       kind: "set_fill",
@@ -915,6 +1472,46 @@ try {
   await fitSelection();
   const roundedRectangle = await selectedEdgeSample("rounded-rectangle");
 
+  const affineNodeId = (await getProof()).primary_node.id;
+  const affineBefore = await getProof();
+  const affineCenter = transformPoint(
+    affineBefore.primary_node.world_transform,
+    [affineBefore.primary_node.geometry.width / 2, affineBefore.primary_node.geometry.height / 2],
+  );
+  await send("command", {
+    command: {
+      kind: "set_geometry",
+      node_id: affineNodeId,
+      shape: "rectangle",
+      width: 160,
+      height: 60,
+    },
+  });
+  await send("command", {
+    command: { kind: "set_corner_radii", node_id: affineNodeId, radii: [0, 0, 0, 0] },
+  });
+  await setNodeAppearance(affineNodeId, {
+    fill: [0.92, 0.12, 0.68, 1],
+    stroke: [0.92, 0.12, 0.68, 0],
+    strokeWidth: 0,
+    opacity: 1,
+  });
+  await send("command", {
+    command: { kind: "set_fill", node_id: frame4kId, color: [0, 0, 0, 1] },
+  });
+  await send("command", {
+    command: {
+      kind: "set_transform",
+      node_id: affineNodeId,
+      matrix: centeredRotationMatrix(160, 60, 33, affineCenter),
+    },
+  });
+  await send("selection", { target: affineNodeId, mode: "replace" });
+  await fitSelection();
+  const affineParity = await proveAffineRenderHitOverlayParity(affineNodeId);
+  await send("selection", { target: affineNodeId, mode: "replace" });
+  await capture(screenshots.affine_parity);
+
   const beforeMove = await getProof();
   const selection = await boundsForSelector(".selection-outline");
   await dragFrom(selection, 24, 18, 12, "window.__PHASE0E_PROOF__?.fsm === 'Moving'");
@@ -949,10 +1546,61 @@ try {
     whiteBackground,
     roundedRectangle,
   ];
+  const srgbRenderViewActive =
+    ["bgra8unorm", "rgba8unorm"].includes(initial.surface_base_format) &&
+    initial.pipeline_view_format === `${initial.surface_base_format}-srgb` &&
+    initial.readback_view_format === initial.pipeline_view_format;
+  const affineSemanticParity =
+    affineParity.m12_not_equal_m21 &&
+    affineParity.rust_semantic_hit_matches &&
+    affineParity.transposed_semantic_rejected;
+  const renderHitTestOverlayParity =
+    affineSemanticParity &&
+    affineParity.render_pixels_distinguish_semantics &&
+    affineParity.overlay_matches_rust_semantics &&
+    affineParity.actual_click_selects_shape &&
+    affineParity.transposed_click_does_not_select_shape;
+  const expectedColorContractMatch = colorContractCases.every((entry) => entry.passed);
+  const haloFreeBlackBackground = colorContractCases.every((entry) =>
+    entry.analyses.every((analysis) => analysis.black_halo_free),
+  );
+  const haloFreeWhiteBackground = colorContractCases.every((entry) =>
+    entry.analyses.every((analysis) => analysis.white_halo_free),
+  );
+  const boundaryAlphaTolerance = 0.045;
+  const fillStrokeBoundaryHasNoAlphaDip =
+    combinedBoundaryAlpha >= Math.min(combinedFillAlpha, combinedStrokeAlpha) - boundaryAlphaTolerance &&
+    combinedBoundaryAlpha <= Math.max(combinedFillAlpha, combinedStrokeAlpha) + boundaryAlphaTolerance;
+  const ellipseStrokeWidthUniform =
+    ellipseStrokeMeasurements.length === 48 &&
+    ellipseStrokeMeasurements.every((measurement) => measurement.passed);
+  const ellipseStrokeMaxErrorLocal = Math.max(
+    ...ellipseStrokeMeasurements.flatMap((measurement) => [
+      measurement.major.absolute_error_local,
+      measurement.minor.absolute_error_local,
+    ]),
+  );
+  const ellipseStrokeMaxErrorPhysical = Math.max(
+    ...ellipseStrokeMeasurements.flatMap((measurement) => [
+      measurement.major.absolute_error_physical,
+      measurement.minor.absolute_error_physical,
+    ]),
+  );
+  const ellipseStrokeMaxMajorMinorDeltaLocal = Math.max(
+    ...ellipseStrokeMeasurements.map((measurement) => measurement.major_minor_delta_local),
+  );
   const pixelAssertions = {
     default_frame_is_visible:
       Array.isArray(defaultFramePixel?.rgba) &&
       rgbDistance(defaultFramePixel.rgba.slice(0, 3), [9, 14, 20]) > 30,
+    affine_semantic_parity: affineSemanticParity,
+    srgb_render_view_active: srgbRenderViewActive,
+    expected_color_contract_match: expectedColorContractMatch,
+    halo_free_black_background: haloFreeBlackBackground,
+    halo_free_white_background: haloFreeWhiteBackground,
+    fill_stroke_boundary_has_no_alpha_dip: fillStrokeBoundaryHasNoAlphaDip,
+    ellipse_stroke_width_uniform: ellipseStrokeWidthUniform,
+    render_hit_test_overlay_parity: renderHitTestOverlayParity,
     every_dpr_zoom_edge_has_partial_coverage:
       aaMatrix.every((sample) => sample.partial_coverage_present),
     circle_has_partial_coverage: circle.partial_coverage_present,
@@ -977,6 +1625,25 @@ try {
     captured_at_utc: new Date().toISOString(),
     color_contract: "sRGB UI to linear premultiplied WebGPU output",
     analytic_aa: "fwidth + smoothstep; no fragment discard",
+    surface_base_format: initial.surface_base_format,
+    pipeline_view_format: initial.pipeline_view_format,
+    readback_view_format: initial.readback_view_format,
+    raw_readback_channel_normalization: "BGRA/RGBA base bytes normalized explicitly to RGBA",
+    color_channel_tolerance_linear: 0.055,
+    fill_stroke_boundary_alpha_tolerance: boundaryAlphaTolerance,
+    color_contract_cases: colorContractCases,
+    color_contract_max_channel_error: colorContractMaxChannelError,
+    ellipse_stroke_measurement_count: ellipseStrokeMeasurements.length,
+    ellipse_stroke_measurement_method: "integrated connected linear coverage over an isolated black backdrop",
+    ellipse_stroke_tolerance_physical: 1,
+    ellipse_stroke_measurements: ellipseStrokeMeasurements,
+    ellipse_stroke_max_error_local: ellipseStrokeMaxErrorLocal,
+    ellipse_stroke_max_major_minor_delta_local: ellipseStrokeMaxMajorMinorDeltaLocal,
+    ellipse_stroke_max_error_physical: ellipseStrokeMaxErrorPhysical,
+    affine_parity: affineParity,
+    assertion_count: Object.keys(pixelAssertions).length,
+    passed_assertion_count: Object.values(pixelAssertions).filter(Boolean).length,
+    expected_assertion_names: Object.keys(pixelAssertions),
     cases: allPixelSamples,
     assertions: pixelAssertions,
     all_passed: Object.values(pixelAssertions).every(Boolean),
@@ -996,6 +1663,14 @@ try {
     navigator_gpu: initial.actual_webgpu === true,
     actual_adapter_and_device:
       Boolean(initial.adapter) && Boolean(activeDevice.deviceString || activeDevice.deviceId),
+    affine_semantic_parity: pixelAssertions.affine_semantic_parity,
+    srgb_render_view_active: pixelAssertions.srgb_render_view_active,
+    expected_color_contract_match: pixelAssertions.expected_color_contract_match,
+    halo_free_black_background: pixelAssertions.halo_free_black_background,
+    halo_free_white_background: pixelAssertions.halo_free_white_background,
+    fill_stroke_boundary_has_no_alpha_dip: pixelAssertions.fill_stroke_boundary_has_no_alpha_dip,
+    ellipse_stroke_width_uniform: pixelAssertions.ellipse_stroke_width_uniform,
+    render_hit_test_overlay_parity: pixelAssertions.render_hit_test_overlay_parity,
     dedicated_worker_wasm:
       initial.worker_runtime_owner === "dedicated-worker" &&
       initial.wasm_initialized === true &&
@@ -1072,6 +1747,9 @@ try {
     gpu: {
       adapter: initial.adapter,
       backend: initial.backend,
+      surface_base_format: initial.surface_base_format,
+      pipeline_view_format: initial.pipeline_view_format,
+      readback_view_format: initial.readback_view_format,
       active_device: activeDevice,
     },
     preview: {
@@ -1088,6 +1766,7 @@ try {
       frame_undo: afterFrameUndo,
       frame_redo: afterFrameRedo,
       styled_frame: styledFrame,
+      affine_render_hit_overlay_parity: affineParity,
       move: afterMove,
       resize_interaction: afterResizeInteraction,
       resize: afterResize,
@@ -1102,6 +1781,8 @@ try {
     max_fallback_rebuild_count_seen: maxFallbackRebuildCountSeen,
     fallback_checkpoints: fallbackCheckpoints,
     checks,
+    assertion_count: Object.keys(checks).length,
+    passed_assertion_count: Object.values(checks).filter(Boolean).length,
     all_passed: Object.values(checks).every(Boolean),
   };
   await writeFile(proofPath, JSON.stringify(proof, null, 2) + "\n", "utf8");

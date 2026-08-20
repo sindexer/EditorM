@@ -67,6 +67,31 @@ if ($isPhase1A) {
         throw "Phase 1A hardware proof does not contain DOM input evidence"
     }
 
+    $requiredPhase1AAssertions = @(
+        "affine_semantic_parity",
+        "srgb_render_view_active",
+        "expected_color_contract_match",
+        "halo_free_black_background",
+        "halo_free_white_background",
+        "fill_stroke_boundary_has_no_alpha_dip",
+        "ellipse_stroke_width_uniform",
+        "render_hit_test_overlay_parity"
+    )
+    foreach ($assertion in $requiredPhase1AAssertions) {
+        $property = $proof.checks.PSObject.Properties[$assertion]
+        if ($null -eq $property -or $property.Value -ne $true) {
+            throw "Phase 1A hardware proof assertion failed or is missing: $assertion"
+        }
+    }
+    $surfaceBaseFormat = [string]$proof.gpu.surface_base_format
+    $pipelineViewFormat = [string]$proof.gpu.pipeline_view_format
+    $readbackViewFormat = [string]$proof.gpu.readback_view_format
+    if ($surfaceBaseFormat -notmatch "^(bgra|rgba)8unorm$" -or
+        $pipelineViewFormat -ne "$surfaceBaseFormat-srgb" -or
+        $readbackViewFormat -ne $pipelineViewFormat) {
+        throw "Phase 1A hardware proof does not use a compatible sRGB render/readback view"
+    }
+
     $adapter = [string]$proof.gpu.adapter
     $device = [string]$proof.gpu.active_device.deviceString
     $driverVendor = [string]$proof.gpu.active_device.driverVendor
@@ -120,6 +145,46 @@ $pixelProof = Get-Content -Raw -LiteralPath $pixelFull | ConvertFrom-Json
 if ($isPhase1A) {
     if ($pixelProof.proof_kind -ne "actual-hardware-webgpu-pixel-readback" -or $pixelProof.all_passed -ne $true) {
         throw "Phase 1A pixel artifact is not a passing actual-WebGPU readback"
+    }
+    if ([string]$pixelProof.surface_base_format -ne $surfaceBaseFormat -or
+        [string]$pixelProof.pipeline_view_format -ne $pipelineViewFormat -or
+        [string]$pixelProof.readback_view_format -ne $readbackViewFormat) {
+        throw "Phase 1A pixel proof sRGB formats do not match the browser proof"
+    }
+    foreach ($assertion in $requiredPhase1AAssertions) {
+        $property = $pixelProof.assertions.PSObject.Properties[$assertion]
+        if ($null -eq $property -or $property.Value -ne $true) {
+            throw "Phase 1A pixel proof assertion failed or is missing: $assertion"
+        }
+    }
+    if ([string]$pixelProof.ellipse_stroke_measurement_method -ne "integrated connected linear coverage over an isolated black backdrop" -or
+        [double]$pixelProof.ellipse_stroke_tolerance_physical -ne 1.0 -or
+        [double]$pixelProof.ellipse_stroke_max_error_physical -gt 1.0) {
+        throw "Phase 1A ellipse stroke proof must use integrated coverage with a 1 physical pixel tolerance"
+    }
+    $measurements = @($pixelProof.ellipse_stroke_measurements)
+    if ([int]$pixelProof.ellipse_stroke_measurement_count -ne 48 -or $measurements.Count -ne 48) {
+        throw "Phase 1A pixel proof must contain all 48 ellipse DPR/zoom stroke measurements"
+    }
+    foreach ($measurement in $measurements) {
+        if ($measurement.passed -ne $true -or
+            $measurement.major.clipping_free -ne $true -or
+            $measurement.minor.clipping_free -ne $true -or
+            [double]$measurement.major.absolute_error_physical -gt [double]$measurement.major.tolerance_physical -or
+            [double]$measurement.minor.absolute_error_physical -gt [double]$measurement.minor.tolerance_physical -or
+            [double]$measurement.major.absolute_error_local -gt [double]$measurement.major.tolerance_local -or
+            [double]$measurement.minor.absolute_error_local -gt [double]$measurement.minor.tolerance_local) {
+            throw "Phase 1A ellipse stroke measurement failed or exceeded tolerance"
+        }
+    }
+    if (@($pixelProof.color_contract_cases).Count -ne 3 -or
+        [double]$pixelProof.color_contract_max_channel_error -gt [double]$pixelProof.color_channel_tolerance_linear) {
+        throw "Phase 1A linear premultiplied color contract evidence is incomplete or outside tolerance"
+    }
+    if ($pixelProof.affine_parity.m12_not_equal_m21 -ne $true -or
+        $pixelProof.affine_parity.actual_click_selects_shape -ne $true -or
+        $pixelProof.affine_parity.transposed_click_does_not_select_shape -ne $true) {
+        throw "Phase 1A affine render/hit-test/overlay parity evidence is incomplete"
     }
 }
 elseif ($pixelProof.kind -ne "actual-webgpu-texture-readback" -or $pixelProof.all_passed -ne $true) {

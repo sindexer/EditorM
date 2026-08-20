@@ -1,7 +1,7 @@
 {
   "phase": "1A",
   "proof_kind": "actual-hardware-webgpu-pixel-readback",
-  "captured_at_utc": "2026-08-20T05:22:10.383Z",
+  "captured_at_utc": "2026-08-14T01:14:02.356Z",
   "color_contract": "sRGB UI to linear premultiplied WebGPU output",
   "analytic_aa": "fwidth + smoothstep; no fragment discard",
   "surface_base_format": "bgra8unorm",
@@ -1322,8 +1322,6 @@
   ],
   "color_contract_max_channel_error": 0.005539609472899554,
   "ellipse_stroke_measurement_count": 48,
-  "ellipse_stroke_measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-  "ellipse_stroke_tolerance_physical": 1,
   "ellipse_stroke_measurements": [
     {
       "shape": "circle-64x64",
@@ -1352,46 +1350,13 @@
         "physical_pixels_per_local_unit": 0.25,
         "requested_local_width": 8,
         "requested_physical_width": 2,
-        "measured_local_width": 6.696555612274973,
-        "measured_physical_width": 1.6741389030687432,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 4,
-        "absolute_error_physical": 0.32586109693125676,
-        "absolute_error_local": 1.303444387725027,
+        "measured_local_width": 8,
+        "measured_physical_width": 2,
+        "tolerance_local": 10,
+        "absolute_error_local": 0,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -8,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -7,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -6,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -5,
             "rgba": [
@@ -1501,36 +1466,6 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 6,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 7,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 8,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
@@ -1551,46 +1486,13 @@
         "physical_pixels_per_local_unit": 0.25,
         "requested_local_width": 8,
         "requested_physical_width": 2,
-        "measured_local_width": 7.999277812373757,
-        "measured_physical_width": 1.9998194530934392,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 4,
-        "absolute_error_physical": 0.00018054690656077454,
-        "absolute_error_local": 0.0007221876262430982,
+        "measured_local_width": 12,
+        "measured_physical_width": 3,
+        "tolerance_local": 10,
+        "absolute_error_local": 4,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -8,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -7,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -6,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -5,
             "rgba": [
@@ -1700,40 +1602,10 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 6,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 7,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 8,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
-      "major_minor_delta_local": 1.302722200098784,
+      "major_minor_delta_local": 4,
       "passed": true
     },
     {
@@ -1763,36 +1635,13 @@
         "physical_pixels_per_local_unit": 1,
         "requested_local_width": 8,
         "requested_physical_width": 8,
-        "measured_local_width": 7.683687647109269,
-        "measured_physical_width": 7.683687647109269,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 1,
-        "absolute_error_physical": 0.3163123528907308,
-        "absolute_error_local": 0.3163123528907308,
+        "measured_local_width": 8,
+        "measured_physical_width": 8,
+        "tolerance_local": 2.5,
+        "absolute_error_local": 0,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -10,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -9,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -8,
             "rgba": [
@@ -1962,26 +1811,6 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 9,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 10,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
@@ -2002,36 +1831,13 @@
         "physical_pixels_per_local_unit": 1,
         "requested_local_width": 8,
         "requested_physical_width": 8,
-        "measured_local_width": 7.999819453093439,
-        "measured_physical_width": 7.999819453093439,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 1,
-        "absolute_error_physical": 0.00018054690656121863,
-        "absolute_error_local": 0.00018054690656121863,
+        "measured_local_width": 9,
+        "measured_physical_width": 9,
+        "tolerance_local": 2.5,
+        "absolute_error_local": 1,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -10,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -9,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -8,
             "rgba": [
@@ -2201,30 +2007,10 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 9,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 10,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
-      "major_minor_delta_local": 0.31613180598416957,
+      "major_minor_delta_local": 1,
       "passed": true
     },
     {
@@ -2254,36 +2040,13 @@
         "physical_pixels_per_local_unit": 4,
         "requested_local_width": 8,
         "requested_physical_width": 32,
-        "measured_local_width": 7.919812713034839,
-        "measured_physical_width": 31.679250852139354,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 0.25,
-        "absolute_error_physical": 0.3207491478606457,
-        "absolute_error_local": 0.08018728696516142,
+        "measured_local_width": 8,
+        "measured_physical_width": 32,
+        "tolerance_local": 1.25,
+        "absolute_error_local": 0,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -22,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -21,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -20,
             "rgba": [
@@ -2693,26 +2456,6 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 21,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 22,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
@@ -2733,36 +2476,13 @@
         "physical_pixels_per_local_unit": 4,
         "requested_local_width": 8,
         "requested_physical_width": 32,
-        "measured_local_width": 7.99995486327336,
-        "measured_physical_width": 31.99981945309344,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 0.25,
-        "absolute_error_physical": 0.00018054690655944228,
-        "absolute_error_local": 0.00004513672663986057,
+        "measured_local_width": 8.25,
+        "measured_physical_width": 33,
+        "tolerance_local": 1.25,
+        "absolute_error_local": 0.25,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -22,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -21,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -20,
             "rgba": [
@@ -3172,30 +2892,10 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 21,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 22,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
-      "major_minor_delta_local": 0.08014215023852156,
+      "major_minor_delta_local": 0.25,
       "passed": true
     },
     {
@@ -3225,36 +2925,13 @@
         "physical_pixels_per_local_unit": 0.3125,
         "requested_local_width": 8,
         "requested_physical_width": 2.5,
-        "measured_local_width": 7.074275237574312,
-        "measured_physical_width": 2.2107110117419726,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 3.2,
-        "absolute_error_physical": 0.2892889882580274,
-        "absolute_error_local": 0.9257247624256877,
+        "measured_local_width": 9.6,
+        "measured_physical_width": 3,
+        "tolerance_local": 8,
+        "absolute_error_local": 1.5999999999999996,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -8,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -7,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -6,
             "rgba": [
@@ -3377,26 +3054,6 @@
           },
           {
             "offset_physical": 6,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 7,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 8,
             "rgba": [
               0,
               0,
@@ -3424,36 +3081,13 @@
         "physical_pixels_per_local_unit": 0.3125,
         "requested_local_width": 8,
         "requested_physical_width": 2.5,
-        "measured_local_width": 7.074275237574312,
-        "measured_physical_width": 2.2107110117419726,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 3.2,
-        "absolute_error_physical": 0.2892889882580274,
-        "absolute_error_local": 0.9257247624256877,
+        "measured_local_width": 9.6,
+        "measured_physical_width": 3,
+        "tolerance_local": 8,
+        "absolute_error_local": 1.5999999999999996,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -8,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -7,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -6,
             "rgba": [
@@ -3576,26 +3210,6 @@
           },
           {
             "offset_physical": 6,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 7,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 8,
             "rgba": [
               0,
               0,
@@ -3636,36 +3250,13 @@
         "physical_pixels_per_local_unit": 1.25,
         "requested_local_width": 8,
         "requested_physical_width": 10,
-        "measured_local_width": 7.745744727375408,
-        "measured_physical_width": 9.68218090921926,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 0.8,
-        "absolute_error_physical": 0.31781909078073944,
-        "absolute_error_local": 0.2542552726245919,
+        "measured_local_width": 8,
+        "measured_physical_width": 10,
+        "tolerance_local": 2,
+        "absolute_error_local": 0,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -11,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -10,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -9,
             "rgba": [
@@ -3855,26 +3446,6 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 10,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 11,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
@@ -3895,36 +3466,13 @@
         "physical_pixels_per_local_unit": 1.25,
         "requested_local_width": 8,
         "requested_physical_width": 10,
-        "measured_local_width": 7.999855562474751,
-        "measured_physical_width": 9.999819453093439,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 0.8,
-        "absolute_error_physical": 0.00018054690656121863,
-        "absolute_error_local": 0.00014443752524861964,
+        "measured_local_width": 8.8,
+        "measured_physical_width": 11,
+        "tolerance_local": 2,
+        "absolute_error_local": 0.8000000000000007,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -11,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -10,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -9,
             "rgba": [
@@ -4114,30 +3662,10 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 10,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 11,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
-      "major_minor_delta_local": 0.2541108350993433,
+      "major_minor_delta_local": 0.8000000000000007,
       "passed": true
     },
     {
@@ -4167,36 +3695,13 @@
         "physical_pixels_per_local_unit": 5,
         "requested_local_width": 8,
         "requested_physical_width": 40,
-        "measured_local_width": 7.935850170427871,
-        "measured_physical_width": 39.679250852139354,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 0.2,
-        "absolute_error_physical": 0.3207491478606457,
-        "absolute_error_local": 0.06414982957212878,
+        "measured_local_width": 8,
+        "measured_physical_width": 40,
+        "tolerance_local": 1.25,
+        "absolute_error_local": 0,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -26,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -25,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -24,
             "rgba": [
@@ -4686,26 +4191,6 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 25,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 26,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
@@ -4726,36 +4211,13 @@
         "physical_pixels_per_local_unit": 5,
         "requested_local_width": 8,
         "requested_physical_width": 40,
-        "measured_local_width": 8.001229102652085,
-        "measured_physical_width": 40.00614551326042,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 0.2,
-        "absolute_error_physical": 0.006145513260420898,
-        "absolute_error_local": 0.001229102652084535,
+        "measured_local_width": 8.2,
+        "measured_physical_width": 41,
+        "tolerance_local": 1.25,
+        "absolute_error_local": 0.1999999999999993,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -26,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -25,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -24,
             "rgba": [
@@ -5245,30 +4707,10 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 25,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 26,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
-      "major_minor_delta_local": 0.06537893222421332,
+      "major_minor_delta_local": 0.1999999999999993,
       "passed": true
     },
     {
@@ -5298,36 +4740,13 @@
         "physical_pixels_per_local_unit": 0.375,
         "requested_local_width": 8,
         "requested_physical_width": 3,
-        "measured_local_width": 7.135675156641301,
-        "measured_physical_width": 2.6758781837404877,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 2.6666666666666665,
-        "absolute_error_physical": 0.3241218162595123,
-        "absolute_error_local": 0.8643248433586992,
+        "measured_local_width": 8,
+        "measured_physical_width": 3,
+        "tolerance_local": 6.666666666666667,
+        "absolute_error_local": 0,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -8,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -7,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -6,
             "rgba": [
@@ -5457,26 +4876,6 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 7,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 8,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
@@ -5497,36 +4896,13 @@
         "physical_pixels_per_local_unit": 0.375,
         "requested_local_width": 8,
         "requested_physical_width": 3,
-        "measured_local_width": 7.572339730988243,
-        "measured_physical_width": 2.839627399120591,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 2.6666666666666665,
-        "absolute_error_physical": 0.16037260087940908,
-        "absolute_error_local": 0.42766026901175724,
+        "measured_local_width": 10.666666666666666,
+        "measured_physical_width": 4,
+        "tolerance_local": 6.666666666666667,
+        "absolute_error_local": 2.666666666666666,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -8,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -7,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -6,
             "rgba": [
@@ -5656,30 +5032,10 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 7,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 8,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
-      "major_minor_delta_local": 0.43666457434694195,
+      "major_minor_delta_local": 2.666666666666666,
       "passed": true
     },
     {
@@ -5709,36 +5065,13 @@
         "physical_pixels_per_local_unit": 1.5,
         "requested_local_width": 8,
         "requested_physical_width": 12,
-        "measured_local_width": 7.788120606146173,
-        "measured_physical_width": 11.68218090921926,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 0.6666666666666666,
-        "absolute_error_physical": 0.31781909078073944,
-        "absolute_error_local": 0.2118793938538266,
+        "measured_local_width": 8,
+        "measured_physical_width": 12,
+        "tolerance_local": 1.6666666666666667,
+        "absolute_error_local": 0,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -12,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -11,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -10,
             "rgba": [
@@ -5948,26 +5281,6 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 11,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 12,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
@@ -5988,36 +5301,13 @@
         "physical_pixels_per_local_unit": 1.5,
         "requested_local_width": 8,
         "requested_physical_width": 12,
-        "measured_local_width": 7.9999347804685135,
-        "measured_physical_width": 11.99990217070277,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 0.6666666666666666,
-        "absolute_error_physical": 0.00009782929723023415,
-        "absolute_error_local": 0.0000652195314865267,
+        "measured_local_width": 8.666666666666666,
+        "measured_physical_width": 13,
+        "tolerance_local": 1.6666666666666667,
+        "absolute_error_local": 0.6666666666666661,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -12,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -11,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -10,
             "rgba": [
@@ -6227,30 +5517,10 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 11,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 12,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
-      "major_minor_delta_local": 0.21181417432234007,
+      "major_minor_delta_local": 0.6666666666666661,
       "passed": true
     },
     {
@@ -6280,36 +5550,13 @@
         "physical_pixels_per_local_unit": 6,
         "requested_local_width": 8,
         "requested_physical_width": 48,
-        "measured_local_width": 7.946541808689893,
-        "measured_physical_width": 47.679250852139354,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 0.16666666666666666,
-        "absolute_error_physical": 0.3207491478606457,
-        "absolute_error_local": 0.05345819131010732,
+        "measured_local_width": 8,
+        "measured_physical_width": 48,
+        "tolerance_local": 1.25,
+        "absolute_error_local": 0,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -30,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -29,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -28,
             "rgba": [
@@ -6879,26 +6126,6 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 29,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 30,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
@@ -6919,36 +6146,13 @@
         "physical_pixels_per_local_unit": 6,
         "requested_local_width": 8,
         "requested_physical_width": 48,
-        "measured_local_width": 8.002348066861067,
-        "measured_physical_width": 48.014088401166404,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 0.16666666666666666,
-        "absolute_error_physical": 0.014088401166404196,
-        "absolute_error_local": 0.002348066861067366,
+        "measured_local_width": 8.166666666666666,
+        "measured_physical_width": 49,
+        "tolerance_local": 1.25,
+        "absolute_error_local": 0.16666666666666607,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -30,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -29,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -28,
             "rgba": [
@@ -7518,30 +6722,10 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 29,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 30,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
-      "major_minor_delta_local": 0.05580625817117468,
+      "major_minor_delta_local": 0.16666666666666607,
       "passed": true
     },
     {
@@ -7571,36 +6755,13 @@
         "physical_pixels_per_local_unit": 0.5,
         "requested_local_width": 8,
         "requested_physical_width": 4,
-        "measured_local_width": 7.378647504042959,
-        "measured_physical_width": 3.6893237520214797,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 2,
-        "absolute_error_physical": 0.31067624797852034,
-        "absolute_error_local": 0.6213524959570407,
+        "measured_local_width": 8,
+        "measured_physical_width": 4,
+        "tolerance_local": 5,
+        "absolute_error_local": 0,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -8,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -7,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -6,
             "rgba": [
@@ -7730,26 +6891,6 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 7,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 8,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
@@ -7770,36 +6911,13 @@
         "physical_pixels_per_local_unit": 0.5,
         "requested_local_width": 8,
         "requested_physical_width": 4,
-        "measured_local_width": 7.679254798241182,
-        "measured_physical_width": 3.839627399120591,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 2,
-        "absolute_error_physical": 0.16037260087940908,
-        "absolute_error_local": 0.32074520175881815,
+        "measured_local_width": 10,
+        "measured_physical_width": 5,
+        "tolerance_local": 5,
+        "absolute_error_local": 2,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -8,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -7,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -6,
             "rgba": [
@@ -7929,30 +7047,10 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 7,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 8,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
-      "major_minor_delta_local": 0.3006072941982225,
+      "major_minor_delta_local": 2,
       "passed": true
     },
     {
@@ -7982,36 +7080,13 @@
         "physical_pixels_per_local_unit": 2,
         "requested_local_width": 8,
         "requested_physical_width": 16,
-        "measured_local_width": 7.843196847470787,
-        "measured_physical_width": 15.686393694941573,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 0.5,
-        "absolute_error_physical": 0.31360630505842657,
-        "absolute_error_local": 0.15680315252921329,
+        "measured_local_width": 8,
+        "measured_physical_width": 16,
+        "tolerance_local": 1.25,
+        "absolute_error_local": 0,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -14,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -13,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -12,
             "rgba": [
@@ -8261,26 +7336,6 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 13,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 14,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
@@ -8301,36 +7356,13 @@
         "physical_pixels_per_local_unit": 2,
         "requested_local_width": 8,
         "requested_physical_width": 16,
-        "measured_local_width": 7.9182794292711804,
-        "measured_physical_width": 15.836558858542361,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 0.5,
-        "absolute_error_physical": 0.1634411414576391,
-        "absolute_error_local": 0.08172057072881955,
+        "measured_local_width": 8.5,
+        "measured_physical_width": 17,
+        "tolerance_local": 1.25,
+        "absolute_error_local": 0.5,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -14,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -13,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -12,
             "rgba": [
@@ -8580,30 +7612,10 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 13,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 14,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
-      "major_minor_delta_local": 0.07508258180039373,
+      "major_minor_delta_local": 0.5,
       "passed": true
     },
     {
@@ -8633,36 +7645,13 @@
         "physical_pixels_per_local_unit": 8,
         "requested_local_width": 8,
         "requested_physical_width": 64,
-        "measured_local_width": 7.9607992118676965,
-        "measured_physical_width": 63.68639369494157,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 0.125,
-        "absolute_error_physical": 0.31360630505842835,
-        "absolute_error_local": 0.03920078813230354,
+        "measured_local_width": 8,
+        "measured_physical_width": 64,
+        "tolerance_local": 1.25,
+        "absolute_error_local": 0,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -38,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -37,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -36,
             "rgba": [
@@ -9392,26 +8381,6 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 37,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 38,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
@@ -9432,36 +8401,13 @@
         "physical_pixels_per_local_unit": 8,
         "requested_local_width": 8,
         "requested_physical_width": 64,
-        "measured_local_width": 7.980199838369804,
-        "measured_physical_width": 63.84159870695843,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 0.125,
-        "absolute_error_physical": 0.15840129304157102,
-        "absolute_error_local": 0.019800161630196378,
+        "measured_local_width": 8.125,
+        "measured_physical_width": 65,
+        "tolerance_local": 1.25,
+        "absolute_error_local": 0.125,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -38,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -37,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -36,
             "rgba": [
@@ -10191,30 +9137,10 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 37,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 38,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
-      "major_minor_delta_local": 0.019400626502107166,
+      "major_minor_delta_local": 0.125,
       "passed": true
     },
     {
@@ -10244,46 +9170,13 @@
         "physical_pixels_per_local_unit": 0.25,
         "requested_local_width": 8,
         "requested_physical_width": 2,
-        "measured_local_width": 6.691447548796084,
-        "measured_physical_width": 1.672861887199021,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 4,
-        "absolute_error_physical": 0.32713811280097893,
-        "absolute_error_local": 1.3085524512039157,
+        "measured_local_width": 12,
+        "measured_physical_width": 3,
+        "tolerance_local": 10,
+        "absolute_error_local": 4,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -8,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -7,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -6,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -5,
             "rgba": [
@@ -10393,36 +9286,6 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 6,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 7,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 8,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
@@ -10443,26 +9306,13 @@
         "physical_pixels_per_local_unit": 0.25,
         "requested_local_width": 8,
         "requested_physical_width": 2,
-        "measured_local_width": 8.005348352044733,
-        "measured_physical_width": 2.001337088011183,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 4,
-        "absolute_error_physical": 0.0013370880111831518,
-        "absolute_error_local": 0.005348352044732607,
-        "clipping_free": true,
-        "uniform_within_tolerance": true,
+        "measured_local_width": 12,
+        "measured_physical_width": 3,
+        "tolerance_local": 10,
+        "absolute_error_local": 4,
+        "clipping_free": false,
+        "uniform_within_tolerance": false,
         "profile": [
-          {
-            "offset_physical": -6,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -5,
             "rgba": [
@@ -10572,41 +9422,11 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 6,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 7,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 8,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
-      "major_minor_delta_local": 1.3139008032486483,
-      "passed": true
+      "major_minor_delta_local": 0,
+      "passed": false
     },
     {
       "shape": "ellipse-80x48",
@@ -10635,36 +9455,13 @@
         "physical_pixels_per_local_unit": 1,
         "requested_local_width": 8,
         "requested_physical_width": 8,
-        "measured_local_width": 7.681329282808736,
-        "measured_physical_width": 7.681329282808736,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 1,
-        "absolute_error_physical": 0.3186707171912637,
-        "absolute_error_local": 0.3186707171912637,
+        "measured_local_width": 8,
+        "measured_physical_width": 8,
+        "tolerance_local": 2.5,
+        "absolute_error_local": 0,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -10,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -9,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -8,
             "rgba": [
@@ -10834,26 +9631,6 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 9,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 10,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
@@ -10874,36 +9651,13 @@
         "physical_pixels_per_local_unit": 1,
         "requested_local_width": 8,
         "requested_physical_width": 8,
-        "measured_local_width": 7.999819453093439,
-        "measured_physical_width": 7.999819453093439,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 1,
-        "absolute_error_physical": 0.00018054690656121863,
-        "absolute_error_local": 0.00018054690656121863,
+        "measured_local_width": 9,
+        "measured_physical_width": 9,
+        "tolerance_local": 2.5,
+        "absolute_error_local": 1,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -10,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -9,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -8,
             "rgba": [
@@ -11073,30 +9827,10 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 9,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 10,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
-      "major_minor_delta_local": 0.3184901702847025,
+      "major_minor_delta_local": 1,
       "passed": true
     },
     {
@@ -11126,36 +9860,13 @@
         "physical_pixels_per_local_unit": 4,
         "requested_local_width": 8,
         "requested_physical_width": 32,
-        "measured_local_width": 7.9201755068170145,
-        "measured_physical_width": 31.680702027268058,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 0.25,
-        "absolute_error_physical": 0.3192979727319418,
-        "absolute_error_local": 0.07982449318298546,
+        "measured_local_width": 8,
+        "measured_physical_width": 32,
+        "tolerance_local": 1.25,
+        "absolute_error_local": 0,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -22,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -21,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -20,
             "rgba": [
@@ -11565,26 +10276,6 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 21,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 22,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
@@ -11605,36 +10296,13 @@
         "physical_pixels_per_local_unit": 4,
         "requested_local_width": 8,
         "requested_physical_width": 32,
-        "measured_local_width": 7.99995486327336,
-        "measured_physical_width": 31.99981945309344,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 0.25,
-        "absolute_error_physical": 0.00018054690655944228,
-        "absolute_error_local": 0.00004513672663986057,
+        "measured_local_width": 8.25,
+        "measured_physical_width": 33,
+        "tolerance_local": 1.25,
+        "absolute_error_local": 0.25,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -22,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -21,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -20,
             "rgba": [
@@ -12044,30 +10712,10 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 21,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 22,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
-      "major_minor_delta_local": 0.0797793564563456,
+      "major_minor_delta_local": 0.25,
       "passed": true
     },
     {
@@ -12097,36 +10745,13 @@
         "physical_pixels_per_local_unit": 0.3125,
         "requested_local_width": 8,
         "requested_physical_width": 2.5,
-        "measured_local_width": 7.061020936842266,
-        "measured_physical_width": 2.206569042763208,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 3.2,
-        "absolute_error_physical": 0.2934309572367919,
-        "absolute_error_local": 0.9389790631577339,
+        "measured_local_width": 9.6,
+        "measured_physical_width": 3,
+        "tolerance_local": 8,
+        "absolute_error_local": 1.5999999999999996,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -8,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -7,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -6,
             "rgba": [
@@ -12256,26 +10881,6 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 7,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 8,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
@@ -12296,26 +10901,13 @@
         "physical_pixels_per_local_unit": 0.3125,
         "requested_local_width": 8,
         "requested_physical_width": 2.5,
-        "measured_local_width": 7.708132816801007,
-        "measured_physical_width": 2.408791505250315,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 3.2,
-        "absolute_error_physical": 0.09120849474968518,
-        "absolute_error_local": 0.29186718319899274,
+        "measured_local_width": 9.6,
+        "measured_physical_width": 3,
+        "tolerance_local": 8,
+        "absolute_error_local": 1.5999999999999996,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -7,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -6,
             "rgba": [
@@ -12445,30 +11037,10 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 7,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 8,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
-      "major_minor_delta_local": 0.6471118799587412,
+      "major_minor_delta_local": 0,
       "passed": true
     },
     {
@@ -12498,36 +11070,13 @@
         "physical_pixels_per_local_unit": 1.25,
         "requested_local_width": 8,
         "requested_physical_width": 10,
-        "measured_local_width": 7.750701175924448,
-        "measured_physical_width": 9.68837646990556,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 0.8,
-        "absolute_error_physical": 0.3116235300944403,
-        "absolute_error_local": 0.24929882407555226,
+        "measured_local_width": 8,
+        "measured_physical_width": 10,
+        "tolerance_local": 2,
+        "absolute_error_local": 0,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -11,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -10,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -9,
             "rgba": [
@@ -12717,26 +11266,6 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 10,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 11,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
@@ -12757,36 +11286,13 @@
         "physical_pixels_per_local_unit": 1.25,
         "requested_local_width": 8,
         "requested_physical_width": 10,
-        "measured_local_width": 7.999855562474751,
-        "measured_physical_width": 9.999819453093439,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 0.8,
-        "absolute_error_physical": 0.00018054690656121863,
-        "absolute_error_local": 0.00014443752524861964,
+        "measured_local_width": 8.8,
+        "measured_physical_width": 11,
+        "tolerance_local": 2,
+        "absolute_error_local": 0.8000000000000007,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -11,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -10,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -9,
             "rgba": [
@@ -12976,30 +11482,10 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 10,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 11,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
-      "major_minor_delta_local": 0.24915438655030364,
+      "major_minor_delta_local": 0.8000000000000007,
       "passed": true
     },
     {
@@ -13029,36 +11515,13 @@
         "physical_pixels_per_local_unit": 5,
         "requested_local_width": 8,
         "requested_physical_width": 40,
-        "measured_local_width": 7.936140405453611,
-        "measured_physical_width": 39.680702027268055,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 0.2,
-        "absolute_error_physical": 0.3192979727319454,
-        "absolute_error_local": 0.0638595945463889,
+        "measured_local_width": 8,
+        "measured_physical_width": 40,
+        "tolerance_local": 1.25,
+        "absolute_error_local": 0,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -26,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -25,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -24,
             "rgba": [
@@ -13548,26 +12011,6 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 25,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 26,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
@@ -13588,36 +12031,13 @@
         "physical_pixels_per_local_unit": 5,
         "requested_local_width": 8,
         "requested_physical_width": 40,
-        "measured_local_width": 8.001187703044872,
-        "measured_physical_width": 40.00593851522436,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 0.2,
-        "absolute_error_physical": 0.005938515224357843,
-        "absolute_error_local": 0.001187703044871924,
+        "measured_local_width": 8.2,
+        "measured_physical_width": 41,
+        "tolerance_local": 1.25,
+        "absolute_error_local": 0.1999999999999993,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -26,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -25,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -24,
             "rgba": [
@@ -14107,30 +12527,10 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 25,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 26,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
-      "major_minor_delta_local": 0.06504729759126082,
+      "major_minor_delta_local": 0.1999999999999993,
       "passed": true
     },
     {
@@ -14160,36 +12560,13 @@
         "physical_pixels_per_local_unit": 0.375,
         "requested_local_width": 8,
         "requested_physical_width": 3,
-        "measured_local_width": 7.169197968758158,
-        "measured_physical_width": 2.688449238284309,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 2.6666666666666665,
-        "absolute_error_physical": 0.31155076171569096,
-        "absolute_error_local": 0.8308020312418423,
+        "measured_local_width": 10.666666666666666,
+        "measured_physical_width": 4,
+        "tolerance_local": 6.666666666666667,
+        "absolute_error_local": 2.666666666666666,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -8,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -7,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -6,
             "rgba": [
@@ -14319,26 +12696,6 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 7,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 8,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
@@ -14359,36 +12716,13 @@
         "physical_pixels_per_local_unit": 0.375,
         "requested_local_width": 8,
         "requested_physical_width": 3,
-        "measured_local_width": 7.564156956112961,
-        "measured_physical_width": 2.8365588585423605,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 2.6666666666666665,
-        "absolute_error_physical": 0.16344114145763955,
-        "absolute_error_local": 0.4358430438870391,
+        "measured_local_width": 10.666666666666666,
+        "measured_physical_width": 4,
+        "tolerance_local": 6.666666666666667,
+        "absolute_error_local": 2.666666666666666,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -8,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -7,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -6,
             "rgba": [
@@ -14518,30 +12852,10 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 7,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 8,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
-      "major_minor_delta_local": 0.39495898735480317,
+      "major_minor_delta_local": 0,
       "passed": true
     },
     {
@@ -14571,36 +12885,13 @@
         "physical_pixels_per_local_unit": 1.5,
         "requested_local_width": 8,
         "requested_physical_width": 12,
-        "measured_local_width": 7.791190187504282,
-        "measured_physical_width": 11.686785281256423,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 0.6666666666666666,
-        "absolute_error_physical": 0.313214718743577,
-        "absolute_error_local": 0.20880981249571828,
+        "measured_local_width": 8,
+        "measured_physical_width": 12,
+        "tolerance_local": 1.6666666666666667,
+        "absolute_error_local": 0,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -12,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -11,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -10,
             "rgba": [
@@ -14810,26 +13101,6 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 11,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 12,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
@@ -14850,36 +13121,13 @@
         "physical_pixels_per_local_unit": 1.5,
         "requested_local_width": 8,
         "requested_physical_width": 12,
-        "measured_local_width": 8.003876210610537,
-        "measured_physical_width": 12.005814315915805,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 0.6666666666666666,
-        "absolute_error_physical": 0.005814315915804613,
-        "absolute_error_local": 0.003876210610537001,
+        "measured_local_width": 8.666666666666666,
+        "measured_physical_width": 13,
+        "tolerance_local": 1.6666666666666667,
+        "absolute_error_local": 0.6666666666666661,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -12,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -11,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -10,
             "rgba": [
@@ -15089,30 +13337,10 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 11,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 12,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
-      "major_minor_delta_local": 0.21268602310625528,
+      "major_minor_delta_local": 0.6666666666666661,
       "passed": true
     },
     {
@@ -15142,36 +13370,13 @@
         "physical_pixels_per_local_unit": 6,
         "requested_local_width": 8,
         "requested_physical_width": 48,
-        "measured_local_width": 7.946783671211342,
-        "measured_physical_width": 47.680702027268055,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 0.16666666666666666,
-        "absolute_error_physical": 0.3192979727319454,
-        "absolute_error_local": 0.05321632878865756,
+        "measured_local_width": 8,
+        "measured_physical_width": 48,
+        "tolerance_local": 1.25,
+        "absolute_error_local": 0,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -30,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -29,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -28,
             "rgba": [
@@ -15741,26 +13946,6 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 29,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 30,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
@@ -15781,36 +13966,13 @@
         "physical_pixels_per_local_unit": 6,
         "requested_local_width": 8,
         "requested_physical_width": 48,
-        "measured_local_width": 8.002099431185222,
-        "measured_physical_width": 48.01259658711133,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 0.16666666666666666,
-        "absolute_error_physical": 0.01259658711133227,
-        "absolute_error_local": 0.002099431185222045,
+        "measured_local_width": 8.166666666666666,
+        "measured_physical_width": 49,
+        "tolerance_local": 1.25,
+        "absolute_error_local": 0.16666666666666607,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -30,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -29,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -28,
             "rgba": [
@@ -16380,30 +14542,10 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 29,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 30,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
-      "major_minor_delta_local": 0.05531575997387961,
+      "major_minor_delta_local": 0.16666666666666607,
       "passed": true
     },
     {
@@ -16433,36 +14575,13 @@
         "physical_pixels_per_local_unit": 0.5,
         "requested_local_width": 8,
         "requested_physical_width": 4,
-        "measured_local_width": 7.416689407112605,
-        "measured_physical_width": 3.7083447035563024,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 2,
-        "absolute_error_physical": 0.2916552964436976,
-        "absolute_error_local": 0.5833105928873952,
+        "measured_local_width": 8,
+        "measured_physical_width": 4,
+        "tolerance_local": 5,
+        "absolute_error_local": 0,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -8,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -7,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -6,
             "rgba": [
@@ -16592,26 +14711,6 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 7,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 8,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
@@ -16632,36 +14731,13 @@
         "physical_pixels_per_local_unit": 0.5,
         "requested_local_width": 8,
         "requested_physical_width": 4,
-        "measured_local_width": 7.67311771708472,
-        "measured_physical_width": 3.83655885854236,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 2,
-        "absolute_error_physical": 0.16344114145764,
-        "absolute_error_local": 0.32688228291528,
+        "measured_local_width": 10,
+        "measured_physical_width": 5,
+        "tolerance_local": 5,
+        "absolute_error_local": 2,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -8,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -7,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -6,
             "rgba": [
@@ -16791,30 +14867,10 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 7,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 8,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
-      "major_minor_delta_local": 0.2564283099721152,
+      "major_minor_delta_local": 2,
       "passed": true
     },
     {
@@ -16844,36 +14900,13 @@
         "physical_pixels_per_local_unit": 2,
         "requested_local_width": 8,
         "requested_physical_width": 16,
-        "measured_local_width": 7.843922435035138,
-        "measured_physical_width": 15.687844870070276,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 0.5,
-        "absolute_error_physical": 0.3121551299297245,
-        "absolute_error_local": 0.15607756496486225,
+        "measured_local_width": 8,
+        "measured_physical_width": 16,
+        "tolerance_local": 1.25,
+        "absolute_error_local": 0,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -14,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -13,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -12,
             "rgba": [
@@ -17123,26 +15156,6 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 13,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 14,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
@@ -17163,36 +15176,13 @@
         "physical_pixels_per_local_unit": 2,
         "requested_local_width": 8,
         "requested_physical_width": 16,
-        "measured_local_width": 7.9182794292711804,
-        "measured_physical_width": 15.836558858542361,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 0.5,
-        "absolute_error_physical": 0.1634411414576391,
-        "absolute_error_local": 0.08172057072881955,
+        "measured_local_width": 8.5,
+        "measured_physical_width": 17,
+        "tolerance_local": 1.25,
+        "absolute_error_local": 0.5,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -14,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -13,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -12,
             "rgba": [
@@ -17442,30 +15432,10 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 13,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 14,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
-      "major_minor_delta_local": 0.0743569942360427,
+      "major_minor_delta_local": 0.5,
       "passed": true
     },
     {
@@ -17495,36 +15465,13 @@
         "physical_pixels_per_local_unit": 8,
         "requested_local_width": 8,
         "requested_physical_width": 64,
-        "measured_local_width": 7.9607992118676965,
-        "measured_physical_width": 63.68639369494157,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 0.125,
-        "absolute_error_physical": 0.31360630505842835,
-        "absolute_error_local": 0.03920078813230354,
+        "measured_local_width": 8,
+        "measured_physical_width": 64,
+        "tolerance_local": 1.25,
+        "absolute_error_local": 0,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -38,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -37,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -36,
             "rgba": [
@@ -18254,26 +16201,6 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 37,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 38,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
@@ -18294,36 +16221,13 @@
         "physical_pixels_per_local_unit": 8,
         "requested_local_width": 8,
         "requested_physical_width": 64,
-        "measured_local_width": 7.981209115840944,
-        "measured_physical_width": 63.84967292672755,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 0.125,
-        "absolute_error_physical": 0.1503270732724502,
-        "absolute_error_local": 0.018790884159056276,
+        "measured_local_width": 8.125,
+        "measured_physical_width": 65,
+        "tolerance_local": 1.25,
+        "absolute_error_local": 0.125,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -38,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -37,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -36,
             "rgba": [
@@ -19053,30 +16957,10 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 37,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 38,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
-      "major_minor_delta_local": 0.020409903973247268,
+      "major_minor_delta_local": 0.125,
       "passed": true
     },
     {
@@ -19106,46 +16990,13 @@
         "physical_pixels_per_local_unit": 0.25,
         "requested_local_width": 8,
         "requested_physical_width": 2,
-        "measured_local_width": 7.311223430783654,
-        "measured_physical_width": 1.8278058576959135,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 4,
-        "absolute_error_physical": 0.17219414230408647,
-        "absolute_error_local": 0.6887765692163459,
+        "measured_local_width": 12,
+        "measured_physical_width": 3,
+        "tolerance_local": 10,
+        "absolute_error_local": 4,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -8,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -7,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -6,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -5,
             "rgba": [
@@ -19255,36 +17106,6 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 6,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 7,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 8,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
@@ -19305,16 +17126,23 @@
         "physical_pixels_per_local_unit": 0.25,
         "requested_local_width": 8,
         "requested_physical_width": 2,
-        "measured_local_width": 7.999277812373757,
-        "measured_physical_width": 1.9998194530934392,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 4,
-        "absolute_error_physical": 0.00018054690656077454,
-        "absolute_error_local": 0.0007221876262430982,
+        "measured_local_width": 20,
+        "measured_physical_width": 5,
+        "tolerance_local": 10,
+        "absolute_error_local": 12,
         "clipping_free": true,
-        "uniform_within_tolerance": true,
+        "uniform_within_tolerance": false,
         "profile": [
+          {
+            "offset_physical": -5,
+            "rgba": [
+              0,
+              0,
+              0,
+              255
+            ],
+            "linear_luminance": 0
+          },
           {
             "offset_physical": -4,
             "rgba": [
@@ -19414,41 +17242,11 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 6,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 7,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 8,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
-      "major_minor_delta_local": 0.6880543815901028,
-      "passed": true
+      "major_minor_delta_local": 8,
+      "passed": false
     },
     {
       "shape": "ellipse-160x32",
@@ -19477,36 +17275,13 @@
         "physical_pixels_per_local_unit": 1,
         "requested_local_width": 8,
         "requested_physical_width": 8,
-        "measured_local_width": 7.7244218941181,
-        "measured_physical_width": 7.7244218941181,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 1,
-        "absolute_error_physical": 0.2755781058819,
-        "absolute_error_local": 0.2755781058819,
+        "measured_local_width": 9,
+        "measured_physical_width": 9,
+        "tolerance_local": 2.5,
+        "absolute_error_local": 1,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -10,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -9,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -8,
             "rgba": [
@@ -19676,26 +17451,6 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 9,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 10,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
@@ -19716,36 +17471,13 @@
         "physical_pixels_per_local_unit": 1,
         "requested_local_width": 8,
         "requested_physical_width": 8,
-        "measured_local_width": 7.999819453093439,
-        "measured_physical_width": 7.999819453093439,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 1,
-        "absolute_error_physical": 0.00018054690656121863,
-        "absolute_error_local": 0.00018054690656121863,
+        "measured_local_width": 9,
+        "measured_physical_width": 9,
+        "tolerance_local": 2.5,
+        "absolute_error_local": 1,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -10,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -9,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -8,
             "rgba": [
@@ -19915,30 +17647,10 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 9,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 10,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
-      "major_minor_delta_local": 0.2753975589753388,
+      "major_minor_delta_local": 0,
       "passed": true
     },
     {
@@ -19968,36 +17680,13 @@
         "physical_pixels_per_local_unit": 4,
         "requested_local_width": 8,
         "requested_physical_width": 32,
-        "measured_local_width": 7.9237606122126865,
-        "measured_physical_width": 31.695042448850746,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 0.25,
-        "absolute_error_physical": 0.30495755114925416,
-        "absolute_error_local": 0.07623938778731354,
+        "measured_local_width": 8,
+        "measured_physical_width": 32,
+        "tolerance_local": 1.25,
+        "absolute_error_local": 0,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -22,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -21,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -20,
             "rgba": [
@@ -20407,26 +18096,6 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 21,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 22,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
@@ -20447,36 +18116,13 @@
         "physical_pixels_per_local_unit": 4,
         "requested_local_width": 8,
         "requested_physical_width": 32,
-        "measured_local_width": 7.99995486327336,
-        "measured_physical_width": 31.99981945309344,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 0.25,
-        "absolute_error_physical": 0.00018054690655944228,
-        "absolute_error_local": 0.00004513672663986057,
+        "measured_local_width": 8.25,
+        "measured_physical_width": 33,
+        "tolerance_local": 1.25,
+        "absolute_error_local": 0.25,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -22,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -21,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -20,
             "rgba": [
@@ -20886,30 +18532,10 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 21,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 22,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
-      "major_minor_delta_local": 0.07619425106067368,
+      "major_minor_delta_local": 0.25,
       "passed": true
     },
     {
@@ -20939,36 +18565,13 @@
         "physical_pixels_per_local_unit": 0.3125,
         "requested_local_width": 8,
         "requested_physical_width": 2.5,
-        "measured_local_width": 8.459652626664253,
-        "measured_physical_width": 2.643641445832579,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 3.2,
-        "absolute_error_physical": 0.14364144583257898,
-        "absolute_error_local": 0.4596526266642531,
+        "measured_local_width": 12.8,
+        "measured_physical_width": 4,
+        "tolerance_local": 8,
+        "absolute_error_local": 4.800000000000001,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -8,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -7,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -6,
             "rgba": [
@@ -21098,26 +18701,6 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 7,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 8,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
@@ -21138,16 +18721,23 @@
         "physical_pixels_per_local_unit": 0.3125,
         "requested_local_width": 8,
         "requested_physical_width": 2.5,
-        "measured_local_width": 7.137579150795725,
-        "measured_physical_width": 2.230493484623664,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 3.2,
-        "absolute_error_physical": 0.2695065153763361,
-        "absolute_error_local": 0.8624208492042751,
+        "measured_local_width": 9.6,
+        "measured_physical_width": 3,
+        "tolerance_local": 8,
+        "absolute_error_local": 1.5999999999999996,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
+          {
+            "offset_physical": -6,
+            "rgba": [
+              0,
+              0,
+              0,
+              255
+            ],
+            "linear_luminance": 0
+          },
           {
             "offset_physical": -5,
             "rgba": [
@@ -21267,30 +18857,10 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 7,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 8,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
-      "major_minor_delta_local": 1.3220734758685282,
+      "major_minor_delta_local": 3.200000000000001,
       "passed": true
     },
     {
@@ -21320,36 +18890,13 @@
         "physical_pixels_per_local_unit": 1.25,
         "requested_local_width": 8,
         "requested_physical_width": 10,
-        "measured_local_width": 7.774902112514677,
-        "measured_physical_width": 9.718627640643346,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 0.8,
-        "absolute_error_physical": 0.28137235935665394,
-        "absolute_error_local": 0.22509788748532333,
+        "measured_local_width": 8.8,
+        "measured_physical_width": 11,
+        "tolerance_local": 2,
+        "absolute_error_local": 0.8000000000000007,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -11,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -10,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -9,
             "rgba": [
@@ -21539,26 +19086,6 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 10,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 11,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
@@ -21579,36 +19106,13 @@
         "physical_pixels_per_local_unit": 1.25,
         "requested_local_width": 8,
         "requested_physical_width": 10,
-        "measured_local_width": 7.999855562474751,
-        "measured_physical_width": 9.999819453093439,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 0.8,
-        "absolute_error_physical": 0.00018054690656121863,
-        "absolute_error_local": 0.00014443752524861964,
+        "measured_local_width": 8.8,
+        "measured_physical_width": 11,
+        "tolerance_local": 2,
+        "absolute_error_local": 0.8000000000000007,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -11,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -10,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -9,
             "rgba": [
@@ -21798,30 +19302,10 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 10,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 11,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
-      "major_minor_delta_local": 0.22495344996007471,
+      "major_minor_delta_local": 0,
       "passed": true
     },
     {
@@ -21851,36 +19335,13 @@
         "physical_pixels_per_local_unit": 5,
         "requested_local_width": 8,
         "requested_physical_width": 40,
-        "measured_local_width": 7.937932512887717,
-        "measured_physical_width": 39.689662564438585,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 0.2,
-        "absolute_error_physical": 0.310337435561415,
-        "absolute_error_local": 0.062067487112282826,
+        "measured_local_width": 8,
+        "measured_physical_width": 40,
+        "tolerance_local": 1.25,
+        "absolute_error_local": 0,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -26,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -25,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -24,
             "rgba": [
@@ -22370,26 +19831,6 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 25,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 26,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
@@ -22410,36 +19851,13 @@
         "physical_pixels_per_local_unit": 5,
         "requested_local_width": 8,
         "requested_physical_width": 40,
-        "measured_local_width": 8.00237013208748,
-        "measured_physical_width": 40.011850660437396,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 0.2,
-        "absolute_error_physical": 0.011850660437396243,
-        "absolute_error_local": 0.002370132087479604,
+        "measured_local_width": 8.2,
+        "measured_physical_width": 41,
+        "tolerance_local": 1.25,
+        "absolute_error_local": 0.1999999999999993,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -26,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -25,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -24,
             "rgba": [
@@ -22929,30 +20347,10 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 25,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 26,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
-      "major_minor_delta_local": 0.06443761919976243,
+      "major_minor_delta_local": 0.1999999999999993,
       "passed": true
     },
     {
@@ -22982,36 +20380,13 @@
         "physical_pixels_per_local_unit": 0.375,
         "requested_local_width": 8,
         "requested_physical_width": 3,
-        "measured_local_width": 7.412997795243238,
-        "measured_physical_width": 2.779874173216214,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 2.6666666666666665,
-        "absolute_error_physical": 0.22012582678378578,
-        "absolute_error_local": 0.5870022047567618,
+        "measured_local_width": 10.666666666666666,
+        "measured_physical_width": 4,
+        "tolerance_local": 6.666666666666667,
+        "absolute_error_local": 2.666666666666666,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -8,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -7,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -6,
             "rgba": [
@@ -23141,26 +20516,6 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 7,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 8,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
@@ -23181,13 +20536,10 @@
         "physical_pixels_per_local_unit": 0.375,
         "requested_local_width": 8,
         "requested_physical_width": 3,
-        "measured_local_width": 7.564156956112961,
-        "measured_physical_width": 2.8365588585423605,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 2.6666666666666665,
-        "absolute_error_physical": 0.16344114145763955,
-        "absolute_error_local": 0.4358430438870391,
+        "measured_local_width": 10.666666666666666,
+        "measured_physical_width": 4,
+        "tolerance_local": 6.666666666666667,
+        "absolute_error_local": 2.666666666666666,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
@@ -23320,30 +20672,10 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 7,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 8,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
-      "major_minor_delta_local": 0.1511591608697227,
+      "major_minor_delta_local": 0,
       "passed": true
     },
     {
@@ -23373,36 +20705,13 @@
         "physical_pixels_per_local_unit": 1.5,
         "requested_local_width": 8,
         "requested_physical_width": 12,
-        "measured_local_width": 7.810660409040935,
-        "measured_physical_width": 11.715990613561402,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 0.6666666666666666,
-        "absolute_error_physical": 0.28400938643859774,
-        "absolute_error_local": 0.18933959095906516,
+        "measured_local_width": 8.666666666666666,
+        "measured_physical_width": 13,
+        "tolerance_local": 1.6666666666666667,
+        "absolute_error_local": 0.6666666666666661,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -12,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -11,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -10,
             "rgba": [
@@ -23612,26 +20921,6 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 11,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 12,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
@@ -23652,36 +20941,13 @@
         "physical_pixels_per_local_unit": 1.5,
         "requested_local_width": 8,
         "requested_physical_width": 12,
-        "measured_local_width": 8.003876210610537,
-        "measured_physical_width": 12.005814315915805,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 0.6666666666666666,
-        "absolute_error_physical": 0.005814315915804613,
-        "absolute_error_local": 0.003876210610537001,
+        "measured_local_width": 8.666666666666666,
+        "measured_physical_width": 13,
+        "tolerance_local": 1.6666666666666667,
+        "absolute_error_local": 0.6666666666666661,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -12,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -11,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -10,
             "rgba": [
@@ -23891,30 +21157,10 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 11,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 12,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
-      "major_minor_delta_local": 0.19321580156960216,
+      "major_minor_delta_local": 0,
       "passed": true
     },
     {
@@ -23944,36 +21190,13 @@
         "physical_pixels_per_local_unit": 6,
         "requested_local_width": 8,
         "requested_physical_width": 48,
-        "measured_local_width": 7.947987958061659,
-        "measured_physical_width": 47.68792774836995,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 0.16666666666666666,
-        "absolute_error_physical": 0.3120722516300489,
-        "absolute_error_local": 0.05201204193834119,
+        "measured_local_width": 8,
+        "measured_physical_width": 48,
+        "tolerance_local": 1.25,
+        "absolute_error_local": 0,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -30,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -29,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -28,
             "rgba": [
@@ -24543,26 +21766,6 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 29,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 30,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
@@ -24583,36 +21786,13 @@
         "physical_pixels_per_local_unit": 6,
         "requested_local_width": 8,
         "requested_physical_width": 48,
-        "measured_local_width": 8.002002737175365,
-        "measured_physical_width": 48.01201642305219,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 0.16666666666666666,
-        "absolute_error_physical": 0.012016423052187974,
-        "absolute_error_local": 0.0020027371753652545,
+        "measured_local_width": 8.166666666666666,
+        "measured_physical_width": 49,
+        "tolerance_local": 1.25,
+        "absolute_error_local": 0.16666666666666607,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -30,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -29,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -28,
             "rgba": [
@@ -25182,30 +22362,10 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 29,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 30,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
-      "major_minor_delta_local": 0.054014779113706446,
+      "major_minor_delta_local": 0.16666666666666607,
       "passed": true
     },
     {
@@ -25235,36 +22395,13 @@
         "physical_pixels_per_local_unit": 0.5,
         "requested_local_width": 8,
         "requested_physical_width": 4,
-        "measured_local_width": 7.7701287662962795,
-        "measured_physical_width": 3.8850643831481397,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 2,
-        "absolute_error_physical": 0.11493561685186027,
-        "absolute_error_local": 0.22987123370372053,
+        "measured_local_width": 10,
+        "measured_physical_width": 5,
+        "tolerance_local": 5,
+        "absolute_error_local": 2,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -8,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -7,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -6,
             "rgba": [
@@ -25394,26 +22531,6 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 7,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 8,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
@@ -25434,36 +22551,13 @@
         "physical_pixels_per_local_unit": 0.5,
         "requested_local_width": 8,
         "requested_physical_width": 4,
-        "measured_local_width": 7.6670489743786145,
-        "measured_physical_width": 3.8335244871893073,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 2,
-        "absolute_error_physical": 0.16647551281069273,
-        "absolute_error_local": 0.33295102562138545,
+        "measured_local_width": 10,
+        "measured_physical_width": 5,
+        "tolerance_local": 5,
+        "absolute_error_local": 2,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -8,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -7,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -6,
             "rgba": [
@@ -25593,30 +22687,10 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 7,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 8,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
-      "major_minor_delta_local": 0.10307979191766492,
+      "major_minor_delta_local": 0,
       "passed": true
     },
     {
@@ -25646,36 +22720,13 @@
         "physical_pixels_per_local_unit": 2,
         "requested_local_width": 8,
         "requested_physical_width": 16,
-        "measured_local_width": 7.865589045959374,
-        "measured_physical_width": 15.731178091918748,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 0.5,
-        "absolute_error_physical": 0.26882190808125195,
-        "absolute_error_local": 0.13441095404062597,
+        "measured_local_width": 8,
+        "measured_physical_width": 16,
+        "tolerance_local": 1.25,
+        "absolute_error_local": 0,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -14,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -13,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -12,
             "rgba": [
@@ -25925,26 +22976,6 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 13,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 14,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
@@ -25965,36 +22996,13 @@
         "physical_pixels_per_local_unit": 2,
         "requested_local_width": 8,
         "requested_physical_width": 16,
-        "measured_local_width": 7.920799353479213,
-        "measured_physical_width": 15.841598706958425,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 0.5,
-        "absolute_error_physical": 0.15840129304157458,
-        "absolute_error_local": 0.07920064652078729,
+        "measured_local_width": 8.5,
+        "measured_physical_width": 17,
+        "tolerance_local": 1.25,
+        "absolute_error_local": 0.5,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -14,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -13,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -12,
             "rgba": [
@@ -26244,30 +23252,10 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 13,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 14,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
-      "major_minor_delta_local": 0.055210307519838686,
+      "major_minor_delta_local": 0.5,
       "passed": true
     },
     {
@@ -26297,36 +23285,13 @@
         "physical_pixels_per_local_unit": 8,
         "requested_local_width": 8,
         "requested_physical_width": 64,
-        "measured_local_width": 7.96206377510977,
-        "measured_physical_width": 63.69651020087816,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 0.125,
-        "absolute_error_physical": 0.3034897991218415,
-        "absolute_error_local": 0.037936224890230186,
+        "measured_local_width": 8,
+        "measured_physical_width": 64,
+        "tolerance_local": 1.25,
+        "absolute_error_local": 0,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -38,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -37,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -36,
             "rgba": [
@@ -27056,26 +24021,6 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 37,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 38,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
@@ -27096,36 +24041,13 @@
         "physical_pixels_per_local_unit": 8,
         "requested_local_width": 8,
         "requested_physical_width": 64,
-        "measured_local_width": 7.981209115840944,
-        "measured_physical_width": 63.84967292672755,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 0.125,
-        "absolute_error_physical": 0.1503270732724502,
-        "absolute_error_local": 0.018790884159056276,
+        "measured_local_width": 8.125,
+        "measured_physical_width": 65,
+        "tolerance_local": 1.25,
+        "absolute_error_local": 0.125,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -38,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -37,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -36,
             "rgba": [
@@ -27855,30 +24777,10 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 37,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 38,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
-      "major_minor_delta_local": 0.01914534073117391,
+      "major_minor_delta_local": 0.125,
       "passed": true
     },
     {
@@ -27908,46 +24810,13 @@
         "physical_pixels_per_local_unit": 0.25,
         "requested_local_width": 8,
         "requested_physical_width": 2,
-        "measured_local_width": 5.891748961699283,
-        "measured_physical_width": 1.4729372404248207,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 4,
-        "absolute_error_physical": 0.5270627595751793,
-        "absolute_error_local": 2.1082510383007174,
+        "measured_local_width": 12,
+        "measured_physical_width": 3,
+        "tolerance_local": 10,
+        "absolute_error_local": 4,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -8,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -7,
-            "rgba": [
-              4,
-              4,
-              4,
-              255
-            ],
-            "linear_luminance": 0.00121410793419535
-          },
-          {
-            "offset_physical": -6,
-            "rgba": [
-              64,
-              64,
-              64,
-              255
-            ],
-            "linear_luminance": 0.05126945837404324
-          },
           {
             "offset_physical": -5,
             "rgba": [
@@ -28057,36 +24926,6 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 6,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 7,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 8,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
@@ -28107,16 +24946,23 @@
         "physical_pixels_per_local_unit": 0.25,
         "requested_local_width": 8,
         "requested_physical_width": 2,
-        "measured_local_width": 7.0285232994713995,
-        "measured_physical_width": 1.7571308248678499,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 4,
-        "absolute_error_physical": 0.24286917513215012,
-        "absolute_error_local": 0.9714767005286005,
+        "measured_local_width": 12,
+        "measured_physical_width": 3,
+        "tolerance_local": 10,
+        "absolute_error_local": 4,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
+          {
+            "offset_physical": -5,
+            "rgba": [
+              0,
+              0,
+              0,
+              255
+            ],
+            "linear_luminance": 0
+          },
           {
             "offset_physical": -4,
             "rgba": [
@@ -28216,40 +25062,10 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 6,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 7,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 8,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
-      "major_minor_delta_local": 1.136774337772117,
+      "major_minor_delta_local": 0,
       "passed": true
     },
     {
@@ -28279,36 +25095,13 @@
         "physical_pixels_per_local_unit": 1,
         "requested_local_width": 8,
         "requested_physical_width": 8,
-        "measured_local_width": 7.454504072341667,
-        "measured_physical_width": 7.454504072341667,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 1,
-        "absolute_error_physical": 0.5454959276583331,
-        "absolute_error_local": 0.5454959276583331,
+        "measured_local_width": 9,
+        "measured_physical_width": 9,
+        "tolerance_local": 2.5,
+        "absolute_error_local": 1,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -10,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -9,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -8,
             "rgba": [
@@ -28478,26 +25271,6 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 9,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 10,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
@@ -28518,36 +25291,13 @@
         "physical_pixels_per_local_unit": 1,
         "requested_local_width": 8,
         "requested_physical_width": 8,
-        "measured_local_width": 7.386616215996338,
-        "measured_physical_width": 7.386616215996338,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 1,
-        "absolute_error_physical": 0.6133837840036618,
-        "absolute_error_local": 0.6133837840036618,
+        "measured_local_width": 8,
+        "measured_physical_width": 8,
+        "tolerance_local": 2.5,
+        "absolute_error_local": 0,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -10,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -9,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -8,
             "rgba": [
@@ -28717,30 +25467,10 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 9,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 10,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
-      "major_minor_delta_local": 0.06788785634532868,
+      "major_minor_delta_local": 1,
       "passed": true
     },
     {
@@ -28770,36 +25500,13 @@
         "physical_pixels_per_local_unit": 4,
         "requested_local_width": 8,
         "requested_physical_width": 32,
-        "measured_local_width": 7.987511212266653,
-        "measured_physical_width": 31.95004484906661,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 0.25,
-        "absolute_error_physical": 0.04995515093338909,
-        "absolute_error_local": 0.012488787733347273,
+        "measured_local_width": 8.25,
+        "measured_physical_width": 33,
+        "tolerance_local": 1.25,
+        "absolute_error_local": 0.25,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -22,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -21,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -20,
             "rgba": [
@@ -29209,26 +25916,6 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 21,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 22,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
@@ -29249,36 +25936,13 @@
         "physical_pixels_per_local_unit": 4,
         "requested_local_width": 8,
         "requested_physical_width": 32,
-        "measured_local_width": 7.991832225801261,
-        "measured_physical_width": 31.967328903205043,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 0.25,
-        "absolute_error_physical": 0.03267109679495661,
-        "absolute_error_local": 0.008167774198739153,
+        "measured_local_width": 8.25,
+        "measured_physical_width": 33,
+        "tolerance_local": 1.25,
+        "absolute_error_local": 0.25,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -22,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -21,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -20,
             "rgba": [
@@ -29688,30 +26352,10 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 21,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 22,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
-      "major_minor_delta_local": 0.00432101353460812,
+      "major_minor_delta_local": 0,
       "passed": true
     },
     {
@@ -29741,36 +26385,13 @@
         "physical_pixels_per_local_unit": 0.3125,
         "requested_local_width": 8,
         "requested_physical_width": 2.5,
-        "measured_local_width": 9.181771122585648,
-        "measured_physical_width": 2.869303475808015,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 3.2,
-        "absolute_error_physical": 0.36930347580801515,
-        "absolute_error_local": 1.1817711225856478,
+        "measured_local_width": 12.8,
+        "measured_physical_width": 4,
+        "tolerance_local": 8,
+        "absolute_error_local": 4.800000000000001,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -8,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -7,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -6,
             "rgba": [
@@ -29900,26 +26521,6 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 7,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 8,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
@@ -29940,16 +26541,23 @@
         "physical_pixels_per_local_unit": 0.3125,
         "requested_local_width": 8,
         "requested_physical_width": 2.5,
-        "measured_local_width": 5.902639921109762,
-        "measured_physical_width": 1.8445749753468008,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 3.2,
-        "absolute_error_physical": 0.6554250246531992,
-        "absolute_error_local": 2.0973600788902376,
+        "measured_local_width": 9.6,
+        "measured_physical_width": 3,
+        "tolerance_local": 8,
+        "absolute_error_local": 1.5999999999999996,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
+          {
+            "offset_physical": -6,
+            "rgba": [
+              0,
+              0,
+              0,
+              255
+            ],
+            "linear_luminance": 0
+          },
           {
             "offset_physical": -5,
             "rgba": [
@@ -30069,30 +26677,10 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 7,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 8,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
-      "major_minor_delta_local": 3.2791312014758853,
+      "major_minor_delta_local": 3.200000000000001,
       "passed": true
     },
     {
@@ -30122,36 +26710,13 @@
         "physical_pixels_per_local_unit": 1.25,
         "requested_local_width": 8,
         "requested_physical_width": 10,
-        "measured_local_width": 8.100699910673299,
-        "measured_physical_width": 10.125874888341624,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 0.8,
-        "absolute_error_physical": 0.12587488834162386,
-        "absolute_error_local": 0.10069991067329909,
+        "measured_local_width": 9.6,
+        "measured_physical_width": 12,
+        "tolerance_local": 2,
+        "absolute_error_local": 1.5999999999999996,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -11,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -10,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -9,
             "rgba": [
@@ -30341,26 +26906,6 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 10,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 11,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
@@ -30381,36 +26926,13 @@
         "physical_pixels_per_local_unit": 1.25,
         "requested_local_width": 8,
         "requested_physical_width": 10,
-        "measured_local_width": 8.401949698687442,
-        "measured_physical_width": 10.502437123359304,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 0.8,
-        "absolute_error_physical": 0.5024371233593037,
-        "absolute_error_local": 0.40194969868744224,
+        "measured_local_width": 9.6,
+        "measured_physical_width": 12,
+        "tolerance_local": 2,
+        "absolute_error_local": 1.5999999999999996,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -11,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -10,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -9,
             "rgba": [
@@ -30600,30 +27122,10 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 10,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 11,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
-      "major_minor_delta_local": 0.30124978801414315,
+      "major_minor_delta_local": 0,
       "passed": true
     },
     {
@@ -30653,36 +27155,13 @@
         "physical_pixels_per_local_unit": 5,
         "requested_local_width": 8,
         "requested_physical_width": 40,
-        "measured_local_width": 7.862754419623599,
-        "measured_physical_width": 39.313772098117994,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 0.2,
-        "absolute_error_physical": 0.6862279018820061,
-        "absolute_error_local": 0.13724558037640122,
+        "measured_local_width": 8,
+        "measured_physical_width": 40,
+        "tolerance_local": 1.25,
+        "absolute_error_local": 0,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -26,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -25,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -24,
             "rgba": [
@@ -31172,26 +27651,6 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 25,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 26,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
@@ -31212,36 +27671,13 @@
         "physical_pixels_per_local_unit": 5,
         "requested_local_width": 8,
         "requested_physical_width": 40,
-        "measured_local_width": 7.887783820817776,
-        "measured_physical_width": 39.43891910408888,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 0.2,
-        "absolute_error_physical": 0.5610808959111182,
-        "absolute_error_local": 0.11221617918222382,
+        "measured_local_width": 8.2,
+        "measured_physical_width": 41,
+        "tolerance_local": 1.25,
+        "absolute_error_local": 0.1999999999999993,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -26,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -25,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -24,
             "rgba": [
@@ -31731,30 +28167,10 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 25,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 26,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
-      "major_minor_delta_local": 0.025029401194177403,
+      "major_minor_delta_local": 0.1999999999999993,
       "passed": true
     },
     {
@@ -31784,36 +28200,13 @@
         "physical_pixels_per_local_unit": 0.375,
         "requested_local_width": 8,
         "requested_physical_width": 3,
-        "measured_local_width": 8.176770041838715,
-        "measured_physical_width": 3.066288765689518,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 2.6666666666666665,
-        "absolute_error_physical": 0.06628876568951814,
-        "absolute_error_local": 0.17677004183871503,
+        "measured_local_width": 13.333333333333334,
+        "measured_physical_width": 5,
+        "tolerance_local": 6.666666666666667,
+        "absolute_error_local": 5.333333333333334,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -8,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -7,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -6,
             "rgba": [
@@ -31943,26 +28336,6 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 7,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 8,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
@@ -31983,13 +28356,10 @@
         "physical_pixels_per_local_unit": 0.375,
         "requested_local_width": 8,
         "requested_physical_width": 3,
-        "measured_local_width": 7.796486864224202,
-        "measured_physical_width": 2.9236825740840757,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 2.6666666666666665,
-        "absolute_error_physical": 0.07631742591592428,
-        "absolute_error_local": 0.20351313577579777,
+        "measured_local_width": 10.666666666666666,
+        "measured_physical_width": 4,
+        "tolerance_local": 6.666666666666667,
+        "absolute_error_local": 2.666666666666666,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
@@ -32122,30 +28492,10 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 7,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 8,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
-      "major_minor_delta_local": 0.3802831776145128,
+      "major_minor_delta_local": 2.666666666666668,
       "passed": true
     },
     {
@@ -32175,36 +28525,13 @@
         "physical_pixels_per_local_unit": 1.5,
         "requested_local_width": 8,
         "requested_physical_width": 12,
-        "measured_local_width": 8.133964206654676,
-        "measured_physical_width": 12.200946309982013,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 0.6666666666666666,
-        "absolute_error_physical": 0.20094630998201346,
-        "absolute_error_local": 0.13396420665467623,
+        "measured_local_width": 8.666666666666666,
+        "measured_physical_width": 13,
+        "tolerance_local": 1.6666666666666667,
+        "absolute_error_local": 0.6666666666666661,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -12,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -11,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -10,
             "rgba": [
@@ -32414,26 +28741,6 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 11,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 12,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
@@ -32454,36 +28761,13 @@
         "physical_pixels_per_local_unit": 1.5,
         "requested_local_width": 8,
         "requested_physical_width": 12,
-        "measured_local_width": 7.983017214159371,
-        "measured_physical_width": 11.974525821239057,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 0.6666666666666666,
-        "absolute_error_physical": 0.025474178760942934,
-        "absolute_error_local": 0.016982785840628623,
+        "measured_local_width": 9.333333333333334,
+        "measured_physical_width": 14,
+        "tolerance_local": 1.6666666666666667,
+        "absolute_error_local": 1.333333333333334,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -12,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -11,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -10,
             "rgba": [
@@ -32693,30 +28977,10 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 11,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 12,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
-      "major_minor_delta_local": 0.15094699249530485,
+      "major_minor_delta_local": 0.6666666666666679,
       "passed": true
     },
     {
@@ -32746,36 +29010,13 @@
         "physical_pixels_per_local_unit": 6,
         "requested_local_width": 8,
         "requested_physical_width": 48,
-        "measured_local_width": 8.010433710438965,
-        "measured_physical_width": 48.06260226263379,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 0.16666666666666666,
-        "absolute_error_physical": 0.06260226263378854,
-        "absolute_error_local": 0.010433710438965349,
+        "measured_local_width": 8.333333333333334,
+        "measured_physical_width": 50,
+        "tolerance_local": 1.25,
+        "absolute_error_local": 0.3333333333333339,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -30,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -29,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -28,
             "rgba": [
@@ -33345,26 +29586,6 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 29,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 30,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
@@ -33385,36 +29606,13 @@
         "physical_pixels_per_local_unit": 6,
         "requested_local_width": 8,
         "requested_physical_width": 48,
-        "measured_local_width": 7.946471924129022,
-        "measured_physical_width": 47.678831544774134,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 0.16666666666666666,
-        "absolute_error_physical": 0.321168455225866,
-        "absolute_error_local": 0.053528075870977965,
+        "measured_local_width": 8.166666666666666,
+        "measured_physical_width": 49,
+        "tolerance_local": 1.25,
+        "absolute_error_local": 0.16666666666666607,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -30,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -29,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -28,
             "rgba": [
@@ -33984,30 +30182,10 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 29,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 30,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
-      "major_minor_delta_local": 0.06396178630994331,
+      "major_minor_delta_local": 0.16666666666666785,
       "passed": true
     },
     {
@@ -34037,36 +30215,13 @@
         "physical_pixels_per_local_unit": 0.5,
         "requested_local_width": 8,
         "requested_physical_width": 4,
-        "measured_local_width": 8.427398927233092,
-        "measured_physical_width": 4.213699463616546,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 2,
-        "absolute_error_physical": 0.21369946361654613,
-        "absolute_error_local": 0.42739892723309225,
+        "measured_local_width": 12,
+        "measured_physical_width": 6,
+        "tolerance_local": 5,
+        "absolute_error_local": 4,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -8,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -7,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -6,
             "rgba": [
@@ -34196,26 +30351,6 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 7,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 8,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
@@ -34236,36 +30371,13 @@
         "physical_pixels_per_local_unit": 0.5,
         "requested_local_width": 8,
         "requested_physical_width": 4,
-        "measured_local_width": 7.072590567200352,
-        "measured_physical_width": 3.536295283600176,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 2,
-        "absolute_error_physical": 0.4637047163998238,
-        "absolute_error_local": 0.9274094327996476,
+        "measured_local_width": 10,
+        "measured_physical_width": 5,
+        "tolerance_local": 5,
+        "absolute_error_local": 2,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -8,
-            "rgba": [
-              54,
-              54,
-              54,
-              255
-            ],
-            "linear_luminance": 0.03688945040110004
-          },
-          {
-            "offset_physical": -7,
-            "rgba": [
-              87,
-              87,
-              87,
-              255
-            ],
-            "linear_luminance": 0.0953074666309647
-          },
           {
             "offset_physical": -6,
             "rgba": [
@@ -34395,30 +30507,10 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 7,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 8,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
-      "major_minor_delta_local": 1.3548083600327399,
+      "major_minor_delta_local": 2,
       "passed": true
     },
     {
@@ -34448,36 +30540,13 @@
         "physical_pixels_per_local_unit": 2,
         "requested_local_width": 8,
         "requested_physical_width": 16,
-        "measured_local_width": 8.049251969054046,
-        "measured_physical_width": 16.09850393810809,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 0.5,
-        "absolute_error_physical": 0.09850393810809166,
-        "absolute_error_local": 0.04925196905404583,
+        "measured_local_width": 8.5,
+        "measured_physical_width": 17,
+        "tolerance_local": 1.25,
+        "absolute_error_local": 0.5,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -14,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -13,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -12,
             "rgba": [
@@ -34727,26 +30796,6 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 13,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 14,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
@@ -34767,36 +30816,13 @@
         "physical_pixels_per_local_unit": 2,
         "requested_local_width": 8,
         "requested_physical_width": 16,
-        "measured_local_width": 8.099175617602949,
-        "measured_physical_width": 16.198351235205898,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 0.5,
-        "absolute_error_physical": 0.19835123520589804,
-        "absolute_error_local": 0.09917561760294902,
+        "measured_local_width": 9,
+        "measured_physical_width": 18,
+        "tolerance_local": 1.25,
+        "absolute_error_local": 1,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -14,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -13,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -12,
             "rgba": [
@@ -35046,30 +31072,10 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 13,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 14,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
-      "major_minor_delta_local": 0.04992364854890319,
+      "major_minor_delta_local": 0.5,
       "passed": true
     },
     {
@@ -35099,36 +31105,13 @@
         "physical_pixels_per_local_unit": 8,
         "requested_local_width": 8,
         "requested_physical_width": 64,
-        "measured_local_width": 7.93920472695434,
-        "measured_physical_width": 63.51363781563472,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 0.125,
-        "absolute_error_physical": 0.48636218436527656,
-        "absolute_error_local": 0.06079527304565957,
+        "measured_local_width": 8,
+        "measured_physical_width": 64,
+        "tolerance_local": 1.25,
+        "absolute_error_local": 0,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -38,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -37,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -36,
             "rgba": [
@@ -35858,26 +31841,6 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 37,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 38,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
@@ -35898,36 +31861,13 @@
         "physical_pixels_per_local_unit": 8,
         "requested_local_width": 8,
         "requested_physical_width": 64,
-        "measured_local_width": 7.910710505718304,
-        "measured_physical_width": 63.28568404574643,
-        "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
-        "tolerance_physical": 1,
-        "tolerance_local": 0.125,
-        "absolute_error_physical": 0.7143159542535713,
-        "absolute_error_local": 0.08928949428169641,
+        "measured_local_width": 8,
+        "measured_physical_width": 64,
+        "tolerance_local": 1.25,
+        "absolute_error_local": 0,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
-          {
-            "offset_physical": -38,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": -37,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
           {
             "offset_physical": -36,
             "rgba": [
@@ -36657,36 +32597,15 @@
               255
             ],
             "linear_luminance": 0
-          },
-          {
-            "offset_physical": 37,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
-          },
-          {
-            "offset_physical": 38,
-            "rgba": [
-              0,
-              0,
-              0,
-              255
-            ],
-            "linear_luminance": 0
           }
         ]
       },
-      "major_minor_delta_local": 0.028494221236036843,
+      "major_minor_delta_local": 0,
       "passed": true
     }
   ],
-  "ellipse_stroke_max_error_local": 2.1082510383007174,
-  "ellipse_stroke_max_major_minor_delta_local": 3.2791312014758853,
-  "ellipse_stroke_max_error_physical": 0.7143159542535713,
+  "ellipse_stroke_max_error_local": 12,
+  "ellipse_stroke_max_major_minor_delta_local": 8,
   "affine_parity": {
     "matrix_order": "[m11,m12,m21,m22,tx,ty]",
     "matrix": [
@@ -36720,7 +32639,7 @@
         430.69103383271795,
         307.80871667070977
       ],
-      "hit_topmost": "d3c90c45-b2ab-427b-939c-ddcf8ab7f16e",
+      "hit_topmost": "79ed6a3b-5a4a-4ed3-8602-7537369a4705",
       "pixel": {
         "x": 430.69103383271795,
         "y": 307.80871667070977,
@@ -36737,7 +32656,7 @@
           255
         ]
       },
-      "click_selected": "d3c90c45-b2ab-427b-939c-ddcf8ab7f16e"
+      "click_selected": "79ed6a3b-5a4a-4ed3-8602-7537369a4705"
     },
     "transposed_only": {
       "local": [
@@ -36753,7 +32672,7 @@
         418.9337907199665,
         236.29881492690595
       ],
-      "hit_topmost": "c8f97f7a-8cfa-42b5-8dd6-175b96b93d53",
+      "hit_topmost": "f87efce7-91db-459e-b4fc-42a646f995ba",
       "pixel": {
         "x": 418.9337907199665,
         "y": 236.29881492690595,
@@ -36770,7 +32689,7 @@
           255
         ]
       },
-      "click_selected": "c8f97f7a-8cfa-42b5-8dd6-175b96b93d53"
+      "click_selected": "f87efce7-91db-459e-b4fc-42a646f995ba"
     },
     "expected_overlay_points": [
       [
@@ -36817,7 +32736,7 @@
     "transposed_click_does_not_select_shape": true
   },
   "assertion_count": 16,
-  "passed_assertion_count": 16,
+  "passed_assertion_count": 15,
   "expected_assertion_names": [
     "default_frame_is_visible",
     "affine_semantic_parity",
@@ -53404,7 +49323,7 @@
     "halo_free_black_background": true,
     "halo_free_white_background": true,
     "fill_stroke_boundary_has_no_alpha_dip": true,
-    "ellipse_stroke_width_uniform": true,
+    "ellipse_stroke_width_uniform": false,
     "render_hit_test_overlay_parity": true,
     "every_dpr_zoom_edge_has_partial_coverage": true,
     "circle_has_partial_coverage": true,
@@ -53414,5 +49333,5 @@
     "opacity_fill_and_stroke_render_together": true,
     "no_binary_edge_only_result": true
   },
-  "all_passed": true
+  "all_passed": false
 }

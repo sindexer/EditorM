@@ -13,7 +13,10 @@ Baseline: main merge commit `277bc71361da5b50a2d3168856ce0b3cb83d0463`; approved
 - Rectangle, Frame, and Ellipse persist solid sRGB fill RGBA, independent opacity, four corner radii, and one centered solid stroke.
 - Typed commands cross the Worker-owned Rust/WASM boundary; invalid finite/range inputs fail atomically without partial Document, History, Selection, Scene, Render, or GPU mutation.
 - Document format version 2 stores appearance while loading version 1 with defaults. Request protocol remains version 1. Render binary schema advances independently to version 2 with 112-byte instances and 116-byte dirty records.
-- Shared native/browser WGSL uses derivative-based analytic coverage (`fwidth`/`smoothstep`) with no fragment `discard`, sRGB-to-linear conversion, and a premultiplied-linear alpha/blend contract.
+- Rust, WGSL, browser proof, selection overlay, and hit-test share `[m11,m12,m21,m22,tx,ty]` semantics: `x=m11*x+m12*y+tx`, `y=m21*x+m22*y+ty`.
+- Browser rendering keeps the preferred base format and uses compatible sRGB pipeline, canvas, and readback views; unsupported sRGB views fail closed.
+- Ellipse stroke distance uses a gradient-correct local-unit approximation, conservative per-axis half-stroke expansion, and matching bounds/culling/hit-test semantics.
+- Fill and stroke contribute mutually exclusive premultiplied coverage, then object opacity is applied exactly once; black/white paired readback rejects halo, dip, overshoot, and undershoot.
 - Centered strokes affect bounds/culling and dirty only the edited stable slot. Single appearance and geometry edits show zero full RenderModel clone, zero unrelated item scan, and zero fallback rebuild in current proof.
 
 ## Explicit exclusions
@@ -37,30 +40,36 @@ All commands below were run on Windows against the final source state:
 | `tools/cargo.ps1 fmt --all -- --check` | PASS |
 | `tools/cargo.ps1 clippy --workspace --all-targets -- -D warnings` | PASS |
 | `tools/cargo.ps1 build --workspace --all-targets` | PASS |
-| `tools/cargo.ps1 test --workspace --all-targets` | PASS: 182 passed, 0 failed, 0 ignored |
+| `tools/cargo.ps1 test --workspace --all-targets` | PASS: 183 passed, 0 failed, 0 ignored |
 | `tools/build-phase0e-wasm.ps1` | PASS |
 | generated shared WGSL contract `--check` | PASS |
-| `npm.cmd test` | PASS: 3 files, 15 tests |
+| Preview `npm.cmd test` / `npm.cmd run build` | PASS: 7 tests; 9 verified build assets |
+| Editor `npm.cmd test` | PASS: 3 files, 17 tests |
 | `npm.cmd run build` | PASS |
-| `npm.cmd run test:browser:phase1a` | PASS: fresh actual hardware run plus 4 artifact assertions |
+| `npm.cmd run test:browser:phase1a` | PASS: fresh actual hardware run plus 5 stored-proof tests |
 
-The complete command/result record is [PHASE_1A_VERIFICATION.txt](verification/PHASE_1A_VERIFICATION.txt). Checked-in and fresh pinned WASM packages are both 1,285,981 bytes with SHA-256 `5a543298efef4ce276a4dab100727b09b57f856c2447e9e4db7237c7e4ae78d0`; both instantiate EngineHost with protocol v1 and render schema v2.
+The complete command/result record is [PHASE_1A_VERIFICATION.txt](verification/PHASE_1A_VERIFICATION.txt). The rebuilt pinned WASM package is 1,284,737 bytes with SHA-256 `aa8444cc8a5120b6d9c97ebeafc401cac2b53152f69e6451f5b4f73b4b45f492`; the fresh browser run instantiates EngineHost with protocol v1 and render schema v2.
 
 ## Actual Chrome, Worker, WASM, and WebGPU proof
 
-Fresh capture: `2026-08-13T17:50:42.777Z`.
+Fresh capture: `2026-08-20T05:22:10.457Z`.
 
-- Chrome `151.0.7922.110`, new process, new temporary profile.
-- NVIDIA GeForce GTX 970 actual WebGPU device.
+- Chrome `151.0.7922.138`, new process PID 17468, new temporary profile.
+- NVIDIA GeForce GTX 970 actual WebGPU device, driver `32.0.15.8157`.
 - Dedicated Worker owns an initialized WASM EngineHost; heartbeat is at least 1.
+- Surface base `bgra8unorm`; pipeline and readback views `bgra8unorm-srgb`.
 - Server health and HTML/Worker/JS/WASM assets including WASM MIME pass.
-- Default 1080p Frame, 4K create/select/undo/redo, Inspector appearance, direct move/resize/undo/redo, stable single-slot updates, and engine/GPU/overlay sequence agreement pass.
-- Checks: 18/18; console errors: 0; GPU validation errors: 0; fallback rebuilds: 0.
+- Default 1080p Frame, 4K create/select/undo/redo, affine render/hit/overlay parity, Inspector appearance, direct move/resize/undo/redo, stable single-slot updates, and engine/GPU/overlay sequence agreement pass.
+- Browser checks: 26/26; pixel assertions: 16/16; console errors: 0; GPU validation errors: 0; fallback rebuilds: 0.
 - The harness owns port allocation, preview start/health, `PHASE0D_URL` equivalent routing, Chrome process/profile, proof capture, and cleanup. It does not require a pre-existing server.
 
 ## Pixel evidence
 
-[PHASE_1A_PIXEL_READBACK.json](verification/PHASE_1A_PIXEL_READBACK.json) records 17 passing actual WebGPU readback cases. It covers every combination of DPR 1/1.25/1.5/2 and zoom 25%/100%/400%, plus a circle, a rotated nonuniform ellipse, a rounded rectangle, black/white backgrounds, opacity, fill, and centered stroke. Every required edge has partial analytic coverage; binary-only edges and halo conditions are rejected.
+[PHASE_1A_PIXEL_READBACK.json](verification/PHASE_1A_PIXEL_READBACK.json) records 48 passing ellipse stroke measurements across four shapes, DPR 1/1.25/1.5/2, and zoom 25%/100%/400%, plus 17 analytic-AA cases.
+
+- Stroke width is measured by integrated connected linear coverage on an isolated black backdrop with a 1 physical pixel tolerance; maximum observed error is 0.7144 px.
+- Three fill-only/stroke-only/fill+stroke cases use paired black/white samples; maximum linear channel error is 0.00554 against tolerance 0.055.
+- The non-symmetric affine case, sRGB view linkage, halo rejection, boundary alpha continuity, clipping, and render/hit/overlay parity all fail closed.
 
 Screenshots:
 
@@ -68,6 +77,8 @@ Screenshots:
 - [Open 4K Frame preset menu](verification/phase1a-frame-4k.png)
 - [Appearance and analytic AA](verification/phase1a-appearance-aa.png)
 - [DPR/zoom matrix state](verification/phase1a-dpr-zoom-matrix.png)
+- [sRGB color contract](verification/phase1a-color-contract.png)
+- [Affine render/hit/overlay parity](verification/phase1a-affine-parity.png)
 
 ## Actual GTX 970 performance
 
@@ -75,16 +86,18 @@ Screenshots:
 
 | Fixture | Visible | Warmup / measured | Median | p95 | Max | Interpretation |
 | --- | ---: | ---: | ---: | ---: | ---: | --- |
-| BENCH-A | 1,000 | 30 / 300 | 0.3838 ms | 0.6052 ms | 1.0244 ms | Gate threshold `p95 <= 16.7 ms`: PASS |
-| BENCH-B | 10,000 | 10 / 60 | 0.5000 ms | 0.6535 ms | 0.7359 ms | Comparative evidence only |
+| BENCH-A | 1,000 | 30 / 300 | 0.2962 ms | 0.7028 ms | 1.8826 ms | Gate threshold `p95 <= 16.7 ms`: PASS |
+| BENCH-B | 10,000 | 10 / 60 | 0.6036 ms | 0.7990 ms | 1.6970 ms | Comparative evidence only |
 
 Both use a 1920×1080 viewport, DPR 1, one batch, one draw call, and actual NVIDIA GeForce GTX 970 hardware. Warmup and evidence serialization are outside measured frame samples.
 
 ## Preserved failures and corrections
 
-[PHASE_1A_BROWSER_INCIDENT_PRE_FIX.json](verification/PHASE_1A_BROWSER_INCIDENT_PRE_FIX.json) preserves a pre-fix `condition_timeout` waiting for the Resizing FSM; it is not presented as a pass. Fresh hardware proof also exposed a nonuniform ellipse centered-stroke quad clipping defect and a transposed affine selection-overlay mapping. The quad expansion, overlay mapping, and direct resize hit path were corrected before the final proof.
+[PHASE_1A_BROWSER_INCIDENT_PRE_FIX.json](verification/PHASE_1A_BROWSER_INCIDENT_PRE_FIX.json) preserves the original pre-fix resize timeout and is not presented as a pass. `PHASE_1A_BROWSER_FAILURE*.json`, `PHASE_1A_BROWSER_PROOF_FAILED_*.json`, and `PHASE_1A_PIXEL_READBACK_FAILED_*.json` preserve subsequent harness/readback failures rather than being deleted or rewritten as passes.
 
-A first `npm.ps1` validation entry did not execute because of Windows execution policy and was not counted as a pass; final commands use `npm.cmd`. Two failures while authoring the new artifact test (one TypeScript type inference error and one temporary-profile expectation mismatch) were corrected before the final 15/15 and 4/4 passing runs.
+Those runs exposed an out-of-viewport affine sample, asynchronous pointer-up races, non-isolated color backdrops, threshold-based subpixel width overcounting, opposite-edge contamination, and inward-AA misclassification. Each failure remains recorded; the final proof uses bounded discriminating points, press/transaction synchronization, isolated black/white backdrops, integrated connected coverage, and outward-only clipping validation.
+
+An initial targeted Rust compile failed because `Vec2::length` did not exist; it was corrected to `f64::hypot` and was not represented as a pass. A first `npm.ps1` validation entry did not execute because Windows execution policy blocked it. Final passing counts are Rust 183, Editor 17, Preview 7, and browser stored-proof 5.
 
 ## CI first-run incident
 
@@ -92,14 +105,16 @@ The first PR Actions run, [31726409602](https://github.com/sindexer/EditorM/acti
 
 ## Evidence index and hashes
 
-- `docs/verification/PHASE_1A_BROWSER_PROOF.json` — `ee9584bf0f2e2c9863c473fe7b938e25d1f775de4ffe3c0e2d036e2db78e2815`
-- `docs/verification/PHASE_1A_PIXEL_READBACK.json` — `f884312db341e8c8c9f3d0726ab1fe017792ca5df89bcbd17ca2017098624a98`
-- `docs/PHASE_1A_METRICS.json` — `b74162be5fc66ca84c363c5decf53bd30fba1bd6387a0da684738986c1cbb777`
+- `docs/verification/PHASE_1A_BROWSER_PROOF.json` — `86f795f2b95911d7f0a0d91bc13d66630886b7b45f6928b34b4fed9baa6f9bc6`
+- `docs/verification/PHASE_1A_PIXEL_READBACK.json` — `0379f046e97495cbb0199b41fc8371815c7f325ff13cfa2d6f01e26a23708894`
+- `docs/PHASE_1A_METRICS.json` — `9a4882a67a53f099776b3e20ea0b06f9882d17cbaffb32db9f3f5ae42b556a66`
 - `docs/verification/PHASE_1A_BROWSER_INCIDENT_PRE_FIX.json` — `6353bb842f7f474b38012a052969df2962e1108734bdb0ac26b73c10509e1668`
-- `docs/verification/phase1a-editor-default.png` — `5ceec717d942e439dbb0d9ed630283869ff01bb4d0bd666a8651d2c1c5686859`
-- `docs/verification/phase1a-frame-4k.png` — `19151523b81ca6e899cd28e08d79a3f3a74453b4df40c9309c83d9895cabbd7d`
-- `docs/verification/phase1a-appearance-aa.png` — `dbc39099074844cb249bdfac5b15a22b6c54a1ce2ca928f249ae07448ed6d6cb`
-- `docs/verification/phase1a-dpr-zoom-matrix.png` — `720fc23556c4f3dbccd5c59a944b195026111868b83ed331a2ce215c815b9dc1`
+- `docs/verification/phase1a-editor-default.png` — `a7c4923378db301d567220135c884e69d0347bd533f9c2281bedb7298301c816`
+- `docs/verification/phase1a-frame-4k.png` — `8b89c7ca12a90652caf08e66b8c81f0df4466e7aec896f4e9cc772aa07bc8dfc`
+- `docs/verification/phase1a-appearance-aa.png` — `637130bb0e62894fc29463ccf69d9ab61b635f1fbd3b608e2539281d2a23e0b1`
+- `docs/verification/phase1a-dpr-zoom-matrix.png` — `740bd2655a0f72ec31cba540fcbe023864525b707fb08d9212ec0ddf2f71d609`
+- `docs/verification/phase1a-color-contract.png` — `d74d6e9139b6c574f10b9414764727e747f29ae07c7416977034776dbad70610`
+- `docs/verification/phase1a-affine-parity.png` — `9c69a6b2f530d84e0e3b28c270f969ecfffb1c6129b093a9feba2b7023942f9e`
 
 ## Run locally
 

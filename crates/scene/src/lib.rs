@@ -1415,13 +1415,7 @@ impl ComputedScene {
                     && local.y >= -half_stroke
                     && local.y <= size.y + half_stroke
             }
-            Geometry::Ellipse { .. } => {
-                let center = size * 0.5;
-                let radii = size * 0.5 + Vec2::new(half_stroke, half_stroke);
-                let x = (local.x - center.x) / radii.x;
-                let y = (local.y - center.y) / radii.y;
-                x.mul_add(x, y * y) <= 1.0
-            }
+            Geometry::Ellipse { .. } => ellipse_distance(local, size) <= half_stroke,
         }
     }
 
@@ -1514,11 +1508,16 @@ fn geometry_world_bounds(
     let bounds = match geometry {
         Geometry::Ellipse { .. } => {
             let center = world.transform_point(size * 0.5);
-            let radii = size * 0.5 + Vec2::new(half_stroke, half_stroke);
-            let extent = Vec2::new(
+            let radii = size * 0.5;
+            let geometry_extent = Vec2::new(
                 (world.m11 * radii.x).hypot(world.m12 * radii.y),
                 (world.m21 * radii.x).hypot(world.m22 * radii.y),
             );
+            let stroke_extent = Vec2::new(
+                half_stroke * world.m11.hypot(world.m12),
+                half_stroke * world.m21.hypot(world.m22),
+            );
+            let extent = geometry_extent + stroke_extent;
             if !center.is_finite() || !extent.is_finite() {
                 return Err(());
             }
@@ -1532,4 +1531,19 @@ fn geometry_world_bounds(
         }
     };
     bounds.is_finite().then_some(Some(bounds)).ok_or(())
+}
+
+fn ellipse_distance(local: Vec2, size: Vec2) -> f64 {
+    let radii = size * 0.5;
+    let normalized = Vec2::new(
+        (local.x - size.x * 0.5) / radii.x,
+        (local.y - size.y * 0.5) / radii.y,
+    );
+    let normalized_length = normalized.x.hypot(normalized.y);
+    if normalized_length < 1.0e-12 {
+        return -radii.x.min(radii.y);
+    }
+    let gradient_length =
+        (normalized.x / radii.x).hypot(normalized.y / radii.y) / normalized_length;
+    (normalized_length - 1.0) / gradient_length.max(1.0e-12)
 }

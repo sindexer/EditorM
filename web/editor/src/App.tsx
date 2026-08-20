@@ -35,6 +35,7 @@ import {
 } from "react";
 import { EngineClient, EngineFailure } from "./engine";
 import type { StoredProjectionNode } from "./engine";
+import { transformAffinePoint } from "./affine";
 import type { EngineResponse, ProjectionNode } from "./types";
 
 declare global {
@@ -1112,9 +1113,8 @@ export function App() {
 
   const overlay = useMemo(() => {
     if (!currentNode?.geometry || !currentNode.world_transform || !response) return null;
-    const [a, b, c, d, tx, ty] = currentNode.world_transform;
     const corners: Array<[number, number]> = [[0, 0], [currentNode.geometry.width, 0], [currentNode.geometry.width, currentNode.geometry.height], [0, currentNode.geometry.height]];
-    const points = corners.map(([x, y]) => worldToViewport([a * x + c * y + tx, b * x + d * y + ty]));
+    const points = corners.map((point) => worldToViewport(transformAffinePoint(currentNode.world_transform!, point)));
     const handle = points[2];
     const topMid: [number, number] = [(points[0][0] + points[1][0]) / 2, (points[0][1] + points[1][1]) / 2];
     return { points, handle, rotate: [topMid[0], topMid[1] - 24] as [number, number] };
