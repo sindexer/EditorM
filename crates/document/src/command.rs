@@ -364,9 +364,14 @@ impl ReversibleEffect {
                 property: PersistentProperty::Locked,
             },
             Self::SetGeometry { target, .. } => DocumentChange::GeometryChanged { node: *target },
-            Self::SetAppearance { target, .. } => {
-                DocumentChange::AppearanceChanged { node: *target }
-            }
+            Self::SetAppearance {
+                target,
+                before,
+                after,
+            } => DocumentChange::AppearanceChanged {
+                node: *target,
+                bounds_changed: before.stroke.width != after.stroke.width,
+            },
             Self::SetMetadata { target, .. } => DocumentChange::PersistentPropertyChanged {
                 node: *target,
                 property: PersistentProperty::Metadata,

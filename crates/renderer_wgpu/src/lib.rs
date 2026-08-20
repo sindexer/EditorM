@@ -12,9 +12,9 @@ use visual_authoring_render_model::{
 };
 use wgpu::util::DeviceExt;
 
-pub const RENDER_BINARY_SCHEMA_VERSION: u32 = 1;
-pub const INSTANCE_STRIDE_BYTES: usize = 48;
-pub const DIRTY_RECORD_STRIDE_BYTES: usize = 52;
+pub const RENDER_BINARY_SCHEMA_VERSION: u32 = 2;
+pub const INSTANCE_STRIDE_BYTES: usize = 112;
+pub const DIRTY_RECORD_STRIDE_BYTES: usize = 116;
 pub const VIEW_UNIFORM_BYTES: usize = 32;
 pub const SHADER_SOURCE: &str = include_str!("../../../shared/render_contract.wgsl");
 
@@ -90,6 +90,11 @@ struct InstanceRaw {
     size: [f32; 2],
     opacity: f32,
     primitive: u32,
+    fill_linear: [f32; 4],
+    corner_radii: [f32; 4],
+    stroke_linear: [f32; 4],
+    stroke_width: f32,
+    padding: [f32; 3],
 }
 
 #[repr(C)]
@@ -185,7 +190,18 @@ impl WgpuRenderer {
                 entry_point: "fs_main",
                 targets: &[Some(wgpu::ColorTargetState {
                     format: wgpu::TextureFormat::Rgba8UnormSrgb,
-                    blend: Some(wgpu::BlendState::ALPHA_BLENDING),
+                    blend: Some(wgpu::BlendState {
+                        color: wgpu::BlendComponent {
+                            src_factor: wgpu::BlendFactor::One,
+                            dst_factor: wgpu::BlendFactor::OneMinusSrcAlpha,
+                            operation: wgpu::BlendOperation::Add,
+                        },
+                        alpha: wgpu::BlendComponent {
+                            src_factor: wgpu::BlendFactor::One,
+                            dst_factor: wgpu::BlendFactor::OneMinusSrcAlpha,
+                            operation: wgpu::BlendOperation::Add,
+                        },
+                    }),
                     write_mask: wgpu::ColorWrites::ALL,
                 })],
                 compilation_options: wgpu::PipelineCompilationOptions::default(),
@@ -552,7 +568,20 @@ fn encode_instance(item: &RenderItem) -> Result<InstanceRaw, RendererError> {
         world.m22,
         item.size.x,
         item.size.y,
+        item.fill_linear[0],
+        item.fill_linear[1],
+        item.fill_linear[2],
+        item.fill_linear[3],
         item.opacity,
+        item.corner_radii[0],
+        item.corner_radii[1],
+        item.corner_radii[2],
+        item.corner_radii[3],
+        item.stroke_linear[0],
+        item.stroke_linear[1],
+        item.stroke_linear[2],
+        item.stroke_linear[3],
+        item.stroke_width,
     ];
     if values.iter().any(|value| !finite_f32(*value)) {
         return Err(RendererError::F32Conversion {
@@ -571,6 +600,11 @@ fn encode_instance(item: &RenderItem) -> Result<InstanceRaw, RendererError> {
         size: [item.size.x as f32, item.size.y as f32],
         opacity: item.opacity as f32,
         primitive: u32::from(item.primitive == PrimitiveKind::Ellipse),
+        fill_linear: item.fill_linear.map(|value| value as f32),
+        corner_radii: item.corner_radii.map(|value| value as f32),
+        stroke_linear: item.stroke_linear.map(|value| value as f32),
+        stroke_width: item.stroke_width as f32,
+        padding: [0.0; 3],
     })
 }
 
@@ -651,7 +685,11 @@ mod tests {
             size: Vec2::new(100.0, 50.0),
             world_transform: Some(transform),
             world_bounds: Some(Rect::from_min_max(Vec2::ZERO, Vec2::new(100.0, 50.0))),
+            fill_linear: [0.2, 0.4, 0.8, 1.0],
             opacity: 1.0,
+            corner_radii: [8.0; 4],
+            stroke_linear: [0.1, 0.1, 0.1, 1.0],
+            stroke_width: 2.0,
             renderable: true,
             gpu_encodable: true,
             encoding_diagnostic: None,
@@ -676,7 +714,10 @@ mod tests {
         let ellipse = encode_instance(&item(Affine2::IDENTITY, PrimitiveKind::Ellipse)).unwrap();
         assert_eq!(rectangle.primitive, 0);
         assert_eq!(ellipse.primitive, 1);
-        assert!(SHADER_SOURCE.contains("discard"));
+        assert!(SHADER_SOURCE.contains("fwidth"));
+        assert!(SHADER_SOURCE.contains("smoothstep"));
+        assert!(!SHADER_SOURCE.contains("discard"));
+        assert_eq!(size_of::<InstanceRaw>(), INSTANCE_STRIDE_BYTES);
     }
 
     #[test]
@@ -698,13 +739,13 @@ mod tests {
     #[test]
     fn shared_shader_and_binary_schema_match_native_layout() {
         let schema = include_str!("../../../shared/render_binary_schema.json");
-        assert_eq!(RENDER_BINARY_SCHEMA_VERSION, 1);
+        assert_eq!(RENDER_BINARY_SCHEMA_VERSION, 2);
         assert_eq!(size_of::<InstanceRaw>(), INSTANCE_STRIDE_BYTES);
         assert_eq!(size_of::<ViewRaw>(), VIEW_UNIFORM_BYTES);
         assert_eq!(DIRTY_RECORD_STRIDE_BYTES, 4 + INSTANCE_STRIDE_BYTES);
-        assert!(schema.contains("\"version\": 1"));
-        assert!(schema.contains("\"instance_stride_bytes\": 48"));
-        assert!(schema.contains("\"dirty_record_stride_bytes\": 52"));
+        assert!(schema.contains("\"version\": 2"));
+        assert!(schema.contains("\"instance_stride_bytes\": 112"));
+        assert!(schema.contains("\"dirty_record_stride_bytes\": 116"));
         assert!(schema.contains("\"rectangle\": 0"));
         assert!(schema.contains("\"ellipse\": 1"));
         assert!(SHADER_SOURCE.contains("visible_slots[visible_index]"));

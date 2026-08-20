@@ -14,6 +14,7 @@ import {
   RENDER_BINARY_SCHEMA_VERSION,
   SHADER_SOURCE,
 } from "../src/render_contract.js";
+import { RendererFailure, srgbViewFormat } from "../src/renderer.js";
 import {
   EXPECTED_PREVIEW_ASSETS,
   HarnessFailure,
@@ -66,10 +67,13 @@ test("high and low f32 camera split preserves a large finite coordinate", () => 
 });
 
 test("shared render schema fixes binary offsets, strides, and primitive values", () => {
-  assert.equal(RENDER_BINARY_SCHEMA_VERSION, 1);
-  assert.equal(INSTANCE_STRIDE, 48);
-  assert.equal(DIRTY_STRIDE, 52);
+  assert.equal(RENDER_BINARY_SCHEMA_VERSION, 2);
+  assert.equal(INSTANCE_STRIDE, 112);
+  assert.equal(DIRTY_STRIDE, 116);
   assert.equal(RENDER_BINARY_SCHEMA.endianness, "little");
+  assert.equal(RENDER_BINARY_SCHEMA.alpha_contract, "premultiplied-linear");
+  assert.equal(RENDER_BINARY_SCHEMA.color_input, "srgb");
+  assert.equal(RENDER_BINARY_SCHEMA.stroke_alignment, "center");
   assert.deepEqual(RENDER_BINARY_SCHEMA.primitive, { rectangle: 0, ellipse: 1 });
   assert.deepEqual(RENDER_BINARY_SCHEMA.instance_fields, {
     linear: 0,
@@ -78,15 +82,41 @@ test("shared render schema fixes binary offsets, strides, and primitive values",
     size: 32,
     opacity: 40,
     primitive: 44,
+    fill_linear: 48,
+    corner_radii: 64,
+    stroke_linear: 80,
+    stroke_width: 96,
+    padding: 100,
   });
 });
 
-test("WGSL is geometry-aware and uses instanced visible slots", () => {
+test("WGSL is geometry-aware and uses instanced analytic coverage", () => {
   assert.match(SHADER_SOURCE, /visible_slots\[visible_index\]/);
   assert.match(SHADER_SOURCE, /input\.primitive == 1u/);
-  assert.match(SHADER_SOURCE, /discard/);
+  assert.match(SHADER_SOURCE, /fwidth\(distance\)/);
+  assert.match(SHADER_SOURCE, /smoothstep\(-width, width, distance\)/);
+  assert.doesNotMatch(SHADER_SOURCE, /ellipse_axis_ratio/);
+  assert.match(SHADER_SOURCE, /linear\.x \* local\.x \+ item\.linear\.y \* local\.y/);
+  assert.match(SHADER_SOURCE, /linear\.z \* local\.x \+ item\.linear\.w \* local\.y/);
+  assert.match(SHADER_SOURCE, /gradient_length/);
+  assert.match(SHADER_SOURCE, /vec4<f32>\(premultiplied, alpha\) \* input\.opacity/);
+  assert.doesNotMatch(SHADER_SOURCE, /fill_alpha \* \(1\.0 - stroke_alpha\)/);
+  assert.doesNotMatch(SHADER_SOURCE, /stroke_alpha \+ fill_alpha \* \(1\.0 - stroke_alpha\)/);
+  assert.doesNotMatch(SHADER_SOURCE, /\bdiscard\b/);
   assert.match(SHADER_SOURCE, /switch vertex_index/);
 });
+
+test("sRGB render view mapping is explicit and fail-closed", () => {
+  assert.equal(srgbViewFormat("bgra8unorm"), "bgra8unorm-srgb");
+  assert.equal(srgbViewFormat("rgba8unorm"), "rgba8unorm-srgb");
+  assert.throws(
+    () => srgbViewFormat("rgba16float"),
+    (error) =>
+      error instanceof RendererFailure &&
+      error.code === "srgb_view_format_unavailable",
+  );
+});
+
 
 test("self-contained harness classifies asset status and MIME failures", () => {
   assert.deepEqual([...EXPECTED_PREVIEW_ASSETS], [

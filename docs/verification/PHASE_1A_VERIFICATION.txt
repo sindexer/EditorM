@@ -1,0 +1,147 @@
+EditorM Phase 1A Verification Record
+====================================
+
+Disposition
+-----------
+Implementation and evidence are complete for external review. This record does not claim Gate 1A approval. Phase 1B was not started. No review ZIP was created.
+
+Baseline
+--------
+- main merge commit: 277bc71361da5b50a2d3168856ce0b3cb83d0463
+- approved Phase 0E-R3 payload: 39085167a1b9d2ce1ba78060b3fee4d9327aaf27
+- approved tag: phase-0e-r3-approved
+- working branch: feat/phase1a-visible-frame-primitives
+
+Final Rust validation (Windows)
+-------------------------------
+1. powershell -NoProfile -ExecutionPolicy Bypass -File tools/cargo.ps1 fmt --all -- --check
+   PASS, exit 0.
+2. powershell -NoProfile -ExecutionPolicy Bypass -File tools/cargo.ps1 clippy --workspace --all-targets -- -D warnings
+   PASS, exit 0, warnings treated as errors.
+3. powershell -NoProfile -ExecutionPolicy Bypass -File tools/cargo.ps1 build --workspace --all-targets
+   PASS, exit 0.
+4. powershell -NoProfile -ExecutionPolicy Bypass -File tools/cargo.ps1 test --workspace --all-targets
+   PASS, exit 0, 183 passed, 0 failed, 0 ignored.
+
+The 183 count was taken from the single successful workspace/all-targets run. It was not retried and target was not deleted after a failure.
+
+WASM and generated contract
+---------------------------
+- powershell -NoProfile -ExecutionPolicy Bypass -File tools/build-phase0e-wasm.ps1
+  PASS. Release wasm and wasm-bindgen web module were generated.
+- Rebuilt pinned package: SHA-256 aa8444cc8a5120b6d9c97ebeafc401cac2b53152f69e6451f5b4f73b4b45f492, 1,284,737 bytes; protocol v1, render schema v2, EngineHost initialize PASS in the fresh Dedicated Worker run.
+- node web/phase0d-preview/scripts/generate-render-contract.mjs --check
+  PASS. The generated browser WGSL string matches shared/render_contract.wgsl.
+- A legacy direct-wasm R3 script was intentionally not rerun because it writes a Phase 0E-R3 historical evidence path. Current WASM initialization is proven by the fresh Phase 1A Dedicated Worker browser run below.
+
+Preview validation
+------------------
+- npm.cmd test
+  PASS: 7 tests, 0 failed, 0 skipped.
+- npm.cmd run build
+  PASS: 9 verified build assets.
+
+Editor validation
+-----------------
+- npm.cmd test
+  PASS: 3 files, 17 tests, 0 failed.
+- npm.cmd run build
+  PASS: TypeScript and Vite production build.
+- npm.cmd run test:browser:phase1a
+  PASS: production build, fresh actual hardware browser proof, and 5 stored-proof integrity tests.
+
+Failed browser/readback runs were copied to timestamped failure artifacts and remain non-passing evidence. A targeted Rust compile initially failed on a nonexistent Vec2::length method and was corrected to f64::hypot. The final commands were not represented as passing until their actual exit code was zero.
+
+Fresh actual hardware browser proof
+-----------------------------------
+- captured_at_utc: 2026-08-20T05:22:10.457Z
+- browser: Chrome/151.0.7922.138
+- Chrome process id: 17468; new temporary profile: true
+- GPU: NVIDIA GeForce GTX 970
+- driver: 32.0.15.8157
+- runtime owner: Dedicated Worker
+- WASM initialized: true
+- actual WebGPU device: true
+- initial heartbeat: 1
+- surface base format: bgra8unorm
+- pipeline view format: bgra8unorm-srgb
+- readback view format: bgra8unorm-srgb
+- browser checks: 26/26
+- pixel assertions: 16/16
+- ellipse stroke measurements: 48/48
+- maximum linear color channel error: 0.00553961 (tolerance 0.055)
+- console errors: 0
+- GPU validation errors: 0
+- maximum fallback rebuild count: 0
+- all_passed: true
+
+The browser harness allocates an available localhost port, starts the preview server, checks health and asset/MIME status, starts a new Chrome process with a new temporary profile, drives DOM pointer/keyboard interactions, performs actual WebGPU readback, writes proof/screenshots, and cleans up the server/profile whether it passes or fails.
+
+Pixel coverage matrix
+---------------------
+- circle 64x64, ellipse 80x48, ellipse 160x32, and ellipse 160x32 rotated 33 degrees
+- DPR 1, 1.25, 1.5, and 2
+- zoom 25%, 100%, and 400% at every DPR
+- 48/48 major/minor stroke measurements pass
+- integrated connected linear coverage, isolated black backdrop, 1 physical pixel tolerance
+- maximum stroke measurement error: 0.714316 physical pixel
+- fill-only, stroke-only, and same-color fill+stroke at 70% opacity
+- black/white paired samples; maximum linear channel error 0.00553961
+- asymmetric affine render/hit-test/selection-overlay parity
+- rounded rectangle
+- black and white backgrounds
+- opacity with simultaneous fill and centered stroke
+- partial analytic coverage present in every required edge case
+- binary-only edges and halo conditions rejected
+
+Actual native WebGPU performance
+--------------------------------
+Artifact: docs/PHASE_1A_METRICS.json
+Adapter: NVIDIA GeForce GTX 970, Vulkan, DiscreteGpu
+
+Required 1,000 visible primitive case:
+- viewport: 1920x1080
+- DPR: 1
+- warmup frames: 30
+- measured frames: 300
+- draw calls/batches: 1/1
+- median: 0.2962 ms
+- p95: 0.7028 ms
+- maximum: 1.8826 ms
+- threshold: p95 <= 16.7 ms, PASS
+
+Comparative 10,000 visible primitive case:
+- warmup frames: 10
+- measured frames: 60
+- median: 0.6036 ms
+- p95: 0.7990 ms
+- maximum: 1.6970 ms
+- comparative evidence only; it is not represented as the Gate threshold.
+
+Evidence SHA-256
+---------------
+86f795f2b95911d7f0a0d91bc13d66630886b7b45f6928b34b4fed9baa6f9bc6  docs/verification/PHASE_1A_BROWSER_PROOF.json
+0379f046e97495cbb0199b41fc8371815c7f325ff13cfa2d6f01e26a23708894  docs/verification/PHASE_1A_PIXEL_READBACK.json
+9a4882a67a53f099776b3e20ea0b06f9882d17cbaffb32db9f3f5ae42b556a66  docs/PHASE_1A_METRICS.json
+6353bb842f7f474b38012a052969df2962e1108734bdb0ac26b73c10509e1668  docs/verification/PHASE_1A_BROWSER_INCIDENT_PRE_FIX.json
+a7c4923378db301d567220135c884e69d0347bd533f9c2281bedb7298301c816  docs/verification/phase1a-editor-default.png
+8b89c7ca12a90652caf08e66b8c81f0df4466e7aec896f4e9cc772aa07bc8dfc  docs/verification/phase1a-frame-4k.png
+637130bb0e62894fc29463ccf69d9ab61b635f1fbd3b608e2539281d2a23e0b1  docs/verification/phase1a-appearance-aa.png
+740bd2655a0f72ec31cba540fcbe023864525b707fb08d9212ec0ddf2f71d609  docs/verification/phase1a-dpr-zoom-matrix.png
+d74d6e9139b6c574f10b9414764727e747f29ae07c7416977034776dbad70610  docs/verification/phase1a-color-contract.png
+9c69a6b2f530d84e0e3b28c270f969ecfffb1c6129b093a9feba2b7023942f9e  docs/verification/phase1a-affine-parity.png
+
+Preserved incident
+------------------
+PHASE_1A_BROWSER_INCIDENT_PRE_FIX.json and all PHASE_1A_BROWSER_FAILURE / BROWSER_PROOF_FAILED / PIXEL_READBACK_FAILED artifacts remain failed-run evidence and are not represented as current passes. They record the affine viewport sample, async pointer-up, non-isolated backdrop, threshold-width, opposite-edge, and inward-AA harness corrections that preceded the final passing proof.
+
+CI first-run incident and correction
+------------------------------------
+PR #2 Actions run 31726409602 is preserved as a failed first run. Rust, Editor, repository integrity, and scope classification passed. Three stale Phase 0 assumptions failed: ci-wasm-smoke required the approved Phase 0 WASM hash/schema v1, Preview tests required render schema v1 and fragment discard, and the hardware validator accepted only the Phase 0E-R3 proof shape. The first failures were not rerun into a pass. The validators/tests were corrected to verify current checked-in and fresh schema v2 WASM while retaining the legacy Phase 0 evidence branch, to assert analytic AA with no discard, and to validate an explicit Phase 1A execution/no-fallback contract. The legacy Phase 0E-R3 hardware proof was revalidated structurally after the compatibility change.
+
+Scope integrity
+---------------
+- Existing Phase 0 evidence and ADR-001 through ADR-041: unchanged.
+- Phase 1B and later features: not started.
+- Frame transform-aware clipping, snapping, multi-selection transforms, Pen/Bezier, text, gradient/image fill, shadow, auto layout, components, motion, AI integration, export: excluded.
+- No ZIP created.

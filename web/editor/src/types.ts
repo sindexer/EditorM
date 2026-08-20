@@ -9,6 +9,11 @@ export interface ProjectionNode {
   visible: boolean;
   locked: boolean;
   opacity: number;
+  appearance?: {
+    fill: [number, number, number, number];
+    corner_radii: [number, number, number, number];
+    stroke: { color: [number, number, number, number]; width: number };
+  };
   local_transform: [number, number, number, number, number, number];
   world_transform: [number, number, number, number, number, number] | null;
   geometry: { width: number; height: number } | null;

@@ -893,7 +893,10 @@ fn appearance_dirty_is_tracked_without_transform_or_bounds_recompute() {
     let outcome = runtime
         .dispatch(Command::SetAppearance {
             target: id,
-            appearance: Appearance { opacity: 0.5 },
+            appearance: Appearance {
+                opacity: 0.5,
+                ..Appearance::default()
+            },
         })
         .unwrap();
     assert_eq!(outcome.scene.dirty_nodes, 1);
@@ -1287,4 +1290,112 @@ fn eight_overlapping_siblings_keep_exact_order_and_hit_test_across_reorder_undo_
         hit_world(&mut runtime, Vec2::new(5.0, 5.0)).all(),
         expected.iter().rev().copied().collect::<Vec<_>>()
     );
+}
+#[test]
+fn centered_stroke_expands_bounds_and_undo_restores_them_incrementally() {
+    let mut runtime = EngineRuntime::blank("Root").unwrap();
+    let root = runtime.document().root_id();
+    let id = rectangle(
+        &mut runtime,
+        root,
+        NodeId::new(),
+        Vec2::new(100.0, 50.0),
+        Affine2::translation(Vec2::new(10.0, 20.0)),
+    );
+    let before = runtime
+        .scene()
+        .node(id)
+        .unwrap()
+        .own_world_bounds()
+        .unwrap();
+    let outcome = runtime
+        .dispatch(Command::SetAppearance {
+            target: id,
+            appearance: Appearance {
+                stroke: visual_authoring_document::Stroke {
+                    width: 10.0,
+                    ..visual_authoring_document::Stroke::default()
+                },
+                ..Appearance::default()
+            },
+        })
+        .unwrap();
+    let after = runtime
+        .scene()
+        .node(id)
+        .unwrap()
+        .own_world_bounds()
+        .unwrap();
+
+    assert_eq!(outcome.scene.bounds_recomputed, 1);
+    assert_eq!(
+        outcome.render.dirty_slots,
+        vec![runtime.render_model().item(id).unwrap().slot]
+    );
+    assert_eq!(after.min, Vec2::new(5.0, 15.0));
+    assert_eq!(after.max, Vec2::new(115.0, 75.0));
+
+    runtime.undo().unwrap().unwrap();
+    assert_eq!(
+        runtime.scene().node(id).unwrap().own_world_bounds(),
+        Some(before)
+    );
+}
+
+#[test]
+fn asymmetric_affine_ellipse_stroke_bounds_and_hit_test_share_semantics() {
+    let mut runtime = EngineRuntime::blank("Root").unwrap();
+    let root = runtime.document().root_id();
+    let size = Vec2::new(160.0, 32.0);
+    let transform = Affine2::from_components(0.9, 0.35, -0.2, 1.1, 30.0, 40.0);
+    let id = ellipse(&mut runtime, root, NodeId::new(), size, transform);
+    runtime
+        .dispatch(Command::SetAppearance {
+            target: id,
+            appearance: Appearance {
+                stroke: visual_authoring_document::Stroke {
+                    width: 8.0,
+                    ..visual_authoring_document::Stroke::default()
+                },
+                ..Appearance::default()
+            },
+        })
+        .unwrap();
+
+    let major_inside = transform.transform_point(Vec2::new(size.x + 3.5, size.y * 0.5));
+    let minor_inside = transform.transform_point(Vec2::new(size.x * 0.5, -3.5));
+    let major_outside = transform.transform_point(Vec2::new(size.x + 5.0, size.y * 0.5));
+    let minor_outside = transform.transform_point(Vec2::new(size.x * 0.5, -5.0));
+    assert_eq!(hit_world(&mut runtime, major_inside).topmost(), Some(id));
+    assert_eq!(hit_world(&mut runtime, minor_inside).topmost(), Some(id));
+    assert_ne!(hit_world(&mut runtime, major_outside).topmost(), Some(id));
+    assert_ne!(hit_world(&mut runtime, minor_outside).topmost(), Some(id));
+
+    let semantic_local = Vec2::new(130.0, 8.0);
+    let semantic_world = transform.transform_point(semantic_local);
+    let transposed = Affine2::from_components(
+        transform.m11,
+        transform.m21,
+        transform.m12,
+        transform.m22,
+        transform.tx,
+        transform.ty,
+    );
+    let transposed_only_world = transposed.transform_point(semantic_local);
+    assert_eq!(hit_world(&mut runtime, semantic_world).topmost(), Some(id));
+    assert_ne!(
+        hit_world(&mut runtime, transposed_only_world).topmost(),
+        Some(id)
+    );
+
+    let bounds = runtime
+        .scene()
+        .node(id)
+        .unwrap()
+        .own_world_bounds()
+        .unwrap();
+    for point in [major_inside, minor_inside] {
+        assert!(point.x >= bounds.min.x && point.x <= bounds.max.x);
+        assert!(point.y >= bounds.min.y && point.y <= bounds.max.y);
+    }
 }

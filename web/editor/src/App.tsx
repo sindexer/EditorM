@@ -35,6 +35,7 @@ import {
 } from "react";
 import { EngineClient, EngineFailure } from "./engine";
 import type { StoredProjectionNode } from "./engine";
+import { transformAffinePoint } from "./affine";
 import type { EngineResponse, ProjectionNode } from "./types";
 
 declare global {
@@ -48,7 +49,7 @@ declare global {
   }
 }
 
-type Tool = "select" | "hand" | "rectangle" | "ellipse";
+type Tool = "select" | "hand" | "frame" | "rectangle" | "ellipse";
 type FsmState =
   | "Idle"
   | "Hovering"
@@ -59,6 +60,7 @@ type FsmState =
   | "Panning"
   | "CreatingRectangle"
   | "CreatingEllipse"
+  | "CreatingFrame"
   | "NestedEditing";
 
 type Interaction = {
@@ -67,7 +69,7 @@ type Interaction = {
   start: [number, number];
   last: [number, number];
   nodeId?: string;
-  nodeKind?: "rectangle" | "ellipse";
+  nodeKind?: "frame" | "rectangle" | "ellipse";
   matrix?: [number, number, number, number, number, number];
   geometry?: { width: number; height: number };
   created?: boolean;
@@ -77,10 +79,40 @@ type Interaction = {
 const tools: Array<{ id: Tool; label: string; shortcut: string; icon: LucideIcon }> = [
   { id: "select", label: "Select", shortcut: "V", icon: MousePointer2 },
   { id: "hand", label: "Hand", shortcut: "H", icon: Hand },
+  { id: "frame", label: "Frame", shortcut: "F", icon: Scan },
   { id: "rectangle", label: "Rectangle", shortcut: "R", icon: Square },
   { id: "ellipse", label: "Ellipse", shortcut: "O", icon: Circle },
 ];
 
+type AppearanceProjection = NonNullable<ProjectionNode["appearance"]>;
+
+const DEFAULT_APPEARANCE: AppearanceProjection = {
+  fill: [0.2, 0.58, 0.96, 1],
+  corner_radii: [0, 0, 0, 0],
+  stroke: { color: [0.08, 0.11, 0.16, 1], width: 0 },
+};
+
+function shapeName(kind: "frame" | "rectangle" | "ellipse") {
+  if (kind === "frame") return "Frame";
+  if (kind === "ellipse") return "Ellipse";
+  return "Rectangle";
+}
+
+function colorToHex(color: [number, number, number, number]) {
+  return "#" + color.slice(0, 3).map((component) =>
+    Math.round(Math.max(0, Math.min(1, component)) * 255).toString(16).padStart(2, "0")
+  ).join("");
+}
+
+function hexToColor(value: string, alpha: number): [number, number, number, number] {
+  const normalized = value.startsWith("#") ? value.slice(1) : value;
+  return [
+    Number.parseInt(normalized.slice(0, 2), 16) / 255,
+    Number.parseInt(normalized.slice(2, 4), 16) / 255,
+    Number.parseInt(normalized.slice(4, 6), 16) / 255,
+    alpha,
+  ];
+}
 function IconButton({
   icon: Icon,
   label,
@@ -389,6 +421,7 @@ function Inspector({ engine, version, onError }: { engine: EngineClient; version
   const node = engine.projection.primary ? engine.projection.nodes.get(engine.projection.primary) : undefined;
   const matrix = node?.local_transform ?? [1, 0, 0, 1, 0, 0];
   const rotation = Math.atan2(matrix[2], matrix[0]) * (180 / Math.PI);
+  const appearance = node?.appearance ?? DEFAULT_APPEARANCE;
   const setTransform = (next: [number, number, number, number, number, number]) => {
     if (!node) return;
     void engine.send("command", { command: { kind: "set_transform", node_id: node.id, matrix: next } }).catch(onError);
@@ -400,7 +433,7 @@ function Inspector({ engine, version, onError }: { engine: EngineClient; version
     setTransform([Math.cos(radians) * sx, -Math.sin(radians) * sy, Math.sin(radians) * sx, Math.cos(radians) * sy, matrix[4], matrix[5]]);
   };
   const setGeometry = (width: number, height: number) => {
-    if (!node || (node.kind !== "rectangle" && node.kind !== "ellipse")) return;
+    if (!node || (node.kind !== "frame" && node.kind !== "rectangle" && node.kind !== "ellipse")) return;
     void engine
       .send("command", {
         command: { kind: "set_geometry", node_id: node.id, shape: node.kind, width, height },
@@ -408,6 +441,25 @@ function Inspector({ engine, version, onError }: { engine: EngineClient; version
       .catch(onError);
   };
 
+  const setFill = (value: string) => {
+    if (!node) return;
+    void engine.send("command", {
+      command: { kind: "set_fill", node_id: node.id, color: hexToColor(value, appearance.fill[3]) },
+    }).catch(onError);
+  };
+  const setCornerRadius = (radius: number) => {
+    if (!node) return;
+    const safeRadius = Math.max(0, radius);
+    void engine.send("command", {
+      command: { kind: "set_corner_radii", node_id: node.id, radii: [safeRadius, safeRadius, safeRadius, safeRadius] },
+    }).catch(onError);
+  };
+  const setStroke = (color: [number, number, number, number], width: number) => {
+    if (!node) return;
+    void engine.send("command", {
+      command: { kind: "set_stroke", node_id: node.id, color, width: Math.max(0, width) },
+    }).catch(onError);
+  };
   return (
     <section className="panel inspector" aria-label="Transform inspector" data-version={version}>
       <PanelHeader title="Inspector" />
@@ -452,7 +504,42 @@ function Inspector({ engine, version, onError }: { engine: EngineClient; version
               onCommit={(value) => void engine.send("command", { command: { kind: "set_opacity", node_id: node.id, opacity: Math.max(0, Math.min(100, value)) / 100 } }).catch(onError)}
             />
           </div>
-          <div className="inline-controls">
+          <div className="appearance-section" aria-label="Appearance">
+            <div className="appearance-heading">Appearance</div>
+            <div className="appearance-grid">
+              <label className="field color-field">
+                <span>Fill</span>
+                <input
+                  type="color"
+                  aria-label="Fill color"
+                  value={colorToHex(appearance.fill)}
+                  onChange={(event) => setFill(event.currentTarget.value)}
+                />
+              </label>
+              <label className="field color-field">
+                <span>Stroke</span>
+                <input
+                  type="color"
+                  aria-label="Stroke color"
+                  value={colorToHex(appearance.stroke.color)}
+                  onChange={(event) => setStroke(hexToColor(event.currentTarget.value, appearance.stroke.color[3]), appearance.stroke.width)}
+                />
+              </label>
+              {(node.kind === "frame" || node.kind === "rectangle") ? (
+                <NumericField
+                  label="Radius"
+                  value={appearance.corner_radii[0]}
+                  onCommit={setCornerRadius}
+                />
+              ) : <span />}
+              <NumericField
+                label="Stroke width"
+                value={appearance.stroke.width}
+                onCommit={(width) => setStroke(appearance.stroke.color, width)}
+              />
+            </div>
+            <small>Centered stroke · sRGB input · linear premultiplied GPU output</small>
+          </div>          <div className="inline-controls">
             <label className="check-control">
               <input
                 type="checkbox"
@@ -637,6 +724,8 @@ export function App() {
   const [showcase, setShowcase] = useState(false);
   const [editRoot, setEditRoot] = useState<string | null>(null);
   const [ready, setReady] = useState(false);
+  const [customFrameWidth, setCustomFrameWidth] = useState(1440);
+  const [customFrameHeight, setCustomFrameHeight] = useState(900);
 
   const fail = useCallback((reason: unknown) => {
     const message = reason instanceof Error ? `${"code" in reason ? `${String((reason as EngineFailure).code)}: ` : ""}${reason.message}` : String(reason);
@@ -815,19 +904,48 @@ export function App() {
     setFsm("Moving");
   };
 
+  const beginHandleAt = async (
+    pointerId: number,
+    clientX: number,
+    clientY: number,
+    kind: "resize" | "rotate",
+  ) => {
+    if (!currentNode || currentNode.locked || !currentNode.geometry) return;
+    const rect = canvasRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    const point: [number, number] = [clientX - rect.left, clientY - rect.top];
+    await engine.send("begin_transaction");
+    interaction.current = {
+      pointerId,
+      kind,
+      start: point,
+      last: point,
+      nodeId: currentNode.id,
+      nodeKind: currentNode.kind === "frame" ? "frame" : currentNode.kind === "ellipse" ? "ellipse" : "rectangle",
+      matrix: [...currentNode.local_transform],
+      geometry: { ...currentNode.geometry },
+    };
+    shellRef.current?.setPointerCapture(pointerId);
+    setFsm(kind === "resize" ? "Resizing" : "Rotating");
+  };
   const onCanvasPointerDown = async (event: ReactPointerEvent<HTMLDivElement>) => {
     if (!ready || event.button !== 0) return;
     const point = pointerPosition(event);
     const captureTarget = event.currentTarget;
     const pointerId = event.pointerId;
     try {
+      const handleKind = (event.target as HTMLElement).dataset.testid;
+      if (handleKind === "resize-handle" || handleKind === "rotate-handle") {
+        await beginHandleAt(pointerId, event.clientX, event.clientY, handleKind === "resize-handle" ? "resize" : "rotate");
+        return;
+      }
       if (tool === "hand") {
         interaction.current = { pointerId: event.pointerId, kind: "pan", start: point, last: point, panPending: [0, 0] };
         event.currentTarget.setPointerCapture(event.pointerId);
         setFsm("Panning");
         return;
       }
-      if (tool === "rectangle" || tool === "ellipse") {
+      if (tool === "frame" || tool === "rectangle" || tool === "ellipse") {
         await engine.send("begin_transaction");
         interaction.current = {
           pointerId: event.pointerId,
@@ -839,7 +957,7 @@ export function App() {
           created: false,
         };
         captureTarget.setPointerCapture(event.pointerId);
-        setFsm(tool === "rectangle" ? "CreatingRectangle" : "CreatingEllipse");
+        setFsm(tool === "rectangle" ? "CreatingRectangle" : tool === "ellipse" ? "CreatingEllipse" : "CreatingFrame");
         return;
       }
       setFsm("Selecting");
@@ -905,7 +1023,7 @@ export function App() {
           command: {
             kind: "create_shape", node_id: active.nodeId, parent_id: root,
             index: engine.projection.nodes.get(root)?.children.length ?? 0,
-            shape: active.nodeKind, name: active.nodeKind === "rectangle" ? "Rectangle" : "Ellipse",
+            shape: active.nodeKind, name: shapeName(active.nodeKind!),
             x, y, width, height,
           },
         }).then(() => undefined));
@@ -949,7 +1067,7 @@ export function App() {
           const start = viewportToWorld(active.start);
           const root = editRoot ?? engine.projection.rootId;
           if (root) {
-            await engine.send("update_transaction", { command: { kind: "create_shape", node_id: active.nodeId, parent_id: root, index: engine.projection.nodes.get(root)?.children.length ?? 0, shape: active.nodeKind, name: active.nodeKind === "rectangle" ? "Rectangle" : "Ellipse", x: start[0], y: start[1], width: 24, height: 24 } });
+            await engine.send("update_transaction", { command: { kind: "create_shape", node_id: active.nodeId, parent_id: root, index: engine.projection.nodes.get(root)?.children.length ?? 0, shape: active.nodeKind, name: shapeName(active.nodeKind!), x: start[0], y: start[1], width: 24, height: 24 } });
           }
         }
         await engine.send("commit_transaction");
@@ -962,30 +1080,6 @@ export function App() {
     if (active.kind === "create") setTool("select");
   };
 
-  const beginHandle = async (event: ReactPointerEvent<SVGElement>, kind: "resize" | "rotate") => {
-    if (!currentNode || currentNode.locked || !currentNode.geometry) return;
-    event.stopPropagation();
-    const rect = canvasRef.current?.getBoundingClientRect();
-    if (!rect) return;
-    const point: [number, number] = [event.clientX - rect.left, event.clientY - rect.top];
-    try {
-      await engine.send("begin_transaction");
-      interaction.current = {
-        pointerId: event.pointerId,
-        kind,
-        start: point,
-        last: point,
-        nodeId: currentNode.id,
-        nodeKind: currentNode.kind === "ellipse" ? "ellipse" : "rectangle",
-        matrix: [...currentNode.local_transform],
-        geometry: { ...currentNode.geometry },
-      };
-      shellRef.current?.setPointerCapture(event.pointerId);
-      setFsm(kind === "resize" ? "Resizing" : "Rotating");
-    } catch (reason) {
-      fail(reason);
-    }
-  };
 
   const onWheel = (event: React.WheelEvent<HTMLDivElement>) => {
     if (!response) return;
@@ -1019,9 +1113,8 @@ export function App() {
 
   const overlay = useMemo(() => {
     if (!currentNode?.geometry || !currentNode.world_transform || !response) return null;
-    const [a, b, c, d, tx, ty] = currentNode.world_transform;
     const corners: Array<[number, number]> = [[0, 0], [currentNode.geometry.width, 0], [currentNode.geometry.width, currentNode.geometry.height], [0, currentNode.geometry.height]];
-    const points = corners.map(([x, y]) => worldToViewport([a * x + b * y + tx, c * x + d * y + ty]));
+    const points = corners.map((point) => worldToViewport(transformAffinePoint(currentNode.world_transform!, point)));
     const handle = points[2];
     const topMid: [number, number] = [(points[0][0] + points[1][0]) / 2, (points[0][1] + points[1][1]) / 2];
     return { points, handle, rotate: [topMid[0], topMid[1] - 24] as [number, number] };
@@ -1049,10 +1142,48 @@ export function App() {
     } catch (reason) { fail(reason); }
   };
 
+  const createFramePreset = async (width: number, height: number) => {
+    if (!Number.isFinite(width) || !Number.isFinite(height) || width <= 0 || height <= 0) {
+      fail(new EngineFailure("invalid_frame_size", "Frame width and height must be finite and positive"));
+      return;
+    }
+    const root = editRoot ?? engine.projection.rootId;
+    if (!root) return;
+    const nodeId = crypto.randomUUID();
+    const center = response?.camera.center ?? [0, 0];
+    const baseName = "Frame " + Math.round(width) + "×" + Math.round(height);
+    const existingNames = new Set([...engine.projection.nodes.values()].map((candidate) => candidate.name));
+    let name = baseName;
+    let suffix = 2;
+    while (existingNames.has(name)) {
+      name = baseName + " " + suffix;
+      suffix += 1;
+    }
+    try {
+      await engine.send("command", {
+        command: {
+          kind: "create_shape",
+          node_id: nodeId,
+          parent_id: root,
+          index: engine.projection.nodes.get(root)?.children.length ?? 0,
+          shape: "frame",
+          name,
+          x: center[0] - width / 2,
+          y: center[1] - height / 2,
+          width,
+          height,
+        },
+      });
+      await engine.send("selection", { target: nodeId, mode: "replace" });
+      setTool("select");
+    } catch (reason) {
+      fail(reason);
+    }
+  };
   return (
     <main className="editor-app" aria-label="Vector Forge editor">
       <header className="app-bar">
-        <div className="brand"><span className="brand-mark">V</span><strong>Vector Forge</strong><span className="phase-badge">Phase 0E</span></div>
+        <div className="brand"><span className="brand-mark">V</span><strong>Vector Forge</strong><span className="phase-badge">Phase 1A</span></div>
         <div className="app-actions">
           <IconButton icon={Undo2} label="Undo (Ctrl+Z)" disabled={!response?.history.undo_depth} onClick={() => void engine.send("undo").catch(fail)} testId="undo" />
           <IconButton icon={Redo2} label="Redo (Ctrl+Y)" disabled={!response?.history.redo_depth} onClick={() => void engine.send("redo").catch(fail)} testId="redo" />
@@ -1103,19 +1234,41 @@ export function App() {
             onWheel={onWheel}
             data-testid="canvas-shell"
           >
-            <canvas ref={canvasRef} className="webgpu-canvas" aria-label="Actual WebGPU document canvas" tabIndex={0} />
+            {tool === "frame" ? (
+              <div
+                className="frame-preset-popover"
+                role="dialog"
+                aria-label="Frame presets"
+                onPointerDown={(event) => event.stopPropagation()}
+              >
+                <strong>Frame presets</strong>
+                <button type="button" onClick={() => void createFramePreset(1920, 1080)}>1920 × 1080 · Full HD</button>
+                <button type="button" onClick={() => void createFramePreset(3840, 2160)}>3840 × 2160 · 4K UHD</button>
+                <button type="button" onClick={() => void createFramePreset(4096, 2160)}>4096 × 2160 · DCI 4K</button>
+                <div className="frame-custom-row">
+                  <label><span>W</span><input aria-label="Custom frame width" type="number" min="1" value={customFrameWidth} onChange={(event) => setCustomFrameWidth(Number(event.currentTarget.value))} /></label>
+                  <label><span>H</span><input aria-label="Custom frame height" type="number" min="1" value={customFrameHeight} onChange={(event) => setCustomFrameHeight(Number(event.currentTarget.value))} /></label>
+                </div>
+                <button type="button" className="button primary" onClick={() => void createFramePreset(customFrameWidth, customFrameHeight)}>Create custom frame</button>
+                <small>Or drag on canvas to create a custom frame.</small>
+              </div>
+            ) : null}            <canvas ref={canvasRef} className="webgpu-canvas" aria-label="Actual WebGPU document canvas" tabIndex={0} />
             <svg className="selection-overlay" aria-hidden="true" data-sequence={response?.engine_sequence ?? 0}>
               {overlay ? (
                 <g>
                   <polygon points={overlay.points.map((point) => point.join(",")).join(" ")} className="selection-outline" />
                   {overlay.points.map((point, index) => <circle key={index} cx={point[0]} cy={point[1]} r="4" className="selection-handle" />)}
                   <line x1={(overlay.points[0][0] + overlay.points[1][0]) / 2} y1={(overlay.points[0][1] + overlay.points[1][1]) / 2} x2={overlay.rotate[0]} y2={overlay.rotate[1]} className="rotation-stem" />
-                  <circle cx={overlay.handle[0]} cy={overlay.handle[1]} r="10" className="handle-hit" onPointerDown={(event) => void beginHandle(event, "resize")} data-testid="resize-handle" />
-                  <circle cx={overlay.rotate[0]} cy={overlay.rotate[1]} r="10" className="handle-hit rotate-hit" onPointerDown={(event) => void beginHandle(event, "rotate")} data-testid="rotate-handle" />
                   <circle cx={overlay.rotate[0]} cy={overlay.rotate[1]} r="4" className="selection-handle rotate" />
                 </g>
               ) : null}
             </svg>
+            {overlay ? (
+              <>
+                <button type="button" aria-label="Resize selection" data-testid="resize-handle" className="transform-handle-hit resize-hit" style={{ left: overlay.handle[0], top: overlay.handle[1] }} />
+                <button type="button" aria-label="Rotate selection" data-testid="rotate-handle" className="transform-handle-hit rotate-hit" style={{ left: overlay.rotate[0], top: overlay.rotate[1] }} />
+              </>
+            ) : null}
             {!ready ? <div className="canvas-loading"><span className="spinner" /> Initializing Worker, WASM, and WebGPU…</div> : null}
           </div>
           <DebugPanel engine={engine} response={response} onLoad={loadFixture} onError={error} />

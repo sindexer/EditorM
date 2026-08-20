@@ -35,7 +35,11 @@ pub struct RenderItem {
     pub size: Vec2,
     pub world_transform: Option<Affine2>,
     pub world_bounds: Option<Rect>,
+    pub fill_linear: [f64; 4],
     pub opacity: f64,
+    pub corner_radii: [f64; 4],
+    pub stroke_linear: [f64; 4],
+    pub stroke_width: f64,
     pub renderable: bool,
     pub gpu_encodable: bool,
     pub encoding_diagnostic: Option<RenderEncodingDiagnosticKind>,
@@ -337,7 +341,7 @@ impl RenderModel {
                     collect_scene_subtree(scene, *node, &mut dirty)?;
                 }
                 DocumentChange::GeometryChanged { node }
-                | DocumentChange::AppearanceChanged { node } => {
+                | DocumentChange::AppearanceChanged { node, .. } => {
                     dirty.insert(*node);
                 }
                 DocumentChange::PersistentPropertyChanged { .. }
@@ -495,7 +499,11 @@ impl RenderModel {
             size: prepared.size,
             world_transform: prepared.world_transform,
             world_bounds: prepared.world_bounds,
+            fill_linear: prepared.fill_linear,
             opacity: prepared.opacity,
+            corner_radii: prepared.corner_radii,
+            stroke_linear: prepared.stroke_linear,
+            stroke_width: prepared.stroke_width,
             renderable: prepared.renderable,
             gpu_encodable: prepared.gpu_encodable,
             encoding_diagnostic: prepared.encoding_diagnostic,
@@ -569,7 +577,11 @@ struct PreparedItem {
     size: Vec2,
     world_transform: Option<Affine2>,
     world_bounds: Option<Rect>,
+    fill_linear: [f64; 4],
     opacity: f64,
+    corner_radii: [f64; 4],
+    stroke_linear: [f64; 4],
+    stroke_width: f64,
     renderable: bool,
     gpu_encodable: bool,
     encoding_diagnostic: Option<RenderEncodingDiagnosticKind>,
@@ -590,6 +602,15 @@ fn prepare_item(
         .node(id)
         .ok_or(RenderModelError::MissingSceneNode(id))?;
     let world_transform = scene_node.world_transform();
+    let appearance = node.appearance();
+    let fill_linear = linear_color(appearance.fill);
+    let stroke_linear = linear_color(appearance.stroke.color);
+    let corner_radii = [
+        appearance.corner_radii.top_left,
+        appearance.corner_radii.top_right,
+        appearance.corner_radii.bottom_right,
+        appearance.corner_radii.bottom_left,
+    ];
     let renderable = scene_node.attached()
         && scene_node.effective_visible()
         && scene_node.invalid().is_none()
@@ -601,7 +622,11 @@ fn prepare_item(
         encoding_diagnostic(
             world_transform.expect("renderable item has a world transform"),
             size,
-            node.appearance().opacity,
+            fill_linear,
+            appearance.opacity,
+            corner_radii,
+            stroke_linear,
+            appearance.stroke.width,
         )
     } else {
         None
@@ -611,7 +636,11 @@ fn prepare_item(
         size,
         world_transform,
         world_bounds: scene_node.own_world_bounds(),
-        opacity: node.appearance().opacity,
+        fill_linear,
+        opacity: appearance.opacity,
+        corner_radii,
+        stroke_linear,
+        stroke_width: appearance.stroke.width,
         renderable,
         gpu_encodable: renderable && encoding_diagnostic.is_none(),
         encoding_diagnostic,
@@ -621,10 +650,33 @@ fn prepare_item(
 fn encoding_diagnostic(
     world: Affine2,
     size: Vec2,
+    fill_linear: [f64; 4],
     opacity: f64,
+    corner_radii: [f64; 4],
+    stroke_linear: [f64; 4],
+    stroke_width: f64,
 ) -> Option<RenderEncodingDiagnosticKind> {
     let linear_and_geometry = [
-        world.m11, world.m12, world.m21, world.m22, size.x, size.y, opacity,
+        world.m11,
+        world.m12,
+        world.m21,
+        world.m22,
+        size.x,
+        size.y,
+        fill_linear[0],
+        fill_linear[1],
+        fill_linear[2],
+        fill_linear[3],
+        opacity,
+        corner_radii[0],
+        corner_radii[1],
+        corner_radii[2],
+        corner_radii[3],
+        stroke_linear[0],
+        stroke_linear[1],
+        stroke_linear[2],
+        stroke_linear[3],
+        stroke_width,
     ];
     if linear_and_geometry.iter().any(|value| !finite_f32(*value)) {
         return Some(RenderEncodingDiagnosticKind::LinearOrGeometryOutsideF32);
@@ -633,6 +685,22 @@ fn encoding_diagnostic(
         return Some(RenderEncodingDiagnosticKind::TranslationOutsideF32);
     }
     None
+}
+
+fn linear_color(color: visual_authoring_document::ColorRgba) -> [f64; 4] {
+    let channel = |value: f64| {
+        if value <= 0.040_45 {
+            value / 12.92
+        } else {
+            ((value + 0.055) / 1.055).powf(2.4)
+        }
+    };
+    [
+        channel(color.r),
+        channel(color.g),
+        channel(color.b),
+        color.a,
+    ]
 }
 
 fn finite_f32(value: f64) -> bool {
@@ -703,7 +771,9 @@ fn coalesce_ranges(slots: &[u32]) -> Vec<DirtySlotRange> {
 }
 #[cfg(test)]
 mod tests {
-    use visual_authoring_document::{Command, HeadlessEditorCore, NodeSpec};
+    use visual_authoring_document::{
+        Appearance, ColorRgba, Command, CornerRadii, HeadlessEditorCore, NodeSpec, Stroke,
+    };
 
     use super::*;
 
@@ -986,5 +1056,48 @@ mod tests {
                 counters.total_render_items + counters.free_slots
             );
         }
+    }
+
+    #[test]
+    fn appearance_change_updates_one_stable_slot_with_linear_color_contract() {
+        let (mut editor, mut scene, mut model, rectangle, _) = setup();
+        let slot = model.item(rectangle).unwrap().slot;
+        let outcome = editor
+            .dispatch(Command::SetAppearance {
+                target: rectangle,
+                appearance: Appearance {
+                    fill: ColorRgba::new(1.0, 0.040_45, 0.0, 0.75),
+                    opacity: 0.5,
+                    corner_radii: CornerRadii {
+                        top_left: 2.0,
+                        top_right: 4.0,
+                        bottom_right: 6.0,
+                        bottom_left: 8.0,
+                    },
+                    stroke: Stroke {
+                        color: ColorRgba::new(0.0, 1.0, 0.0, 0.5),
+                        width: 3.0,
+                    },
+                },
+            })
+            .unwrap();
+        let scene_stats = scene
+            .apply_changes(editor.document(), outcome.change_set())
+            .unwrap();
+        let delta = model
+            .apply_changes(editor.document(), &scene, outcome.change_set())
+            .unwrap();
+        let item = model.item(rectangle).unwrap();
+
+        assert_eq!(item.slot, slot);
+        assert_eq!(item.fill_linear, [1.0, 0.040_45 / 12.92, 0.0, 0.75]);
+        assert_eq!(item.opacity, 0.5);
+        assert_eq!(item.corner_radii, [2.0, 4.0, 6.0, 8.0]);
+        assert_eq!(item.stroke_linear, [0.0, 1.0, 0.0, 0.5]);
+        assert_eq!(item.stroke_width, 3.0);
+        assert_eq!(delta.dirty_slots, vec![slot]);
+        assert_eq!(delta.stats.full_render_rebuild_count, 0);
+        assert_eq!(delta.stats.full_render_model_scans, 0);
+        assert_eq!(scene_stats.bounds_recomputed, 1);
     }
 }

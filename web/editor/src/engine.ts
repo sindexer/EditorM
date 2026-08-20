@@ -372,12 +372,13 @@ export class EngineClient {
     this.renderer = await WebGpuRenderer.create(canvas);
     this.capabilities = this.renderer.capabilities();
     await this.restartWorker(false);
-    const initialized = await this.send("initialize");
+    await this.send("initialize");
     const rect = canvas.getBoundingClientRect();
-    const resized = await this.send("camera", {
+    await this.send("camera", {
       camera: { kind: "resize", width: rect.width, height: rect.height, dpr: devicePixelRatio },
     });
-    return resized;
+    await this.send("load_fixture", { fixture: "editor" });
+    return this.send("camera", { camera: { kind: "fit" } });
   }
 
   subscribe(listener: Listener): () => void {
@@ -418,9 +419,11 @@ export class EngineClient {
     await this.send("initialize");
     if (!this.canvas) return null;
     const rect = this.canvas.getBoundingClientRect();
-    return this.send("camera", {
+    await this.send("camera", {
       camera: { kind: "resize", width: rect.width, height: rect.height, dpr: devicePixelRatio },
     });
+    await this.send("load_fixture", { fixture: "editor" });
+    return this.send("camera", { camera: { kind: "fit" } });
   }
 
   send(type: string, payload: Record<string, unknown> = {}): Promise<EngineResponse> {
@@ -489,6 +492,7 @@ export class EngineClient {
     pending?.resolve(response);
   }
 
+
   async readPixel(x: number, y: number) {
     if (!this.renderer) throw new EngineFailure("renderer_not_ready", "WebGPU renderer is not ready");
     return this.renderer.readPixel(x, y);
@@ -501,6 +505,9 @@ export class EngineClient {
       actual_webgpu: Boolean(this.capabilities.available),
       adapter: this.capabilities.adapter ?? null,
       backend: this.capabilities.backend ?? null,
+      surface_base_format: this.capabilities.surface_base_format ?? null,
+      pipeline_view_format: this.capabilities.pipeline_view_format ?? null,
+      readback_view_format: this.capabilities.readback_view_format ?? null,
       worker_runtime_owner: "dedicated-worker",
       wasm_initialized: Boolean(response),
       heartbeat: this.heartbeat,

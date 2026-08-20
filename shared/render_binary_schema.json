@@ -1,9 +1,12 @@
 {
-  "version": 1,
+  "version": 2,
   "endianness": "little",
-  "instance_stride_bytes": 48,
-  "dirty_record_stride_bytes": 52,
+  "instance_stride_bytes": 112,
+  "dirty_record_stride_bytes": 116,
   "uniform_stride_bytes": 32,
+  "alpha_contract": "premultiplied-linear",
+  "color_input": "srgb",
+  "stroke_alignment": "center",
   "primitive": {
     "rectangle": 0,
     "ellipse": 1
@@ -14,6 +17,11 @@
     "translation_lo": 24,
     "size": 32,
     "opacity": 40,
-    "primitive": 44
+    "primitive": 44,
+    "fill_linear": 48,
+    "corner_radii": 64,
+    "stroke_linear": 80,
+    "stroke_width": 96,
+    "padding": 100
   }
 }
