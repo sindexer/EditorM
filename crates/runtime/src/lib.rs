@@ -15,7 +15,7 @@ use thiserror::Error;
 use visual_authoring_core_math::{Rect, Vec2};
 use visual_authoring_document::{
     Command, CommandOutcome, Document, DocumentChangeSet, EditorError, HeadlessEditorCore,
-    HistoryState, NodeId, Selection, SelectionError, SequenceWork,
+    HistoryState, NodeId, NodeSpec, Selection, SelectionError, SequenceWork,
 };
 use visual_authoring_render_model::{
     CullingResult, DirtySlotRange, RenderDelta, RenderModel, RenderModelError,
@@ -327,6 +327,144 @@ impl EngineRuntime {
 
     pub fn clear_selection(&mut self) {
         self.core.clear_selection();
+    }
+
+    pub fn create_slide(
+        &mut self,
+        slide: NodeId,
+        name: String,
+        index: usize,
+        size: Vec2,
+    ) -> Result<RuntimeCommandOutcome, RuntimeError> {
+        let name = Self::validated_slide_name(name)?;
+        let root = self.document().root_id();
+        let root_index = self.slide_root_insertion_index(None, index)?;
+        let outcome = self.dispatch(Command::CreateNode {
+            spec: NodeSpec::frame(slide, name, size),
+            parent: root,
+            index: root_index,
+        })?;
+        self.activate_slide(slide)?;
+        Ok(outcome)
+    }
+
+    pub fn duplicate_slide(
+        &mut self,
+        source: NodeId,
+        duplicate: NodeId,
+        name: String,
+        index: usize,
+    ) -> Result<RuntimeCommandOutcome, RuntimeError> {
+        EditorSession::validate_slide(self.document(), source)?;
+        let name = Self::validated_slide_name(name)?;
+        let root = self.document().root_id();
+        let root_index = self.slide_root_insertion_index(None, index)?;
+        let outcome = self.dispatch(Command::DuplicateSubtree {
+            source,
+            new_root: duplicate,
+            parent: root,
+            index: root_index,
+            name,
+        })?;
+        self.activate_slide(duplicate)?;
+        Ok(outcome)
+    }
+
+    pub fn rename_slide(
+        &mut self,
+        slide: NodeId,
+        name: String,
+    ) -> Result<RuntimeCommandOutcome, RuntimeError> {
+        EditorSession::validate_slide(self.document(), slide)?;
+        let name = Self::validated_slide_name(name)?;
+        self.dispatch(Command::SetName {
+            target: slide,
+            name,
+        })
+    }
+
+    pub fn reorder_slide(
+        &mut self,
+        slide: NodeId,
+        index: usize,
+    ) -> Result<RuntimeCommandOutcome, RuntimeError> {
+        EditorSession::validate_slide(self.document(), slide)?;
+        let root = self.document().root_id();
+        let root_index = self.slide_root_insertion_index(Some(slide), index)?;
+        self.dispatch(Command::Reparent {
+            child: slide,
+            new_parent: root,
+            index: root_index,
+        })
+    }
+
+    pub fn delete_slide(&mut self, slide: NodeId) -> Result<RuntimeCommandOutcome, RuntimeError> {
+        EditorSession::validate_slide(self.document(), slide)?;
+        let slides = self.slide_ids();
+        if slides.len() == 1 {
+            return Err(SlideSessionError::LastSlideDeletion.into());
+        }
+        let position = slides
+            .iter()
+            .position(|candidate| *candidate == slide)
+            .expect("validated Slide belongs to slide_ids");
+        let adjacent = if position + 1 < slides.len() {
+            slides[position + 1]
+        } else {
+            slides[position - 1]
+        };
+        let was_active = self.active_slide_id() == Some(slide);
+        let outcome = self.dispatch(Command::DeleteSubtree { target: slide })?;
+        if was_active && self.active_slide_id() != Some(adjacent) {
+            self.activate_slide(adjacent)?;
+        }
+        Ok(outcome)
+    }
+
+    fn validated_slide_name(name: String) -> Result<String, SlideSessionError> {
+        let name = name.trim();
+        if name.is_empty() {
+            return Err(SlideSessionError::EmptySlideName);
+        }
+        Ok(name.to_owned())
+    }
+
+    fn slide_root_insertion_index(
+        &self,
+        moving: Option<NodeId>,
+        slide_index: usize,
+    ) -> Result<usize, SlideSessionError> {
+        let slides = self
+            .slide_ids()
+            .into_iter()
+            .filter(|id| Some(*id) != moving)
+            .collect::<Vec<_>>();
+        if slide_index > slides.len() {
+            return Err(SlideSessionError::InvalidSlideIndex {
+                index: slide_index,
+                maximum: slides.len(),
+            });
+        }
+        let root = self
+            .document()
+            .node(self.document().root_id())
+            .expect("Document root must exist");
+        let children = root
+            .children()
+            .iter()
+            .copied()
+            .filter(|id| Some(*id) != moving)
+            .collect::<Vec<_>>();
+        if let Some(next) = slides.get(slide_index) {
+            return Ok(children
+                .iter()
+                .position(|id| id == next)
+                .expect("Slide is a root child"));
+        }
+        Ok(slides
+            .last()
+            .and_then(|last| children.iter().position(|id| id == last))
+            .map_or(0, |position| position + 1))
     }
 
     pub fn activate_slide(&mut self, slide: NodeId) -> Result<bool, RuntimeError> {

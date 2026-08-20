@@ -1624,4 +1624,63 @@ mod tests {
         assert_eq!(replace_editor.document().snapshot(), replace_document);
         assert_eq!(replace_editor.revision(), u64::MAX);
     }
+
+    #[test]
+    fn duplicate_subtree_is_one_history_entry_and_round_trips_stable_ids() {
+        let mut editor = HeadlessEditorCore::blank("duplicate");
+        let root = editor.document().root_id();
+        let source = create_group(&mut editor, root, "Slide 1");
+        let nested = create_group(&mut editor, source, "Nested");
+        let original_leaf = create_rectangle(&mut editor, nested, "Leaf");
+        let duplicate = NodeId::new();
+        let before_history = editor.history_state();
+
+        let outcome = editor
+            .dispatch(Command::DuplicateSubtree {
+                source,
+                new_root: duplicate,
+                parent: root,
+                index: 1,
+                name: "Slide 1 copy".to_owned(),
+            })
+            .unwrap();
+        assert!(outcome.changed());
+        assert_eq!(
+            editor.history_state().undo_depth,
+            before_history.undo_depth + 1
+        );
+        let duplicated_root = editor.document().node(duplicate).unwrap();
+        assert_eq!(duplicated_root.name(), "Slide 1 copy");
+        let duplicated_nested = duplicated_root.children()[0];
+        let duplicated_leaf = editor
+            .document()
+            .node(duplicated_nested)
+            .unwrap()
+            .children()[0];
+        assert_ne!(duplicated_nested, nested);
+        assert_ne!(duplicated_leaf, original_leaf);
+        assert_eq!(
+            editor.document().node(duplicated_leaf).unwrap().geometry(),
+            editor.document().node(original_leaf).unwrap().geometry()
+        );
+
+        editor.undo().unwrap();
+        assert!(editor.document().node(duplicate).is_none());
+        assert!(editor.document().node(duplicated_nested).is_none());
+        assert!(editor.document().node(duplicated_leaf).is_none());
+
+        editor.redo().unwrap();
+        assert_eq!(
+            editor.document().node(duplicate).unwrap().children(),
+            &[duplicated_nested]
+        );
+        assert_eq!(
+            editor
+                .document()
+                .node(duplicated_nested)
+                .unwrap()
+                .children(),
+            &[duplicated_leaf]
+        );
+    }
 }

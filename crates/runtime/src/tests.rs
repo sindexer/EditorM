@@ -1496,3 +1496,116 @@ fn nested_frame_cannot_be_activated_as_a_slide() {
     assert_eq!(runtime.document_revision(), revision);
     assert_eq!(runtime.active_slide_id(), Some(active));
 }
+
+#[test]
+fn slide_mutations_are_single_history_entries_and_preserve_root_items() {
+    let document = build_fixture(FixtureKind::Editor).unwrap();
+    let mut runtime = EngineRuntime::new(document, Camera::default()).unwrap();
+    let first = runtime.active_slide_id().unwrap();
+    let first_shape = rectangle(
+        &mut runtime,
+        first,
+        NodeId::new(),
+        Vec2::new(120.0, 80.0),
+        Affine2::translation(Vec2::new(64.0, 72.0)),
+    );
+    let root = runtime.document().root_id();
+    let preserved = create_node(
+        &mut runtime,
+        NodeSpec::group(NodeId::new(), "Preserved root item"),
+        root,
+    );
+
+    let second = NodeId::new();
+    let before_create = runtime.history_state().undo_depth;
+    runtime
+        .create_slide(second, "Slide 2".to_owned(), 1, Vec2::new(1920.0, 1080.0))
+        .unwrap();
+    assert_eq!(runtime.history_state().undo_depth, before_create + 1);
+    assert_eq!(runtime.active_slide_id(), Some(second));
+
+    let duplicate = NodeId::new();
+    let before_duplicate = runtime.history_state().undo_depth;
+    let duplicate_outcome = runtime
+        .duplicate_slide(first, duplicate, "Slide 1 copy".to_owned(), 2)
+        .unwrap();
+    assert!(duplicate_outcome.command.affected().len() > 1);
+    assert_eq!(runtime.history_state().undo_depth, before_duplicate + 1);
+    let duplicated_shape = runtime.document().node(duplicate).unwrap().children()[0];
+    assert_ne!(duplicated_shape, first_shape);
+    assert_eq!(
+        runtime
+            .document()
+            .node(duplicated_shape)
+            .unwrap()
+            .geometry(),
+        runtime.document().node(first_shape).unwrap().geometry()
+    );
+
+    let before_rename = runtime.history_state().undo_depth;
+    runtime.rename_slide(second, "Closing".to_owned()).unwrap();
+    assert_eq!(runtime.history_state().undo_depth, before_rename + 1);
+    assert_eq!(runtime.document().node(second).unwrap().name(), "Closing");
+
+    let before_reorder = runtime.history_state().undo_depth;
+    runtime.reorder_slide(duplicate, 0).unwrap();
+    assert_eq!(runtime.history_state().undo_depth, before_reorder + 1);
+    assert_eq!(runtime.slide_ids(), vec![duplicate, first, second]);
+    assert_eq!(runtime.preserved_root_items(), vec![preserved]);
+
+    let before_delete = runtime.history_state().undo_depth;
+    runtime.delete_slide(duplicate).unwrap();
+    assert_eq!(runtime.history_state().undo_depth, before_delete + 1);
+    assert_eq!(runtime.slide_ids(), vec![first, second]);
+    assert_eq!(runtime.active_slide_id(), Some(first));
+    assert!(runtime.document().node(duplicate).is_none());
+    assert_eq!(runtime.preserved_root_items(), vec![preserved]);
+
+    runtime.undo().unwrap();
+    assert_eq!(runtime.slide_ids(), vec![duplicate, first, second]);
+    assert_eq!(
+        runtime.document().node(duplicate).unwrap().children(),
+        &[duplicated_shape]
+    );
+    runtime.redo().unwrap();
+    assert_eq!(runtime.slide_ids(), vec![first, second]);
+}
+
+#[test]
+fn rejected_slide_mutations_leave_document_history_and_session_unchanged() {
+    let document = build_fixture(FixtureKind::Editor).unwrap();
+    let mut runtime = EngineRuntime::new(document, Camera::default()).unwrap();
+    let only = runtime.active_slide_id().unwrap();
+    let document_before = runtime.document().snapshot();
+    let history_before = runtime.history_state();
+    let session_before = runtime.editor_session().clone();
+
+    assert!(matches!(
+        runtime.delete_slide(only),
+        Err(RuntimeError::SlideSession(
+            crate::SlideSessionError::LastSlideDeletion
+        ))
+    ));
+    assert!(matches!(
+        runtime.rename_slide(only, "   ".to_owned()),
+        Err(RuntimeError::SlideSession(
+            crate::SlideSessionError::EmptySlideName
+        ))
+    ));
+    assert!(matches!(
+        runtime.create_slide(
+            NodeId::new(),
+            "Slide 2".to_owned(),
+            2,
+            Vec2::new(1920.0, 1080.0),
+        ),
+        Err(RuntimeError::SlideSession(
+            crate::SlideSessionError::InvalidSlideIndex { .. }
+        ))
+    ));
+
+    assert_eq!(runtime.document().snapshot(), document_before);
+    assert_eq!(runtime.history_state(), history_before);
+    assert_eq!(runtime.editor_session(), &session_before);
+    assert_eq!(runtime.active_slide_id(), Some(only));
+}

@@ -15,6 +15,12 @@ pub enum SlideSessionError {
     NotSlide(NodeId),
     #[error("node {node} is outside active Slide {active_slide}")]
     NodeOutsideActiveSlide { node: NodeId, active_slide: NodeId },
+    #[error("Slide name must contain a non-whitespace character")]
+    EmptySlideName,
+    #[error("Slide index {index} is outside 0..={maximum}")]
+    InvalidSlideIndex { index: usize, maximum: usize },
+    #[error("the last remaining Slide cannot be deleted")]
+    LastSlideDeletion,
 }
 
 /// Worker-owned interaction state. Nothing in this type is serialized with Document.
