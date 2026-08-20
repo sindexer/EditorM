@@ -2055,6 +2055,7 @@ try {
   }
   const proof = {
     phase: "1B",
+    proof_kind: "actual-hardware-browser",
     captured_at_utc: new Date().toISOString(),
     browser: version.Browser,
     chrome_process_id: chromeProcess.pid,
@@ -2100,6 +2101,7 @@ try {
     : null;
   const failure = {
     phase: "1B",
+    proof_kind: "actual-hardware-browser",
     captured_at_utc: new Date().toISOString(),
     code: error?.code ?? "browser_test_failed",
     message: error?.message ?? String(error),

@@ -48,6 +48,7 @@ catch {
 if ($proof.proof_kind -ne "actual-hardware-browser") { throw "Evidence is not an actual-hardware browser proof" }
 $phaseProperty = $proof.PSObject.Properties["phase"]
 $isPhase1A = $null -ne $phaseProperty -and [string]$phaseProperty.Value -eq "1A"
+$isPhase1B = $null -ne $phaseProperty -and [string]$phaseProperty.Value -eq "1B"
 
 if ($isPhase1A) {
     if ($proof.initial.actual_webgpu -ne $true -or $proof.checks.actual_adapter_and_device -ne $true) {
@@ -101,6 +102,68 @@ if ($isPhase1A) {
     $finishedAt = [DateTimeOffset]::Parse([string]$proof.execution.finished_at_utc)
     $command = [string]$proof.execution.command
 }
+elseif ($isPhase1B) {
+    if ($proof.initial.actual_webgpu -ne $true -or $proof.checks.actual_webgpu -ne $true -or
+        $proof.checks.hardware_device -ne $true -or $proof.checks.dedicated_worker_wasm -ne $true) {
+        throw "Phase 1B evidence does not prove actual WebGPU, hardware, Worker, and WASM use"
+    }
+    if ([string]$proof.initial.backend -notmatch "browser-webgpu") {
+        throw "Phase 1B evidence backend is not browser WebGPU"
+    }
+    if ([string]$proof.browser_mode -notmatch "no mock" -or
+        [string]$proof.browser_mode -notmatch "no Canvas2D fallback") {
+        throw "Phase 1B evidence does not explicitly exclude mock and Canvas2D fallback"
+    }
+    if ($proof.max_fallback_rebuild_count_seen -ne 0 -or
+        $proof.checks.no_fallback_rebuilds -ne $true -or
+        $proof.checks.no_console_errors -ne $true -or
+        $proof.checks.no_gpu_validation_errors -ne $true) {
+        throw "Phase 1B evidence reports fallback, console, or GPU validation errors"
+    }
+    if ($proof.all_passed -ne $true -or [int]$proof.assertion_count -ne 25 -or
+        [int]$proof.passed_assertion_count -ne [int]$proof.assertion_count) {
+        throw "Phase 1B hardware proof did not pass all 25 assertions"
+    }
+    foreach ($assertion in @(
+        "isolated_thumbnail_invalidation",
+        "bounded_thumbnail_queue",
+        "actual_webgpu_thumbnails",
+        "worker_gpu_overlay_sequence_match",
+        "layers_timeline_row_sync",
+        "splitter_preferences_not_document"
+    )) {
+        $property = $proof.checks.PSObject.Properties[$assertion]
+        if ($null -eq $property -or $property.Value -ne $true) {
+            throw "Phase 1B hardware proof assertion failed or is missing: $assertion"
+        }
+    }
+    if ([int]$proof.final.thumbnails.cached -ne 3 -or
+        [int]$proof.final.thumbnails.pending -ne 0 -or
+        [int]$proof.final.thumbnails.errors -ne 0 -or
+        [int]$proof.final.thumbnails.queue_depth -ne 0 -or
+        [int]$proof.final.thumbnails.max_renders_per_engine_frame -ne 1 -or
+        [int]$proof.final.thumbnails.canvas2d_fallback_count -ne 0) {
+        throw "Phase 1B thumbnail evidence is incomplete, unbounded, or uses a fallback"
+    }
+
+    $surfaceBaseFormat = [string]$proof.gpu.surface_base_format
+    $pipelineViewFormat = [string]$proof.gpu.pipeline_view_format
+    $readbackViewFormat = [string]$proof.gpu.readback_view_format
+    if ($surfaceBaseFormat -notmatch "^(bgra|rgba)8unorm$" -or
+        $pipelineViewFormat -ne "$surfaceBaseFormat-srgb" -or
+        $readbackViewFormat -ne $pipelineViewFormat) {
+        throw "Phase 1B hardware proof does not use a compatible sRGB render/readback view"
+    }
+
+    $adapter = [string]$proof.initial.adapter
+    $device = [string]$proof.gpu.active_device.deviceString
+    $driverVendor = [string]$proof.gpu.active_device.driverVendor
+    $driverVersion = [string]$proof.gpu.active_device.driverVersion
+    $capturedAt = [DateTimeOffset]::Parse([string]$proof.captured_at_utc)
+    $startedAt = [DateTimeOffset]::Parse([string]$proof.execution.started_at_utc)
+    $finishedAt = [DateTimeOffset]::Parse([string]$proof.execution.finished_at_utc)
+    $command = [string]$proof.execution.command
+}
 else {
     if ($proof.hardware.actual_hardware -ne $true -or $proof.runtime.actual_webgpu -ne $true) { throw "Evidence does not prove actual WebGPU hardware use" }
     if ($proof.runtime.backend -notmatch "browser-webgpu") { throw "Evidence backend is not browser WebGPU" }
@@ -132,6 +195,25 @@ if ($age.TotalMinutes -lt -5 -or $age.TotalHours -gt $MaximumAgeHours) {
     throw "Hardware proof is not fresh enough for this phase-gate dispatch"
 }
 
+if ($isPhase1B) {
+    [pscustomobject]@{
+        evidence_path = $relative
+        evidence_sha256 = $actualHash
+        phase = "1B"
+        captured_at_utc = $capturedAt.ToUniversalTime().ToString("o")
+        command = $command
+        actual_webgpu = $true
+        mock_or_fallback = $false
+        pixel_readback = $false
+        dom_input = $true
+        adapter = $adapter
+        device = $device
+        driver_vendor = $driverVendor
+        driver_version = $driverVersion
+        all_passed = $true
+    } | ConvertTo-Json -Depth 4
+    exit 0
+}
 $pixelRelative = ([string]$proof.pixel_readback_artifact).Replace("\", "/")
 if ($pixelRelative -notmatch "^docs/verification/.+\.json$") { throw "Pixel readback artifact path is invalid" }
 $pixelFull = [IO.Path]::GetFullPath((Join-Path $repoRoot $pixelRelative))

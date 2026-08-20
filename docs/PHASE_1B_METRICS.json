@@ -36,7 +36,7 @@
   },
   "actual_browser_cross_check": {
     "artifact": "docs/verification/PHASE_1B_BROWSER_PROOF.json",
-    "captured_at_utc": "2026-08-20T09:33:07.023Z",
+    "captured_at_utc": "2026-08-20T09:43:40.099Z",
     "actual_device": "NVIDIA GeForce GTX 970",
     "thumbnail_captures": 8,
     "thumbnail_invalidations": 7,

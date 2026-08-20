@@ -46,14 +46,15 @@ All commands below were run on Windows against the final source state:
 | Editor `npm test` / `npm run build` | PASS: 25 tests; TypeScript and production build |
 | existing R3 React complexity matrix | PASS: 1 matrix test |
 | `npm run test:browser:phase1b` | PASS: fresh actual hardware run plus 5 stored-proof tests |
+| scope classifier / hardware evidence validator | PASS: 9/9 cases; 1 Phase 1B proof |
 
 The exact command and incident record is [PHASE_1B_VERIFICATION.txt](verification/PHASE_1B_VERIFICATION.txt).
 
 ## Actual Chrome, Worker, WASM, and WebGPU proof
 
-Fresh capture: `2026-08-20T09:33:07.023Z`.
+Fresh capture: `2026-08-20T09:43:40.099Z`.
 
-- Chrome `151.0.7922.138`, new process PID 15884, and a new temporary profile.
+- Chrome `151.0.7922.138`, new process PID 21748, and a new temporary profile.
 - NVIDIA GeForce GTX 970 actual WebGPU device, driver `32.0.15.8157`.
 - Dedicated Worker owns an initialized WASM EngineHost; heartbeat advances from 1 to 3.
 - Surface base `bgra8unorm`; pipeline and readback views `bgra8unorm-srgb`.
@@ -86,13 +87,13 @@ Screenshots:
 
 ## Evidence SHA-256
 
-- `docs/verification/PHASE_1B_BROWSER_PROOF.json` — `151e9c0fa5b44bb8d88d3b6fb929100ab45b1724d394b987987da91e142d1dde`
-- `docs/PHASE_1B_METRICS.json` — `0b2738d06b42d65ba58fc370697a745c374b3bf35006c69fc06a98418b3feb89`
+- `docs/verification/PHASE_1B_BROWSER_PROOF.json` — `9f09fe10487c27198f801986a5f90329888caed927386bc4c58bba8b88a31225`
+- `docs/PHASE_1B_METRICS.json` — `4eb4137631046f51eeb1c10ca17d8f0a0fc42397001847e01f5d9aa65518ebeb`
 - `docs/verification/PHASE_1B_BROWSER_FAILURE.json` — `058bcd04d9e956dbdf8c9beb42a00c2729ae034a1b1b0051b8c03cb5ed8bcab6`
 - `docs/verification/PHASE_1B_BROWSER_FAILURE_PRE_FIX_QUEUE_RACE.json` — `cdef37db60677609f69096e126c3aea20b2d9e4c1d1ad413aa7fd2c0c4b8d51f`
 - `docs/verification/PHASE_1B_BROWSER_FAILURE_PRE_FIX_STALE_QUEUED_REVISION.json` — `058bcd04d9e956dbdf8c9beb42a00c2729ae034a1b1b0051b8c03cb5ed8bcab6`
 - `docs/verification/phase1b-multislide-workspace.png` — `5733e80f32b90a0f4f61da6bdc07b29a4bb1251d6c306b955ae1d78ae4f40b0d`
-- `docs/verification/phase1b-layers-timeline.png` — `16918e44fcb8792675e4343cc8b9b8d6e32d485d6e583c350f0208ccd8194f35`
+- `docs/verification/phase1b-layers-timeline.png` — `5512ccd91c737ae739935891ed0bf2a96cc987556ff4e7bf3670f40c7b3c5c58`
 
 ## Scope integrity
 

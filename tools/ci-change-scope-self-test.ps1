@@ -8,6 +8,7 @@ $cases = @(
     @{ name = "wasm-bridge"; paths = @("crates/wasm_bridge/src/lib.rs"); expect = @{ rust = $true; wasm = $true; ci_or_unknown = $false } },
     @{ name = "wgsl"; paths = @("shared/render_contract.wgsl"); expect = @{ rust = $true; wasm = $true; editor_web = $true; preview_web = $true; render_or_gpu = $true; ci_or_unknown = $false } },
     @{ name = "editor-react"; paths = @("web/editor/src/App.tsx"); expect = @{ rust = $false; wasm = $false; editor_web = $true; preview_web = $false; render_or_gpu = $false; ci_or_unknown = $false } },
+    @{ name = "editor-engine"; paths = @("web/editor/src/engine.ts"); expect = @{ rust = $true; wasm = $true; editor_web = $true; preview_web = $true; render_or_gpu = $true; ci_or_unknown = $false } },
     @{ name = "preview"; paths = @("web/phase0d-preview/src/app.js"); expect = @{ rust = $false; wasm = $false; editor_web = $false; preview_web = $true; render_or_gpu = $false; ci_or_unknown = $false } },
     @{ name = "workflow"; paths = @(".github/workflows/pr-fast.yml"); expected_path = ".github/workflows/pr-fast.yml"; expected_reason = "full:ci-or-governance:.github/workflows/pr-fast.yml"; expect = @{ rust = $true; wasm = $true; editor_web = $true; preview_web = $true; ci_or_unknown = $true } },
     @{ name = "unknown-product"; paths = @("future_product/engine.bin"); expect = @{ rust = $true; wasm = $true; editor_web = $true; preview_web = $true; ci_or_unknown = $true } }

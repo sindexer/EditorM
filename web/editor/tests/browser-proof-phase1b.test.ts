@@ -8,6 +8,7 @@ const proof = JSON.parse(readFileSync(path.join(workspace, "docs/verification/PH
 describe("Phase 1B targeted actual browser proof integrity", () => {
   test("records a fresh Chrome Worker/WASM/GTX 970 WebGPU run", () => {
     expect(proof.phase).toBe("1B");
+    expect(proof.proof_kind).toBe("actual-hardware-browser");
     expect(proof.all_passed).toBe(true);
     expect(Number.isFinite(Date.parse(proof.captured_at_utc))).toBe(true);
     expect(proof.browser).toMatch(/^Chrome\//);

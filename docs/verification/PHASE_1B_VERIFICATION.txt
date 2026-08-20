@@ -55,13 +55,15 @@ Editor validation
 - `npm run build`: PASS, TypeScript project build and Vite production build.
 - `npm run test:react:r3`: PASS, 1 large complexity-matrix test.
 - `npm run test:browser:phase1b`: PASS, production build, fresh actual hardware proof, and 5 stored-proof fail-closed tests.
+- Scope classifier self-test: PASS, 9/9 cases; web/editor/src/engine.ts requires full software and hardware evidence.
+- PR hardware evidence validator: PASS, 1 tracked fresh Phase 1B proof.
 - Phase 1B focused workspace tests: 8 passed, including stale queued thumbnail revision recovery.
 
 Fresh actual hardware browser proof
 -----------------------------------
-- captured_at_utc: 2026-08-20T09:33:07.023Z
+- captured_at_utc: 2026-08-20T09:43:40.099Z
 - browser: Chrome/151.0.7922.138
-- Chrome process id: 15884
+- Chrome process id: 21748
 - new temporary Chrome profile: true
 - GPU: NVIDIA GeForce GTX 970
 - driver: 32.0.15.8157

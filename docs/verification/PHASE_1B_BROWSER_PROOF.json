@@ -1,14 +1,15 @@
 {
   "phase": "1B",
-  "captured_at_utc": "2026-08-20T09:33:07.023Z",
+  "proof_kind": "actual-hardware-browser",
+  "captured_at_utc": "2026-08-20T09:43:40.099Z",
   "browser": "Chrome/151.0.7922.138",
-  "chrome_process_id": 15884,
-  "chrome_profile": "C:\\Users\\thdwl\\AppData\\Local\\Temp\\phase1b-chrome-24472-1787218381275",
+  "chrome_process_id": 21748,
+  "chrome_profile": "C:\\Users\\thdwl\\AppData\\Local\\Temp\\phase1b-chrome-20520-1787219014396",
   "browser_mode": "fresh Chrome; actual Dedicated Worker + WASM EngineHost + WebGPU; no mock; no Canvas2D fallback",
   "execution": {
     "command": "npm run test:browser:phase1b",
-    "started_at_utc": "2026-08-20T09:33:01.275Z",
-    "finished_at_utc": "2026-08-20T09:33:07.023Z"
+    "started_at_utc": "2026-08-20T09:43:34.396Z",
+    "finished_at_utc": "2026-08-20T09:43:40.099Z"
   },
   "gpu": {
     "active_device": {
@@ -26,7 +27,7 @@
     "readback_view_format": "bgra8unorm-srgb"
   },
   "preview": {
-    "url": "http://127.0.0.1:49273/",
+    "url": "http://127.0.0.1:49480/",
     "health": {
       "ok": true,
       "status": 200,
@@ -138,8 +139,8 @@
       "buffer_bytes": 264,
       "upload_calls": 2,
       "frame_upload_bytes": 36,
-      "render_submit_ms": 0.5,
-      "frame_ms": 0.5999999940395355,
+      "render_submit_ms": 0.5999999940395355,
+      "frame_ms": 0.699999988079071,
       "validation_errors": 0,
       "frame_sequence": 6,
       "gpu_encode_attempted": 0,
@@ -359,8 +360,8 @@
       "buffer_bytes": 712,
       "upload_calls": 3,
       "frame_upload_bytes": 152,
-      "render_submit_ms": 0.800000011920929,
-      "frame_ms": 0.800000011920929,
+      "render_submit_ms": 0.9000000059604645,
+      "frame_ms": 1,
       "validation_errors": 0,
       "frame_sequence": 35,
       "gpu_encode_attempted": 1,
@@ -422,7 +423,7 @@
       "undo_depth": 1
     },
     "editor_session": {
-      "active_slide_id": "5d6760d9-1afd-4d10-a234-910918239e4f",
+      "active_slide_id": "82f54793-2183-4c7c-9204-59fec3a5e58c",
       "preserved_root_items": [],
       "slides": [
         {
@@ -452,7 +453,7 @@
           "aspect_ratio": 1.7777777777777777,
           "child_count": 1,
           "height": 1080,
-          "id": "5d6760d9-1afd-4d10-a234-910918239e4f",
+          "id": "82f54793-2183-4c7c-9204-59fec3a5e58c",
           "index": 2,
           "name": "Slide 2",
           "thumbnail_revision": 12,
@@ -572,7 +573,7 @@
       },
       "metrics": {
         "allocation_growth_count": 0,
-        "cpu_update_ms": 10,
+        "cpu_update_ms": 9,
         "culling_candidates": 2,
         "document_full_clones": 0,
         "document_nodes": 3,
@@ -719,7 +720,7 @@
         "diagnostics": [],
         "gpu_omitted_items": 0
       },
-      "request_id": "command-1787218384741-7",
+      "request_id": "command-1787219017931-7",
       "resources": {
         "allocated_slots": 2,
         "dirty_record_stride_bytes": 116,
@@ -773,7 +774,7 @@
         "visible": 2
       },
       "editor_session": {
-        "active_slide_id": "5d6760d9-1afd-4d10-a234-910918239e4f",
+        "active_slide_id": "82f54793-2183-4c7c-9204-59fec3a5e58c",
         "preserved_root_items": [],
         "slides": [
           {
@@ -792,7 +793,7 @@
             "aspect_ratio": 1.7777777777777777,
             "child_count": 1,
             "height": 1080,
-            "id": "5d6760d9-1afd-4d10-a234-910918239e4f",
+            "id": "82f54793-2183-4c7c-9204-59fec3a5e58c",
             "index": 1,
             "name": "Slide 2",
             "thumbnail_revision": 4,
@@ -810,7 +811,7 @@
       },
       "metrics": {
         "allocation_growth_count": 0,
-        "cpu_update_ms": 1,
+        "cpu_update_ms": 0,
         "culling_candidates": 3,
         "document_full_clones": 0,
         "document_nodes": 5,
@@ -873,7 +874,7 @@
             "index": 0,
             "kind": "attach",
             "node_id": "30000000-0000-0000-0000-000000000002",
-            "parent_id": "5d6760d9-1afd-4d10-a234-910918239e4f"
+            "parent_id": "82f54793-2183-4c7c-9204-59fec3a5e58c"
           }
         ],
         "upserts": [
@@ -919,7 +920,7 @@
             "locked": false,
             "name": "Second slide object",
             "opacity": 1,
-            "parent_id": "5d6760d9-1afd-4d10-a234-910918239e4f",
+            "parent_id": "82f54793-2183-4c7c-9204-59fec3a5e58c",
             "visible": true,
             "world_bounds": {
               "max": [
@@ -957,7 +958,7 @@
         "diagnostics": [],
         "gpu_omitted_items": 0
       },
-      "request_id": "command-1787218385064-13",
+      "request_id": "command-1787219018190-13",
       "resources": {
         "allocated_slots": 4,
         "dirty_record_stride_bytes": 116,
@@ -1037,7 +1038,7 @@
       },
       "metrics": {
         "allocation_growth_count": 0,
-        "cpu_update_ms": 1,
+        "cpu_update_ms": 0,
         "culling_candidates": 2,
         "document_full_clones": 0,
         "document_nodes": 3,
@@ -1113,7 +1114,7 @@
         "diagnostics": [],
         "gpu_omitted_items": 0
       },
-      "request_id": "camera-1787218384787-10",
+      "request_id": "camera-1787219017969-10",
       "resources": {
         "allocated_slots": 2,
         "dirty_record_stride_bytes": 116,
@@ -1169,7 +1170,7 @@
         "visible": 2
       },
       "editor_session": {
-        "active_slide_id": "5d6760d9-1afd-4d10-a234-910918239e4f",
+        "active_slide_id": "82f54793-2183-4c7c-9204-59fec3a5e58c",
         "preserved_root_items": [],
         "slides": [
           {
@@ -1188,7 +1189,7 @@
             "aspect_ratio": 1.7777777777777777,
             "child_count": 1,
             "height": 1080,
-            "id": "5d6760d9-1afd-4d10-a234-910918239e4f",
+            "id": "82f54793-2183-4c7c-9204-59fec3a5e58c",
             "index": 1,
             "name": "Slide 2",
             "thumbnail_revision": 4,
@@ -1282,7 +1283,7 @@
         "diagnostics": [],
         "gpu_omitted_items": 0
       },
-      "request_id": "camera-1787218385083-15",
+      "request_id": "camera-1787219018209-15",
       "resources": {
         "allocated_slots": 4,
         "dirty_record_stride_bytes": 116,
@@ -1357,7 +1358,7 @@
             "aspect_ratio": 1.7777777777777777,
             "child_count": 1,
             "height": 1080,
-            "id": "5d6760d9-1afd-4d10-a234-910918239e4f",
+            "id": "82f54793-2183-4c7c-9204-59fec3a5e58c",
             "index": 1,
             "name": "Slide 2",
             "thumbnail_revision": 4,
@@ -1375,7 +1376,7 @@
       },
       "metrics": {
         "allocation_growth_count": 0,
-        "cpu_update_ms": 1,
+        "cpu_update_ms": 0,
         "culling_candidates": 4,
         "document_full_clones": 0,
         "document_nodes": 5,
@@ -1451,7 +1452,7 @@
         "diagnostics": [],
         "gpu_omitted_items": 0
       },
-      "request_id": "slide-1787218385857-17",
+      "request_id": "slide-1787219018976-17",
       "resources": {
         "allocated_slots": 4,
         "dirty_record_stride_bytes": 116,
@@ -1526,7 +1527,7 @@
             "aspect_ratio": 1.7777777777777777,
             "child_count": 1,
             "height": 1080,
-            "id": "5d6760d9-1afd-4d10-a234-910918239e4f",
+            "id": "82f54793-2183-4c7c-9204-59fec3a5e58c",
             "index": 1,
             "name": "Slide 2",
             "thumbnail_revision": 4,
@@ -1620,7 +1621,7 @@
         "diagnostics": [],
         "gpu_omitted_items": 0
       },
-      "request_id": "hit_test-1787218385867-18",
+      "request_id": "hit_test-1787219018981-18",
       "resources": {
         "allocated_slots": 4,
         "dirty_record_stride_bytes": 116,
@@ -1686,7 +1687,7 @@
         "visible": 2
       },
       "editor_session": {
-        "active_slide_id": "5d6760d9-1afd-4d10-a234-910918239e4f",
+        "active_slide_id": "82f54793-2183-4c7c-9204-59fec3a5e58c",
         "preserved_root_items": [],
         "slides": [
           {
@@ -1705,7 +1706,7 @@
             "aspect_ratio": 1.7777777777777777,
             "child_count": 1,
             "height": 1080,
-            "id": "5d6760d9-1afd-4d10-a234-910918239e4f",
+            "id": "82f54793-2183-4c7c-9204-59fec3a5e58c",
             "index": 1,
             "name": "Slide 2",
             "thumbnail_revision": 4,
@@ -1799,7 +1800,7 @@
         "diagnostics": [],
         "gpu_omitted_items": 0
       },
-      "request_id": "slide-1787218385887-20",
+      "request_id": "slide-1787219018987-20",
       "resources": {
         "allocated_slots": 4,
         "dirty_record_stride_bytes": 116,
@@ -1855,7 +1856,7 @@
         "visible": 2
       },
       "editor_session": {
-        "active_slide_id": "5d6760d9-1afd-4d10-a234-910918239e4f",
+        "active_slide_id": "82f54793-2183-4c7c-9204-59fec3a5e58c",
         "preserved_root_items": [],
         "slides": [
           {
@@ -1874,7 +1875,7 @@
             "aspect_ratio": 1.7777777777777777,
             "child_count": 1,
             "height": 1080,
-            "id": "5d6760d9-1afd-4d10-a234-910918239e4f",
+            "id": "82f54793-2183-4c7c-9204-59fec3a5e58c",
             "index": 1,
             "name": "Slide 2",
             "thumbnail_revision": 4,
@@ -1968,7 +1969,7 @@
         "diagnostics": [],
         "gpu_omitted_items": 0
       },
-      "request_id": "hit_test-1787218385900-21",
+      "request_id": "hit_test-1787219018995-21",
       "resources": {
         "allocated_slots": 4,
         "dirty_record_stride_bytes": 116,
@@ -1983,7 +1984,7 @@
       "result": {
         "all": [
           "30000000-0000-0000-0000-000000000002",
-          "5d6760d9-1afd-4d10-a234-910918239e4f"
+          "82f54793-2183-4c7c-9204-59fec3a5e58c"
         ],
         "candidates": 3,
         "exact_geometry_tests": 2,
@@ -2049,7 +2050,7 @@
             "aspect_ratio": 1.7777777777777777,
             "child_count": 1,
             "height": 1080,
-            "id": "5d6760d9-1afd-4d10-a234-910918239e4f",
+            "id": "82f54793-2183-4c7c-9204-59fec3a5e58c",
             "index": 1,
             "name": "Slide 2",
             "thumbnail_revision": 4,
@@ -2078,7 +2079,7 @@
       },
       "metrics": {
         "allocation_growth_count": 1,
-        "cpu_update_ms": 2,
+        "cpu_update_ms": 4,
         "culling_candidates": 5,
         "document_full_clones": 0,
         "document_nodes": 7,
@@ -2169,8 +2170,71 @@
                 "width": 0
               }
             },
+            "children": [],
+            "geometry": {
+              "height": 80,
+              "width": 160
+            },
+            "id": "24a2ad80-7bf2-4cc3-9099-c2af1215a63d",
+            "kind": "ellipse",
+            "local_transform": [
+              1,
+              0,
+              0,
+              1,
+              120,
+              120
+            ],
+            "locked": false,
+            "name": "Second slide object",
+            "opacity": 1,
+            "parent_id": "30000000-0000-0000-0000-000000000003",
+            "visible": true,
+            "world_bounds": {
+              "max": [
+                280,
+                200
+              ],
+              "min": [
+                120,
+                120
+              ]
+            },
+            "world_transform": [
+              1,
+              0,
+              0,
+              1,
+              120,
+              120
+            ]
+          },
+          {
+            "appearance": {
+              "corner_radii": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "fill": [
+                0.2,
+                0.58,
+                0.96,
+                1
+              ],
+              "stroke": {
+                "color": [
+                  0.08,
+                  0.11,
+                  0.16,
+                  1
+                ],
+                "width": 0
+              }
+            },
             "children": [
-              "57d1b679-5c4c-4edd-ac1e-723b2fa2957b"
+              "24a2ad80-7bf2-4cc3-9099-c2af1215a63d"
             ],
             "geometry": {
               "height": 1080,
@@ -2209,69 +2273,6 @@
               0,
               0
             ]
-          },
-          {
-            "appearance": {
-              "corner_radii": [
-                0,
-                0,
-                0,
-                0
-              ],
-              "fill": [
-                0.2,
-                0.58,
-                0.96,
-                1
-              ],
-              "stroke": {
-                "color": [
-                  0.08,
-                  0.11,
-                  0.16,
-                  1
-                ],
-                "width": 0
-              }
-            },
-            "children": [],
-            "geometry": {
-              "height": 80,
-              "width": 160
-            },
-            "id": "57d1b679-5c4c-4edd-ac1e-723b2fa2957b",
-            "kind": "ellipse",
-            "local_transform": [
-              1,
-              0,
-              0,
-              1,
-              120,
-              120
-            ],
-            "locked": false,
-            "name": "Second slide object",
-            "opacity": 1,
-            "parent_id": "30000000-0000-0000-0000-000000000003",
-            "visible": true,
-            "world_bounds": {
-              "max": [
-                280,
-                200
-              ],
-              "min": [
-                120,
-                120
-              ]
-            },
-            "world_transform": [
-              1,
-              0,
-              0,
-              1,
-              120,
-              120
-            ]
           }
         ]
       },
@@ -2290,7 +2291,7 @@
         "diagnostics": [],
         "gpu_omitted_items": 0
       },
-      "request_id": "slide-1787218385903-22",
+      "request_id": "slide-1787219019001-22",
       "resources": {
         "allocated_slots": 6,
         "dirty_record_stride_bytes": 116,
@@ -2374,7 +2375,7 @@
             "aspect_ratio": 1.7777777777777777,
             "child_count": 1,
             "height": 1080,
-            "id": "5d6760d9-1afd-4d10-a234-910918239e4f",
+            "id": "82f54793-2183-4c7c-9204-59fec3a5e58c",
             "index": 2,
             "name": "Slide 2",
             "thumbnail_revision": 4,
@@ -2382,7 +2383,7 @@
           }
         ]
       },
-      "engine_sequence": 27,
+      "engine_sequence": 26,
       "error": null,
       "fixture": "EDITOR",
       "history": {
@@ -2392,7 +2393,7 @@
       },
       "metrics": {
         "allocation_growth_count": 0,
-        "cpu_update_ms": 2,
+        "cpu_update_ms": 1,
         "culling_candidates": 5,
         "document_full_clones": 0,
         "document_nodes": 7,
@@ -2486,7 +2487,7 @@
               }
             },
             "children": [
-              "57d1b679-5c4c-4edd-ac1e-723b2fa2957b"
+              "24a2ad80-7bf2-4cc3-9099-c2af1215a63d"
             ],
             "geometry": {
               "height": 1080,
@@ -2543,7 +2544,7 @@
         "diagnostics": [],
         "gpu_omitted_items": 0
       },
-      "request_id": "slide-1787218385920-25",
+      "request_id": "slide-1787219019021-24",
       "resources": {
         "allocated_slots": 6,
         "dirty_record_stride_bytes": 116,
@@ -2616,7 +2617,7 @@
             "aspect_ratio": 1.7777777777777777,
             "child_count": 1,
             "height": 1080,
-            "id": "5d6760d9-1afd-4d10-a234-910918239e4f",
+            "id": "82f54793-2183-4c7c-9204-59fec3a5e58c",
             "index": 1,
             "name": "Slide 2",
             "thumbnail_revision": 4,
@@ -2624,7 +2625,7 @@
           }
         ]
       },
-      "engine_sequence": 30,
+      "engine_sequence": 29,
       "error": null,
       "fixture": "EDITOR",
       "history": {
@@ -2691,8 +2692,8 @@
       "projection": {
         "full": false,
         "removed": [
-          "30000000-0000-0000-0000-000000000003",
-          "57d1b679-5c4c-4edd-ac1e-723b2fa2957b"
+          "24a2ad80-7bf2-4cc3-9099-c2af1215a63d",
+          "30000000-0000-0000-0000-000000000003"
         ],
         "schema_version": 2,
         "structural_ops": [
@@ -2720,7 +2721,7 @@
         "diagnostics": [],
         "gpu_omitted_items": 0
       },
-      "request_id": "slide-1787218385950-28",
+      "request_id": "slide-1787219019047-27",
       "resources": {
         "allocated_slots": 6,
         "dirty_record_stride_bytes": 116,
@@ -2806,7 +2807,7 @@
             "aspect_ratio": 1.7777777777777777,
             "child_count": 1,
             "height": 1080,
-            "id": "5d6760d9-1afd-4d10-a234-910918239e4f",
+            "id": "82f54793-2183-4c7c-9204-59fec3a5e58c",
             "index": 2,
             "name": "Slide 2",
             "thumbnail_revision": 4,
@@ -2814,7 +2815,7 @@
           }
         ]
       },
-      "engine_sequence": 31,
+      "engine_sequence": 30,
       "error": null,
       "fixture": "EDITOR",
       "history": {
@@ -2915,8 +2916,71 @@
                 "width": 0
               }
             },
+            "children": [],
+            "geometry": {
+              "height": 80,
+              "width": 160
+            },
+            "id": "24a2ad80-7bf2-4cc3-9099-c2af1215a63d",
+            "kind": "ellipse",
+            "local_transform": [
+              1,
+              0,
+              0,
+              1,
+              120,
+              120
+            ],
+            "locked": false,
+            "name": "Second slide object",
+            "opacity": 1,
+            "parent_id": "30000000-0000-0000-0000-000000000003",
+            "visible": true,
+            "world_bounds": {
+              "max": [
+                280,
+                200
+              ],
+              "min": [
+                120,
+                120
+              ]
+            },
+            "world_transform": [
+              1,
+              0,
+              0,
+              1,
+              120,
+              120
+            ]
+          },
+          {
+            "appearance": {
+              "corner_radii": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "fill": [
+                0.2,
+                0.58,
+                0.96,
+                1
+              ],
+              "stroke": {
+                "color": [
+                  0.08,
+                  0.11,
+                  0.16,
+                  1
+                ],
+                "width": 0
+              }
+            },
             "children": [
-              "57d1b679-5c4c-4edd-ac1e-723b2fa2957b"
+              "24a2ad80-7bf2-4cc3-9099-c2af1215a63d"
             ],
             "geometry": {
               "height": 1080,
@@ -2955,69 +3019,6 @@
               0,
               0
             ]
-          },
-          {
-            "appearance": {
-              "corner_radii": [
-                0,
-                0,
-                0,
-                0
-              ],
-              "fill": [
-                0.2,
-                0.58,
-                0.96,
-                1
-              ],
-              "stroke": {
-                "color": [
-                  0.08,
-                  0.11,
-                  0.16,
-                  1
-                ],
-                "width": 0
-              }
-            },
-            "children": [],
-            "geometry": {
-              "height": 80,
-              "width": 160
-            },
-            "id": "57d1b679-5c4c-4edd-ac1e-723b2fa2957b",
-            "kind": "ellipse",
-            "local_transform": [
-              1,
-              0,
-              0,
-              1,
-              120,
-              120
-            ],
-            "locked": false,
-            "name": "Second slide object",
-            "opacity": 1,
-            "parent_id": "30000000-0000-0000-0000-000000000003",
-            "visible": true,
-            "world_bounds": {
-              "max": [
-                280,
-                200
-              ],
-              "min": [
-                120,
-                120
-              ]
-            },
-            "world_transform": [
-              1,
-              0,
-              0,
-              1,
-              120,
-              120
-            ]
           }
         ]
       },
@@ -3036,7 +3037,7 @@
         "diagnostics": [],
         "gpu_omitted_items": 0
       },
-      "request_id": "undo-1787218385973-29",
+      "request_id": "undo-1787219019055-28",
       "resources": {
         "allocated_slots": 6,
         "dirty_record_stride_bytes": 116,
@@ -3111,7 +3112,7 @@
             "aspect_ratio": 1.7777777777777777,
             "child_count": 1,
             "height": 1080,
-            "id": "5d6760d9-1afd-4d10-a234-910918239e4f",
+            "id": "82f54793-2183-4c7c-9204-59fec3a5e58c",
             "index": 1,
             "name": "Slide 2",
             "thumbnail_revision": 4,
@@ -3119,7 +3120,7 @@
           }
         ]
       },
-      "engine_sequence": 32,
+      "engine_sequence": 31,
       "error": null,
       "fixture": "EDITOR",
       "history": {
@@ -3129,7 +3130,7 @@
       },
       "metrics": {
         "allocation_growth_count": 0,
-        "cpu_update_ms": 1,
+        "cpu_update_ms": 0,
         "culling_candidates": 4,
         "document_full_clones": 0,
         "document_nodes": 5,
@@ -3186,8 +3187,8 @@
       "projection": {
         "full": false,
         "removed": [
-          "30000000-0000-0000-0000-000000000003",
-          "57d1b679-5c4c-4edd-ac1e-723b2fa2957b"
+          "24a2ad80-7bf2-4cc3-9099-c2af1215a63d",
+          "30000000-0000-0000-0000-000000000003"
         ],
         "schema_version": 2,
         "structural_ops": [
@@ -3215,7 +3216,7 @@
         "diagnostics": [],
         "gpu_omitted_items": 0
       },
-      "request_id": "redo-1787218385978-30",
+      "request_id": "redo-1787219019060-29",
       "resources": {
         "allocated_slots": 6,
         "dirty_record_stride_bytes": 116,
@@ -3301,7 +3302,7 @@
             "aspect_ratio": 1.7777777777777777,
             "child_count": 1,
             "height": 1080,
-            "id": "5d6760d9-1afd-4d10-a234-910918239e4f",
+            "id": "82f54793-2183-4c7c-9204-59fec3a5e58c",
             "index": 2,
             "name": "Slide 2",
             "thumbnail_revision": 0,
@@ -3319,7 +3320,7 @@
       },
       "metrics": {
         "allocation_growth_count": 2,
-        "cpu_update_ms": 5,
+        "cpu_update_ms": 4,
         "culling_candidates": 6,
         "document_full_clones": 0,
         "document_nodes": 7,
@@ -3406,7 +3407,7 @@
             "children": [
               "30000000-0000-0000-0000-000000000003",
               "00000000-0000-0000-0000-000000000002",
-              "5d6760d9-1afd-4d10-a234-910918239e4f"
+              "82f54793-2183-4c7c-9204-59fec3a5e58c"
             ],
             "geometry": null,
             "id": "00000000-0000-0000-0000-000000000001",
@@ -3459,7 +3460,7 @@
               }
             },
             "children": [
-              "57d1b679-5c4c-4edd-ac1e-723b2fa2957b"
+              "24a2ad80-7bf2-4cc3-9099-c2af1215a63d"
             ],
             "geometry": {
               "height": 1080,
@@ -3528,7 +3529,7 @@
               "height": 80,
               "width": 160
             },
-            "id": "57d1b679-5c4c-4edd-ac1e-723b2fa2957b",
+            "id": "24a2ad80-7bf2-4cc3-9099-c2af1215a63d",
             "kind": "ellipse",
             "local_transform": [
               1,
@@ -3721,7 +3722,7 @@
               "height": 1080,
               "width": 1920
             },
-            "id": "5d6760d9-1afd-4d10-a234-910918239e4f",
+            "id": "82f54793-2183-4c7c-9204-59fec3a5e58c",
             "kind": "frame",
             "local_transform": [
               1,
@@ -3797,7 +3798,7 @@
             "locked": false,
             "name": "Second slide object",
             "opacity": 1,
-            "parent_id": "5d6760d9-1afd-4d10-a234-910918239e4f",
+            "parent_id": "82f54793-2183-4c7c-9204-59fec3a5e58c",
             "visible": true,
             "world_bounds": {
               "max": [
@@ -3835,7 +3836,7 @@
         "diagnostics": [],
         "gpu_omitted_items": 0
       },
-      "request_id": "load_document-1787218385987-31",
+      "request_id": "load_document-1787219019079-31",
       "resources": {
         "allocated_slots": 6,
         "dirty_record_stride_bytes": 116,
@@ -3885,11 +3886,11 @@
       },
       "layer_ids": [
         "30000000-0000-0000-0000-000000000003",
-        "57d1b679-5c4c-4edd-ac1e-723b2fa2957b"
+        "24a2ad80-7bf2-4cc3-9099-c2af1215a63d"
       ],
       "timeline_ids": [
         "30000000-0000-0000-0000-000000000003",
-        "57d1b679-5c4c-4edd-ac1e-723b2fa2957b"
+        "24a2ad80-7bf2-4cc3-9099-c2af1215a63d"
       ]
     }
   },
@@ -3900,11 +3901,11 @@
     },
     "timeline": {
       "path": "docs/verification/phase1b-layers-timeline.png",
-      "bytes": 62453
+      "bytes": 62465
     }
   },
   "console_errors": [],
-  "chrome_stderr_tail": "\r\nDevTools listening on ws://127.0.0.1:49278/devtools/browser/4ebe18cf-edef-41d8-a744-f50b75a3d24c\r\n[15884:10000:0820/183306.219:ERROR:google_apis\\gcm\\engine\\registration_request.cc:291] Registration response error message: DEPRECATED_ENDPOINT\r\n",
+  "chrome_stderr_tail": "\r\nDevTools listening on ws://127.0.0.1:49485/devtools/browser/898fb107-7bdd-40d6-b8b7-aa0576a8c10a\r\n[21748:16120:0820/184338.905:ERROR:google_apis\\gcm\\engine\\registration_request.cc:291] Registration response error message: DEPRECATED_ENDPOINT\r\n",
   "max_fallback_rebuild_count_seen": 0,
   "fallback_checkpoints": [
     {
@@ -3928,7 +3929,7 @@
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 42,
+      "engine_sequence": 43,
       "fixture": "EDITOR",
       "fallback_rebuild_count": 0
     }
