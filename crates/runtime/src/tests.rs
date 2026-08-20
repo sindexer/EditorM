@@ -1399,3 +1399,100 @@ fn asymmetric_affine_ellipse_stroke_bounds_and_hit_test_share_semantics() {
         assert!(point.y >= bounds.min.y && point.y <= bounds.max.y);
     }
 }
+#[test]
+fn editor_fixture_starts_with_one_full_hd_active_slide() {
+    let document = build_fixture(FixtureKind::Editor).unwrap();
+    let runtime = EngineRuntime::new(document, Camera::default()).unwrap();
+    let slides = runtime.slide_ids();
+    assert_eq!(slides.len(), 1);
+    assert_eq!(runtime.active_slide_id(), Some(slides[0]));
+    assert!(runtime.preserved_root_items().is_empty());
+    assert_eq!(
+        runtime.document().node(slides[0]).unwrap().geometry(),
+        Some(&Geometry::Frame {
+            size: Vec2::new(1920.0, 1080.0)
+        })
+    );
+}
+
+#[test]
+fn slide_activation_restores_selection_and_camera_without_document_mutation() {
+    let document = build_fixture(FixtureKind::Editor).unwrap();
+    let mut runtime = EngineRuntime::new(document, Camera::default()).unwrap();
+    let first_slide = runtime.active_slide_id().unwrap();
+    let second_slide = NodeId::new();
+    let mut second_spec = NodeSpec::frame(second_slide, "Slide 2", Vec2::new(1920.0, 1080.0));
+    second_spec.local_transform = Affine2::translation(Vec2::new(2400.0, -540.0));
+    runtime
+        .dispatch(Command::CreateNode {
+            spec: second_spec,
+            parent: runtime.document().root_id(),
+            index: 1,
+        })
+        .unwrap();
+    let first_shape = rectangle(
+        &mut runtime,
+        first_slide,
+        NodeId::new(),
+        Vec2::new(120.0, 80.0),
+        Affine2::translation(Vec2::new(100.0, 120.0)),
+    );
+    let second_shape = rectangle(
+        &mut runtime,
+        second_slide,
+        NodeId::new(),
+        Vec2::new(90.0, 60.0),
+        Affine2::translation(Vec2::new(180.0, 160.0)),
+    );
+
+    runtime.select_only(first_shape).unwrap();
+    runtime.camera_mut().pan(Vec2::new(80.0, -24.0)).unwrap();
+    let first_camera = runtime.camera().clone();
+    let revision = runtime.document_revision();
+
+    assert!(runtime.activate_slide(second_slide).unwrap());
+    assert_eq!(runtime.document_revision(), revision);
+    assert!(runtime.selection().is_empty());
+    runtime.select_only(second_shape).unwrap();
+    runtime.camera_mut().pan(Vec2::new(-45.0, 18.0)).unwrap();
+    let second_camera = runtime.camera().clone();
+
+    assert!(runtime.activate_slide(first_slide).unwrap());
+    assert_eq!(runtime.document_revision(), revision);
+    assert_eq!(runtime.selection().ordered(), &[first_shape]);
+    assert_eq!(runtime.camera(), &first_camera);
+
+    assert!(runtime.activate_slide(second_slide).unwrap());
+    assert_eq!(runtime.selection().ordered(), &[second_shape]);
+    assert_eq!(runtime.camera(), &second_camera);
+    assert!(matches!(
+        runtime.select_only(first_shape),
+        Err(RuntimeError::SlideSession(
+            crate::SlideSessionError::NodeOutsideActiveSlide { .. }
+        ))
+    ));
+}
+
+#[test]
+fn nested_frame_cannot_be_activated_as_a_slide() {
+    let document = build_fixture(FixtureKind::Editor).unwrap();
+    let mut runtime = EngineRuntime::new(document, Camera::default()).unwrap();
+    let active = runtime.active_slide_id().unwrap();
+    let nested = NodeId::new();
+    runtime
+        .dispatch(Command::CreateNode {
+            spec: NodeSpec::frame(nested, "Nested Frame", Vec2::new(640.0, 360.0)),
+            parent: active,
+            index: 0,
+        })
+        .unwrap();
+    let revision = runtime.document_revision();
+    assert!(matches!(
+        runtime.activate_slide(nested),
+        Err(RuntimeError::SlideSession(
+            crate::SlideSessionError::NotSlide(id)
+        )) if id == nested
+    ));
+    assert_eq!(runtime.document_revision(), revision);
+    assert_eq!(runtime.active_slide_id(), Some(active));
+}
