@@ -42,6 +42,18 @@ export interface ProjectionDelta {
   structural_ops: StructuralProjectionOperation[];
 }
 
+export interface SlideSummary {
+  id: string;
+  index: number;
+  name: string;
+  width: number;
+  height: number;
+  aspect_ratio: number;
+  active: boolean;
+  thumbnail_revision: number;
+  child_count: number;
+}
+
 export interface EngineResponse {
   type: "engine_response";
   protocol_version: number;
@@ -55,6 +67,11 @@ export interface EngineResponse {
   fixture: string;
   revisions: { document: number; scene: number; render: number };
   projection: ProjectionDelta;
+  editor_session: {
+    active_slide_id: string | null;
+    slides: SlideSummary[];
+    preserved_root_items: string[];
+  };
   selection: { ordered: string[]; primary: string | null };
   history: { undo_depth: number; redo_depth: number; transaction_active: boolean };
   camera: { center: [number, number]; zoom: number; viewport: [number, number]; dpr: number };

@@ -39,6 +39,7 @@ function response(full: boolean, upserts: ProjectionNode[], removed: string[] = 
     fixture: "test",
     revisions: { document: 1, scene: 1, render: 1 },
     projection: { schema_version: 2, full, upserts, removed, structural_ops: structuralOps },
+    editor_session: { active_slide_id: null, slides: [], preserved_root_items: [] },
     selection: { ordered: [], primary: null },
     history: { undo_depth: 0, redo_depth: 0, transaction_active: false },
     camera: { center: [0, 0], zoom: 1, viewport: [100, 100], dpr: 1 },

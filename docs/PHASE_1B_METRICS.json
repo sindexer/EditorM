@@ -1,0 +1,52 @@
+{
+  "phase": "1B",
+  "captured_at_utc": "2026-08-20T08:45:14.5403013Z",
+  "proof_kind": "structural-work-counters",
+  "fixture": {
+    "slide_count": 30,
+    "primitives_per_slide": 100,
+    "document_nodes": 3031
+  },
+  "active_slide_switch": {
+    "document_revision_delta": 0,
+    "scene_revision_delta": 0,
+    "render_revision_delta": 0,
+    "document_full_clones": 0,
+    "render_full_rebuilds": 0,
+    "passed": true
+  },
+  "thumbnail_cull": {
+    "render_items_read": 101,
+    "exact_visible": 101,
+    "full_render_model_scans": 0,
+    "passed": true
+  },
+  "single_node_edit": {
+    "changed_thumbnail_revisions": 1,
+    "render_full_rebuilds": 0,
+    "full_render_model_scans": 0,
+    "render_items_cloned": 0,
+    "passed": true
+  },
+  "ui_bounds": {
+    "maximum_mounted_layer_timeline_rows": 25,
+    "maximum_thumbnail_renders_per_animation_frame": 1,
+    "thumbnail_priority_policy": "active-visible-remaining",
+    "passed": true
+  },
+  "actual_browser_cross_check": {
+    "artifact": "docs/verification/PHASE_1B_BROWSER_PROOF.json",
+    "captured_at_utc": "2026-08-20T09:33:07.023Z",
+    "actual_device": "NVIDIA GeForce GTX 970",
+    "thumbnail_captures": 8,
+    "thumbnail_invalidations": 7,
+    "cached_thumbnails": 3,
+    "pending_thumbnails": 0,
+    "thumbnail_errors": 0,
+    "queue_depth": 0,
+    "gpu_validation_errors": 0,
+    "fallback_rebuilds": 0,
+    "passed": true
+  },
+  "all_passed": true
+}
