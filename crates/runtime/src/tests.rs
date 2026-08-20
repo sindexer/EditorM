@@ -1609,3 +1609,84 @@ fn rejected_slide_mutations_leave_document_history_and_session_unchanged() {
     assert_eq!(runtime.editor_session(), &session_before);
     assert_eq!(runtime.active_slide_id(), Some(only));
 }
+
+#[test]
+fn active_slide_isolates_hit_query_selection_and_render_slots() {
+    let document = build_fixture(FixtureKind::Editor).unwrap();
+    let mut runtime = EngineRuntime::new(document, Camera::default()).unwrap();
+    let first = runtime.active_slide_id().unwrap();
+    let first_shape = rectangle(
+        &mut runtime,
+        first,
+        NodeId::new(),
+        Vec2::new(140.0, 100.0),
+        Affine2::translation(Vec2::new(80.0, 90.0)),
+    );
+    let second = NodeId::new();
+    runtime
+        .create_slide(second, "Slide 2".to_owned(), 1, Vec2::new(1920.0, 1080.0))
+        .unwrap();
+    let second_shape = rectangle(
+        &mut runtime,
+        second,
+        NodeId::new(),
+        Vec2::new(140.0, 100.0),
+        Affine2::translation(Vec2::new(80.0, 90.0)),
+    );
+
+    runtime.activate_slide(first).unwrap();
+    runtime.fit_active_slide(48.0).unwrap();
+    let first_world = WorldPoint(
+        runtime
+            .document()
+            .local_to_world(first_shape, Vec2::new(70.0, 50.0))
+            .unwrap(),
+    );
+    let first_bounds = runtime
+        .scene()
+        .node(first_shape)
+        .unwrap()
+        .own_world_bounds()
+        .unwrap();
+    let first_viewport = runtime.camera().world_to_viewport(first_world).unwrap();
+    let first_hit = runtime.hit_test_viewport(first_viewport).unwrap();
+    assert!(first_hit.all().contains(&first_shape));
+    assert!(!first_hit.all().contains(&second_shape));
+    let first_query = runtime.query_world_rect(first_bounds).unwrap();
+    assert!(first_query.ids().contains(&first_shape));
+    assert!(!first_query.ids().contains(&second_shape));
+    let first_cull = runtime.cull_viewport().unwrap();
+    assert!(first_cull.ids_top_to_bottom.contains(&first_shape));
+    assert!(!first_cull.ids_top_to_bottom.contains(&second_shape));
+    assert!(matches!(
+        runtime.select_only(second_shape),
+        Err(RuntimeError::SlideSession(
+            crate::SlideSessionError::NodeOutsideActiveSlide { .. }
+        ))
+    ));
+
+    runtime.activate_slide(second).unwrap();
+    runtime.fit_active_slide(48.0).unwrap();
+    let second_world = WorldPoint(
+        runtime
+            .document()
+            .local_to_world(second_shape, Vec2::new(70.0, 50.0))
+            .unwrap(),
+    );
+    let second_bounds = runtime
+        .scene()
+        .node(second_shape)
+        .unwrap()
+        .own_world_bounds()
+        .unwrap();
+    let second_viewport = runtime.camera().world_to_viewport(second_world).unwrap();
+    let second_hit = runtime.hit_test_viewport(second_viewport).unwrap();
+    assert!(second_hit.all().contains(&second_shape));
+    assert!(!second_hit.all().contains(&first_shape));
+    let second_query = runtime.query_world_rect(second_bounds).unwrap();
+    assert!(second_query.ids().contains(&second_shape));
+    assert!(!second_query.ids().contains(&first_shape));
+    let second_cull = runtime.cull_viewport().unwrap();
+    assert!(second_cull.ids_top_to_bottom.contains(&second_shape));
+    assert!(!second_cull.ids_top_to_bottom.contains(&first_shape));
+}

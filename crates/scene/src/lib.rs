@@ -652,6 +652,54 @@ impl ComputedScene {
         })
     }
 
+    #[must_use]
+    pub fn node_belongs_to_subtree(&self, node: NodeId, root: NodeId) -> bool {
+        let mut current = Some(node);
+        for _ in 0..=self.nodes.len() {
+            let Some(id) = current else {
+                return false;
+            };
+            if id == root {
+                return true;
+            }
+            current = self.nodes.get(&id).and_then(SceneNode::parent);
+        }
+        false
+    }
+
+    pub fn query_rect_candidates_in_subtree(
+        &mut self,
+        bounds: Rect,
+        root: NodeId,
+    ) -> Result<SceneQueryResult, SceneError> {
+        if !self.nodes.contains_key(&root) {
+            return Err(SceneError::MissingSceneNode(root));
+        }
+        let query = self.spatial.query_rect(bounds)?;
+        let mut ids = query
+            .ids()
+            .iter()
+            .copied()
+            .filter(|id| self.node_belongs_to_subtree(*id, root))
+            .collect::<Vec<_>>();
+        let (order_nodes_visited, sibling_search_steps) = self.sort_top_to_bottom(&mut ids);
+        let stats = SceneUpdateStats {
+            spatial_candidate_count: query.candidate_count() as u64,
+            order_nodes_visited,
+            sibling_search_steps,
+            document_revision: self.scene_revision,
+            scene_revision: self.scene_revision,
+            ..SceneUpdateStats::default()
+        };
+        self.finish_stats(stats);
+        Ok(SceneQueryResult {
+            candidate_count: query.candidate_count(),
+            ids,
+            order_nodes_visited,
+            sibling_search_steps,
+        })
+    }
+
     pub fn hit_test_world_point(
         &mut self,
         document: &Document,
@@ -661,6 +709,46 @@ impl ComputedScene {
         let mut hits = Vec::new();
         let mut exact = 0_usize;
         for id in query.ids() {
+            exact += 1;
+            if self.exact_hit(document, *id, point) {
+                hits.push(*id);
+            }
+        }
+        let (order_nodes_visited, sibling_search_steps) = self.sort_top_to_bottom(&mut hits);
+        let stats = SceneUpdateStats {
+            spatial_candidate_count: query.candidate_count() as u64,
+            exact_geometry_hit_test_count: exact as u64,
+            order_nodes_visited,
+            sibling_search_steps,
+            document_revision: self.scene_revision,
+            scene_revision: self.scene_revision,
+            ..SceneUpdateStats::default()
+        };
+        self.finish_stats(stats);
+        Ok(HitTestResult {
+            topmost: hits.first().copied(),
+            all: hits,
+            candidate_count: query.candidate_count(),
+            exact_geometry_test_count: exact,
+        })
+    }
+
+    pub fn hit_test_world_point_in_subtree(
+        &mut self,
+        document: &Document,
+        point: Vec2,
+        root: NodeId,
+    ) -> Result<HitTestResult, SceneError> {
+        if !self.nodes.contains_key(&root) {
+            return Err(SceneError::MissingSceneNode(root));
+        }
+        let query = self.spatial.query_point(point)?;
+        let mut hits = Vec::new();
+        let mut exact = 0_usize;
+        for id in query.ids() {
+            if !self.node_belongs_to_subtree(*id, root) {
+                continue;
+            }
             exact += 1;
             if self.exact_hit(document, *id, point) {
                 hits.push(*id);

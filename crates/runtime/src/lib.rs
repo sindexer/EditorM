@@ -291,18 +291,33 @@ impl EngineRuntime {
         point: ViewportPoint,
     ) -> Result<HitTestResult, RuntimeError> {
         let world = self.camera.viewport_to_world(point)?;
-        Ok(self
-            .scene
-            .hit_test_world_point(self.core.document(), world.0)?)
+        let active = self.active_slide_id();
+        Ok(if let Some(slide) = active {
+            self.scene
+                .hit_test_world_point_in_subtree(self.core.document(), world.0, slide)?
+        } else {
+            self.scene
+                .hit_test_world_point(self.core.document(), world.0)?
+        })
     }
 
     pub fn query_world_rect(&mut self, bounds: Rect) -> Result<SceneQueryResult, RuntimeError> {
-        Ok(self.scene.query_rect_candidates(bounds)?)
+        let active = self.active_slide_id();
+        Ok(if let Some(slide) = active {
+            self.scene.query_rect_candidates_in_subtree(bounds, slide)?
+        } else {
+            self.scene.query_rect_candidates(bounds)?
+        })
     }
 
     pub fn cull_viewport(&mut self) -> Result<CullingResult, RuntimeError> {
         let world_viewport = self.camera.world_viewport_bounds()?;
-        Ok(self.render.cull(&mut self.scene, world_viewport)?)
+        Ok(if let Some(slide) = self.active_slide_id() {
+            self.render
+                .cull_subtree(&mut self.scene, world_viewport, slide)?
+        } else {
+            self.render.cull(&mut self.scene, world_viewport)?
+        })
     }
 
     pub fn select_only(&mut self, id: NodeId) -> Result<(), RuntimeError> {
