@@ -1,0 +1,40 @@
+{
+  "phase": "1C",
+  "proof_kind": "actual-browser-gate-failure",
+  "gate_run_id": "phase1c-20260822-1958-kst-r4",
+  "tested_source_commit": "38c5c56f",
+  "tested_branch": "feat/phase1c-direct-editing",
+  "execution": {
+    "command": "npm run test:browser:phase1c",
+    "started_at_utc": "2026-08-22T10:57:42.964Z",
+    "finished_at_utc": "2026-08-22T10:58:21.409Z",
+    "exit_status": 1
+  },
+  "code": "gesture_did_not_start",
+  "message": "Timed out waiting for window.__PHASE0E_PROOF__?.fsm === 'Moving'",
+  "details": {},
+  "browser_diagnostics": {
+    "tool": "select",
+    "fsm": "Idle",
+    "camera": {
+      "center": [
+        0,
+        0
+      ],
+      "dpr": 2,
+      "viewport": [
+        1040,
+        863
+      ],
+      "zoom": 2
+    },
+    "shell": {
+      "x": 280,
+      "y": 84,
+      "width": 1040,
+      "height": 863
+    }
+  },
+  "console_errors": [],
+  "chrome_stderr_tail": "\r\nDevTools listening on ws://127.0.0.1:9009/devtools/browser/b95bc110-60b0-4c6d-8c9c-88e2c69a35aa\r\n[23584:13204:0822/195746.040:ERROR:components\\device_event_log\\device_event_log_impl.cc:200] [19:57:46.052] USB: usb_service_win.cc:108 SetupDiGetDeviceProperty({{A45C254E-DF1C-4EFD-8020-67D146A850E0}, 6}) failed: 요소가 없습니다. (0x490)\r\n[23584:4908:0822/195746.649:ERROR:google_apis\\gcm\\engine\\registration_request.cc:291] Registration response error message: DEPRECATED_ENDPOINT\r\nCreated TensorFlow Lite XNNPACK delegate for CPU.\r\n[23584:4908:0822/195810.146:ERROR:google_apis\\gcm\\engine\\registration_request.cc:291] Registration response error message: DEPRECATED_ENDPOINT\r\n"
+}

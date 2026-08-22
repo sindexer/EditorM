@@ -159,6 +159,10 @@ button:disabled { cursor: not-allowed; color: var(--ui-label-assistive) !importa
 .arrange-button.snap-toggle.is-active { color: var(--ui-primary); background: var(--ui-primary-soft); border-color: rgba(0, 102, 255, 0.12); }
 .transform-handle-hit { position: absolute; width: 20px; height: 20px; padding: 0; border: 0; border-radius: 50%; background: transparent; transform: translate(-50%, -50%); z-index: 4; }
 .resize-hit { cursor: nwse-resize; }
+.resize-n, .resize-s { cursor: ns-resize; }
+.resize-e, .resize-w { cursor: ew-resize; }
+.resize-ne, .resize-sw { cursor: nesw-resize; }
+.resize-nw, .resize-se { cursor: nwse-resize; }
 .rotate-hit { cursor: grab; }
 .canvas-loading { position: absolute; inset: 0; display: grid; place-content: center; grid-auto-flow: column; gap: 9px; color: #dce5f3; background: rgba(9, 14, 20, 0.74); font-size: 12px; }
 .spinner { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,.25); border-top-color: white; border-radius: 50%; animation: spin .8s linear infinite; }

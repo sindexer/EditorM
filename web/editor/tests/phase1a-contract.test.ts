@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, test } from "vitest";
-import { transformAffinePoint } from "../src/affine";
+import { inverseTransformAffinePoint, transformAffinePoint } from "../src/affine";
 
 const editorRoot = path.resolve(process.cwd());
 const workspace = path.resolve(editorRoot, "../..");
@@ -77,7 +77,8 @@ describe("Phase 1A visible frame and primitive appearance contract", () => {
     const actual = transformAffinePoint(matrix, point);
     expect(actual).toEqual([102, 231]);
     expect(actual).not.toEqual([140, 197]);
-    expect(app).toContain("transformAffinePoint(currentNode.world_transform!");
+    expect(inverseTransformAffinePoint(matrix, actual)).toEqual(point);
+    expect(app).toContain("transformAffinePoint(node.world_transform!");
     expect(shader).toContain("item.linear.x * local.x + item.linear.y * local.y");
     expect(shader).toContain("item.linear.z * local.x + item.linear.w * local.y");
     expect(browserProof).toContain("matrix[0] * x + matrix[1] * y + matrix[4]");

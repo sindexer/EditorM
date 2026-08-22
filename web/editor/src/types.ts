@@ -56,6 +56,7 @@ export interface EngineResponse {
   revisions: { document: number; scene: number; render: number };
   projection: ProjectionDelta;
   selection: { ordered: string[]; primary: string | null };
+  active_root: string;
   history: { undo_depth: number; redo_depth: number; transaction_active: boolean };
   camera: { center: [number, number]; zoom: number; viewport: [number, number]; dpr: number };
   culling: Record<string, number>;

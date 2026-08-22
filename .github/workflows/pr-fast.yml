@@ -161,6 +161,16 @@ jobs:
         run: ./tools/build-phase0e-wasm.ps1 -OutDir target/ci-wasm-pkg
       - name: Verify fresh bindings, ABI, protocol, and EngineHost initialization
         run: node tools/ci-wasm-smoke.mjs --pkg target/ci-wasm-pkg
+      - name: Bind fresh WASM artifact to the source commit
+        shell: pwsh
+        run: Set-Content -LiteralPath target/ci-wasm-pkg/SOURCE_COMMIT -Encoding utf8NoBOM -NoNewline -Value '${{ github.event.pull_request.head.sha }}'
+      - name: Upload source-bound fresh WASM package
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: phase1c-wasm-${{ github.event.pull_request.head.sha }}
+          path: target/ci-wasm-pkg
+          if-no-files-found: error
+          retention-days: 3
       - name: Summarize WASM cache and duration
         if: always()
         shell: pwsh

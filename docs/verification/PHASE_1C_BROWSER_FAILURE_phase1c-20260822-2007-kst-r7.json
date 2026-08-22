@@ -1,0 +1,128 @@
+{
+  "phase": "1C",
+  "proof_kind": "actual-browser-gate-failure",
+  "gate_run_id": "phase1c-20260822-2007-kst-r7",
+  "tested_source_commit": "29018ee0f105161c2844a509cd8a0f89499c74fb",
+  "tested_branch": "feat/phase1c-direct-editing",
+  "started_at_utc": "2026-08-22T11:04:58.198Z",
+  "finished_at_utc": "2026-08-22T11:05:07.234Z",
+  "command": "npm run test:browser:phase1c",
+  "exit_status": 1,
+  "browser": "Chrome/151.0.7922.170",
+  "gpu": {
+    "adapter": "ampere",
+    "active_device": {
+      "vendorId": 4318,
+      "deviceId": 8708,
+      "subSysId": 1077613656,
+      "revision": 161,
+      "vendorString": "",
+      "deviceString": "NVIDIA GeForce RTX 3090",
+      "driverVendor": "NVIDIA",
+      "driverVersion": "32.0.15.9186"
+    },
+    "software_renderer": false
+  },
+  "wasm": {
+    "path": "web/editor/public/pkg/engine_host_bg.wasm",
+    "bytes": 1436282,
+    "sha256": "1ea84a4b71507a9dc87bfba6c3b47d9feef3eaf39bfc4650857a62f025c1a2fa",
+    "protocol_version": 1,
+    "render_binary_schema_version": 2
+  },
+  "preview": {
+    "url": "http://127.0.0.1:3877/",
+    "health": {
+      "ok": true,
+      "phase": "0E"
+    },
+    "assets": {
+      "worker.js": {
+        "status": 200,
+        "content_type": "text/javascript; charset=utf-8"
+      },
+      "pkg/engine_host.js": {
+        "status": 200,
+        "content_type": "text/javascript; charset=utf-8"
+      },
+      "pkg/engine_host_bg.wasm": {
+        "status": 200,
+        "content_type": "application/wasm"
+      }
+    }
+  },
+  "interactions": {
+    "rectangles": [
+      "4072ea75-e01e-41e1-b102-530dba85f071",
+      "4cefccd5-6ca5-475c-aa29-c291838512cc",
+      "a8bbb689-3788-44cd-a0e7-b2b7123e3b26"
+    ],
+    "move_deltas": [
+      [
+        99.8854927062988,
+        48.025000000000034
+      ],
+      [
+        99.8854927062988,
+        48.02499999999998
+      ]
+    ],
+    "rotation_degrees": [
+      90.0000312246597,
+      90.0000312246597
+    ],
+    "distribution_gaps": [
+      99.88543163935338,
+      99.88543163935338
+    ],
+    "dpr_zoom_matrix": [
+      {
+        "dpr": 1,
+        "zoom": 0.5,
+        "engine_dpr": 1,
+        "snap_error_world": 0,
+        "passed": true
+      },
+      {
+        "dpr": 2,
+        "zoom": 2,
+        "engine_dpr": 2,
+        "snap_error_world": 0,
+        "passed": true
+      }
+    ]
+  },
+  "screenshot": {
+    "path": "docs/verification/phase1c-direct-editing-failure-phase1c-20260822-2007-kst-r7.png",
+    "bytes": 63723
+  },
+  "console_errors": [],
+  "chrome_stderr_tail": "\r\nDevTools listening on ws://127.0.0.1:3882/devtools/browser/34075244-0e93-4ce4-8f59-76d1223c6f64\r\n[42284:25852:0822/200501.252:ERROR:components\\device_event_log\\device_event_log_impl.cc:200] [20:05:01.264] USB: usb_service_win.cc:108 SetupDiGetDeviceProperty({{A45C254E-DF1C-4EFD-8020-67D146A850E0}, 6}) failed: 요소가 없습니다. (0x490)\r\n[42284:53492:0822/200501.884:ERROR:google_apis\\gcm\\engine\\registration_request.cc:291] Registration response error message: DEPRECATED_ENDPOINT\r\n",
+  "checks": {
+    "actual_chrome": true,
+    "actual_nvidia_gtx_970": false,
+    "dedicated_worker_wasm": true,
+    "actual_webgpu_no_fallback": true,
+    "active_slide_root_excluded": true,
+    "shift_click_selection": true,
+    "layers_canvas_synchronized": false,
+    "marquee_selection": true,
+    "multi_move_relative_position_and_one_undo": true,
+    "escape_rolls_back": true,
+    "aggregate_resize_and_one_undo": true,
+    "clockwise_rotation_positive_and_one_undo": true,
+    "shift_rotation_15_degrees": true,
+    "alignment_one_undo": true,
+    "distribution_equal_gaps": true,
+    "group_and_ungroup_preserve_world": true,
+    "inspector_mixed_apply": true,
+    "invalid_numeric_fail_closed": true,
+    "dpr_zoom_snap_matrix": true,
+    "console_errors_zero": true,
+    "gpu_validation_errors_zero": true,
+    "response_gpu_overlay_sequences_match": true
+  },
+  "fail_count": 2,
+  "unverified_count": 0,
+  "all_passed": false
+}
