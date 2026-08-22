@@ -7,7 +7,7 @@ import { fileURLToPath } from "node:url";
 const scriptPath = fileURLToPath(import.meta.url);
 const scriptRoot = path.dirname(scriptPath);
 const defaultWorkspace = path.resolve(scriptRoot, "../../..");
-const EXPECTED_BRANCH = "claude/editorm-technical-spec-itwm6l";
+export const EXPECTED_BRANCH = "main";
 const VALID_STATUSES = new Set(["PASS", "FAIL", "UNVERIFIED"]);
 
 const RELATIVE_PATHS = {
