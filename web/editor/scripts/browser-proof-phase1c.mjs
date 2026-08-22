@@ -343,8 +343,8 @@ try {
     const canvasMetrics = await boundsFor(".webgpu-canvas");
     await send("camera", { camera: { kind: "resize", width: canvasMetrics.width, height: canvasMetrics.height, dpr } });
     await waitFor(`window.__PHASE0E_PROOF__?.camera?.dpr === ${dpr}`, 30000, "camera_dpr_not_applied");
-    const camera = await proof();
-    await send("camera", { camera: { kind: "zoom", x: camera.camera.viewport[0] / 2, y: camera.camera.viewport[1] / 2, zoom } });
+    const zoomAnchor = await clientForNode(rectangles[0]);
+    await send("camera", { camera: { kind: "zoom", x: zoomAnchor.x - canvasMetrics.x, y: zoomAnchor.y - canvasMetrics.y, zoom } });
     const matrixNodes = await nodes(); const first = matrixNodes.get(rectangles[0]); const anchor = matrixNodes.get(rectangles[1]);
     await send("selection", { mode: "replace", target: rectangles[0] });
     const matrixHistory = (await proof()).history.undo_depth;
