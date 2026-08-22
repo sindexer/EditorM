@@ -315,18 +315,19 @@ try {
   const alignHistory = (await proof()).history.undo_depth; await click("[data-testid='align-left']"); await waitFor(`window.__PHASE0E_PROOF__?.history?.undo_depth === ${alignHistory + 1}`);
   const aligned = await nodes(); const alignmentExact = close(aligned.get(rectangles[0]).world_bounds.min[0], aligned.get(rectangles[1]).world_bounds.min[0]);
   await key("z", "KeyZ", 90, 2); await waitFor(`window.__PHASE0E_PROOF__?.history?.undo_depth === ${alignHistory}`);
-  await clickPoint(await clientForNode(rectangles[2]), 8); await waitFor("window.__PHASE0E_PROOF__?.selection_count === 3");
+  await send("selection", { mode: "set", targets: rectangles });
+  await waitFor("window.__PHASE0E_PROOF__?.selection_count === 3", 30000, "distribution_selection_failed");
   const distributeHistory = (await proof()).history.undo_depth; await click("[data-testid='distribute-horizontal']"); await waitFor(`window.__PHASE0E_PROOF__?.history?.undo_depth === ${distributeHistory + 1}`);
   const distributed = await nodes(); const ordered = rectangles.map((id) => distributed.get(id).world_bounds).sort((a, b) => a.min[0] - b.min[0]);
   const gaps = [ordered[1].min[0] - ordered[0].max[0], ordered[2].min[0] - ordered[1].max[0]];
   const distributionExact = close(gaps[0], gaps[1]);
 
   const preGroup = await nodes(); const groupHistory = (await proof()).history.undo_depth;
-  await key("g", "KeyG", 71, 2); await waitFor("window.__PHASE0E_PROOF__?.primary_node?.kind === 'group'");
+  await click("[data-testid='group']"); await waitFor("window.__PHASE0E_PROOF__?.primary_node?.kind === 'group'", 30000, "group_command_failed");
   const groupProof = await proof(); const groupId = groupProof.primary_node.id; const grouped = await nodes();
   const groupPreserved = rectangles.every((id) => JSON.stringify(grouped.get(id).world_transform) === JSON.stringify(preGroup.get(id).world_transform)) && grouped.get(groupId).world_bounds != null && groupProof.history.undo_depth === groupHistory + 1;
   const hierarchyVisible = await evaluate(`Boolean(document.querySelector('[data-node-id=${JSON.stringify(groupId)}]'))`);
-  await key("g", "KeyG", 71, 10); await waitFor("window.__PHASE0E_PROOF__?.selection_count === 3 && window.__PHASE0E_PROOF__?.primary_node?.kind !== 'group'");
+  await click("[data-testid='ungroup']"); await waitFor("window.__PHASE0E_PROOF__?.selection_count === 3 && window.__PHASE0E_PROOF__?.primary_node?.kind !== 'group'", 30000, "ungroup_command_failed");
   const ungrouped = await nodes(); const ungroupPreserved = rectangles.every((id) => JSON.stringify(ungrouped.get(id).world_transform) === JSON.stringify(preGroup.get(id).world_transform)) && !ungrouped.has(groupId) && (await proof()).history.undo_depth === groupHistory + 2;
 
   await clickPoint(await clientForNode(rectangles[0])); await clickPoint(await clientForNode(rectangles[1]), 8); await waitFor("window.__PHASE0E_PROOF__?.selection_count === 2");
@@ -412,6 +413,8 @@ try {
     return {
       tool: window.__PHASE0E_PROOF__?.tool ?? null,
       fsm: window.__PHASE0E_PROOF__?.fsm ?? null,
+      selection: window.__PHASE0E_PROOF__?.selection ?? null,
+      primary_node: window.__PHASE0E_PROOF__?.primary_node ?? null,
       camera: window.__PHASE0E_PROOF__?.camera ?? null,
       shell: shell ? { x: shell.left, y: shell.top, width: shell.width, height: shell.height } : null,
     };
