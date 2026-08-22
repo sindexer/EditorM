@@ -22,6 +22,11 @@ const gluePath = path.join(webRoot, "public", "pkg", "engine_host.js");
 const wasmPath = path.join(webRoot, "public", "pkg", "engine_host_bg.wasm");
 const outputPath = path.join(workspace, "docs", "PHASE_1B_METRICS_ENGINE_ONLY.json");
 const startedAt = new Date().toISOString();
+const gateEvidence = {
+  gate_run_id: process.env.PHASE1B_GATE_RUN_ID ?? null,
+  tested_source_commit: process.env.PHASE1B_GATE_SOURCE_COMMIT ?? null,
+  tested_branch: process.env.PHASE1B_GATE_SOURCE_BRANCH ?? null,
+};
 
 const OBJECT_COUNTS = [10, 100, 1000];
 const FRAMES_PER_DRAG = 5;
@@ -153,6 +158,7 @@ const checks = {
 
 const report = {
   phase: "1B",
+  ...gateEvidence,
   proof_kind: "actual-wasm-engine-only-multi-drag",
   gpu_evidence: false,
   browser_evidence: false,

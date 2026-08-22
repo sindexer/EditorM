@@ -1,90 +1,122 @@
 # Phase 1B Hardware Verification Run
 
-Gate 1B needs evidence that can only be produced on a machine with a real GPU. Everything in this
-document is written to be run as-is on the Windows workstation that produced the Phase 1A
-hardware evidence. Nothing here has been executed in the container that prepared this branch; see
-[PHASE_1B_GATE_STATUS.json](verification/PHASE_1B_GATE_STATUS.json) for what is still UNVERIFIED.
+Gate 1B requires a Windows workstation with a real hardware GPU. The branch-preparation environment
+cannot produce that evidence, so Gate 1B remains **NOT PASSED** until this runner succeeds on the
+GTX 970 workstation. Software GPU output is diagnostic only and can never satisfy the Gate.
 
 ## Prerequisites
 
-- Google Chrome with working WebGPU (the Phase 1A run used Chrome 151 on an NVIDIA GeForce GTX 970).
-- The pinned Rust toolchain and the verified `wasm-bindgen` 0.2.126 CLI, as in Phase 1A.
-- No other Chrome instance is required; each harness starts its own process with a throwaway profile.
+- Check out `claude/editorm-technical-spec-itwm6l` with no production or harness changes after the
+  commit that will be tested.
+- Install Google Chrome with working WebGPU. Set `PHASE0E_CHROME` only when Chrome is not at
+  `C:\Program Files\Google\Chrome\Application\chrome.exe`.
+- Install the pinned Rust toolchain and `wasm-bindgen` 0.2.126. The existing `VAE_TOOL_ROOT` and
+  `VAE_WASM_BINDGEN` overrides remain supported.
+- Start in the repository root. Do not enter `web/editor` manually.
 
-    $env:VAE_TOOL_ROOT='C:\path\to\WebEditor\.tools'
-    # Only if Chrome is not at the default location the harnesses assume:
-    $env:PHASE0E_CHROME='C:\Program Files\Google\Chrome\Application\chrome.exe'
+## Single Windows command
 
-## 1. Rebuild the engine and the pinned WASM package
+Run exactly this command from the repository root:
 
-    powershell -NoProfile -ExecutionPolicy Bypass -File tools/cargo.ps1 fmt --all -- --check
-    powershell -NoProfile -ExecutionPolicy Bypass -File tools/cargo.ps1 clippy --workspace --all-targets -- -D warnings
-    powershell -NoProfile -ExecutionPolicy Bypass -File tools/cargo.ps1 build --workspace --all-targets
-    powershell -NoProfile -ExecutionPolicy Bypass -File tools/cargo.ps1 test --workspace --all-targets
-    powershell -NoProfile -ExecutionPolicy Bypass -File tools/build-phase0e-wasm.ps1
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File tools/run-phase1b-gate.ps1
+```
 
-## 2. Phase 1A regression re-run
+The runner enters `web/editor` exactly once. There is no repeated `cd web/editor`, and users do not
+need to copy a sequence of npm commands by hand.
 
-    cd web/editor
-    npm.cmd ci
-    npm.cmd run test:browser:phase1a
+## Recorded run identity and environment
 
-Evidence written:
+Before validation starts, `docs/verification/PHASE_1B_GATE_RUN.json` records:
 
-- `docs/verification/PHASE_1A_BROWSER_PROOF.json`
-- `docs/verification/PHASE_1A_PIXEL_READBACK.json`
-- `docs/verification/phase1a-*.png`
+- the Gate run ID, full tested Git commit SHA, tested branch, and UTC start time;
+- Windows version, Chrome executable, Node version, Rust toolchain, Cargo/Rust versions, and
+  `wasm-bindgen` version;
+- the initial Git status and every unexpected non-evidence path.
 
-A failing run writes `docs/verification/PHASE_1A_BROWSER_FAILURE.json` instead. Preserve the
-failure file; do not overwrite the previously committed Phase 1A evidence with a passing rerun
-unless the gate reviewer asks for a refreshed capture.
+The runner exports `PHASE1B_GATE_RUN_ID`, `PHASE1B_GATE_SOURCE_COMMIT`, and
+`PHASE1B_GATE_SOURCE_BRANCH` to every child process. Browser, pixel, benchmark, direct-WASM, and
+final Gate JSON records must carry the same values. An initially dirty source tree is printed. Any
+production or harness change fails the Gate; pre-existing verification artifacts are reported and
+may remain dirty.
 
-## 3. Phase 1B browser and WebGPU proof
+## Fail-closed execution order
 
-    cd web/editor
-    npm.cmd run test:browser:phase1b
+The runner stops on the first failed step and records that failure. The order is fixed:
 
-This builds the editor, starts the preview server on a free port, launches a new Chrome process
-with a throwaway profile, and drives the real Editor through pointer and keyboard input only. It
-verifies, in the browser: shift multi-selection, rubber-band selection, `Ctrl+A`, multi-object
-drag, drift-free coalesced drag over 64 pointer frames, edge/center snapping, Alt snap suspend,
-the snap toggle, snap-guide rendering, all six align operations, both distribute operations,
-arrange-then-undo, and multi-drag-then-undo. It then runs the multi-selection drag benchmark for
-10, 100, and 1,000 objects with snapping off and on.
+1. `tools/cargo.ps1 fmt --all -- --check`
+2. `tools/cargo.ps1 clippy --workspace --all-targets -- -D warnings`
+3. `tools/cargo.ps1 build --workspace --all-targets`
+4. `tools/cargo.ps1 test --workspace --all-targets`
+5. `tools/build-phase0e-wasm.ps1`
+6. Enter `web/editor` once and run `npm.cmd ci`.
+7. Run `npm.cmd run test:browser:phase1a`.
+8. Run `npm.cmd run test:browser:phase1b` through real Chrome/CDP input -> React Editor ->
+   Dedicated Worker -> shipped WASM -> WebGPU -> hardware GPU.
+9. Run `npm.cmd run test:direct-wasm:phase1b`.
+10. Run `npm.cmd run bench:multi-drag:phase1b`.
+11. Run `npm.cmd run build`.
+12. Run `npm.cmd run finalize:gate:phase1b`.
+13. Run `npm.cmd test` only after the generated Gate status is current.
 
-Evidence written:
+The finalizer order is intentional. A successful browser harness creates
+`PHASE_1B_BROWSER_PROOF.json`; the default Gate guard therefore runs only after the finalizer has
+calculated `PHASE_1B_GATE_STATUS.json` from that proof and the other current-run evidence.
 
-- `docs/verification/PHASE_1B_BROWSER_PROOF.json` — the run, its checks, and the GPU adapter.
-- `docs/verification/PHASE_1B_PIXEL_READBACK.json` — pixel evidence for the selection outline,
-  union bounds, rubber band, snap guide, and the dragged rectangle on the WebGPU surface.
-- `docs/PHASE_1B_METRICS.json` — the browser-side multi-drag benchmark.
-- `docs/verification/phase1b-multi-selection.png`, `phase1b-marquee.png`, `phase1b-snap-guide.png`,
-  `phase1b-aligned.png`, `phase1b-distributed.png`.
+## Automatic finalization
 
-A failing run writes `docs/verification/PHASE_1B_BROWSER_FAILURE.json` and exits non-zero. The
-harness fails closed: no WebGPU, a software renderer, a Worker or WASM failure, a fallback
-rebuild, or a console error all stop the run instead of degrading it.
+Do not hand-edit `PHASE_1B_GATE_STATUS.json`. The finalizer reads the evidence and calculates every
+item as `PASS`, `FAIL`, or `UNVERIFIED`, then derives the summary counts. `gate_conclusion` is
+`PASSED` only when there are no failed or unverified items and every required item is `PASS`.
 
-The harness rejects software renderers by design. `PHASE1B_ALLOW_SOFTWARE_GPU=1` runs it anyway
-for diagnostics and writes to `*_SOFTWARE_RUN.json` paths that are explicitly not gate evidence.
-`PHASE1B_NO_SANDBOX=1` exists only for root containers and is never needed on Windows.
+It verifies at minimum:
 
-## 4. Engine-side checks that do not need a GPU
+- a passing current-run Phase 1A browser regression;
+- actual Chrome, Dedicated Worker, initialized WASM, actual WebGPU, and
+  `gpu.software_renderer === false` in the Phase 1B browser proof;
+- passing pixel evidence;
+- snapped and unsnapped 10/100/1,000 browser benchmark series, retaining the 16.7 ms thresholds
+  for 10 and 100 only;
+- the direct-WASM 46/46 proof, engine benchmark, and complete runner prerequisite sequence;
+- one Gate run ID, source commit, and branch across every evidence artifact.
 
-    cd web/editor
-    npm.cmd run test:direct-wasm:phase1b
-    npm.cmd run bench:multi-drag:phase1b
-    npm.cmd test
-    npm.cmd run build
+One thousand dragged objects remain a measurement with no new Gate threshold.
 
-Evidence written: `docs/verification/PHASE_1B_DIRECT_WASM_PROOF.json` and
-`docs/PHASE_1B_METRICS_ENGINE_ONLY.json`. These already passed in the preparing container and are
-committed; re-running them on Windows confirms the same result on the gate machine.
+## Tested commit and evidence commits
 
-## 5. Update the gate record
+An evidence-only commit may follow the tested source commit. The finalizer accepts this only when
+the tested commit is an ancestor of the current HEAD and every later committed or uncommitted path
+is Gate evidence under `docs/verification/`, the Phase 1B metrics files, or Gate review evidence.
+Any production or harness change after the tested commit invalidates the hardware proof and
+requires a new hardware run.
 
-After the hardware runs, update `docs/verification/PHASE_1B_GATE_STATUS.json` so every item that
-now has evidence moves from `UNVERIFIED` to `PASS` or `FAIL`, set `browser_proof_present` to true,
-and set `gate_conclusion`. `web/editor/tests/phase1b-gate-status.test.ts` enforces that a `PASS`
-item names artifacts that exist and that no GPU-dependent item claims `PASS` while the browser
-proof artifact is missing, so the record cannot drift from the evidence.
+## Failure handling
+
+On failure the runner preserves the harness failure artifact, updates the run manifest, invokes the
+finalizer again, and leaves `gate_conclusion` as `NOT PASSED`. Its report includes the first failing
+step/assertion, related artifacts, Chrome/GPU diagnostics where available, source commit, and Gate
+run ID. Assertion failures are `FAIL`; only an unavailable hardware GPU may leave GPU-dependent
+items `UNVERIFIED`.
+
+`PHASE1B_ALLOW_SOFTWARE_GPU=1` remains diagnostic-only and writes separate `*_SOFTWARE_RUN.json`
+files. Such a run is never Gate evidence.
+
+## Successful evidence set
+
+A successful hardware run produces or refreshes at least:
+
+- Phase 1A browser regression evidence;
+- `docs/verification/PHASE_1B_BROWSER_PROOF.json`;
+- `docs/verification/PHASE_1B_PIXEL_READBACK.json`;
+- `docs/PHASE_1B_METRICS.json`;
+- `docs/verification/phase1b-multi-selection.png`;
+- `docs/verification/phase1b-marquee.png`;
+- `docs/verification/phase1b-snap-guide.png`;
+- `docs/verification/phase1b-aligned.png`;
+- `docs/verification/phase1b-distributed.png`;
+- `docs/verification/PHASE_1B_DIRECT_WASM_PROOF.json`;
+- `docs/PHASE_1B_METRICS_ENGINE_ONLY.json`;
+- `docs/verification/PHASE_1B_GATE_RUN.json`;
+- `docs/verification/PHASE_1B_GATE_STATUS.json`.
+
+Success requires `FAIL = 0`, `UNVERIFIED = 0`, and `gate_conclusion = PASSED`.

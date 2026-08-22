@@ -25,6 +25,11 @@ const scriptRoot = path.dirname(fileURLToPath(import.meta.url));
 const webRoot = path.resolve(scriptRoot, "..");
 const workspace = path.resolve(webRoot, "../..");
 const verificationRoot = path.join(workspace, "docs", "verification");
+const gateEvidence = {
+  gate_run_id: process.env.PHASE1B_GATE_RUN_ID ?? null,
+  tested_source_commit: process.env.PHASE1B_GATE_SOURCE_COMMIT ?? null,
+  tested_branch: process.env.PHASE1B_GATE_SOURCE_BRANCH ?? null,
+};
 const allowSoftwareGpu = process.env.PHASE1B_ALLOW_SOFTWARE_GPU === "1";
 // A software-GPU run can exercise the harness end to end, but it is never gate evidence, so it
 // is written to separate diagnostic paths and never overwrites the hardware proof artifacts.
@@ -844,6 +849,7 @@ async function runBenchmark(adapterLabel) {
   };
   const metrics = {
     phase: "1B",
+    ...gateEvidence,
     proof_kind: "actual-browser-worker-wasm-webgpu-multi-drag",
     captured_at_utc: new Date().toISOString(),
     adapter: adapterLabel,
@@ -1429,6 +1435,7 @@ try {
   };
   const pixelReadback = {
     phase: "1B",
+    ...gateEvidence,
     proof_kind: "actual-hardware-webgpu-and-composited-overlay-readback",
     captured_at_utc: new Date().toISOString(),
     surface_base_format: initial.surface_base_format,
@@ -1541,6 +1548,7 @@ try {
   const browserProofFinishedAtUtc = new Date().toISOString();
   const proof = {
     phase: "1B",
+    ...gateEvidence,
     proof_kind: allowSoftwareGpu
       ? "software-gpu-diagnostic-run-not-gate-evidence"
       : "actual-hardware-browser",
@@ -1649,6 +1657,7 @@ try {
     : null;
   const failure = {
     phase: "1B",
+    ...gateEvidence,
     captured_at_utc: new Date().toISOString(),
     execution: {
       command: "npm run test:browser:phase1b",

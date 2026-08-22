@@ -18,6 +18,11 @@ const gluePath = path.join(webRoot, "public", "pkg", "engine_host.js");
 const wasmPath = path.join(webRoot, "public", "pkg", "engine_host_bg.wasm");
 const outputPath = path.join(workspace, "docs", "verification", "PHASE_1B_DIRECT_WASM_PROOF.json");
 const startedAt = new Date().toISOString();
+const gateEvidence = {
+  gate_run_id: process.env.PHASE1B_GATE_RUN_ID ?? null,
+  tested_source_commit: process.env.PHASE1B_GATE_SOURCE_COMMIT ?? null,
+  tested_branch: process.env.PHASE1B_GATE_SOURCE_BRANCH ?? null,
+};
 
 function dummyImports(module) {
   const imports = {};
@@ -231,6 +236,7 @@ check("no_transaction_left_open", tooFew.history.transaction_active === false, t
 const finalState = call("heartbeat");
 const report = {
   phase: "1B",
+  ...gateEvidence,
   proof_kind: "actual-wasm-direct-node",
   gpu_evidence: false,
   started_at: startedAt,

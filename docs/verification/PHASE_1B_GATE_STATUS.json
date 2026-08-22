@@ -1,238 +1,236 @@
 {
   "phase": "1B",
-  "generated_at_utc": "2026-08-22T04:51:03Z",
   "gate": "Gate 1B",
+  "generated_at_utc": "2026-08-22T07:34:36.101Z",
+  "gate_run_id": null,
+  "tested_source_commit": null,
+  "tested_branch": null,
+  "current_head": "0c157f8ceeb025b980b404e9473f3350de8701f7",
   "gate_conclusion": "NOT PASSED",
+  "runner_status": null,
   "browser_proof_present": false,
-  "environment": {
-    "host": "Claude Code remote Linux container",
-    "gpu": "none",
-    "browser": "Chromium 141.0.7390.37 (Playwright build)",
-    "webgpu": "navigator.gpu is exposed over the secure localhost origin, but the GPU process cannot hold a WebGPU instance ('Instance dropped in popErrorScope'), so no adapter or device is usable.",
-    "software_fallback_attempted": true,
-    "software_fallback_result": "--enable-unsafe-swiftshader --use-angle=swiftshader also failed to produce a usable device."
-  },
+  "current_browser_proof_accepted": false,
   "hardware_run_instructions": "docs/PHASE_1B_HARDWARE_RUN.md",
+  "environment": null,
+  "source_relation": {
+    "valid": false,
+    "reason": "Gate environment and run manifest are missing or inconsistent.",
+    "currentHead": "0c157f8ceeb025b980b404e9473f3350de8701f7"
+  },
   "items": [
     {
       "id": "harness_exists",
       "requirement": "A Phase 1B browser/WebGPU proof harness exists and runs with one command",
-      "status": "PASS",
+      "required": true,
       "requires_gpu": false,
-      "evidence": "web/editor/scripts/browser-proof-phase1b.mjs; npm run test:browser:phase1b",
+      "status": "PASS",
+      "evidence": "The Phase 1B hardware harness and one-command npm entry point exist.",
       "artifacts": [
-        "web/editor/scripts/browser-proof-phase1b.mjs"
-      ],
-      "note": "Executed twice in this container; both runs failed closed at the WebGPU device, which is the correct behaviour without a GPU."
+        "web/editor/scripts/browser-proof-phase1b.mjs",
+        "web/editor/package.json"
+      ]
     },
     {
       "id": "real_path_only",
-      "requirement": "The harness drives Editor -> Dedicated Worker -> WASM -> WebGPU with no mock or React-only substitute",
-      "status": "PASS",
+      "requirement": "The harness drives Chrome -> React -> Dedicated Worker -> WASM -> WebGPU without substitutes",
+      "required": true,
       "requires_gpu": false,
-      "evidence": "Harness source: real CDP pointer/keyboard input, engine responses, WebGPU readback, composited screenshot sampling. No mock renderer or replayed JSON.",
+      "status": "PASS",
+      "evidence": "Harness source requires actual Chrome, Dedicated Worker, shipped WASM, and WebGPU.",
       "artifacts": [
         "web/editor/scripts/browser-proof-phase1b.mjs"
       ]
     },
     {
-      "id": "shift_multi_selection",
-      "requirement": "Shift multi-selection verified in the browser",
+      "id": "source_evidence_binding",
+      "requirement": "All Gate evidence is bound to one run, branch, and tested source commit",
+      "required": true,
+      "requires_gpu": false,
       "status": "UNVERIFIED",
-      "requires_gpu": true,
-      "evidence": "Implemented as harness check shift_click_selects_two; cannot execute without a GPU.",
-      "artifacts": [
-        "docs/verification/PHASE_1B_BROWSER_FAILURE.json"
-      ]
-    },
-    {
-      "id": "marquee_selection",
-      "requirement": "Rubber-band/marquee selection verified in the browser",
-      "status": "UNVERIFIED",
-      "requires_gpu": true,
-      "evidence": "Harness check marquee_selects_intersecting_nodes.",
-      "artifacts": [
-        "docs/verification/PHASE_1B_BROWSER_FAILURE.json"
-      ]
-    },
-    {
-      "id": "select_all",
-      "requirement": "Ctrl/Cmd+A verified in the browser",
-      "status": "UNVERIFIED",
-      "requires_gpu": true,
-      "evidence": "Harness check select_all_selects_every_top_level_node.",
-      "artifacts": [
-        "docs/verification/PHASE_1B_BROWSER_FAILURE.json"
-      ]
-    },
-    {
-      "id": "multi_object_drag",
-      "requirement": "Multi-object drag verified in the browser",
-      "status": "UNVERIFIED",
-      "requires_gpu": true,
-      "evidence": "Harness checks multi_drag_moves_every_node_by_one_delta and multi_drag_leaves_unselected_nodes_alone.",
-      "artifacts": [
-        "docs/verification/PHASE_1B_BROWSER_FAILURE.json"
-      ]
-    },
-    {
-      "id": "coalesced_drag_no_drift",
-      "requirement": "Repeated/coalesced drag frames show no drift, in the browser",
-      "status": "UNVERIFIED",
-      "requires_gpu": true,
-      "evidence": "Harness checks coalesced_drag_has_no_drift and coalesced_drag_coalesced_requests over 64 pointer frames.",
-      "artifacts": [
-        "docs/verification/PHASE_1B_BROWSER_FAILURE.json"
-      ]
-    },
-    {
-      "id": "edge_center_snapping",
-      "requirement": "Object edge/center snapping verified in the browser",
-      "status": "UNVERIFIED",
-      "requires_gpu": true,
-      "evidence": "Harness check snapping_aligns_edges_exactly.",
-      "artifacts": [
-        "docs/verification/PHASE_1B_BROWSER_FAILURE.json"
-      ]
-    },
-    {
-      "id": "alt_snap_suspend",
-      "requirement": "Alt suspends snapping, verified in the browser",
-      "status": "UNVERIFIED",
-      "requires_gpu": true,
-      "evidence": "Harness check alt_suspends_snapping.",
-      "artifacts": [
-        "docs/verification/PHASE_1B_BROWSER_FAILURE.json"
-      ]
-    },
-    {
-      "id": "snap_toggle",
-      "requirement": "Snap toggle verified in the browser",
-      "status": "UNVERIFIED",
-      "requires_gpu": true,
-      "evidence": "Harness checks snap_toggle_disables_snapping, snap_toggle_off_suspends_snapping, snap_toggle_restored.",
-      "artifacts": [
-        "docs/verification/PHASE_1B_BROWSER_FAILURE.json"
-      ]
-    },
-    {
-      "id": "snap_guide_rendered",
-      "requirement": "Snap guide is actually rendered, proven by pixels",
-      "status": "UNVERIFIED",
-      "requires_gpu": true,
-      "evidence": "Harness pixel assertion snap_guide_rendered samples the composited guide colour and a control point off the guide.",
-      "artifacts": [
-        "docs/verification/PHASE_1B_BROWSER_FAILURE.json"
-      ]
-    },
-    {
-      "id": "align_six_ways",
-      "requirement": "Align left/center/right/top/middle/bottom verified in the browser",
-      "status": "UNVERIFIED",
-      "requires_gpu": true,
-      "evidence": "Harness checks align_*_aligned for all six operations, driven by real toolbar clicks.",
-      "artifacts": [
-        "docs/verification/PHASE_1B_BROWSER_FAILURE.json"
-      ]
-    },
-    {
-      "id": "distribute_both_axes",
-      "requirement": "Horizontal and vertical distribute verified in the browser",
-      "status": "UNVERIFIED",
-      "requires_gpu": true,
-      "evidence": "Harness checks distribute_horizontal_equal_gaps and distribute_vertical_equal_gaps.",
-      "artifacts": [
-        "docs/verification/PHASE_1B_BROWSER_FAILURE.json"
-      ]
-    },
-    {
-      "id": "arrange_undo",
-      "requirement": "One arrange followed by one undo restores the layout, in the browser",
-      "status": "UNVERIFIED",
-      "requires_gpu": true,
-      "evidence": "Harness checks align_*_undo_restored and distribute_*_undo_restored.",
-      "artifacts": [
-        "docs/verification/PHASE_1B_BROWSER_FAILURE.json"
-      ]
-    },
-    {
-      "id": "multi_drag_undo",
-      "requirement": "One multi-drag followed by one undo restores every node, in the browser",
-      "status": "UNVERIFIED",
-      "requires_gpu": true,
-      "evidence": "Harness check multi_drag_undo_restores_every_node.",
-      "artifacts": [
-        "docs/verification/PHASE_1B_BROWSER_FAILURE.json"
-      ]
-    },
-    {
-      "id": "pixel_readback_overlays",
-      "requirement": "Pixel readback evidence for selection outline, union bounds, marquee, and snap guide",
-      "status": "UNVERIFIED",
-      "requires_gpu": true,
-      "evidence": "Harness pixel assertions selection_outline_rendered, selection_union_rendered, union_absent_for_single_selection, marquee_band_rendered, snap_guide_rendered, dragged_rectangle_moved_on_webgpu_surface.",
-      "artifacts": [
-        "docs/verification/PHASE_1B_BROWSER_FAILURE.json"
-      ]
+      "evidence": "Gate environment and run manifest are missing or inconsistent.",
+      "artifacts": []
     },
     {
       "id": "phase1a_regression",
-      "requirement": "Phase 1A browser proof re-run shows no regression",
-      "status": "UNVERIFIED",
+      "requirement": "The current Gate run passes the Phase 1A browser regression",
+      "required": true,
       "requires_gpu": true,
-      "evidence": "Re-run attempted in this container; the Editor never reached readiness because the WebGPU device could not be held.",
-      "artifacts": [
-        "docs/verification/PHASE_1B_GATE_PHASE1A_RERUN.json"
-      ]
+      "status": "UNVERIFIED",
+      "evidence": "No evidence from the current Gate run is available.",
+      "artifacts": []
+    },
+    {
+      "id": "shift_multi_selection",
+      "requirement": "Shift multi-selection is verified in the browser",
+      "required": true,
+      "requires_gpu": true,
+      "status": "UNVERIFIED",
+      "evidence": "No evidence from the current Gate run is available.",
+      "artifacts": []
+    },
+    {
+      "id": "marquee_selection",
+      "requirement": "Rubber-band selection is verified in the browser",
+      "required": true,
+      "requires_gpu": true,
+      "status": "UNVERIFIED",
+      "evidence": "No evidence from the current Gate run is available.",
+      "artifacts": []
+    },
+    {
+      "id": "select_all",
+      "requirement": "Ctrl/Cmd+A is verified in the browser",
+      "required": true,
+      "requires_gpu": true,
+      "status": "UNVERIFIED",
+      "evidence": "No evidence from the current Gate run is available.",
+      "artifacts": []
+    },
+    {
+      "id": "multi_object_drag",
+      "requirement": "Multi-object drag is verified in the browser",
+      "required": true,
+      "requires_gpu": true,
+      "status": "UNVERIFIED",
+      "evidence": "No evidence from the current Gate run is available.",
+      "artifacts": []
+    },
+    {
+      "id": "coalesced_drag_no_drift",
+      "requirement": "Coalesced drag frames do not drift",
+      "required": true,
+      "requires_gpu": true,
+      "status": "UNVERIFIED",
+      "evidence": "No evidence from the current Gate run is available.",
+      "artifacts": []
+    },
+    {
+      "id": "edge_center_snapping",
+      "requirement": "Edge and center snapping are verified in the browser",
+      "required": true,
+      "requires_gpu": true,
+      "status": "UNVERIFIED",
+      "evidence": "No evidence from the current Gate run is available.",
+      "artifacts": []
+    },
+    {
+      "id": "alt_snap_suspend",
+      "requirement": "Alt snap suspension is verified in the browser",
+      "required": true,
+      "requires_gpu": true,
+      "status": "UNVERIFIED",
+      "evidence": "No evidence from the current Gate run is available.",
+      "artifacts": []
+    },
+    {
+      "id": "snap_toggle",
+      "requirement": "The snap toggle is verified in the browser",
+      "required": true,
+      "requires_gpu": true,
+      "status": "UNVERIFIED",
+      "evidence": "No evidence from the current Gate run is available.",
+      "artifacts": []
+    },
+    {
+      "id": "snap_guide_rendered",
+      "requirement": "The snap guide is proven by actual pixels",
+      "required": true,
+      "requires_gpu": true,
+      "status": "UNVERIFIED",
+      "evidence": "No evidence from the current Gate run is available.",
+      "artifacts": []
+    },
+    {
+      "id": "align_six_ways",
+      "requirement": "All six alignment operations are verified in the browser",
+      "required": true,
+      "requires_gpu": true,
+      "status": "UNVERIFIED",
+      "evidence": "No evidence from the current Gate run is available.",
+      "artifacts": []
+    },
+    {
+      "id": "distribute_both_axes",
+      "requirement": "Horizontal and vertical distribution are verified",
+      "required": true,
+      "requires_gpu": true,
+      "status": "UNVERIFIED",
+      "evidence": "No evidence from the current Gate run is available.",
+      "artifacts": []
+    },
+    {
+      "id": "arrange_undo",
+      "requirement": "Arrange operations restore through one undo",
+      "required": true,
+      "requires_gpu": true,
+      "status": "UNVERIFIED",
+      "evidence": "No evidence from the current Gate run is available.",
+      "artifacts": []
+    },
+    {
+      "id": "multi_drag_undo",
+      "requirement": "A multi-object drag restores through one undo",
+      "required": true,
+      "requires_gpu": true,
+      "status": "UNVERIFIED",
+      "evidence": "No evidence from the current Gate run is available.",
+      "artifacts": []
+    },
+    {
+      "id": "pixel_readback_overlays",
+      "requirement": "Pixel evidence passes for selections, marquee, guide, and moved content",
+      "required": true,
+      "requires_gpu": true,
+      "status": "UNVERIFIED",
+      "evidence": "No evidence from the current Gate run is available.",
+      "artifacts": []
     },
     {
       "id": "browser_multi_drag_benchmark",
-      "requirement": "Multi-selection drag benchmark at 10/100/1,000 objects, measured in the browser",
-      "status": "UNVERIFIED",
+      "requirement": "Browser multi-drag has 10/100/1,000 series and keeps existing 10/100 thresholds",
+      "required": true,
       "requires_gpu": true,
-      "evidence": "Implemented inside the harness; writes docs/PHASE_1B_METRICS.json on a hardware run.",
-      "artifacts": [
-        "docs/verification/PHASE_1B_BROWSER_FAILURE.json"
-      ]
-    },
-    {
-      "id": "engine_multi_drag_benchmark",
-      "requirement": "Multi-selection drag benchmark at 10/100/1,000 objects, measured against the shipped WASM engine",
-      "status": "PASS",
-      "requires_gpu": false,
-      "evidence": "npm run bench:multi-drag:phase1b: 10 objects p95 2.40 ms (2.87 ms snapped), 100 objects p95 6.85 ms (9.95 ms snapped), 1,000 objects p95 238.85 ms (249.62 ms snapped); dirty slots equal selection size; zero full rebuilds, clones, and model scans.",
-      "artifacts": [
-        "docs/PHASE_1B_METRICS_ENGINE_ONLY.json"
-      ]
+      "status": "UNVERIFIED",
+      "evidence": "No evidence from the current Gate run is available.",
+      "artifacts": []
     },
     {
       "id": "engine_behaviour_proof",
-      "requirement": "Phase 1B behaviour proven against the shipped WASM module outside the browser",
-      "status": "PASS",
+      "requirement": "Direct shipped-WASM behavior proof passes 46/46",
+      "required": true,
       "requires_gpu": false,
-      "evidence": "npm run test:direct-wasm:phase1b: 46/46 checks.",
-      "artifacts": [
-        "docs/verification/PHASE_1B_DIRECT_WASM_PROOF.json"
-      ]
+      "status": "UNVERIFIED",
+      "evidence": "No evidence from the current Gate run is available.",
+      "artifacts": []
+    },
+    {
+      "id": "engine_multi_drag_benchmark",
+      "requirement": "Engine benchmark records passing 10/100/1,000 series",
+      "required": true,
+      "requires_gpu": false,
+      "status": "UNVERIFIED",
+      "evidence": "No evidence from the current Gate run is available.",
+      "artifacts": []
     },
     {
       "id": "workspace_checks",
-      "requirement": "Format, lint, build, Rust tests, WASM build, editor tests and build",
-      "status": "PASS",
+      "requirement": "Repository, toolchain, dependency, and build verification passes",
+      "required": true,
       "requires_gpu": false,
-      "evidence": "Recorded command by command with exit statuses.",
-      "artifacts": [
-        "docs/verification/PHASE_1B_VERIFICATION.txt"
-      ]
+      "status": "UNVERIFIED",
+      "evidence": "The complete runner prerequisite sequence has not passed.",
+      "artifacts": []
     }
   ],
   "summary": {
-    "pass": 5,
+    "pass": 2,
     "fail": 0,
-    "unverified": 16
+    "unverified": 20
   },
+  "first_failure": null,
+  "first_unverified": "source_evidence_binding",
   "findings": [
-    "Multi-selection drag cost scales linearly with selection size: 1,000 simultaneously dragged objects cost about 239 ms per drag frame in the engine alone, far outside the 16.7 ms frame budget. Phase 1B never claimed a large-selection drag budget; this is recorded as a measured limit, not a defect.",
-    "A rubber band started on a Frame's own background previously also selected that Frame, because the rectangle tool creates shapes as siblings of the Frame. The band now excludes the container it was drawn on (exclude_ids); covered by a new EngineHost test."
+    "The 1,000-object drag result is measured performance debt and has no new Gate threshold.",
+    "Primitive creation currently places shapes as siblings of the default Frame; marquee exclude_ids avoids selecting its own backdrop, while Frame containment remains future work."
   ]
 }

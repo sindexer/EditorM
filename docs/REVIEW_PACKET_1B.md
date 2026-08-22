@@ -58,44 +58,31 @@ New focused coverage:
 
 ## Known limits
 
-- A multi-node drag issues one `SetLocalTransform` per selected node per committed frame, so its cost scales with selection size. The existing 1k/10k/100k benchmarks cover pan, zoom, selection, and structural work, not large-selection dragging; that measurement is still owed.
+- A multi-node drag issues one `SetLocalTransform` per selected node per committed frame, so its cost scales with selection size. The measured 1,000-object engine result is about 239 ms per frame and remains performance debt, not a new Gate threshold.
 - Snapping compares the selection's union bounds, not each node individually, so a multi-node drag snaps by the outer rectangle.
 - Distribution equalizes edge-to-edge gaps only. Center-spacing distribution and spacing measurements are not implemented.
+- Current primitive creation places shapes as siblings of the default Frame. The Phase 1B marquee
+  `exclude_ids` behavior prevents selecting its own backdrop, but Frame containment semantics
+  remain future work.
 
 ## Gate 1B status
 
-`docs/verification/PHASE_1B_GATE_STATUS.json` is the machine-checked record; the table below is
-its summary. `web/editor/tests/phase1b-gate-status.test.ts` fails the default test suite if any
-GPU-dependent item claims PASS while no passing hardware browser proof exists.
+`docs/verification/PHASE_1B_GATE_STATUS.json` is the machine-generated and machine-checked record.
+`tools/run-phase1b-gate.ps1` supplies one run ID, tested commit, and branch to every proof, and
+`web/editor/scripts/finalize-gate-phase1b.mjs` derives all item states, summary counts, and the Gate
+conclusion. The record must not be hand-edited. `web/editor/tests/phase1b-gate-status.test.ts`
+checks summary/conclusion consistency, browser proof integrity, and evidence binding in the default
+suite.
 
-| # | Gate 1B item | Status | Evidence |
-| --- | --- | --- | --- |
-| 1 | Phase 1B browser/WebGPU proof harness exists | PASS | `web/editor/scripts/browser-proof-phase1b.mjs` |
-| 2 | One command runs it (`npm run test:browser:phase1b`) | PASS | `web/editor/package.json` |
-| 3 | Real Editor -> Worker -> WASM -> WebGPU path only | PASS | harness source: CDP pointer/keyboard input, engine responses, WebGPU readback |
-| 4a | Shift multi-selection | UNVERIFIED | needs GPU |
-| 4b | Rubber-band selection | UNVERIFIED | needs GPU |
-| 4c | Ctrl/Cmd+A | UNVERIFIED | needs GPU |
-| 4d | Multi-object drag | UNVERIFIED | needs GPU |
-| 4e | No drift across coalesced drag frames | UNVERIFIED | needs GPU |
-| 4f | Edge/center snapping | UNVERIFIED | needs GPU |
-| 4g | Alt snap suspend | UNVERIFIED | needs GPU |
-| 4h | Snap toggle | UNVERIFIED | needs GPU |
-| 4i | Snap guide actually rendered | UNVERIFIED | needs GPU |
-| 4j | Align left/center/right/top/middle/bottom | UNVERIFIED | needs GPU |
-| 4k | Horizontal and vertical distribute | UNVERIFIED | needs GPU |
-| 4l | One arrange then one undo | UNVERIFIED | needs GPU |
-| 4m | One multi-drag then one undo | UNVERIFIED | needs GPU |
-| 5 | Pixel readback for outline, union bounds, marquee, snap guide | UNVERIFIED | needs GPU |
-| 6 | Phase 1A browser proof re-run | UNVERIFIED | `docs/verification/PHASE_1B_GATE_PHASE1A_RERUN.json` |
-| 7a | Multi-drag benchmark at 10/100/1,000 in the browser | UNVERIFIED | needs GPU |
-| 7b | Multi-drag benchmark at 10/100/1,000 against the shipped WASM engine | PASS | `docs/PHASE_1B_METRICS_ENGINE_ONLY.json` |
-| - | Engine behaviour proof against the shipped WASM module | PASS | `docs/verification/PHASE_1B_DIRECT_WASM_PROOF.json` |
-| - | Format, lint, build, Rust tests, WASM build, editor tests and build | PASS | `docs/verification/PHASE_1B_VERIFICATION.txt` |
+The branch-preparation snapshot has two static tooling items at `PASS`; every run-bound item is
+`UNVERIFIED` until the Windows runner creates one consistently bound evidence set. The generated
+JSON is authoritative; this packet intentionally does not duplicate a table that could drift from
+the finalizer's output.
 
-Gate conclusion: **NOT PASSED**. Every UNVERIFIED item above is implemented and asserted by the
-harness; none of them has been executed against a GPU. `docs/PHASE_1B_HARDWARE_RUN.md` gives the
-exact Windows commands and the evidence path each one writes.
+Gate conclusion: **NOT PASSED**. Every UNVERIFIED hardware item above is implemented and asserted
+by the harness; none has been executed against a GPU in the branch-preparation environment.
+`docs/PHASE_1B_HARDWARE_RUN.md` now provides one repository-root Windows command and automatic
+finalization rather than a hand-edited PASS/FAIL record.
 
 ## Measured multi-selection drag cost
 

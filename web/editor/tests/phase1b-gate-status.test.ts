@@ -2,10 +2,9 @@ import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, test } from "vitest";
 
-// Gate 1B honesty guard. It runs in the default suite and enforces one rule: the repository may
-// only claim a browser/WebGPU proof when a passing hardware proof artifact is actually present.
-// If no proof exists, an UNVERIFIED status artifact must exist instead, and the review packet
-// must say so. This makes a false PASS a failing test rather than a documentation choice.
+// Gate 1B honesty guard. It runs in the default suite and verifies that the generated status is
+// internally consistent and that any accepted browser proof is real, passing hardware evidence
+// from the same Gate run and tested source commit.
 
 const editorRoot = path.resolve(process.cwd());
 const workspace = path.resolve(editorRoot, "../..");
@@ -31,7 +30,28 @@ describe("Phase 1B gate status honesty", () => {
       expect(["PASS", "FAIL", "UNVERIFIED"]).toContain(item.status);
       expect(typeof item.id).toBe("string");
       expect(typeof item.evidence).toBe("string");
+      expect(typeof item.required).toBe("boolean");
     }
+  });
+
+  test("summary is calculated exactly from items", () => {
+    const status = readJson(statusPath);
+    const calculated = { pass: 0, fail: 0, unverified: 0 };
+    for (const item of status.items) {
+      calculated[item.status.toLowerCase() as keyof typeof calculated] += 1;
+    }
+    expect(status.summary).toEqual(calculated);
+  });
+
+  test("gate conclusion agrees with every required item", () => {
+    const status = readJson(statusPath);
+    const required = status.items.filter(
+      (item: { required?: boolean }) => item.required !== false,
+    );
+    const allRequiredPass =
+      required.length > 0 &&
+      required.every((item: { status: string }) => item.status === "PASS");
+    expect(status.gate_conclusion).toBe(allRequiredPass ? "PASSED" : "NOT PASSED");
   });
 
   test("every PASS item names an evidence artifact that exists", () => {
@@ -67,8 +87,26 @@ describe("Phase 1B gate status honesty", () => {
     const proof = readJson(proofPath);
     expect(status.browser_proof_present).toBe(true);
     expect(proof.all_passed, "a stored browser proof must be a passing run").toBe(true);
+    expect(proof.proof_kind).toBe("actual-hardware-browser");
+    expect(proof.browser).toMatch(/^Chrome\//);
+    expect(proof.initial.worker_runtime_owner).toBe("dedicated-worker");
+    expect(proof.initial.wasm_initialized).toBe(true);
+    expect(proof.initial.actual_webgpu).toBe(true);
     expect(proof.gpu.software_renderer, "a gate proof must not be a software renderer").toBe(
       false,
     );
+    expect(proof.gate_run_id).toBe(status.gate_run_id);
+    expect(proof.tested_source_commit).toBe(status.tested_source_commit);
+    expect(proof.tested_branch).toBe(status.tested_branch);
+
+    for (const relativePath of [
+      "docs/verification/PHASE_1B_PIXEL_READBACK.json",
+      "docs/PHASE_1B_METRICS.json",
+    ]) {
+      const artifact = readJson(path.join(workspace, relativePath));
+      expect(artifact.gate_run_id).toBe(proof.gate_run_id);
+      expect(artifact.tested_source_commit).toBe(proof.tested_source_commit);
+      expect(artifact.tested_branch).toBe(proof.tested_branch);
+    }
   });
 });
