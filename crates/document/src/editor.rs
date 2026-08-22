@@ -82,6 +82,17 @@ impl Selection {
         self.primary = None;
     }
 
+    /// Replaces the whole selection with an already validated, de-duplicated order.
+    fn replace_many(&mut self, ids: &[NodeId]) {
+        self.ordered.clear();
+        for id in ids {
+            if !self.ordered.contains(id) {
+                self.ordered.push(*id);
+            }
+        }
+        self.primary = self.ordered.last().copied();
+    }
+
     fn sanitize(&mut self, document: &Document) -> usize {
         let previous = self.ordered.len();
         self.ordered.retain(|id| document.node(*id).is_some());
@@ -476,6 +487,27 @@ impl HeadlessEditorCore {
     pub fn add_to_selection(&mut self, id: NodeId) -> Result<bool, SelectionError> {
         self.require_selectable(id)?;
         Ok(self.selection.add(id))
+    }
+
+    /// Replaces the selection with several IDs. Every ID is validated before any selection
+    /// state changes, so a rejected request leaves the previous selection intact.
+    pub fn select_many(&mut self, ids: &[NodeId]) -> Result<usize, SelectionError> {
+        for id in ids {
+            self.require_selectable(*id)?;
+        }
+        self.selection.replace_many(ids);
+        Ok(self.selection.len())
+    }
+
+    /// Adds several already existing IDs to the selection, keeping current order first.
+    pub fn extend_selection(&mut self, ids: &[NodeId]) -> Result<usize, SelectionError> {
+        for id in ids {
+            self.require_selectable(*id)?;
+        }
+        let mut merged = self.selection.ordered.clone();
+        merged.extend_from_slice(ids);
+        self.selection.replace_many(&merged);
+        Ok(self.selection.len())
     }
 
     pub fn remove_from_selection(&mut self, id: NodeId) -> bool {

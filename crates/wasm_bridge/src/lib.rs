@@ -8,7 +8,7 @@ use std::collections::BTreeSet;
 use js_sys::{Uint32Array, Uint8Array};
 use serde::Deserialize;
 use serde_json::{json, Value};
-use visual_authoring_core_math::{Affine2, Vec2};
+use visual_authoring_core_math::{Affine2, Rect, Vec2};
 use visual_authoring_document::{
     Appearance, ColorRgba, Command, Document, DocumentChange, DocumentChangeSet, Geometry, NodeId,
     NodeKind, NodeSpec, StructuralGroupChange,
@@ -16,10 +16,12 @@ use visual_authoring_document::{
 use visual_authoring_render_model::{
     CullingResult, PrimitiveKind, RenderDelta, RenderEncodingDiagnosticKind, RenderItem,
 };
+use visual_authoring_runtime::arrange::{translated, world_delta_to_local};
 use visual_authoring_runtime::fixtures::{build_fixture, fixture_node_id, FixtureKind};
 use visual_authoring_runtime::{
-    Camera, CameraError, EngineRuntime, RenderSyncStatus, RuntimeCommandOutcome, RuntimeError,
-    RuntimeSceneOutcome, SceneSyncStatus, ViewportPoint, WorldPoint,
+    AlignMode, BatchOutcome, Camera, CameraError, DistributeAxis, EngineRuntime, RenderSyncStatus,
+    RuntimeCommandOutcome, RuntimeError, RuntimeSceneOutcome, SceneSyncStatus, ViewportPoint,
+    WorldPoint,
 };
 use wasm_bindgen::prelude::*;
 
@@ -63,7 +65,30 @@ enum HostRequest {
     },
     Selection {
         target: Option<String>,
+        #[serde(default)]
+        targets: Option<Vec<String>>,
         mode: String,
+    },
+    MarqueeSelect {
+        x0: f64,
+        y0: f64,
+        x1: f64,
+        y1: f64,
+        #[serde(default)]
+        additive: bool,
+        #[serde(default)]
+        root_id: Option<String>,
+    },
+    TranslateSelection {
+        dx: f64,
+        dy: f64,
+        #[serde(default)]
+        snap: bool,
+        #[serde(default)]
+        snap_threshold_px: Option<f64>,
+    },
+    Arrange {
+        operation: String,
     },
     GetUiSnapshot,
     SaveDocument,
@@ -167,6 +192,22 @@ enum CameraRequest {
     Reset,
     Fit,
     FitSelection { node_id: String },
+}
+
+/// Selection state captured when a transaction opens, so every drag frame is computed from the
+/// same starting geometry instead of from the previously previewed position.
+#[derive(Clone, Debug, Default)]
+struct DragBase {
+    targets: Vec<DragTarget>,
+    union_bounds: Option<Rect>,
+    skipped_locked: usize,
+}
+
+#[derive(Clone, Copy, Debug)]
+struct DragTarget {
+    id: NodeId,
+    local_transform: Affine2,
+    parent_world: Affine2,
 }
 
 #[derive(Clone, Debug, Default)]
@@ -284,6 +325,7 @@ impl From<CameraError> for HostFailure {
 pub struct EngineHost {
     runtime: EngineRuntime,
     fixture: FixtureKind,
+    drag_base: Option<DragBase>,
     pending: PendingBinary,
     projection: PendingProjection,
     last_culling: CullingResult,
@@ -404,6 +446,7 @@ impl EngineHost {
         let mut host = Self {
             runtime,
             fixture,
+            drag_base: None,
             pending: PendingBinary::default(),
             projection: PendingProjection::default(),
             last_culling: CullingResult::default(),
@@ -450,7 +493,14 @@ impl EngineHost {
             }
             HostRequest::BeginTransaction => {
                 self.runtime.begin_transaction()?;
-                Ok(json!({ "transaction_active": true }))
+                self.drag_base = Some(self.capture_drag_base());
+                Ok(json!({
+                    "transaction_active": true,
+                    "drag_targets": self
+                        .drag_base
+                        .as_ref()
+                        .map_or(0, |base| base.targets.len()),
+                }))
             }
             HostRequest::UpdateTransaction { command } => {
                 let structural = command.structural_nodes_touched().is_some();
@@ -467,10 +517,12 @@ impl EngineHost {
             }
             HostRequest::CommitTransaction => {
                 let committed = self.runtime.commit_transaction()?;
+                self.drag_base = None;
                 Ok(json!({ "committed": committed }))
             }
             HostRequest::RollbackTransaction => {
                 let outcome = self.runtime.rollback_transaction()?;
+                self.drag_base = None;
                 self.track_scene_outcome(&outcome);
                 self.prepare_incremental_frame(&outcome.render)?;
                 self.prepare_projection_delta(&outcome.change_set)?;
@@ -512,10 +564,32 @@ impl EngineHost {
                     "exact_geometry_tests": hit.exact_geometry_test_count(),
                 }))
             }
-            HostRequest::Selection { target, mode } => {
-                self.update_selection(target.as_deref(), &mode)?;
-                Ok(json!({ "selection_changed": true }))
+            HostRequest::Selection {
+                target,
+                targets,
+                mode,
+            } => {
+                self.update_selection(target.as_deref(), targets.as_deref(), &mode)?;
+                Ok(json!({
+                    "selection_changed": true,
+                    "selection_count": self.runtime.selection().len(),
+                }))
             }
+            HostRequest::MarqueeSelect {
+                x0,
+                y0,
+                x1,
+                y1,
+                additive,
+                root_id,
+            } => self.marquee_select(x0, y0, x1, y1, additive, root_id.as_deref()),
+            HostRequest::TranslateSelection {
+                dx,
+                dy,
+                snap,
+                snap_threshold_px,
+            } => self.translate_selection(dx, dy, snap, snap_threshold_px),
+            HostRequest::Arrange { operation } => self.arrange_selection(&operation),
             HostRequest::GetUiSnapshot => {
                 self.prepare_full_projection()?;
                 Ok(json!({ "ui_snapshot": true }))
@@ -541,9 +615,27 @@ impl EngineHost {
         }
     }
 
-    fn update_selection(&mut self, target: Option<&str>, mode: &str) -> Result<(), HostFailure> {
+    fn update_selection(
+        &mut self,
+        target: Option<&str>,
+        targets: Option<&[String]>,
+        mode: &str,
+    ) -> Result<(), HostFailure> {
         let parsed = target.map(parse_node_id).transpose()?;
         match mode {
+            "set" | "extend" => {
+                let ids = parse_node_ids(targets.ok_or_else(|| {
+                    HostFailure::new(
+                        "invalid_selection",
+                        format!("{mode} selection requires a targets array"),
+                    )
+                })?)?;
+                if mode == "set" {
+                    self.runtime.select_many(&ids)?;
+                } else {
+                    self.runtime.extend_selection(&ids)?;
+                }
+            }
             "clear" => self.runtime.clear_selection(),
             "replace" => self.runtime.select_only(parsed.ok_or_else(|| {
                 HostFailure::new("invalid_selection", "replace selection requires a target")
@@ -565,6 +657,288 @@ impl EngineHost {
                 ));
             }
         }
+        Ok(())
+    }
+
+    /// Default snap radius in device-independent viewport pixels.
+    const DEFAULT_SNAP_THRESHOLD_PX: f64 = 8.0;
+
+    /// Captures the geometry a drag starts from: local transforms, parent world transforms, and
+    /// the union of the selection's world bounds used for snapping.
+    fn capture_drag_base(&self) -> DragBase {
+        let mut base = DragBase::default();
+        for id in self.runtime.selection().ordered() {
+            let id = *id;
+            let Some(node) = self.runtime.document().node(id) else {
+                continue;
+            };
+            if self.locked_for_edit(id) {
+                base.skipped_locked += 1;
+                continue;
+            }
+            let Some(parent) = node.parent() else {
+                continue;
+            };
+            let Some(parent_world) = self
+                .runtime
+                .scene()
+                .node(parent)
+                .and_then(visual_authoring_scene::SceneNode::world_transform)
+            else {
+                continue;
+            };
+            if let Some(bounds) = self
+                .runtime
+                .scene()
+                .node(id)
+                .and_then(visual_authoring_scene::SceneNode::subtree_world_bounds)
+            {
+                base.union_bounds = Some(match base.union_bounds {
+                    Some(current) => union_rect(current, bounds),
+                    None => bounds,
+                });
+            }
+            base.targets.push(DragTarget {
+                id,
+                local_transform: node.local_transform(),
+                parent_world,
+            });
+        }
+        base
+    }
+
+    /// Mirrors the command layer's rule that a node inside a locked container cannot be edited.
+    fn locked_for_edit(&self, id: NodeId) -> bool {
+        let mut current = Some(id);
+        let mut depth = 0_usize;
+        while let Some(candidate) = current {
+            let Some(node) = self.runtime.document().node(candidate) else {
+                return true;
+            };
+            if node.locked() {
+                return true;
+            }
+            depth += 1;
+            if depth > self.runtime.document().len() {
+                return true;
+            }
+            current = node.parent();
+        }
+        false
+    }
+
+    fn marquee_select(
+        &mut self,
+        x0: f64,
+        y0: f64,
+        x1: f64,
+        y1: f64,
+        additive: bool,
+        root_id: Option<&str>,
+    ) -> Result<Value, HostFailure> {
+        let first = self
+            .runtime
+            .camera()
+            .viewport_to_world(ViewportPoint(Vec2::new(x0, y0)))?;
+        let second = self
+            .runtime
+            .camera()
+            .viewport_to_world(ViewportPoint(Vec2::new(x1, y1)))?;
+        let bounds = Rect::from_min_max(
+            Vec2::new(first.0.x.min(second.0.x), first.0.y.min(second.0.y)),
+            Vec2::new(first.0.x.max(second.0.x), first.0.y.max(second.0.y)),
+        );
+        let root = match root_id {
+            Some(value) => parse_node_id(value)?,
+            None => self.runtime.document().root_id(),
+        };
+        let result = self.runtime.marquee_candidates(bounds, root)?;
+        let selected = result.selected().to_vec();
+        if additive {
+            self.runtime.extend_selection(&selected)?;
+        } else {
+            self.runtime.select_many(&selected)?;
+        }
+        Ok(json!({
+            "selected": selected.iter().map(ToString::to_string).collect::<Vec<_>>(),
+            "selection_count": self.runtime.selection().len(),
+            "candidates": result.candidate_count(),
+            "candidates_examined": result.candidates_examined(),
+            "world_bounds": [bounds.min.x, bounds.min.y, bounds.max.x, bounds.max.y],
+        }))
+    }
+
+    /// Moves every dragged node by one world delta, optionally corrected by snapping.
+    ///
+    /// The delta is always measured from the transaction's captured base, so repeating or
+    /// coalescing pointer frames can never accumulate drift.
+    fn translate_selection(
+        &mut self,
+        dx: f64,
+        dy: f64,
+        snap: bool,
+        snap_threshold_px: Option<f64>,
+    ) -> Result<Value, HostFailure> {
+        if !dx.is_finite() || !dy.is_finite() {
+            return Err(HostFailure::new(
+                "invalid_translation",
+                "translation delta must be finite",
+            ));
+        }
+        if !self.runtime.transaction_active() {
+            return Err(HostFailure::new(
+                "no_transaction",
+                "translate_selection requires an active transaction",
+            ));
+        }
+        let base = self.drag_base.clone().ok_or_else(|| {
+            HostFailure::new(
+                "no_drag_base",
+                "the active transaction captured no draggable selection",
+            )
+        })?;
+        let requested = Vec2::new(dx, dy);
+        if base.targets.is_empty() {
+            return Ok(json!({
+                "moved": 0,
+                "skipped_locked": base.skipped_locked,
+                "requested_delta": [requested.x, requested.y],
+                "applied_delta": [requested.x, requested.y],
+                "snapped": false,
+                "guides": Vec::<Value>::new(),
+            }));
+        }
+
+        let mut applied = requested;
+        let mut guides = Vec::new();
+        let mut snapped = false;
+        let mut candidates_examined = 0_u64;
+        if snap {
+            if let Some(bounds) = base.union_bounds {
+                let threshold_px = snap_threshold_px.unwrap_or(Self::DEFAULT_SNAP_THRESHOLD_PX);
+                if !threshold_px.is_finite() || threshold_px < 0.0 {
+                    return Err(HostFailure::new(
+                        "invalid_snap_threshold",
+                        "snap threshold must be a finite, non-negative pixel distance",
+                    ));
+                }
+                let threshold_world = threshold_px / self.runtime.camera().zoom();
+                let proposed = Rect::from_min_max(
+                    Vec2::new(bounds.min.x + requested.x, bounds.min.y + requested.y),
+                    Vec2::new(bounds.max.x + requested.x, bounds.max.y + requested.y),
+                );
+                let moving = base
+                    .targets
+                    .iter()
+                    .map(|target| target.id)
+                    .collect::<Vec<_>>();
+                let resolution = self
+                    .runtime
+                    .resolve_snap(proposed, &moving, threshold_world)?;
+                applied = requested + resolution.correction();
+                snapped = resolution.snapped();
+                candidates_examined = resolution.candidates_examined();
+                guides = resolution
+                    .guides()
+                    .iter()
+                    .map(|guide| {
+                        json!({
+                            "axis": guide.axis.label(),
+                            "position": guide.position,
+                            "start": guide.start,
+                            "end": guide.end,
+                            "target": guide.target.to_string(),
+                        })
+                    })
+                    .collect();
+            }
+        }
+
+        let mut commands = Vec::with_capacity(base.targets.len());
+        for target in &base.targets {
+            let local_delta =
+                world_delta_to_local(target.parent_world, applied).ok_or_else(|| {
+                    HostFailure::new(
+                        "invalid_translation",
+                        format!("node {} has no invertible parent transform", target.id),
+                    )
+                })?;
+            commands.push(Command::SetLocalTransform {
+                target: target.id,
+                transform: translated(target.local_transform, local_delta),
+            });
+        }
+        let moved = commands.len();
+        let outcome = match self.runtime.apply_batch_in_transaction(commands) {
+            Ok(outcome) => outcome,
+            Err(error) => {
+                // Failure atomicity: a drag frame never leaves part of the selection moved.
+                self.drag_base = None;
+                let rolled_back = self.runtime.rollback_transaction()?;
+                self.track_scene_outcome(&rolled_back);
+                self.prepare_incremental_frame(&rolled_back.render)?;
+                self.prepare_projection_delta(&rolled_back.change_set)?;
+                return Err(error.into());
+            }
+        };
+        self.consume_batch(&outcome)?;
+        Ok(json!({
+            "moved": moved,
+            "skipped_locked": base.skipped_locked,
+            "requested_delta": [requested.x, requested.y],
+            "applied_delta": [applied.x, applied.y],
+            "snapped": snapped,
+            "snap_candidates_examined": candidates_examined,
+            "guides": guides,
+            "preview": true,
+        }))
+    }
+
+    /// Aligns or distributes the current selection as one atomic, undoable operation.
+    fn arrange_selection(&mut self, operation: &str) -> Result<Value, HostFailure> {
+        let targets = self.runtime.selection().ordered().to_vec();
+        let plan = match operation {
+            "align_left" => self.runtime.plan_align(&targets, AlignMode::Left),
+            "align_horizontal_center" => self
+                .runtime
+                .plan_align(&targets, AlignMode::HorizontalCenter),
+            "align_right" => self.runtime.plan_align(&targets, AlignMode::Right),
+            "align_top" => self.runtime.plan_align(&targets, AlignMode::Top),
+            "align_vertical_center" => self.runtime.plan_align(&targets, AlignMode::VerticalCenter),
+            "align_bottom" => self.runtime.plan_align(&targets, AlignMode::Bottom),
+            "distribute_horizontal" => self
+                .runtime
+                .plan_distribute(&targets, DistributeAxis::Horizontal),
+            "distribute_vertical" => self
+                .runtime
+                .plan_distribute(&targets, DistributeAxis::Vertical),
+            _ => {
+                return Err(HostFailure::new(
+                    "invalid_arrange",
+                    format!("unknown arrange operation {operation}"),
+                ))
+            }
+        }?;
+        let reference = plan.reference();
+        let unchanged = plan.unchanged_targets();
+        let outcome = self.runtime.apply_arrange(&plan)?;
+        self.consume_batch(&outcome)?;
+        Ok(json!({
+            "operation": operation,
+            "moved": outcome.applied(),
+            "unchanged": unchanged,
+            "changed": outcome.changed(),
+            "reference": [reference.min.x, reference.min.y, reference.max.x, reference.max.y],
+        }))
+    }
+
+    /// Reports one batched edit as a single frame and a single projection delta.
+    fn consume_batch(&mut self, outcome: &BatchOutcome) -> Result<(), HostFailure> {
+        for command_outcome in &outcome.outcomes {
+            self.track_command_outcome(command_outcome);
+        }
+        self.prepare_incremental_frame(&outcome.render)?;
+        self.prepare_projection_delta(&outcome.change_set)?;
         Ok(())
     }
 
@@ -1459,6 +1833,39 @@ fn node_kind_label(kind: NodeKind) -> &'static str {
         NodeKind::Group => "group",
         NodeKind::Rectangle => "rectangle",
         NodeKind::Ellipse => "ellipse",
+    }
+}
+
+fn parse_node_ids(values: &[String]) -> Result<Vec<NodeId>, HostFailure> {
+    values.iter().map(|value| parse_node_id(value)).collect()
+}
+
+const fn union_rect(left: Rect, right: Rect) -> Rect {
+    Rect {
+        min: Vec2::new(
+            if left.min.x < right.min.x {
+                left.min.x
+            } else {
+                right.min.x
+            },
+            if left.min.y < right.min.y {
+                left.min.y
+            } else {
+                right.min.y
+            },
+        ),
+        max: Vec2::new(
+            if left.max.x > right.max.x {
+                left.max.x
+            } else {
+                right.max.x
+            },
+            if left.max.y > right.max.y {
+                left.max.y
+            } else {
+                right.max.y
+            },
+        ),
     }
 }
 

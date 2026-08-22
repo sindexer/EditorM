@@ -1,12 +1,14 @@
 # EditorM Product Roadmap
 
-This roadmap restores and preserves the approved development order. Phase 0 is complete. Phase 1 is not approved, and none of the capabilities below are implemented by this GitHub-governance correction.
+This roadmap restores and preserves the approved development order and phase numbering. Phase ordering must not change; per-phase status notes below record what has since been implemented.
 
 ## Completed baseline: Phase 0
 
 Phase 0A through Phase 0E-R3 established finite math, typed reversible document mutation, scene/spatial derivation, render-model deltas, Worker-owned WASM execution, actual WebGPU rendering, the professional editor shell, structural group/ungroup, exact ordering, bounded diagnostics, and actual hardware evidence. Gate 0E-R3 remains the approved baseline.
 
 ## Phase 1 — Direct-manipulation editor foundation
+
+Status: Phase 1A (analytic anti-aliasing, Frame tool and presets, single-selection direct manipulation, appearance, undo/redo) merged to `main`. Phase 1B (multiple selection, alignment, distribution, snapping) is in development; see `docs/PHASE_1B_AUTHORIZATION.md`. Phase 2 and later remain unapproved and unimplemented.
 
 - analytic coverage anti-aliasing for circles and ellipses;
 - MSAA only where its need is demonstrated;

@@ -4,9 +4,10 @@ These instructions apply to the entire repository.
 
 ## Authorization boundary
 
-- Phase 0E-R3 is the approved baseline. Phase 0 is complete and Phase 1 is not authorized.
+- Phase 0E-R3 remains the approved baseline for Phase 0 evidence. Phase 1A merged to `main`; Phase 1B (multiple selection, alignment, distribution, snapping) is in development under `docs/PHASE_1B_AUTHORIZATION.md`. Phase 2 and later are not authorized.
 - Preserve the Phase 1 through Phase 8 order in `docs/ROADMAP.md`; do not pull later requirements into an earlier phase.
 - Treat `CHECKSUMS.sha256` and the Phase 0 files that existed at approved commit `39085167a1b9d2ce1ba78060b3fee4d9327aaf27` as immutable history. Add a new ADR instead of rewriting ADR-001 through ADR-041.
+- Record every phase's scope in a `docs/PHASE_*_AUTHORIZATION.md` and its executed evidence under `docs/verification/`. State plainly which required evidence a task could not produce instead of omitting it.
 
 ## Change discipline
 

@@ -1,6 +1,6 @@
 # EditorM Visual Authoring Engine
 
-Phase 0E-R3 is complete and preserved as the approved GitHub baseline. Phase 1A is in development on feat/phase1a-visible-frame-primitives: the editor now opens on a real 1920×1080 Frame and uses shared analytic anti-aliasing for rectangle, rounded rectangle, Frame, and ellipse rendering.
+Phase 0E-R3 is complete and preserved as the approved GitHub baseline. Phase 1A merged to `main`: the editor opens on a real 1920×1080 Frame and uses shared analytic anti-aliasing for rectangle, rounded rectangle, Frame, and ellipse rendering. Phase 1B is in development: multiple selection, rubber-band selection, alignment, distribution, and object snapping, all computed by the Rust engine and all undoable in one step.
 
 The live product path is not mocked. A Dedicated Worker owns the Rust/WASM EngineRuntime; versioned projection and render deltas cross the Worker boundary; the main thread submits them to actual WebGPU. React owns only disposable UI projection and interaction state.
 
@@ -11,6 +11,16 @@ The live product path is not mocked. A Dedicated Worker owns the Rust/WASM Engin
 The script checks the required toolchain, builds the WASM bridge, installs locked Editor dependencies when absent, builds the production UI, selects an available localhost port, health-checks the server and assets, prints the URL, and opens the default browser. Stop it with Ctrl+C.
 
 Actual WebGPU is required. WebGPU absence, adapter/device failure, Worker boot failure, WASM failure, or asset/MIME failure is a blocking typed error; there is no Canvas2D, mock-renderer, or static-image success fallback.
+
+## Phase 1B user path
+
+1. Shift-click, or drag a rubber band on empty canvas, to select several objects. `Ctrl/Cmd+A` selects everything at the top level of the current root.
+2. Drag any selected object to move the whole selection; edges and centers snap to nearby objects and a guide shows the match.
+3. Toggle snapping in the canvas toolbar, or hold `Alt` to suspend it for part of a drag.
+4. Use the align buttons with two or more objects selected, and the distribute buttons with three or more.
+5. Undo once to reverse a whole alignment, distribution, or multi-object drag.
+
+Alignment, distribution, and snapping are planned inside the Rust runtime and applied as typed commands in one transaction. The React editor never computes a transform; it sends a request and draws what the engine reports. Transform handles stay on a single selection in this phase.
 
 ## Phase 1A user path
 
@@ -26,16 +36,17 @@ Fill/stroke colors are stored as sRGB and converted to linear space at the Rende
 
 ## Workspace
 
-- crates/document: persistent Frame and primitive appearance truth, typed commands, transactions, history, and atomic validation.
+- crates/document: persistent Frame and primitive appearance truth, typed commands, transactions, history, atomic validation, and multiple-selection state.
 - crates/serialization: version 2 appearance persistence and version 1 default migration.
 - crates/scene: stroke-aware bounds, culling, spatial index, and exact hit testing.
+- crates/runtime: scene-aware runtime plus `arrange` (alignment and distribution planning) and `snap` (bounded band snapping and alignment guides).
 - crates/render_model: stable slots, sRGB-to-linear conversion, and bounded per-item deltas.
 - crates/renderer_wgpu: native WebGPU backend using the shared WGSL and binary schema.
 - crates/wasm_bridge: Worker-owned EngineHost, projection, and render-binary protocol.
 - shared: render binary schema v2 and analytic-AA WGSL used by native and browser renderers.
 - web/editor: Wanted Design System-adapted React editor shell and actual WebGPU renderer.
 - web/phase0d-preview: retained Phase 0 diagnostic preview.
-- docs/adr: immutable ADR-001–041 plus Phase 1A ADR-042–044.
+- docs/adr: immutable ADR-001–041, Phase 1A ADR-042–044, and Phase 1B ADR-045–047.
 
 ## Verification
 
@@ -48,8 +59,19 @@ Fill/stroke colors are stored as sRGB and converted to linear space at the Rende
     npm test
     npm run build
 
-Browser proof commands and new evidence paths are recorded in the Phase 1A review packet. Keep target, node_modules, dist, credentials, ZIP files, and temporary browser profiles out of commits.
+Phase 1B adds two more checks:
+
+    cd web/editor
+    npm run test:direct-wasm:phase1b
+
+That harness loads the pinned `engine_host` WASM package in Node and exercises multiple selection, rubber-band selection, snapped translation, alignment, distribution, and undo against the actual compiled engine. It produces no GPU evidence and never claims any.
+
+Browser proof commands and new evidence paths are recorded in the Phase 1A and Phase 1B review packets. Keep target, node_modules, dist, credentials, ZIP files, and temporary browser profiles out of commits.
 
 ## Phase boundary
 
-Phase 1A includes visible Frame creation, solid primitive appearance, direct single-selection manipulation, undo/redo, analytic AA, and real WebGPU proof. It intentionally excludes snapping, multi-selection transforms, Pen/Bezier, text, gradients, images, shadows, auto layout, components, motion, AI integration, export, and transform-aware Frame clipping.
+Phase 1A includes visible Frame creation, solid primitive appearance, direct single-selection manipulation, undo/redo, analytic AA, and real WebGPU proof.
+
+Phase 1B adds multiple selection, rubber-band selection, multi-object movement, object snapping with guides, alignment, and distribution. It intentionally excludes multi-selection resize and rotate, pixel-grid snapping, spacing measurements, rulers and user guides, Pen/Bezier, text, gradients, images, shadows, auto layout, components, motion, AI integration, export, and transform-aware Frame clipping.
+
+Phase 1B carries no browser, WebGPU, or pixel evidence yet; see [docs/REVIEW_PACKET_1B.md](docs/REVIEW_PACKET_1B.md) for exactly what has and has not been executed.

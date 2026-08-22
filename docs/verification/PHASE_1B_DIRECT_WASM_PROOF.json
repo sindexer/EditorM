@@ -1,0 +1,356 @@
+{
+  "phase": "1B",
+  "proof_kind": "actual-wasm-direct-node",
+  "gpu_evidence": false,
+  "started_at": "2026-08-22T03:48:38.499Z",
+  "finished_at": "2026-08-22T03:48:38.543Z",
+  "node_version": "v22.22.2",
+  "platform": "linux-x64",
+  "wasm_path": "web/editor/public/pkg/engine_host_bg.wasm",
+  "wasm_bytes": 1402869,
+  "wasm_sha256": "b7c77e5cb8dee4543f25588ee28b746e0d07c5be8d647c57826f8231a229c84b",
+  "protocol_version": 1,
+  "render_binary_schema_version": 2,
+  "engine_sequence": 48,
+  "checks": [
+    {
+      "name": "initialize",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "load_editor_fixture",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "resize_camera",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "editor_fixture_has_frame",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "create_rectangle_0",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "create_rectangle_1",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "create_rectangle_2",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "selection_set",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "selection_set_count",
+      "passed": true,
+      "detail": [
+        "00000000-0000-4000-8000-000000000100",
+        "00000000-0000-4000-8000-000000000101",
+        "00000000-0000-4000-8000-000000000102"
+      ]
+    },
+    {
+      "name": "selection_set_rejects_unknown_id",
+      "passed": true,
+      "detail": {
+        "code": "runtime_error",
+        "message": "node 00000000-0000-4000-8000-999999999999 cannot be selected because it does not exist"
+      }
+    },
+    {
+      "name": "selection_survives_rejected_request",
+      "passed": true,
+      "detail": [
+        "00000000-0000-4000-8000-000000000100",
+        "00000000-0000-4000-8000-000000000101",
+        "00000000-0000-4000-8000-000000000102"
+      ]
+    },
+    {
+      "name": "marquee_select",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "marquee_selects_intersecting_top_level_nodes",
+      "passed": true,
+      "detail": [
+        "00000000-0000-4000-8000-000000000100",
+        "00000000-0000-4000-8000-000000000101"
+      ]
+    },
+    {
+      "name": "selection_replace_second",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "begin_transaction",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "drag_base_captured",
+      "passed": true,
+      "detail": {
+        "drag_targets": 1,
+        "transaction_active": true
+      }
+    },
+    {
+      "name": "translate_selection_snapped",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "translation_snapped",
+      "passed": true,
+      "detail": {
+        "applied_delta": [
+          -300,
+          0
+        ],
+        "guides": [
+          {
+            "axis": "vertical",
+            "end": 20,
+            "position": -960,
+            "start": -140,
+            "target": "00000000-0000-4000-8000-000000000100"
+          }
+        ],
+        "moved": 1,
+        "preview": true,
+        "requested_delta": [
+          -297,
+          0
+        ],
+        "skipped_locked": 0,
+        "snap_candidates_examined": 4,
+        "snapped": true
+      }
+    },
+    {
+      "name": "snap_corrected_applied_delta",
+      "passed": true,
+      "detail": [
+        -300,
+        0
+      ]
+    },
+    {
+      "name": "snap_guide_reported",
+      "passed": true,
+      "detail": [
+        {
+          "axis": "vertical",
+          "end": 20,
+          "position": -960,
+          "start": -140,
+          "target": "00000000-0000-4000-8000-000000000100"
+        }
+      ]
+    },
+    {
+      "name": "commit_transaction",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "snapped_node_left_edge_matches_first",
+      "passed": true,
+      "detail": [
+        -960,
+        -960
+      ]
+    },
+    {
+      "name": "undo_snapped_move",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "begin_drift_transaction",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "translate_frame_10",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "translate_frame_25",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "translate_frame_60",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "commit_drift_transaction",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "repeated_frames_measure_from_base",
+      "passed": true,
+      "detail": [
+        -660,
+        -600
+      ]
+    },
+    {
+      "name": "undo_drift",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "selection_set_all",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "arrange_align_left",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "align_moved_two_nodes",
+      "passed": true,
+      "detail": {
+        "changed": true,
+        "moved": 2,
+        "operation": "align_left",
+        "reference": [
+          -960,
+          -140,
+          -160,
+          120
+        ],
+        "unchanged": 1
+      }
+    },
+    {
+      "name": "align_is_one_history_entry",
+      "passed": true,
+      "detail": {
+        "before": 3,
+        "after": 4
+      }
+    },
+    {
+      "name": "aligned_left_edges_match",
+      "passed": true,
+      "detail": [
+        -960,
+        -960,
+        -960
+      ]
+    },
+    {
+      "name": "undo_alignment",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "undo_restores_every_target",
+      "passed": true,
+      "detail": [
+        -960,
+        -660,
+        -260
+      ]
+    },
+    {
+      "name": "arrange_distribute_horizontal",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "distribute_reported_change",
+      "passed": true,
+      "detail": {
+        "changed": true,
+        "moved": 1,
+        "operation": "distribute_horizontal",
+        "reference": [
+          -960,
+          -140,
+          -160,
+          120
+        ],
+        "unchanged": 2
+      }
+    },
+    {
+      "name": "distribute_equalized_gaps",
+      "passed": true,
+      "detail": [
+        250,
+        250
+      ]
+    },
+    {
+      "name": "undo_distribution",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "translation_without_transaction_is_typed",
+      "passed": true,
+      "detail": {
+        "code": "no_transaction",
+        "message": "translate_selection requires an active transaction"
+      }
+    },
+    {
+      "name": "unknown_arrange_is_typed",
+      "passed": true,
+      "detail": {
+        "code": "invalid_arrange",
+        "message": "unknown arrange operation align_diagonal"
+      }
+    },
+    {
+      "name": "selection_two_only",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "distribute_requires_three",
+      "passed": true,
+      "detail": {
+        "code": "runtime_error",
+        "message": "distribute_horizontal requires at least 3 targets but received 2"
+      }
+    },
+    {
+      "name": "no_transaction_left_open",
+      "passed": true,
+      "detail": {
+        "redo_depth": 1,
+        "transaction_active": false,
+        "undo_depth": 3
+      }
+    }
+  ],
+  "checks_passed": 46,
+  "checks_total": 46,
+  "all_passed": true
+}

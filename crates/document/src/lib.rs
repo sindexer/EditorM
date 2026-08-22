@@ -13,8 +13,8 @@ mod editor;
 mod order_sequence;
 
 pub use change::{
-    DocumentChange, DocumentChangeSet, DocumentRevision, NodePlacement, PersistentProperty,
-    StructuralGroupChange,
+    ChangeMergeError, DocumentChange, DocumentChangeSet, DocumentRevision, NodePlacement,
+    PersistentProperty, StructuralGroupChange,
 };
 pub use command::{Command, CommandError, CommandOutcome};
 pub use editor::{EditorError, HeadlessEditorCore, HistoryState, Selection, SelectionError};

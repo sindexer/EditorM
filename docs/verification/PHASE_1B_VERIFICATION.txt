@@ -1,0 +1,192 @@
+Phase 1B verification record
+============================
+
+Environment
+-----------
+host_os=Linux 6.18.44-fc-v21 x86_64 GNU/Linux
+container=Claude Code remote Linux container (no GPU, no display, no browser proof harness)
+rustc=rustc 1.89.0 (29483883e 2025-08-04)
+cargo=cargo 1.89.0 (c24e10642 2025-06-23)
+wasm_bindgen=wasm-bindgen 0.2.126
+node=v22.22.2
+npm=10.9.7
+git_commit_at_start=8f5a5515eafa0eed8f1f9199f6b73dd51d351f0b
+started_at_utc=2026-08-22T03:44:54Z
+
+NOTE: This record was produced on Linux. The repository's PowerShell wrappers
+(tools/cargo.ps1, tools/build-phase0e-wasm.ps1) are Windows entry points; the equivalent
+cargo and wasm-bindgen invocations below were executed directly with the pinned 1.89.0
+toolchain and wasm-bindgen 0.2.126. No Chrome, WebGPU, GPU adapter, or pixel readback
+evidence was produced here, and none is claimed.
+
+----------------------------------------------------------------
+command: cargo fmt --all -- --check
+started_at_utc=2026-08-22T03:44:54Z
+exit_status=0
+finished_at_utc=2026-08-22T03:44:54Z
+output:
+
+----------------------------------------------------------------
+command: cargo clippy --workspace --all-targets -- -D warnings
+started_at_utc=2026-08-22T03:44:54Z
+exit_status=0
+finished_at_utc=2026-08-22T03:44:55Z
+output:
+      Checking visual_authoring_wasm_bridge v0.1.0 (/home/user/EditorM/crates/wasm_bridge)
+      Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.97s
+
+----------------------------------------------------------------
+command: cargo build --workspace --all-targets
+started_at_utc=2026-08-22T03:44:55Z
+exit_status=0
+finished_at_utc=2026-08-22T03:44:58Z
+output:
+     Compiling visual_authoring_wasm_bridge v0.1.0 (/home/user/EditorM/crates/wasm_bridge)
+      Finished `dev` profile [unoptimized + debuginfo] target(s) in 2.39s
+
+----------------------------------------------------------------
+command: cargo test --workspace --all-targets
+started_at_utc=2026-08-22T03:44:58Z
+exit_status=0
+finished_at_utc=2026-08-22T03:48:28Z
+output:
+  running 12 tests
+  test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+  running 50 tests
+  test result: ok. 50 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.20s
+  running 3 tests
+  test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+  running 8 tests
+  test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+  running 5 tests
+  test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+  running 53 tests
+  test result: ok. 53 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 20.45s
+  running 0 tests
+  test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+  running 0 tests
+  test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+  running 0 tests
+  test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+  running 0 tests
+  test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+  running 0 tests
+  test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+  running 2 tests
+  test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 20.94s
+  running 1 test
+  test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+  running 1 test
+  test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+  running 1 test
+  test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 22.26s
+  running 1 test
+  test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+  running 1 test
+  test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+  running 2 tests
+  test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+  running 9 tests
+  test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+  running 9 tests
+  test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+  running 0 tests
+  test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+  running 13 tests
+  test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+  running 1 test
+  test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+  running 11 tests
+  test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.98s
+  running 14 tests
+  test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 106.63s
+  running 3 tests
+  test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+  running 1 test
+  test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 37.55s
+  running 12 tests
+  test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+----------------------------------------------------------------
+command: cargo build --release --target wasm32-unknown-unknown
+started_at_utc=2026-08-22T03:48:28Z
+exit_status=0
+finished_at_utc=2026-08-22T03:48:38Z
+output:
+     Compiling visual_authoring_document v0.1.0 (/home/user/EditorM/crates/document)
+     Compiling visual_authoring_spatial v0.1.0 (/home/user/EditorM/crates/spatial)
+     Compiling visual_authoring_serialization v0.1.0 (/home/user/EditorM/crates/serialization)
+     Compiling visual_authoring_scene v0.1.0 (/home/user/EditorM/crates/scene)
+     Compiling visual_authoring_render_model v0.1.0 (/home/user/EditorM/crates/render_model)
+     Compiling visual_authoring_runtime v0.1.0 (/home/user/EditorM/crates/runtime)
+     Compiling visual_authoring_wasm_bridge v0.1.0 (/home/user/EditorM/crates/wasm_bridge)
+      Finished `release` profile [optimized] target(s) in 9.64s
+
+----------------------------------------------------------------
+command: wasm-bindgen --target web --out-dir web/editor/public/pkg --out-name engine_host target/wasm32-unknown-unknown/release/visual_authoring_wasm_bridge.wasm
+started_at_utc=2026-08-22T03:48:38Z
+exit_status=0
+finished_at_utc=2026-08-22T03:48:38Z
+output:
+
+----------------------------------------------------------------
+command: node scripts/direct-wasm-phase1b.mjs
+started_at_utc=2026-08-22T03:48:38Z
+exit_status=0
+finished_at_utc=2026-08-22T03:48:38Z
+output:
+  PHASE_1B_DIRECT_WASM_JSON={"phase":"1B","proof_kind":"actual-wasm-direct-node","gpu_evidence":false,"started_at":"2026-08-22T03:48:38.499Z","finished_at":"2026-08-22T03:48:38.543Z","node_version":"v22.22.2","platform":"linux-x64","wasm_path":"web/editor/public/pkg/engine_host_bg.wasm","wasm_bytes":1402869,"wasm_sha256":"b7c77e5cb8dee4543f25588ee28b746e0d07c5be8d647c57826f8231a229c84b","protocol_version":1,"render_binary_schema_version":2,"engine_sequence":48,"checks":[{"name":"initialize","passed":true,"detail":null},{"name":"load_editor_fixture","passed":true,"detail":null},{"name":"resize_camera","passed":true,"detail":null},{"name":"editor_fixture_has_frame","passed":true,"detail":null},{"name":"create_rectangle_0","passed":true,"detail":null},{"name":"create_rectangle_1","passed":true,"detail":null},{"name":"create_rectangle_2","passed":true,"detail":null},{"name":"selection_set","passed":true,"detail":null},{"name":"selection_set_count","passed":true,"detail":["00000000-0000-4000-8000-000000000100","00000000-0000-4000-8000-000000000101","00000000-0000-4000-8000-000000000102"]},{"name":"selection_set_rejects_unknown_id","passed":true,"detail":{"code":"runtime_error","message":"node 00000000-0000-4000-8000-999999999999 cannot be selected because it does not exist"}},{"name":"selection_survives_rejected_request","passed":true,"detail":["00000000-0000-4000-8000-000000000100","00000000-0000-4000-8000-000000000101","00000000-0000-4000-8000-000000000102"]},{"name":"marquee_select","passed":true,"detail":null},{"name":"marquee_selects_intersecting_top_level_nodes","passed":true,"detail":["00000000-0000-4000-8000-000000000100","00000000-0000-4000-8000-000000000101"]},{"name":"selection_replace_second","passed":true,"detail":null},{"name":"begin_transaction","passed":true,"detail":null},{"name":"drag_base_captured","passed":true,"detail":{"drag_targets":1,"transaction_active":true}},{"name":"translate_selection_snapped","passed":true,"detail":null},{"name":"translation_snapped","passed":true,"detail":{"applied_delta":[-300,0],"guides":[{"axis":"vertical","end":20,"position":-960,"start":-140,"target":"00000000-0000-4000-8000-000000000100"}],"moved":1,"preview":true,"requested_delta":[-297,0],"skipped_locked":0,"snap_candidates_examined":4,"snapped":true}},{"name":"snap_corrected_applied_delta","passed":true,"detail":[-300,0]},{"name":"snap_guide_reported","passed":true,"detail":[{"axis":"vertical","end":20,"position":-960,"start":-140,"target":"00000000-0000-4000-8000-000000000100"}]},{"name":"commit_transaction","passed":true,"detail":null},{"name":"snapped_node_left_edge_matches_first","passed":true,"detail":[-960,-960]},{"name":"undo_snapped_move","passed":true,"detail":null},{"name":"begin_drift_transaction","passed":true,"detail":null},{"name":"translate_frame_10","passed":true,"detail":null},{"name":"translate_frame_25","passed":true,"detail":null},{"name":"translate_frame_60","passed":true,"detail":null},{"name":"commit_drift_transaction","passed":true,"detail":null},{"name":"repeated_frames_measure_from_base","passed":true,"detail":[-660,-600]},{"name":"undo_drift","passed":true,"detail":null},{"name":"selection_set_all","passed":true,"detail":null},{"name":"arrange_align_left","passed":true,"detail":null},{"name":"align_moved_two_nodes","passed":true,"detail":{"changed":true,"moved":2,"operation":"align_left","reference":[-960,-140,-160,120],"unchanged":1}},{"name":"align_is_one_history_entry","passed":true,"detail":{"before":3,"after":4}},{"name":"aligned_left_edges_match","passed":true,"detail":[-960,-960,-960]},{"name":"undo_alignment","passed":true,"detail":null},{"name":"undo_restores_every_target","passed":true,"detail":[-960,-660,-260]},{"name":"arrange_distribute_horizontal","passed":true,"detail":null},{"name":"distribute_reported_change","passed":true,"detail":{"changed":true,"moved":1,"operation":"distribute_horizontal","reference":[-960,-140,-160,120],"unchanged":2}},{"name":"distribute_equalized_gaps","passed":true,"detail":[250,250]},{"name":"undo_distribution","passed":true,"detail":null},{"name":"translation_without_transaction_is_typed","passed":true,"detail":{"code":"no_transaction","message":"translate_selection requires an active transaction"}},{"name":"unknown_arrange_is_typed","passed":true,"detail":{"code":"invalid_arrange","message":"unknown arrange operation align_diagonal"}},{"name":"selection_two_only","passed":true,"detail":null},{"name":"distribute_requires_three","passed":true,"detail":{"code":"runtime_error","message":"distribute_horizontal requires at least 3 targets but received 2"}},{"name":"no_transaction_left_open","passed":true,"detail":{"redo_depth":1,"transaction_active":false,"undo_depth":3}}],"checks_passed":46,"checks_total":46,"all_passed":true}
+
+----------------------------------------------------------------
+command: npm test
+started_at_utc=2026-08-22T03:48:38Z
+exit_status=0
+finished_at_utc=2026-08-22T03:48:40Z
+output:
+   RUN  v3.2.7 /home/user/EditorM/web/editor
+  
+   ✓ tests/browser-proof-phase1a.test.ts (5 tests) 13ms
+   ✓ tests/phase1b-contract.test.ts (15 tests) 9ms
+   ✓ tests/phase1b-direct-wasm.test.ts (4 tests) 7ms
+   ✓ tests/phase1a-contract.test.ts (5 tests) 6ms
+  stdout | tests/projection.test.ts > R2 React ProjectionStore bounded benchmark > 10k and 100k group/ungroup use 10 warmups and 30 measured iterations
+  PHASE0E_R2_REACT_JSON={"phase":"0E-R2","layer":"react-projection-store","fixtures":[{"node_count":10000,"target_ids":["node-0","node-5000","node-9999"],"warmups":10,"measured_iterations":30,"group":{"samples_ms":[0.035366999999951076,0.03509199999984958,0.03307599999993727,0.06567500000005566,0.057477999999946405,0.036769999999933134,0.07906000000002678,0.04014899999992849,0.03334699999982149,0.034830000000056316,0.032603999999992084,0.04591800000002877,0.12078700000006393,0.033074999999826105,0.03288399999996727,0.03248200000007273,0.03684700000007979,0.033003999999891676,0.032655999999860796,0.08006399999999303,0.034263000000009924,0.03672499999993306,0.032993000000033135,0.032881000000088534,0.03409699999997429,0.0332220000000234,0.06970000000001164,0.037044000000150845,0.03230499999995118,0.030806999999867912],"median_ms":0.034830000000056316,"p95_ms":0.08006399999999303,"work_samples":[453,453,453,453,453,453,453,453,453,453,453,453,453,453,453,453,453,453,453,453,453,453,453,453,453,453,453,453,453,453]},"ungroup":{"samples_ms":[0.03401299999995899,0.033877000000074986,0.03308999999990192,0.05700299999989511,0.05693100000007689,0.035008000000061656,0.038140000000112195,0.03477500000008149,0.035538999999971566,0.03212900000016816,0.031797999999980675,0.037119999999958964,0.03406799999993382,0.03202699999997094,0.03172200000017256,0.04690699999991921,0.032924000000093656,0.03203099999996084,0.03199900000004163,0.0422120000000632,0.04570699999999306,0.03358800000000883,0.03275800000005802,0.03262499999982538,0.03287199999999757,0.044189999999844076,0.03837300000009236,0.03286400000001777,0.028911999999991167,0.028823999999985972],"median_ms":0.033877000000074986,"p95_ms":0.05693100000007689,"work_samples":[476,476,476,476,476,476,476,476,476,476,476,476,476,476,476,476,476,476,476,476,476,476,476,476,476,476,476,476,476,476]}},{"node_count":100000,"target_ids":["node-0","node-50000","node-99999"],"warmups":10,"measured_iterations":30,"group":{"samples_ms":[0.03307599999993727,0.03337099999998827,0.03306099999986145,0.05037000000015723,0.0347399999998288,0.03305199999999786,0.035632000000077824,0.03305199999999786,0.03305500000010397,0.035429999999905704,0.037477999999964595,0.03336899999999332,0.034269999999878564,0.03387099999986276,0.037753000000066095,0.03424699999982295,0.03446899999994457,0.03385400000001937,0.035329999999930806,0.03627299999993738,0.03340400000001864,0.047854999999799475,0.026847000000088883,0.028154000000085944,0.02564499999994041,0.025294000000030792,0.02577500000006694,0.02536199999985911,0.02573300000017298,0.057821000000103595],"median_ms":0.03385400000001937,"p95_ms":0.05037000000015723,"work_samples":[558,558,558,558,558,558,558,558,558,558,558,558,558,558,558,558,558,558,558,558,558,558,558,558,558,558,558,558,558,558]},"ungroup":{"samples_ms":[0.031275999999934356,0.03161199999999553,0.03114800000003015,0.035768000000189204,0.031199000000015076,0.03131299999995463,0.03165600000011182,0.03141600000003564,0.04184999999984029,0.04037700000003497,0.03189199999997072,0.03146700000002056,0.0337050000000545,0.0846639999999752,0.03388700000004974,0.03286600000001272,0.03187899999988986,0.03226700000004712,0.041429999999991196,0.031970000000001164,0.041067999999995664,0.04282199999988734,0.03150000000005093,0.02791199999978744,0.026787000000012995,0.026395000000093205,0.02659999999991669,0.02645799999982046,0.03587700000002769,0.03276200000004792],"median_ms":0.03189199999997072,"p95_ms":0.04282199999988734,"work_samples":[600,600,600,600,600,600,600,600,600,600,600,600,600,600,600,600,600,600,600,600,600,600,600,600,600,600,600,600,600,600]}}],"ratios_100k_over_10k":{"groupWork":1.2317880794701987,"ungroupWork":1.2605042016806722,"groupMedianTime":0.9719781797291023,"ungroupMedianTime":0.9414056734628252},"all_passed":true}
+  
+  stdout | tests/projection.test.ts > R2 Layers and engine z-order agreement > eight overlapping siblings retain exact noncontiguous group and ungroup order
+  PHASE0E_R2_REACT_ORDER_JSON={"phase":"0E-R2","overlapping_sibling_count":8,"targets":["sibling-0","sibling-3","sibling-7"],"grouped_layers_order":["group-eight","sibling-0","sibling-3","sibling-7","sibling-1","sibling-2","sibling-4","sibling-5","sibling-6"],"engine_topmost_order":["sibling-6","sibling-5","sibling-4","sibling-2","sibling-1","sibling-7","sibling-3","sibling-0"],"restored_layers_order":["sibling-0","sibling-1","sibling-2","sibling-3","sibling-4","sibling-5","sibling-6","sibling-7"],"stale_dense_index_present":false,"all_passed":true}
+  
+   ✓ tests/projection.test.ts (7 tests) 855ms
+     ✓ versioned UI projection > 100k group and ungroup use bounded structural operations without a full hierarchy rebuild  461ms
+  
+   Test Files  5 passed (5)
+        Tests  36 passed (36)
+     Start at  03:48:39
+     Duration  1.35s (transform 304ms, setup 0ms, collect 434ms, tests 890ms, environment 1ms, prepare 416ms)
+  
+
+----------------------------------------------------------------
+command: npm run build
+started_at_utc=2026-08-22T03:48:40Z
+exit_status=0
+finished_at_utc=2026-08-22T03:48:45Z
+output:
+  
+  > visual-authoring-phase0e-editor@0.1.0 build
+  > tsc -b && vite build
+  
+  vite v6.4.3 building for production...
+  transforming...
+  ✓ 1584 modules transformed.
+  rendering chunks...
+  computing gzip size...
+  dist/index.html                   0.48 kB │ gzip:  0.32 kB
+  dist/assets/index-7mgYzBHV.css   16.36 kB │ gzip:  4.06 kB
+  dist/assets/index-BWKPvAOZ.js   230.76 kB │ gzip: 70.82 kB │ map: 607.78 kB
+  ✓ built in 1.77s
+
+----------------------------------------------------------------
+artifacts
+  engine_host_bg.wasm bytes=1402869
+  engine_host_bg.wasm sha256=b7c77e5cb8dee4543f25588ee28b746e0d07c5be8d647c57826f8231a229c84b
+  rust test binaries executed: see cargo test output above
+finished_at_utc=2026-08-22T03:48:45Z
