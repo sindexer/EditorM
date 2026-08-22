@@ -279,12 +279,16 @@ try {
     $powerShell = (Get-Command powershell.exe -ErrorAction Stop).Source
     $cargoScript = Join-Path $repoRoot "tools\cargo.ps1"
     $wasmScript = Join-Path $repoRoot "tools\build-phase0e-wasm.ps1"
+    $wasmSmokeScript = Join-Path $repoRoot "tools\ci-wasm-smoke.mjs"
+    $gateWasmOutDir = Join-Path $repoRoot "target\phase1b-gate-wasm-pkg"
+    $nodeExecutable = (Get-Command node.exe -ErrorAction Stop).Source
 
     Invoke-GateStep -Id "cargo_fmt" -DisplayName "cargo fmt check" -Executable $powerShell -Arguments @("-NoProfile", "-ExecutionPolicy", "Bypass", "-File", $cargoScript, "fmt", "--all", "--", "--check")
     Invoke-GateStep -Id "cargo_clippy" -DisplayName "cargo clippy workspace/all-targets" -Executable $powerShell -Arguments @("-NoProfile", "-ExecutionPolicy", "Bypass", "-File", $cargoScript, "clippy", "--workspace", "--all-targets", "--", "-D", "warnings")
     Invoke-GateStep -Id "cargo_build" -DisplayName "cargo build workspace/all-targets" -Executable $powerShell -Arguments @("-NoProfile", "-ExecutionPolicy", "Bypass", "-File", $cargoScript, "build", "--workspace", "--all-targets")
     Invoke-GateStep -Id "cargo_test" -DisplayName "cargo test workspace/all-targets" -Executable $powerShell -Arguments @("-NoProfile", "-ExecutionPolicy", "Bypass", "-File", $cargoScript, "test", "--workspace", "--all-targets")
-    Invoke-GateStep -Id "wasm_build" -DisplayName "build shipped Phase 0E WASM" -Executable $powerShell -Arguments @("-NoProfile", "-ExecutionPolicy", "Bypass", "-File", $wasmScript) -Artifacts @("web/editor/public/pkg/engine_host.js", "web/editor/public/pkg/engine_host_bg.wasm")
+    Invoke-GateStep -Id "wasm_build" -DisplayName "build fresh Phase 0E WASM outside the tracked package" -Executable $powerShell -Arguments @("-NoProfile", "-ExecutionPolicy", "Bypass", "-File", $wasmScript, "-OutDir", $gateWasmOutDir) -Artifacts @("target/phase1b-gate-wasm-pkg/engine_host.js", "target/phase1b-gate-wasm-pkg/engine_host_bg.wasm")
+    Invoke-GateStep -Id "wasm_smoke" -DisplayName "verify fresh WASM bindings, ABI, and EngineHost initialization" -Executable $nodeExecutable -Arguments @($wasmSmokeScript, "--pkg", $gateWasmOutDir) -Artifacts @("target/phase1b-gate-wasm-pkg/engine_host.js", "target/phase1b-gate-wasm-pkg/engine_host_bg.wasm")
 
     Set-Location $editorRoot
     $npm = (Get-Command npm.cmd -ErrorAction Stop).Source
