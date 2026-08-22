@@ -1,0 +1,42 @@
+{
+  "phase": "1C",
+  "proof_kind": "actual-browser-gate-failure",
+  "gate_run_id": "phase1c-20260822-2004-kst-r6",
+  "tested_source_commit": "78400328b2755ab94e28de6de25054e7e2b0cd62",
+  "tested_branch": "feat/phase1c-direct-editing",
+  "execution": {
+    "command": "npm run test:browser:phase1c",
+    "started_at_utc": "2026-08-22T11:02:34.323Z",
+    "finished_at_utc": "2026-08-22T11:03:08.581Z",
+    "exit_status": 1
+  },
+  "code": "condition_timeout",
+  "message": "Timed out waiting for window.__PHASE0E_PROOF__?.selection_count === 2",
+  "details": {},
+  "browser_diagnostics": {
+    "tool": "select",
+    "fsm": "Idle",
+    "selection": [],
+    "primary_node": null,
+    "camera": {
+      "center": [
+        0,
+        0
+      ],
+      "dpr": 1,
+      "viewport": [
+        1040,
+        863
+      ],
+      "zoom": 0.4997397188964081
+    },
+    "shell": {
+      "x": 280,
+      "y": 84,
+      "width": 1040,
+      "height": 863
+    }
+  },
+  "console_errors": [],
+  "chrome_stderr_tail": "\r\nDevTools listening on ws://127.0.0.1:2389/devtools/browser/1b7afe85-575b-416e-9cb9-22d309e4d57f\r\n[7420:49620:0822/200237.298:ERROR:components\\device_event_log\\device_event_log_impl.cc:200] [20:02:37.310] USB: usb_service_win.cc:108 SetupDiGetDeviceProperty({{A45C254E-DF1C-4EFD-8020-67D146A850E0}, 6}) failed: 요소가 없습니다. (0x490)\r\n[7420:50880:0822/200238.076:ERROR:google_apis\\gcm\\engine\\registration_request.cc:291] Registration response error message: DEPRECATED_ENDPOINT\r\nCreated TensorFlow Lite XNNPACK delegate for CPU.\r\n[7420:50880:0822/200306.231:ERROR:google_apis\\gcm\\engine\\registration_request.cc:291] Registration response error message: DEPRECATED_ENDPOINT\r\n"
+}

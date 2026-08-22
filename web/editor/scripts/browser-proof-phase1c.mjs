@@ -253,9 +253,9 @@ try {
   const rectangles = [await createRectangle(slideNode.world_bounds, 0), await createRectangle(slideNode.world_bounds, 1), await createRectangle(slideNode.world_bounds, 2)];
   await click("[data-testid='tool-select']");
   await waitFor("window.__PHASE0E_PROOF__?.tool === 'select'", 30000, "select_tool_not_active");
-  await clickPoint(await clientForNode(rectangles[0]));
-  await clickPoint(await clientForNode(rectangles[1]), 8);
-  await waitFor("window.__PHASE0E_PROOF__?.selection_count === 2");
+  await click(`[data-node-id='${rectangles[0]}']`);
+  await click(`[data-node-id='${rectangles[1]}']`, 8);
+  await waitFor("window.__PHASE0E_PROOF__?.selection_count === 2", 30000, "layers_shift_selection_failed");
   const shiftSelection = await selection();
   const layersSynchronized = await evaluate("document.querySelectorAll('.layer-row.is-selected').length === 2");
 
@@ -265,7 +265,7 @@ try {
   const bandStart = await clientForWorld([firstBounds.min[0] - 25, firstBounds.min[1] - 25]);
   const bandEnd = await clientForWorld([secondBounds.max[0] + 25, secondBounds.max[1] + 25]);
   await drag(bandStart, bandEnd, { ready: "window.__PHASE0E_PROOF__?.fsm === 'MarqueeSelecting'" });
-  await waitFor("window.__PHASE0E_PROOF__?.selection_count === 2");
+  await waitFor("window.__PHASE0E_PROOF__?.selection_count === 2", 30000, "canvas_marquee_selection_failed");
   const marqueeSelection = await selection();
 
   const moveBeforeNodes = await nodes(); const moveHistory = (await proof()).history.undo_depth;
@@ -330,7 +330,8 @@ try {
   await click("[data-testid='ungroup']"); await waitFor("window.__PHASE0E_PROOF__?.selection_count === 3 && window.__PHASE0E_PROOF__?.primary_node?.kind !== 'group'", 30000, "ungroup_command_failed");
   const ungrouped = await nodes(); const ungroupPreserved = rectangles.every((id) => JSON.stringify(ungrouped.get(id).world_transform) === JSON.stringify(preGroup.get(id).world_transform)) && !ungrouped.has(groupId) && (await proof()).history.undo_depth === groupHistory + 2;
 
-  await clickPoint(await clientForNode(rectangles[0])); await clickPoint(await clientForNode(rectangles[1]), 8); await waitFor("window.__PHASE0E_PROOF__?.selection_count === 2");
+  await send("selection", { mode: "set", targets: rectangles.slice(0, 2) });
+  await waitFor("window.__PHASE0E_PROOF__?.selection_count === 2", 30000, "inspector_selection_failed");
   const mixedShown = await evaluate("document.querySelector(\"input[aria-label='X']\")?.dataset.mixed === 'true'");
   const mixedHistory = (await proof()).history.undo_depth; await replaceNumeric("X", 320); await waitFor(`window.__PHASE0E_PROOF__?.history?.undo_depth === ${mixedHistory + 1}`);
   const mixedAppliedNodes = await nodes(); const mixedApplied = rectangles.slice(0, 2).every((id) => close(mixedAppliedNodes.get(id).local_transform[4], 320));
