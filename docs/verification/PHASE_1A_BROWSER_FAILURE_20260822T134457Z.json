@@ -1,0 +1,243 @@
+{
+  "phase": "1A",
+  "gate_run_id": "phase1b-20260822T134457Z-859f8254770f-f0827ff8",
+  "tested_source_commit": "859f8254770f710ebe628afd4e6dd229d1560ca1",
+  "tested_branch": "main",
+  "captured_at_utc": "2026-08-22T13:53:52.369Z",
+  "code": "condition_timeout",
+  "message": "Timed out waiting for window.__PHASE0E_PROOF__?.fsm === \"Moving\"",
+  "details": {},
+  "preview_url": "http://127.0.0.1:53388/",
+  "preview_health": {
+    "ok": true,
+    "status": 200,
+    "body": {
+      "ok": true,
+      "phase": "0E"
+    }
+  },
+  "preview_assets": {
+    "/index.html": {
+      "status": 200,
+      "content_type": "text/html; charset=utf-8"
+    },
+    "/worker.js": {
+      "status": 200,
+      "content_type": "text/javascript; charset=utf-8"
+    },
+    "/pkg/engine_host.js": {
+      "status": 200,
+      "content_type": "text/javascript; charset=utf-8"
+    },
+    "/pkg/engine_host_bg.wasm": {
+      "status": 200,
+      "content_type": "application/wasm"
+    }
+  },
+  "preview_server": {
+    "exited": false,
+    "exit_code": null,
+    "stdout": "Phase 0E editor: http://127.0.0.1:53388/\n",
+    "stderr": ""
+  },
+  "browser": {
+    "body_ready": "true",
+    "state": {
+      "ready": true,
+      "lastError": null
+    },
+    "proof": {
+      "phase": "0E",
+      "ready": true,
+      "actual_webgpu": true,
+      "adapter": "maxwell",
+      "backend": "browser-webgpu (implementation backend not exposed by Web API)",
+      "surface_base_format": "bgra8unorm",
+      "pipeline_view_format": "bgra8unorm-srgb",
+      "readback_view_format": "bgra8unorm-srgb",
+      "worker_runtime_owner": "dedicated-worker",
+      "wasm_initialized": true,
+      "heartbeat": 62,
+      "engine_sequence": 346,
+      "gpu_frame_sequence": 346,
+      "overlay_sequence": 346,
+      "revisions": {
+        "document": 70,
+        "render": 70,
+        "scene": 70
+      },
+      "fixture": "EDITOR",
+      "metrics": {
+        "allocation_growth_count": 0,
+        "cpu_update_ms": 0,
+        "culling_candidates": 0,
+        "document_full_clones": 0,
+        "document_nodes": 5,
+        "document_nodes_scanned": 0,
+        "document_nodes_touched": 0,
+        "document_sequence_allocated_bytes": 0,
+        "document_sequence_dense_index_rewrites": 0,
+        "document_sequence_entries_copied": 0,
+        "document_sequence_entries_examined": 0,
+        "document_sequence_entries_moved_or_shifted": 0,
+        "document_sequence_fallback_or_rebuild_count": 0,
+        "document_sequence_full_copies": 0,
+        "document_sequence_full_scans": 0,
+        "document_sequence_maximum_depth": 0,
+        "document_sequence_nodes_allocated": 0,
+        "document_sequence_rank_order_comparisons": 0,
+        "document_sequence_tree_rebalances": 0,
+        "fallback_rebuild_count": 0,
+        "full_render_model_scans": 0,
+        "gpu_encode_attempted": 0,
+        "gpu_encode_omitted": 0,
+        "indexed_nodes": 3,
+        "instance_upload_bytes": 0,
+        "invalid_derived_nodes": 0,
+        "order_nodes_visited": 0,
+        "render_items_cloned": 0,
+        "render_items_planned": 0,
+        "render_items_read": 0,
+        "render_items_written": 0,
+        "scene_nodes_visited": 0,
+        "scene_sequence_allocated_bytes": 0,
+        "scene_sequence_dense_index_rewrites": 0,
+        "scene_sequence_entries_copied": 0,
+        "scene_sequence_entries_examined": 0,
+        "scene_sequence_entries_moved_or_shifted": 0,
+        "scene_sequence_fallback_or_rebuild_count": 0,
+        "scene_sequence_full_copies": 0,
+        "scene_sequence_full_scans": 0,
+        "scene_sequence_maximum_depth": 0,
+        "scene_sequence_nodes_allocated": 0,
+        "scene_sequence_rank_order_comparisons": 0,
+        "scene_sequence_tree_rebalances": 0,
+        "sibling_search_steps": 0,
+        "ui_child_ids_serialized": 0,
+        "ui_delta_nodes": 0,
+        "ui_full_snapshots": 0,
+        "ui_nodes_serialized": 0,
+        "ui_projection_payload_bytes": 0,
+        "ui_structural_operations": 0,
+        "visible_items": 0,
+        "visible_slot_upload_bytes": 0
+      },
+      "gpu": {
+        "draw_calls": 1,
+        "batches": 1,
+        "submitted_instances": 3,
+        "buffer_count": 3,
+        "buffer_bytes": 492,
+        "upload_calls": 1,
+        "frame_upload_bytes": 32,
+        "render_submit_ms": 3.7999999970197678,
+        "frame_ms": 3.7999999970197678,
+        "validation_errors": 0,
+        "frame_sequence": 346,
+        "gpu_encode_attempted": 0,
+        "gpu_encode_omitted": 0,
+        "instance_upload_bytes": 0,
+        "visible_slot_upload_bytes": 0,
+        "allocation_growth_count": 7
+      },
+      "ui": {
+        "projectionFullSnapshots": 2,
+        "projectionDeltaNodes": 68,
+        "layersFullSerializes": 2,
+        "hierarchyRebuilds": 2,
+        "hierarchyNodesVisited": 5,
+        "hierarchyFullRebuilds": 2,
+        "projectionStructuralOperations": 5,
+        "layersFlattenedNodesVisited": 1599,
+        "mountedRows": 5,
+        "pointerRawIntents": 22,
+        "pointerRequestsSent": 14,
+        "pointerRequestsCoalesced": 8,
+        "sequenceEntriesExamined": 105,
+        "sequenceEntriesCopied": 18,
+        "sequenceEntriesMovedOrShifted": 27,
+        "sequenceRankOrderComparisons": 67,
+        "sequenceNodesAllocated": 16,
+        "sequenceAllocatedBytes": 1280,
+        "sequenceTreeRebalances": 0,
+        "sequenceMaximumDepth": 3,
+        "sequenceFallbackOrRebuildCount": 0,
+        "sequenceFullScans": 0,
+        "sequenceFullCopies": 0,
+        "sequenceDenseIndexRewrites": 0
+      },
+      "selection": [],
+      "response_gpu_overlay_sequence_match": true,
+      "fsm": "MarqueeSelecting",
+      "tool": "select",
+      "nested_edit_root": null,
+      "console_errors": 0,
+      "fallback_rebuild_count": 0,
+      "gpu_validation_errors": 0,
+      "history": {
+        "redo_depth": 0,
+        "transaction_active": false,
+        "undo_depth": 55
+      },
+      "camera": {
+        "center": [
+          -338.89923469387753,
+          -196.40816326530611
+        ],
+        "dpr": 1,
+        "viewport": [
+          880,
+          863
+        ],
+        "zoom": 4.698391070920869
+      },
+      "projection_nodes": 5,
+      "projection_schema_version": 2,
+      "primary_node": null,
+      "render_delta": {
+        "dirty_ranges": 0,
+        "dirty_slots": 0,
+        "full": false,
+        "removed_slots": 0,
+        "render_full_rebuilds": 0,
+        "scene_full_rebuilds": 0,
+        "upload_bytes": 0
+      },
+      "render_binary_schema_version": 2,
+      "resources": {
+        "allocated_slots": 4,
+        "dirty_record_stride_bytes": 116,
+        "free_slots": 0,
+        "gpu_encodable_items": 3,
+        "gpu_omitted_items": 0,
+        "instance_capacity": 4,
+        "instance_stride_bytes": 112,
+        "renderable_items": 3,
+        "total_render_items": 4
+      },
+      "binary": {
+        "dirty_instances": false,
+        "full_instances": false,
+        "removed_slots": false,
+        "visible_slots": false
+      },
+      "interaction_active": {
+        "pointer_id": 1,
+        "kind": "marquee"
+      },
+      "selection_count": 0,
+      "snap_enabled": true,
+      "snap_guides": 0,
+      "marquee_active": true,
+      "interaction_queue": {
+        "generation": 0,
+        "in_flight": false,
+        "scheduled": false,
+        "latest": false
+      }
+    },
+    "navigator_gpu": true
+  },
+  "console_errors": [],
+  "chrome_stderr_tail": "\r\nDevTools listening on ws://127.0.0.1:53392/devtools/browser/4e7cbd51-20d9-40bf-820c-5cf51b90265b\r\n[11120:8604:0822/225251.509:ERROR:google_apis\\gcm\\engine\\registration_request.cc:291] Registration response error message: DEPRECATED_ENDPOINT\r\nCreated TensorFlow Lite XNNPACK delegate for CPU.\r\n[11120:8604:0822/225318.612:ERROR:google_apis\\gcm\\engine\\registration_request.cc:291] Registration response error message: DEPRECATED_ENDPOINT\r\n"
+}

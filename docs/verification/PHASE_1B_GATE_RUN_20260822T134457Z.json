@@ -1,0 +1,177 @@
+{
+    "phase":  "1B",
+    "record":  "Windows Gate 1B orchestration run",
+    "gate_run_id":  "phase1b-20260822T134457Z-859f8254770f-f0827ff8",
+    "tested_source_commit":  "859f8254770f710ebe628afd4e6dd229d1560ca1",
+    "tested_branch":  "main",
+    "started_at_utc":  "2026-08-22T13:44:57.2301093Z",
+    "finished_at_utc":  "2026-08-22T13:53:52.8197000Z",
+    "status":  "FAIL",
+    "gate_conclusion":  "NOT PASSED",
+    "environment":  {
+                        "windows":  {
+                                        "os_version":  "Microsoft Windows NT 10.0.19045.0",
+                                        "caption":  "Microsoft Windows 10 Pro",
+                                        "version":  "10.0.19045",
+                                        "build_number":  "19045"
+                                    },
+                        "chrome_executable":  "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+                        "chrome_exists":  true,
+                        "node":  {
+                                     "command":  "node.exe System.String[]",
+                                     "available":  true,
+                                     "exit_code":  0,
+                                     "output":  "v24.19.0"
+                                 },
+                        "rust_toolchain":  {
+                                               "command":  "D:\\Codex\\EditorM\\.tools\\cargo\\bin\\rustup.exe System.String[]",
+                                               "available":  true,
+                                               "exit_code":  0,
+                                               "output":  "1.89.0-x86_64-pc-windows-msvc (overridden by \u0027D:\\Codex\\EditorM\\rust-toolchain.toml\u0027)"
+                                           },
+                        "rustc":  {
+                                      "command":  "D:\\Codex\\EditorM\\.tools\\cargo\\bin\\rustc.exe System.String[]",
+                                      "available":  true,
+                                      "exit_code":  0,
+                                      "output":  "rustc 1.89.0 (29483883e 2025-08-04)\r\nbinary: rustc\r\ncommit-hash: 29483883eed69d5fb4db01964cdf2af4d86e9cb2\r\ncommit-date: 2025-08-04\r\nhost: x86_64-pc-windows-msvc\r\nrelease: 1.89.0\r\nLLVM version: 20.1.7"
+                                  },
+                        "cargo":  {
+                                      "command":  "D:\\Codex\\EditorM\\.tools\\cargo\\bin\\cargo.exe System.String[]",
+                                      "available":  true,
+                                      "exit_code":  0,
+                                      "output":  "cargo 1.89.0 (c24e10642 2025-06-23)"
+                                  },
+                        "wasm_bindgen_executable":  "D:\\Codex\\EditorM\\.tools\\wasm-bindgen-0.2.126\\bin\\wasm-bindgen.exe",
+                        "wasm_bindgen":  {
+                                             "command":  "D:\\Codex\\EditorM\\.tools\\wasm-bindgen-0.2.126\\bin\\wasm-bindgen.exe System.String[]",
+                                             "available":  true,
+                                             "exit_code":  0,
+                                             "output":  "wasm-bindgen 0.2.126"
+                                         }
+                    },
+    "source_tree":  {
+                        "initially_dirty":  false,
+                        "initial_status":  [
+
+                                           ],
+                        "initial_paths":  [
+
+                                          ],
+                        "unexpected_paths":  [
+
+                                             ],
+                        "note":  "Generated verification artifacts may make the tree dirty after this snapshot."
+                    },
+    "steps":  [
+                  {
+                      "id":  "cargo_fmt",
+                      "display_name":  "cargo fmt check",
+                      "command":  "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe System.String[]",
+                      "working_directory":  "D:\\Codex\\EditorM",
+                      "started_at_utc":  "2026-08-22T13:44:59.6298638Z",
+                      "finished_at_utc":  "2026-08-22T13:45:01.8848014Z",
+                      "status":  "PASS",
+                      "exit_code":  0,
+                      "error":  null,
+                      "artifacts":  [
+
+                                    ]
+                  },
+                  {
+                      "id":  "cargo_clippy",
+                      "display_name":  "cargo clippy workspace/all-targets",
+                      "command":  "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe System.String[]",
+                      "working_directory":  "D:\\Codex\\EditorM",
+                      "started_at_utc":  "2026-08-22T13:45:01.8877716Z",
+                      "finished_at_utc":  "2026-08-22T13:45:04.3087921Z",
+                      "status":  "PASS",
+                      "exit_code":  0,
+                      "error":  null,
+                      "artifacts":  [
+
+                                    ]
+                  },
+                  {
+                      "id":  "cargo_build",
+                      "display_name":  "cargo build workspace/all-targets",
+                      "command":  "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe System.String[]",
+                      "working_directory":  "D:\\Codex\\EditorM",
+                      "started_at_utc":  "2026-08-22T13:45:04.3107714Z",
+                      "finished_at_utc":  "2026-08-22T13:45:06.3670267Z",
+                      "status":  "PASS",
+                      "exit_code":  0,
+                      "error":  null,
+                      "artifacts":  [
+
+                                    ]
+                  },
+                  {
+                      "id":  "cargo_test",
+                      "display_name":  "cargo test workspace/all-targets",
+                      "command":  "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe System.String[]",
+                      "working_directory":  "D:\\Codex\\EditorM",
+                      "started_at_utc":  "2026-08-22T13:45:06.3680288Z",
+                      "finished_at_utc":  "2026-08-22T13:51:50.0270525Z",
+                      "status":  "PASS",
+                      "exit_code":  0,
+                      "error":  null,
+                      "artifacts":  [
+
+                                    ]
+                  },
+                  {
+                      "id":  "wasm_build",
+                      "display_name":  "build shipped Phase 0E WASM",
+                      "command":  "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe System.String[]",
+                      "working_directory":  "D:\\Codex\\EditorM",
+                      "started_at_utc":  "2026-08-22T13:51:50.0280519Z",
+                      "finished_at_utc":  "2026-08-22T13:51:56.3182599Z",
+                      "status":  "PASS",
+                      "exit_code":  0,
+                      "error":  null,
+                      "artifacts":  [
+                                        "web/editor/public/pkg/engine_host.js",
+                                        "web/editor/public/pkg/engine_host_bg.wasm"
+                                    ]
+                  },
+                  {
+                      "id":  "npm_ci",
+                      "display_name":  "install exact editor dependencies",
+                      "command":  "D:\\Codex\\EditorM\\.tools\\node-bin\\npm.cmd System.String[]",
+                      "working_directory":  "D:\\Codex\\EditorM\\web\\editor",
+                      "started_at_utc":  "2026-08-22T13:51:56.3222600Z",
+                      "finished_at_utc":  "2026-08-22T13:52:27.7517621Z",
+                      "status":  "PASS",
+                      "exit_code":  0,
+                      "error":  null,
+                      "artifacts":  [
+
+                                    ]
+                  },
+                  {
+                      "id":  "phase1a_browser",
+                      "display_name":  "Phase 1A browser regression",
+                      "command":  "D:\\Codex\\EditorM\\.tools\\node-bin\\npm.cmd System.String[]",
+                      "working_directory":  "D:\\Codex\\EditorM\\web\\editor",
+                      "started_at_utc":  "2026-08-22T13:52:27.7528674Z",
+                      "finished_at_utc":  "2026-08-22T13:53:52.7886934Z",
+                      "status":  "FAIL",
+                      "exit_code":  1,
+                      "error":  null,
+                      "artifacts":  [
+                                        "docs/verification/PHASE_1A_BROWSER_PROOF.json",
+                                        "docs/verification/PHASE_1A_PIXEL_READBACK.json"
+                                    ]
+                  }
+              ],
+    "first_failure":  {
+                          "step_id":  "phase1a_browser",
+                          "message":  "Phase 1A browser regression failed.",
+                          "exit_code":  1,
+                          "captured_at_utc":  "2026-08-22T13:53:52.8027064Z",
+                          "artifacts":  [
+                                            "docs/verification/PHASE_1A_BROWSER_PROOF.json",
+                                            "docs/verification/PHASE_1A_PIXEL_READBACK.json"
+                                        ]
+                      }
+}

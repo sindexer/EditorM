@@ -1,0 +1,13 @@
+{
+  "phase": "1B",
+  "record": "Phase 1A browser regression result for the current Gate 1B run",
+  "gate_run_id": "phase1b-20260822T134457Z-859f8254770f-f0827ff8",
+  "tested_source_commit": "859f8254770f710ebe628afd4e6dd229d1560ca1",
+  "tested_branch": "main",
+  "captured_at_utc": "2026-08-22T13:53:53.297Z",
+  "status": "FAIL",
+  "reason": "condition_timeout: Timed out waiting for window.__PHASE0E_PROOF__?.fsm === \"Moving\"",
+  "artifacts": [
+    "docs/verification/PHASE_1A_BROWSER_FAILURE.json"
+  ]
+}
