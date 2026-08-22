@@ -112,8 +112,9 @@ describe("Phase 1B editor wiring", () => {
     expect(styles).toContain(".snap-guide");
   });
 
-  test("transform handles stay on a single selection in this phase", () => {
-    expect(app).toContain("if (engine.projection.selection.length > 1) return null;");
+  test("Phase 1C extends the shared selection overlay with aggregate transform handles", () => {
+    expect(app).toContain("RESIZE_HANDLES.map");
+    expect(app).toContain('engine.send("transform_selection"');
   });
 });
 

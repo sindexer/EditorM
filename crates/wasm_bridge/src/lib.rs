@@ -48,6 +48,9 @@ enum HostRequest {
     Command {
         command: CommandRequest,
     },
+    CommandBatch {
+        commands: Vec<CommandRequest>,
+    },
     BeginTransaction,
     UpdateTransaction {
         command: CommandRequest,
@@ -62,12 +65,19 @@ enum HostRequest {
     HitTest {
         x: f64,
         y: f64,
+        #[serde(default)]
+        root_id: Option<String>,
+        #[serde(default)]
+        selectable_only: bool,
     },
     Selection {
         target: Option<String>,
         #[serde(default)]
         targets: Option<Vec<String>>,
         mode: String,
+    },
+    SetActiveRoot {
+        node_id: String,
     },
     MarqueeSelect {
         x0: f64,
@@ -88,6 +98,9 @@ enum HostRequest {
         snap: bool,
         #[serde(default)]
         snap_threshold_px: Option<f64>,
+    },
+    TransformSelection {
+        matrix: [f64; 6],
     },
     Arrange {
         operation: String,
@@ -337,6 +350,7 @@ impl From<CameraError> for HostFailure {
 pub struct EngineHost {
     runtime: EngineRuntime,
     fixture: FixtureKind,
+    active_root: NodeId,
     drag_base: Option<DragBase>,
     pending: PendingBinary,
     projection: PendingProjection,
@@ -455,9 +469,11 @@ impl EngineHost {
             build_fixture(fixture).map_err(document_failure)?,
             Camera::default(),
         )?;
+        let active_root = default_active_root(runtime.document());
         let mut host = Self {
             runtime,
             fixture,
+            active_root,
             drag_base: None,
             pending: PendingBinary::default(),
             projection: PendingProjection::default(),
@@ -484,6 +500,7 @@ impl EngineHost {
                 let document = build_fixture(kind).map_err(document_failure)?;
                 let outcome = self.runtime.replace_document(document)?;
                 self.fixture = kind;
+                self.active_root = default_active_root(self.runtime.document());
                 self.track_scene_outcome(&outcome);
                 self.reset_camera()?;
                 self.prepare_full_frame_with_delta(&outcome.render)?;
@@ -494,6 +511,7 @@ impl EngineHost {
                 let structural = command.structural_nodes_touched().is_some();
                 let command = command.into_command(self.runtime.document())?;
                 let outcome = self.runtime.dispatch(command)?;
+                self.ensure_active_root();
                 if structural {
                     self.request_metrics.document_nodes_touched =
                         outcome.command.affected().len() as u64;
@@ -502,6 +520,20 @@ impl EngineHost {
                 self.prepare_incremental_frame(&outcome.render)?;
                 self.prepare_projection_delta(outcome.command.change_set())?;
                 Ok(json!({ "changed": outcome.command.changed() }))
+            }
+            HostRequest::CommandBatch { commands } => {
+                let commands = commands
+                    .into_iter()
+                    .map(|command| command.into_command(self.runtime.document()))
+                    .collect::<Result<Vec<_>, _>>()?;
+                let outcome = self.runtime.apply_transactional_batch(commands)?;
+                self.ensure_active_root();
+                self.consume_batch(&outcome)?;
+                Ok(json!({
+                    "changed": outcome.changed(),
+                    "applied": outcome.applied(),
+                    "committed": outcome.committed,
+                }))
             }
             HostRequest::BeginTransaction => {
                 self.runtime.begin_transaction()?;
@@ -529,11 +561,13 @@ impl EngineHost {
             }
             HostRequest::CommitTransaction => {
                 let committed = self.runtime.commit_transaction()?;
+                self.ensure_active_root();
                 self.drag_base = None;
                 Ok(json!({ "committed": committed }))
             }
             HostRequest::RollbackTransaction => {
                 let outcome = self.runtime.rollback_transaction()?;
+                self.ensure_active_root();
                 self.drag_base = None;
                 self.track_scene_outcome(&outcome);
                 self.prepare_incremental_frame(&outcome.render)?;
@@ -542,6 +576,7 @@ impl EngineHost {
             }
             HostRequest::Undo => {
                 if let Some(outcome) = self.runtime.undo()? {
+                    self.ensure_active_root();
                     self.track_scene_outcome(&outcome);
                     self.prepare_incremental_frame(&outcome.render)?;
                     self.prepare_projection_delta(&outcome.change_set)?;
@@ -552,6 +587,7 @@ impl EngineHost {
             }
             HostRequest::Redo => {
                 if let Some(outcome) = self.runtime.redo()? {
+                    self.ensure_active_root();
                     self.track_scene_outcome(&outcome);
                     self.prepare_incremental_frame(&outcome.render)?;
                     self.prepare_projection_delta(&outcome.change_set)?;
@@ -565,13 +601,31 @@ impl EngineHost {
                 self.prepare_visibility_frame()?;
                 Ok(json!({ "camera_changed": true }))
             }
-            HostRequest::HitTest { x, y } => {
+            HostRequest::HitTest {
+                x,
+                y,
+                root_id,
+                selectable_only,
+            } => {
                 let hit = self
                     .runtime
                     .hit_test_viewport(ViewportPoint(Vec2::new(x, y)))?;
+                let root = root_id.as_deref().map(parse_node_id).transpose()?;
+                let all = hit
+                    .all()
+                    .iter()
+                    .copied()
+                    .filter(|id| {
+                        !selectable_only
+                            || match root {
+                                Some(root) => self.selectable_in_root(*id, root),
+                                None => true,
+                            }
+                    })
+                    .collect::<Vec<_>>();
                 Ok(json!({
-                    "topmost": hit.topmost().map(|id| id.to_string()),
-                    "all": hit.all().iter().map(ToString::to_string).collect::<Vec<_>>(),
+                    "topmost": all.first().map(ToString::to_string),
+                    "all": all.iter().map(ToString::to_string).collect::<Vec<_>>(),
                     "candidates": hit.candidate_count(),
                     "exact_geometry_tests": hit.exact_geometry_test_count(),
                 }))
@@ -586,6 +640,23 @@ impl EngineHost {
                     "selection_changed": true,
                     "selection_count": self.runtime.selection().len(),
                 }))
+            }
+            HostRequest::SetActiveRoot { node_id } => {
+                let node_id = parse_node_id(&node_id)?;
+                let node = self.runtime.document().node(node_id).ok_or_else(|| {
+                    HostFailure::new("invalid_active_root", "active slide does not exist")
+                })?;
+                if node.kind() != NodeKind::Frame
+                    || node.parent() != Some(self.runtime.document().root_id())
+                {
+                    return Err(HostFailure::new(
+                        "invalid_active_root",
+                        "active slide must be a top-level Frame",
+                    ));
+                }
+                self.active_root = node_id;
+                self.runtime.clear_selection();
+                Ok(json!({ "active_root": node_id.to_string() }))
             }
             HostRequest::MarqueeSelect {
                 x0,
@@ -612,6 +683,9 @@ impl EngineHost {
                 snap,
                 snap_threshold_px,
             } => self.translate_selection(dx, dy, snap, snap_threshold_px),
+            HostRequest::TransformSelection { matrix } => {
+                self.transform_selection(matrix)
+            }
             HostRequest::Arrange { operation } => self.arrange_selection(&operation),
             HostRequest::GetUiSnapshot => {
                 self.prepare_full_projection()?;
@@ -629,6 +703,7 @@ impl EngineHost {
                 let document = visual_authoring_serialization::from_json(&document_json)
                     .map_err(|error| HostFailure::new("document_load_failed", error.to_string()))?;
                 let outcome = self.runtime.replace_document(document)?;
+                self.active_root = default_active_root(self.runtime.document());
                 self.track_scene_outcome(&outcome);
                 self.prepare_full_frame_with_delta(&outcome.render)?;
                 self.prepare_full_projection()?;
@@ -645,6 +720,14 @@ impl EngineHost {
         mode: &str,
     ) -> Result<(), HostFailure> {
         let parsed = target.map(parse_node_id).transpose()?;
+        if let Some(id) = parsed {
+            if !self.is_descendant_of_root(id, self.active_root) {
+                return Err(HostFailure::new(
+                    "selection_outside_active_root",
+                    "selection target is not an editable object in the active slide",
+                ));
+            }
+        }
         match mode {
             "set" | "extend" => {
                 let ids = parse_node_ids(targets.ok_or_else(|| {
@@ -653,6 +736,15 @@ impl EngineHost {
                         format!("{mode} selection requires a targets array"),
                     )
                 })?)?;
+                if ids
+                    .iter()
+                    .any(|id| !self.is_descendant_of_root(*id, self.active_root))
+                {
+                    return Err(HostFailure::new(
+                        "selection_outside_active_root",
+                        "every selection target must be editable inside the active slide",
+                    ));
+                }
                 if mode == "set" {
                     self.runtime.select_many(&ids)?;
                 } else {
@@ -695,6 +787,22 @@ impl EngineHost {
             let Some(node) = self.runtime.document().node(id) else {
                 continue;
             };
+            let mut ancestor = node.parent();
+            let mut selected_ancestor = false;
+            while let Some(candidate) = ancestor {
+                if self.runtime.selection().contains(candidate) {
+                    selected_ancestor = true;
+                    break;
+                }
+                ancestor = self
+                    .runtime
+                    .document()
+                    .node(candidate)
+                    .and_then(|candidate_node| candidate_node.parent());
+            }
+            if selected_ancestor {
+                continue;
+            }
             if self.locked_for_edit(id) {
                 base.skipped_locked += 1;
                 continue;
@@ -750,6 +858,63 @@ impl EngineHost {
         false
     }
 
+    fn ensure_active_root(&mut self) {
+        let valid = self.runtime.document().node(self.active_root).is_some_and(|node| {
+            node.kind() == NodeKind::Frame
+                && node.parent() == Some(self.runtime.document().root_id())
+        });
+        if !valid {
+            self.active_root = default_active_root(self.runtime.document());
+        }
+    }
+
+    /// Canvas selection is restricted to visible, unlocked descendants of the active slide.
+    /// The root itself is a slide backdrop, not a movable object.
+    fn selectable_in_root(&self, id: NodeId, root: NodeId) -> bool {
+        if !self.is_descendant_of_root(id, root) || self.locked_for_edit(id) {
+            return false;
+        }
+        let mut current = Some(id);
+        let mut depth = 0_usize;
+        while let Some(candidate) = current {
+            let Some(node) = self.runtime.document().node(candidate) else {
+                return false;
+            };
+            if !node.visible() {
+                return false;
+            }
+            current = node.parent();
+            depth += 1;
+            if depth > self.runtime.document().len() {
+                return false;
+            }
+        }
+        true
+    }
+
+    fn is_descendant_of_root(&self, id: NodeId, root: NodeId) -> bool {
+        if id == root {
+            return false;
+        }
+        let mut current = self.runtime.document().node(id).and_then(|node| node.parent());
+        let mut depth = 0_usize;
+        while let Some(candidate) = current {
+            if candidate == root {
+                return true;
+            }
+            current = self
+                .runtime
+                .document()
+                .node(candidate)
+                .and_then(|node| node.parent());
+            depth += 1;
+            if depth > self.runtime.document().len() {
+                return false;
+            }
+        }
+        false
+    }
+
     fn marquee_select(
         &mut self,
         request: MarqueeRequest,
@@ -784,7 +949,12 @@ impl EngineHost {
             None => Vec::new(),
         };
         let result = self.runtime.marquee_candidates(bounds, root, &excluded)?;
-        let selected = result.selected().to_vec();
+        let selected = result
+            .selected()
+            .iter()
+            .copied()
+            .filter(|id| self.selectable_in_root(*id, root))
+            .collect::<Vec<_>>();
         if additive {
             self.runtime.extend_selection(&selected)?;
         } else {
@@ -921,6 +1091,78 @@ impl EngineHost {
             "snapped": snapped,
             "snap_candidates_examined": candidates_examined,
             "guides": guides,
+            "preview": true,
+        }))
+    }
+
+    /// Applies one viewport-authored world transform to every editable selected node.
+    ///
+    /// Every pointer frame starts from the transaction capture, so resize and rotation do not
+    /// accumulate floating-point drift. Converting back through each parent keeps nested and
+    /// grouped selections in their own local coordinate systems.
+    fn transform_selection(&mut self, matrix: [f64; 6]) -> Result<Value, HostFailure> {
+        require_finite(&matrix, "selection transform")?;
+        if !self.runtime.transaction_active() {
+            return Err(HostFailure::new(
+                "no_transaction",
+                "transform_selection requires an active transaction",
+            ));
+        }
+        let world_delta = Affine2::from_components(
+            matrix[0], matrix[1], matrix[2], matrix[3], matrix[4], matrix[5],
+        );
+        let determinant = world_delta.determinant();
+        if !determinant.is_finite() || determinant <= f64::EPSILON * 16.0 {
+            return Err(HostFailure::new(
+                "invalid_selection_transform",
+                "selection transform must be finite, non-mirrored, and invertible",
+            ));
+        }
+        let base = self.drag_base.clone().ok_or_else(|| {
+            HostFailure::new(
+                "no_drag_base",
+                "the active transaction captured no transformable selection",
+            )
+        })?;
+        let mut commands = Vec::with_capacity(base.targets.len());
+        for target in &base.targets {
+            let parent_inverse = target.parent_world.inverse().ok_or_else(|| {
+                HostFailure::new(
+                    "invalid_selection_transform",
+                    format!("node {} has no invertible parent transform", target.id),
+                )
+            })?;
+            let transform = parent_inverse
+                * world_delta
+                * target.parent_world
+                * target.local_transform;
+            if !transform.is_finite() || transform.inverse().is_none() {
+                return Err(HostFailure::new(
+                    "invalid_selection_transform",
+                    format!("node {} would receive an invalid transform", target.id),
+                ));
+            }
+            commands.push(Command::SetLocalTransform {
+                target: target.id,
+                transform,
+            });
+        }
+        let transformed = commands.len();
+        let outcome = match self.runtime.apply_batch_in_transaction(commands) {
+            Ok(outcome) => outcome,
+            Err(error) => {
+                self.drag_base = None;
+                let rolled_back = self.runtime.rollback_transaction()?;
+                self.track_scene_outcome(&rolled_back);
+                self.prepare_incremental_frame(&rolled_back.render)?;
+                self.prepare_projection_delta(&rolled_back.change_set)?;
+                return Err(error.into());
+            }
+        };
+        self.consume_batch(&outcome)?;
+        Ok(json!({
+            "transformed": transformed,
+            "skipped_locked": base.skipped_locked,
             "preview": true,
         }))
     }
@@ -1482,6 +1724,7 @@ impl EngineHost {
                 "ordered": self.runtime.selection().ordered().iter().map(ToString::to_string).collect::<Vec<_>>(),
                 "primary": self.runtime.selection().primary().map(|id| id.to_string()),
             },
+            "active_root": self.active_root.to_string(),
             "history": {
                 "undo_depth": history.undo_depth,
                 "redo_depth": history.redo_depth,
@@ -1869,6 +2112,20 @@ fn node_kind_label(kind: NodeKind) -> &'static str {
 
 fn parse_node_ids(values: &[String]) -> Result<Vec<NodeId>, HostFailure> {
     values.iter().map(|value| parse_node_id(value)).collect()
+}
+
+fn default_active_root(document: &Document) -> NodeId {
+    let root = document.root_id();
+    document
+        .node(root)
+        .and_then(|node| {
+            node.children().iter().copied().find(|id| {
+                document
+                    .node(*id)
+                    .is_some_and(|candidate| candidate.kind() == NodeKind::Frame)
+            })
+        })
+        .unwrap_or(root)
 }
 
 const fn union_rect(left: Rect, right: Rect) -> Rect {
@@ -2427,6 +2684,194 @@ mod tests {
         assert!(host.pending.dirty_instances.is_empty());
         assert!(host.pending.removed_slots.is_empty());
         assert!(host.pending.visible_slots.is_empty());
+    }
+
+    #[test]
+    fn selection_transform_updates_multiple_nodes_as_one_undo_step() {
+        let mut host = EngineHost::new_inner().unwrap();
+        let first = fixture_node_id(1);
+        let second = fixture_node_id(2);
+        let before_first = host.runtime.document().node(first).unwrap().local_transform();
+        let before_second = host.runtime.document().node(second).unwrap().local_transform();
+        response(
+            &mut host,
+            request(
+                "select-two",
+                json!({
+                    "type": "selection",
+                    "mode": "set",
+                    "targets": [first.to_string(), second.to_string()]
+                }),
+            ),
+        );
+        response(
+            &mut host,
+            request("transform-begin", json!({ "type": "begin_transaction" })),
+        );
+        let transformed = response(
+            &mut host,
+            request(
+                "transform-preview",
+                json!({
+                    "type": "transform_selection",
+                    "matrix": [2.0, 0.0, 0.0, 2.0, 10.0, 20.0]
+                }),
+            ),
+        );
+        assert!(transformed["ok"].as_bool().unwrap());
+        assert_eq!(transformed["result"]["transformed"], 2);
+        response(
+            &mut host,
+            request("transform-commit", json!({ "type": "commit_transaction" })),
+        );
+        assert_eq!(host.runtime.history_state().undo_depth, 1);
+        response(&mut host, request("transform-undo", json!({ "type": "undo" })));
+        assert_eq!(
+            host.runtime.document().node(first).unwrap().local_transform(),
+            before_first
+        );
+        assert_eq!(
+            host.runtime.document().node(second).unwrap().local_transform(),
+            before_second
+        );
+    }
+
+    #[test]
+    fn command_batch_failure_rolls_back_every_prior_command() {
+        let mut host = EngineHost::new_inner().unwrap();
+        let first = fixture_node_id(1);
+        let before = host.runtime.document().node(first).unwrap().local_transform();
+        let failed = response(
+            &mut host,
+            request(
+                "batch-failure",
+                json!({
+                    "type": "command_batch",
+                    "commands": [
+                        { "kind": "set_transform", "node_id": first.to_string(), "matrix": [1.0, 0.0, 0.0, 1.0, 50.0, 60.0] },
+                        { "kind": "set_transform", "node_id": fixture_node_id(999_999).to_string(), "matrix": [1.0, 0.0, 0.0, 1.0, 0.0, 0.0] }
+                    ]
+                }),
+            ),
+        );
+        assert!(!failed["ok"].as_bool().unwrap());
+        assert_eq!(host.runtime.document().node(first).unwrap().local_transform(), before);
+        assert_eq!(host.runtime.history_state().undo_depth, 0);
+        assert!(!host.runtime.transaction_active());
+    }
+
+    #[test]
+    fn active_slide_root_is_not_selectable_and_switching_isolates_its_descendants() {
+        let mut host = EngineHost::new_inner().unwrap();
+        let loaded = response(
+            &mut host,
+            request(
+                "load-editor",
+                json!({ "type": "load_fixture", "fixture": "editor" }),
+            ),
+        );
+        let first_slide = fixture_node_id(1);
+        assert_eq!(loaded["active_root"], first_slide.to_string());
+        let root_rejected = response(
+            &mut host,
+            request(
+                "select-slide-root",
+                json!({
+                    "type": "selection",
+                    "mode": "replace",
+                    "target": first_slide.to_string()
+                }),
+            ),
+        );
+        assert!(!root_rejected["ok"].as_bool().unwrap());
+        assert_eq!(
+            root_rejected["error"]["code"],
+            "selection_outside_active_root"
+        );
+
+        let rectangle = fixture_node_id(100);
+        let created = response(
+            &mut host,
+            request(
+                "create-in-slide",
+                json!({
+                    "type": "command",
+                    "command": {
+                        "kind": "create_shape",
+                        "node_id": rectangle.to_string(),
+                        "parent_id": first_slide.to_string(),
+                        "index": 0,
+                        "shape": "rectangle",
+                        "name": "Inside first slide",
+                        "x": 10.0,
+                        "y": 20.0,
+                        "width": 40.0,
+                        "height": 30.0
+                    }
+                }),
+            ),
+        );
+        assert!(created["ok"].as_bool().unwrap());
+        let selected = response(
+            &mut host,
+            request(
+                "select-in-slide",
+                json!({
+                    "type": "selection",
+                    "mode": "replace",
+                    "target": rectangle.to_string()
+                }),
+            ),
+        );
+        assert!(selected["ok"].as_bool().unwrap());
+
+        let second_slide = fixture_node_id(101);
+        response(
+            &mut host,
+            request(
+                "create-second-slide",
+                json!({
+                    "type": "command",
+                    "command": {
+                        "kind": "create_shape",
+                        "node_id": second_slide.to_string(),
+                        "parent_id": fixture_node_id(0).to_string(),
+                        "index": 1,
+                        "shape": "frame",
+                        "name": "Second slide",
+                        "x": 2000.0,
+                        "y": 0.0,
+                        "width": 1920.0,
+                        "height": 1080.0
+                    }
+                }),
+            ),
+        );
+        let switched = response(
+            &mut host,
+            request(
+                "switch-slide",
+                json!({
+                    "type": "set_active_root",
+                    "node_id": second_slide.to_string()
+                }),
+            ),
+        );
+        assert!(switched["ok"].as_bool().unwrap());
+        assert_eq!(switched["active_root"], second_slide.to_string());
+        assert!(host.runtime.selection().is_empty());
+        let old_slide_rejected = response(
+            &mut host,
+            request(
+                "select-old-slide-child",
+                json!({
+                    "type": "selection",
+                    "mode": "replace",
+                    "target": rectangle.to_string()
+                }),
+            ),
+        );
+        assert!(!old_slide_rejected["ok"].as_bool().unwrap());
     }
 
     #[test]

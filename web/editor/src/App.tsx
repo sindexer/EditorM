@@ -37,6 +37,17 @@ import { EngineClient, EngineFailure } from "./engine";
 import type { StoredProjectionNode } from "./engine";
 import { transformAffinePoint } from "./affine";
 import {
+  axisAlignedBox,
+  handlePoint,
+  orientedBox,
+  RESIZE_HANDLES,
+  resizeTransform,
+  rotationAround,
+  snappedRotationDelta,
+  type ResizeHandle,
+  type TransformBox,
+} from "./transformGeometry";
+import {
   arrangeAvailability,
   guideSegment,
   isMarqueeDrag,
@@ -90,6 +101,9 @@ type Interaction = {
   additive?: boolean;
   suspendSnap?: boolean;
   marqueeRoot?: string;
+  resizeHandle?: ResizeHandle;
+  transformBox?: TransformBox;
+  rotationStart?: number;
 };
 
 const tools: Array<{ id: Tool; label: string; shortcut: string; icon: LucideIcon }> = [
@@ -228,6 +242,7 @@ function LayersPanel({
   version,
   onError,
   editRoot,
+  activeRoot,
   setEditRoot,
 }: {
   engine: EngineClient;
@@ -235,6 +250,7 @@ function LayersPanel({
   version: number;
   onError: (error: unknown) => void;
   editRoot: string | null;
+  activeRoot: string | null;
   setEditRoot: (id: string | null) => void;
 }) {
   const rowHeight = 28;
@@ -247,16 +263,21 @@ function LayersPanel({
     const result: Array<{ id: string; depth: number }> = [];
     if (largeFlatProjection) return result;
     const nodes = engine.projection.nodes;
-    const root = editRoot ?? engine.projection.rootId;
+    const root = editRoot ?? activeRoot;
     if (!root) return result;
-    const stack: Array<{ id: string; depth: number }> = [{ id: root, depth: 0 }];
+    const container = nodes.get(root);
+    const stack: Array<{ id: string; depth: number }> = [];
+    for (let index = (container?.children.length ?? 0) - 1; index >= 0; index -= 1) {
+      const child = container?.children.at(index);
+      if (child) stack.push({ id: child, depth: 0 });
+    }
     while (stack.length) {
       const current = stack.pop();
       if (!current) break;
       result.push(current);
       const node = nodes.get(current.id);
       if (!node) continue;
-      const shouldExpand = current.depth === 0 || expanded.has(current.id);
+      const shouldExpand = expanded.has(current.id);
       if (shouldExpand) {
         for (let index = node.children.length - 1; index >= 0; index -= 1) {
           const child = node.children.at(index);
@@ -266,7 +287,7 @@ function LayersPanel({
     }
     engine.projection.counters.layersFlattenedNodesVisited += result.length;
     return result;
-  }, [engine, engine.projection.hierarchyVersion, editRoot, expanded, largeFlatProjection]);
+  }, [engine, engine.projection.hierarchyVersion, editRoot, activeRoot, expanded, largeFlatProjection]);
   const totalRows = largeFlatProjection ? order.length : visibleOrder.length;
   const start = Math.max(0, Math.floor(scrollTop / rowHeight) - 5);
   const count = Math.ceil(viewportHeight / rowHeight) + 10;
@@ -367,7 +388,7 @@ function LayersPanel({
                   {hasChildren ? expanded.has(id) ? <ChevronDown size={14} /> : <ChevronRight size={14} /> : null}
                 </button>
                 <Icon className="tree-kind" size={15} aria-hidden="true" />
-                <span className="tree-name">{node.name}</span>
+                <span className="tree-name" title={node.name}>{node.name}</span>
                 <button
                   className="tree-state"
                   aria-label={`${node.visible ? "Hide" : "Show"} ${node.name}`}
@@ -411,27 +432,35 @@ function LayersPanel({
 function NumericField({
   label,
   value,
+  mixed,
   unit,
   disabled,
+  positive,
   onCommit,
 }: {
   label: string;
   value: number;
+  mixed?: boolean;
   unit?: string;
   disabled?: boolean;
+  positive?: boolean;
   onCommit: (value: number) => void;
 }) {
-  const [draft, setDraft] = useState(String(Number(value.toFixed(3))));
+  const [draft, setDraft] = useState(mixed ? "" : String(Number(value.toFixed(3))));
   const [validationCode, setValidationCode] = useState<string | null>(null);
   const errorId = "numeric-error-" + label.toLowerCase().replace(/[^a-z0-9]+/g, "-");
   useEffect(() => {
-    setDraft(String(Number(value.toFixed(3))));
+    setDraft(mixed ? "" : String(Number(value.toFixed(3))));
     setValidationCode(null);
-  }, [value]);
+  }, [value, mixed]);
   const commit = () => {
     const parsed = Number(draft);
     if (!Number.isFinite(parsed)) {
       setValidationCode("numeric_non_finite");
+      return;
+    }
+    if (positive && parsed <= 0) {
+      setValidationCode("numeric_non_positive");
       return;
     }
     setValidationCode(null);
@@ -443,6 +472,8 @@ function NumericField({
       <div className="field-control">
         <input
           value={draft}
+          placeholder={mixed ? "Mixed" : undefined}
+          data-mixed={mixed ? "true" : undefined}
           inputMode="decimal"
           disabled={disabled}
           aria-label={label}
@@ -457,7 +488,7 @@ function NumericField({
           onKeyDown={(event) => {
             if (event.key === "Enter") event.currentTarget.blur();
             if (event.key === "Escape") {
-              setDraft(String(Number(value.toFixed(3))));
+              setDraft(mixed ? "" : String(Number(value.toFixed(3))));
               setValidationCode(null);
               event.currentTarget.blur();
             }
@@ -465,33 +496,67 @@ function NumericField({
         />
         {unit ? <span className="field-suffix">{unit}</span> : null}
       </div>
-      {validationCode ? <small id={errorId} role="alert">numeric_non_finite: Enter a finite number.</small> : null}
+      {validationCode ? <small id={errorId} role="alert">{validationCode}: Enter a {validationCode === "numeric_non_positive" ? "positive" : "finite"} number.</small> : null}
     </label>
   );
 }
 
-function Inspector({ engine, version, onError }: { engine: EngineClient; version: number; onError: (error: unknown) => void }) {
-  const node = engine.projection.primary ? engine.projection.nodes.get(engine.projection.primary) : undefined;
-  const matrix = node?.local_transform ?? [1, 0, 0, 1, 0, 0];
-  const rotation = Math.atan2(matrix[2], matrix[0]) * (180 / Math.PI);
+function commonValue(values: number[]): { value: number; mixed: boolean } {
+  if (values.length === 0) return { value: 0, mixed: false };
+  return { value: values[0], mixed: values.some((value) => Math.abs(value - values[0]) > 1e-9) };
+}
+
+function Inspector({ engine, version, activeSlideId, onError }: { engine: EngineClient; version: number; activeSlideId: string | null; onError: (error: unknown) => void }) {
+  const nodes = engine.projection.selection
+    .map((id) => engine.projection.nodes.get(id))
+    .filter((candidate): candidate is StoredProjectionNode => Boolean(candidate));
+  const isSlideContext = nodes.length === 0 && Boolean(activeSlideId);
+  const node = nodes[0] ?? (activeSlideId ? engine.projection.nodes.get(activeSlideId) : undefined);
+  const editableNodes = isSlideContext ? (node ? [node] : []) : nodes;
+  const xValue = commonValue(editableNodes.map((candidate) => candidate.local_transform[4]));
+  const yValue = commonValue(editableNodes.map((candidate) => candidate.local_transform[5]));
+  const widthValue = commonValue(editableNodes.flatMap((candidate) => candidate.geometry
+    ? [candidate.geometry.width * Math.hypot(candidate.local_transform[0], candidate.local_transform[2])]
+    : []));
+  const heightValue = commonValue(editableNodes.flatMap((candidate) => candidate.geometry
+    ? [candidate.geometry.height * Math.hypot(candidate.local_transform[1], candidate.local_transform[3])]
+    : []));
+  const rotationValue = commonValue(editableNodes.map((candidate) => Math.atan2(candidate.local_transform[2], candidate.local_transform[0]) * (180 / Math.PI)));
   const appearance = node?.appearance ?? DEFAULT_APPEARANCE;
-  const setTransform = (next: [number, number, number, number, number, number]) => {
-    if (!node) return;
-    void engine.send("command", { command: { kind: "set_transform", node_id: node.id, matrix: next } }).catch(onError);
+  const sendBatch = (commands: Array<Record<string, unknown>>) => {
+    if (!commands.length) return;
+    void engine.send("command_batch", { commands }).catch(onError);
+  };
+  const setAxis = (axis: "x" | "y", value: number) => {
+    if (isSlideContext) return;
+    sendBatch(editableNodes.map((candidate) => ({
+      kind: "set_transform", node_id: candidate.id,
+      matrix: candidate.local_transform.map((entry, index) => index === (axis === "x" ? 4 : 5) ? value : entry),
+    })));
   };
   const updateRotation = (degrees: number) => {
+    if (isSlideContext) return;
     const radians = degrees * (Math.PI / 180);
-    const sx = Math.hypot(matrix[0], matrix[2]);
-    const sy = Math.hypot(matrix[1], matrix[3]);
-    setTransform([Math.cos(radians) * sx, -Math.sin(radians) * sy, Math.sin(radians) * sx, Math.cos(radians) * sy, matrix[4], matrix[5]]);
+    sendBatch(editableNodes.map((candidate) => {
+      const current = candidate.local_transform;
+      const sx = Math.hypot(current[0], current[2]);
+      const sy = Math.hypot(current[1], current[3]);
+      return { kind: "set_transform", node_id: candidate.id, matrix: [Math.cos(radians) * sx, -Math.sin(radians) * sy, Math.sin(radians) * sx, Math.cos(radians) * sy, current[4], current[5]] };
+    }));
   };
-  const setGeometry = (width: number, height: number) => {
-    if (!node || (node.kind !== "frame" && node.kind !== "rectangle" && node.kind !== "ellipse")) return;
-    void engine
-      .send("command", {
-        command: { kind: "set_geometry", node_id: node.id, shape: node.kind, width, height },
-      })
-      .catch(onError);
+  const setGeometryAxis = (axis: "width" | "height", value: number) => {
+    if (!Number.isFinite(value) || value <= 0) return;
+    sendBatch(editableNodes.flatMap((candidate) => {
+      if (!candidate.geometry || (candidate.kind !== "frame" && candidate.kind !== "rectangle" && candidate.kind !== "ellipse")) return [];
+      const scaleX = Math.hypot(candidate.local_transform[0], candidate.local_transform[2]);
+      const scaleY = Math.hypot(candidate.local_transform[1], candidate.local_transform[3]);
+      if (scaleX <= 0 || scaleY <= 0) return [];
+      return [{
+        kind: "set_geometry", node_id: candidate.id, shape: candidate.kind,
+        width: axis === "width" ? value / scaleX : candidate.geometry.width,
+        height: axis === "height" ? value / scaleY : candidate.geometry.height,
+      }];
+    }));
   };
 
   const setFill = (value: string) => {
@@ -524,7 +589,11 @@ function Inspector({ engine, version, onError }: { engine: EngineClient; version
         </div>
       ) : (
         <div className="inspector-content">
-          <label className="field field-wide">
+          <div className="node-summary">
+            <span className="badge">{isSlideContext ? "Slide" : nodes.length > 1 ? `${nodes.length} selected` : node.kind}</span>
+            {isSlideContext && node.geometry ? <span>{Number((node.geometry.width / node.geometry.height).toFixed(3))}:1</span> : <span className="mono">{node.id.slice(0, 8)}</span>}
+          </div>
+          {nodes.length <= 1 ? <label className="field field-wide">
             <span>Name</span>
             <input
               key={`${node.id}-${node.name}`}
@@ -539,17 +608,13 @@ function Inspector({ engine, version, onError }: { engine: EngineClient; version
                 }
               }}
             />
-          </label>
-          <div className="node-summary">
-            <span className="badge">{node.kind}</span>
-            <span className="mono">{node.id.slice(0, 8)}</span>
-          </div>
+          </label> : null}
           <div className="field-grid">
-            <NumericField label="X" value={matrix[4]} onCommit={(value) => setTransform([matrix[0], matrix[1], matrix[2], matrix[3], value, matrix[5]])} />
-            <NumericField label="Y" value={matrix[5]} onCommit={(value) => setTransform([matrix[0], matrix[1], matrix[2], matrix[3], matrix[4], value])} />
-            <NumericField label="W" value={node.geometry?.width ?? 0} disabled={!node.geometry} onCommit={(value) => setGeometry(value, node.geometry?.height ?? 1)} />
-            <NumericField label="H" value={node.geometry?.height ?? 0} disabled={!node.geometry} onCommit={(value) => setGeometry(node.geometry?.width ?? 1, value)} />
-            <NumericField label="Rotation" value={rotation} unit="°" onCommit={updateRotation} />
+            <NumericField label="X" value={xValue.value} mixed={xValue.mixed} disabled={isSlideContext} onCommit={(value) => setAxis("x", value)} />
+            <NumericField label="Y" value={yValue.value} mixed={yValue.mixed} disabled={isSlideContext} onCommit={(value) => setAxis("y", value)} />
+            <NumericField label="W" value={widthValue.value} mixed={widthValue.mixed} positive disabled={!editableNodes.every((candidate) => candidate.geometry)} onCommit={(value) => setGeometryAxis("width", value)} />
+            <NumericField label="H" value={heightValue.value} mixed={heightValue.mixed} positive disabled={!editableNodes.every((candidate) => candidate.geometry)} onCommit={(value) => setGeometryAxis("height", value)} />
+            <NumericField label="Rotation" value={rotationValue.value} mixed={rotationValue.mixed} disabled={isSlideContext} unit="°" onCommit={updateRotation} />
             <NumericField
               label="Opacity"
               value={node.opacity * 100}
@@ -557,7 +622,7 @@ function Inspector({ engine, version, onError }: { engine: EngineClient; version
               onCommit={(value) => void engine.send("command", { command: { kind: "set_opacity", node_id: node.id, opacity: Math.max(0, Math.min(100, value)) / 100 } }).catch(onError)}
             />
           </div>
-          <div className="appearance-section" aria-label="Appearance">
+          {nodes.length <= 1 ? <div className="appearance-section" aria-label="Appearance">
             <div className="appearance-heading">Appearance</div>
             <div className="appearance-grid">
               <label className="field color-field">
@@ -592,7 +657,7 @@ function Inspector({ engine, version, onError }: { engine: EngineClient; version
               />
             </div>
             <small>Centered stroke · sRGB input · linear premultiplied GPU output</small>
-          </div>          <div className="inline-controls">
+          </div> : null}          <div className="inline-controls">
             <label className="check-control">
               <input
                 type="checkbox"
@@ -867,6 +932,11 @@ export function App() {
   }, [engine, response, version, heartbeatTick, fsm, tool, editRoot, error, snapEnabled, guides, marquee]);
 
   const currentNode = engine.projection.primary ? engine.projection.nodes.get(engine.projection.primary) : undefined;
+  const documentRoot = engine.projection.rootId;
+  const activeSlideId = response?.active_root && response.active_root !== documentRoot
+    ? response.active_root
+    : null;
+  const selectionRoot = editRoot ?? activeSlideId ?? documentRoot;
   const worldToViewport = useCallback((point: [number, number]): [number, number] => {
     const camera = response?.camera;
     if (!camera) return point;
@@ -883,6 +953,41 @@ export function App() {
       (point[1] - camera.viewport[1] / 2) / camera.zoom + camera.center[1],
     ];
   }, [response]);
+
+  const selectedNodes = useMemo(
+    () => engine.projection.selection
+      .map((id) => engine.projection.nodes.get(id))
+      .filter((node): node is StoredProjectionNode => Boolean(node)),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [engine, version, response],
+  );
+
+  const transformOverlay = useMemo(() => {
+    if (!response || selectedNodes.length === 0) return null;
+    let worldBox: TransformBox | null = null;
+    if (selectedNodes.length === 1) {
+      const node = selectedNodes[0];
+      if (node.geometry && node.world_transform) {
+        const corners = ([[0, 0], [node.geometry.width, 0], [node.geometry.width, node.geometry.height], [0, node.geometry.height]] as Array<[number, number]>)
+          .map((point) => transformAffinePoint(node.world_transform!, point)) as [[number, number], [number, number], [number, number], [number, number]];
+        worldBox = orientedBox(corners);
+      }
+    }
+    if (!worldBox) {
+      const bounds = unionWorldBounds(selectedNodes.map((node) => node.world_bounds));
+      if (bounds) worldBox = axisAlignedBox(bounds.min, bounds.max);
+    }
+    if (!worldBox) return null;
+    const points = worldBox.points.map(worldToViewport);
+    const centerViewport = worldToViewport(worldBox.center);
+    const handles = Object.fromEntries(RESIZE_HANDLES.map((handle) => [handle, worldToViewport(handlePoint(worldBox!, handle))])) as Record<ResizeHandle, [number, number]>;
+    const top = handles.n;
+    const rotate: [number, number] = [
+      top[0] - worldBox.axisY[0] * 24,
+      top[1] - worldBox.axisY[1] * 24,
+    ];
+    return { worldBox, points, centerViewport, handles, rotate };
+  }, [response, selectedNodes, worldToViewport]);
 
   const scheduleDrag = useCallback((operation: () => Promise<void>) => {
     engine.projection.counters.pointerRawIntents += 1;
@@ -974,8 +1079,9 @@ export function App() {
     clientX: number,
     clientY: number,
     kind: "resize" | "rotate",
+    handle?: ResizeHandle,
   ) => {
-    if (!currentNode || currentNode.locked || !currentNode.geometry) return;
+    if (!currentNode || currentNode.locked || !transformOverlay) return;
     const rect = canvasRef.current?.getBoundingClientRect();
     if (!rect) return;
     const point: [number, number] = [clientX - rect.left, clientY - rect.top];
@@ -985,10 +1091,12 @@ export function App() {
       kind,
       start: point,
       last: point,
-      nodeId: currentNode.id,
-      nodeKind: currentNode.kind === "frame" ? "frame" : currentNode.kind === "ellipse" ? "ellipse" : "rectangle",
-      matrix: [...currentNode.local_transform],
-      geometry: { ...currentNode.geometry },
+      resizeHandle: handle,
+      transformBox: transformOverlay.worldBox,
+      rotationStart: Math.atan2(
+        point[1] - transformOverlay.centerViewport[1],
+        point[0] - transformOverlay.centerViewport[0],
+      ),
     };
     shellRef.current?.setPointerCapture(pointerId);
     setFsm(kind === "resize" ? "Resizing" : "Rotating");
@@ -1000,8 +1108,9 @@ export function App() {
     const pointerId = event.pointerId;
     try {
       const handleKind = (event.target as HTMLElement).dataset.testid;
+      const resizeHandle = (event.target as HTMLElement).dataset.resizeHandle as ResizeHandle | undefined;
       if (handleKind === "resize-handle" || handleKind === "rotate-handle") {
-        await beginHandleAt(pointerId, event.clientX, event.clientY, handleKind === "resize-handle" ? "resize" : "rotate");
+        await beginHandleAt(pointerId, event.clientX, event.clientY, handleKind === "resize-handle" ? "resize" : "rotate", resizeHandle);
         return;
       }
       if (tool === "hand") {
@@ -1026,8 +1135,21 @@ export function App() {
         return;
       }
       setFsm("Selecting");
-      const hit = await engine.send("hit_test", { x: point[0], y: point[1] });
-      const target = (hit.result?.topmost as string | null | undefined) ?? null;
+      const hit = await engine.send("hit_test", { x: point[0], y: point[1], root_id: selectionRoot, selectable_only: true });
+      const hitIds = Array.isArray((hit.result as { all?: unknown } | null)?.all)
+        ? ((hit.result as { all: string[] }).all)
+        : [];
+      const isInSelectionRoot = (id: string) => {
+        if (!selectionRoot || id === selectionRoot) return false;
+        let current = engine.projection.nodes.get(id);
+        while (current?.parent_id) {
+          if (!current.visible || current.locked) return false;
+          if (current.parent_id === selectionRoot) return true;
+          current = engine.projection.nodes.get(current.parent_id);
+        }
+        return false;
+      };
+      const target = hitIds.find(isInSelectionRoot) ?? null;
       const intent = selectionIntent(target, engine.projection.selection, event.shiftKey);
       if (intent.mode === "marquee") {
         interaction.current = { pointerId, kind: "marquee", start: point, last: point, additive: event.shiftKey };
@@ -1117,7 +1239,7 @@ export function App() {
       const y = Math.min(start[1], end[1]);
       const width = Math.max(1, Math.abs(end[0] - start[0]));
       const height = Math.max(1, Math.abs(end[1] - start[1]));
-      const root = editRoot ?? engine.projection.rootId;
+      const root = active.nodeKind === "frame" ? documentRoot : selectionRoot;
       if (!root) return;
       if (!active.created) {
         active.created = true;
@@ -1137,24 +1259,23 @@ export function App() {
       }
       return;
     }
-    if (active.kind === "resize" && active.nodeId && active.geometry) {
-      const zoom = response?.camera.zoom ?? 1;
-      const width = Math.max(1, active.geometry.width + (point[0] - active.start[0]) / zoom);
-      const height = Math.max(1, active.geometry.height + (point[1] - active.start[1]) / zoom);
-      scheduleDrag(() => engine.send("update_transaction", { command: { kind: "set_geometry", node_id: active.nodeId, shape: active.nodeKind, width, height } }).then(() => undefined));
+    if (active.kind === "resize" && active.transformBox && active.resizeHandle) {
+      const matrix = resizeTransform(
+        active.transformBox,
+        active.resizeHandle,
+        viewportToWorld(point),
+        event.shiftKey,
+        event.altKey,
+      );
+      if (matrix) scheduleDrag(() => engine.send("transform_selection", { matrix }).then(() => undefined));
       return;
     }
-    if (active.kind === "rotate" && active.nodeId && active.matrix && currentNode?.world_bounds) {
-      const centerWorld: [number, number] = [
-        (currentNode.world_bounds.min[0] + currentNode.world_bounds.max[0]) / 2,
-        (currentNode.world_bounds.min[1] + currentNode.world_bounds.max[1]) / 2,
-      ];
-      const center = worldToViewport(centerWorld);
-      const angle = Math.atan2(point[1] - center[1], point[0] - center[0]) + Math.PI / 2;
-      const sx = Math.hypot(active.matrix[0], active.matrix[2]);
-      const sy = Math.hypot(active.matrix[1], active.matrix[3]);
-      const next: [number, number, number, number, number, number] = [Math.cos(angle) * sx, -Math.sin(angle) * sy, Math.sin(angle) * sx, Math.cos(angle) * sy, active.matrix[4], active.matrix[5]];
-      scheduleDrag(() => engine.send("update_transaction", { command: { kind: "set_transform", node_id: active.nodeId, matrix: next } }).then(() => undefined));
+    if (active.kind === "rotate" && active.transformBox && active.rotationStart !== undefined) {
+      const center = worldToViewport(active.transformBox.center);
+      const currentAngle = Math.atan2(point[1] - center[1], point[0] - center[0]);
+      const delta = snappedRotationDelta(currentAngle - active.rotationStart, event.shiftKey);
+      const matrix = rotationAround(active.transformBox.center, delta);
+      scheduleDrag(() => engine.send("transform_selection", { matrix }).then(() => undefined));
     }
   };
 
@@ -1167,7 +1288,7 @@ export function App() {
       while (dragQueue.current.inFlight) await new Promise((resolve) => setTimeout(resolve, 4));
       if (active.kind === "marquee") {
         setMarquee(null);
-        const root = editRoot ?? engine.projection.rootId;
+        const root = selectionRoot;
         if (isMarqueeDrag(active.start, active.last)) {
           await engine.send("marquee_select", {
             x0: active.start[0],
@@ -1177,7 +1298,13 @@ export function App() {
             additive: Boolean(active.additive),
             root_id: root,
             // The container the band was drawn on is the backdrop, not a target.
-            exclude_ids: active.marqueeRoot ? [active.marqueeRoot] : [],
+            exclude_ids: [
+              ...(root ? [root] : []),
+              ...(active.marqueeRoot ? [active.marqueeRoot] : []),
+              ...[...engine.projection.nodes.values()]
+                .filter((node) => node.locked || !node.visible)
+                .map((node) => node.id),
+            ],
           });
         } else if (active.nodeId) {
           await engine.send("selection", { target: active.nodeId, mode: active.additive ? "toggle" : "replace" });
@@ -1190,13 +1317,19 @@ export function App() {
       if (active.kind !== "pan") {
         if (active.kind === "create" && !active.created && active.nodeId && active.nodeKind) {
           const start = viewportToWorld(active.start);
-          const root = editRoot ?? engine.projection.rootId;
+          const root = active.nodeKind === "frame" ? documentRoot : selectionRoot;
           if (root) {
             await engine.send("update_transaction", { command: { kind: "create_shape", node_id: active.nodeId, parent_id: root, index: engine.projection.nodes.get(root)?.children.length ?? 0, shape: active.nodeKind, name: shapeName(active.nodeKind!), x: start[0], y: start[1], width: 24, height: 24 } });
           }
         }
         await engine.send("commit_transaction");
-        if (active.kind === "create" && active.nodeId) await engine.send("selection", { target: active.nodeId, mode: "replace" });
+        if (active.kind === "create" && active.nodeId) {
+          if (active.nodeKind === "frame") {
+            await engine.send("set_active_root", { node_id: active.nodeId });
+          } else {
+            await engine.send("selection", { target: active.nodeId, mode: "replace" });
+          }
+        }
       }
     } catch (reason) {
       fail(reason);
@@ -1212,15 +1345,6 @@ export function App() {
     const zoom = Math.max(0.05, Math.min(64, response.camera.zoom * Math.exp(-event.deltaY * 0.0015)));
     scheduleDrag(() => engine.send("camera", { camera: { kind: "zoom", x: point[0], y: point[1], zoom } }).then(() => undefined));
   };
-
-  const selectedNodes = useMemo(
-    () => engine.projection.selection
-      .map((id) => engine.projection.nodes.get(id))
-      .filter((node): node is StoredProjectionNode => Boolean(node)),
-    // The projection version changes whenever the engine reports new node data.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [engine, version, response],
-  );
 
   /** Outline polygons for every selected node, drawn under the primary transform handles. */
   const selectionOutlines = useMemo(() => selectedNodes
@@ -1255,14 +1379,32 @@ export function App() {
     }
   };
 
+  const groupSelection = async () => {
+    if (engine.projection.selection.length < 2) return;
+    try {
+      const groupId = crypto.randomUUID();
+      await engine.send("command", { command: { kind: "group", group_id: groupId, name: "Group", targets: engine.projection.selection } });
+      await engine.send("selection", { target: groupId, mode: "replace" });
+    } catch (reason) { fail(reason); }
+  };
+  const ungroupSelection = async () => {
+    const node = currentNode;
+    if (!node || node.kind !== "group") return;
+    const children = node.children.toArray();
+    try {
+      await engine.send("command", { command: { kind: "ungroup", node_id: node.id } });
+      if (children.length) await engine.send("selection", { mode: "set", targets: children });
+    } catch (reason) { fail(reason); }
+  };
+
   const selectAllInRoot = async () => {
-    const root = editRoot ?? engine.projection.rootId;
+    const root = selectionRoot;
     if (!root) return;
     const container = engine.projection.nodes.get(root);
     if (!container) return;
     const targets = container.children.toArray().filter((id) => {
       const node = engine.projection.nodes.get(id);
-      return Boolean(node) && !node!.locked;
+      return Boolean(node) && node!.visible && !node!.locked;
     });
     try {
       if (targets.length === 0) await engine.send("selection", { target: null, mode: "clear" });
@@ -1289,6 +1431,10 @@ export function App() {
       } else if (modifier && event.key.toLowerCase() === "a") {
         event.preventDefault();
         void selectAllInRoot();
+      } else if (modifier && event.key.toLowerCase() === "g") {
+        event.preventDefault();
+        if (event.shiftKey) void ungroupSelection();
+        else void groupSelection();
       } else if (!modifier) {
         const shortcut = tools.find((entry) => entry.shortcut.toLowerCase() === event.key.toLowerCase());
         if (shortcut) setTool(shortcut.id);
@@ -1296,49 +1442,18 @@ export function App() {
     };
     window.addEventListener("keydown", keydown);
     return () => window.removeEventListener("keydown", keydown);
-  }, [engine, response, editRoot, fail, cancelInteraction]);
-
-  // Transform handles stay on a single selection: Phase 1B moves multiple nodes together but
-  // does not resize or rotate them as one shape.
-  const overlay = useMemo(() => {
-    if (engine.projection.selection.length > 1) return null;
-    if (!currentNode?.geometry || !currentNode.world_transform || !response) return null;
-    const corners: Array<[number, number]> = [[0, 0], [currentNode.geometry.width, 0], [currentNode.geometry.width, currentNode.geometry.height], [0, currentNode.geometry.height]];
-    const points = corners.map((point) => worldToViewport(transformAffinePoint(currentNode.world_transform!, point)));
-    const handle = points[2];
-    const topMid: [number, number] = [(points[0][0] + points[1][0]) / 2, (points[0][1] + points[1][1]) / 2];
-    return { points, handle, rotate: [topMid[0], topMid[1] - 24] as [number, number] };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentNode, response, worldToViewport, engine, version]);
+  }, [engine, response, editRoot, fail, cancelInteraction, selectionRoot]);
 
   const loadFixture = (fixture: string) => {
     setEditRoot(null);
     void engine.send("load_fixture", { fixture }).catch(fail);
   };
-  const groupSelection = async () => {
-    if (engine.projection.selection.length < 2) return;
-    try {
-      const groupId = crypto.randomUUID();
-      await engine.send("command", { command: { kind: "group", group_id: groupId, name: "Group", targets: engine.projection.selection } });
-      await engine.send("selection", { target: groupId, mode: "replace" });
-    } catch (reason) { fail(reason); }
-  };
-  const ungroupSelection = async () => {
-    const node = currentNode;
-    if (!node || node.kind !== "group") return;
-    const first = node.children.at(0);
-    try {
-      await engine.send("command", { command: { kind: "ungroup", node_id: node.id } });
-      if (first) await engine.send("selection", { target: first, mode: "replace" });
-    } catch (reason) { fail(reason); }
-  };
-
   const createFramePreset = async (width: number, height: number) => {
     if (!Number.isFinite(width) || !Number.isFinite(height) || width <= 0 || height <= 0) {
       fail(new EngineFailure("invalid_frame_size", "Frame width and height must be finite and positive"));
       return;
     }
-    const root = editRoot ?? engine.projection.rootId;
+    const root = documentRoot;
     if (!root) return;
     const nodeId = crypto.randomUUID();
     const center = response?.camera.center ?? [0, 0];
@@ -1365,7 +1480,7 @@ export function App() {
           height,
         },
       });
-      await engine.send("selection", { target: nodeId, mode: "replace" });
+      await engine.send("set_active_root", { node_id: nodeId });
       setTool("select");
     } catch (reason) {
       fail(reason);
@@ -1374,7 +1489,7 @@ export function App() {
   return (
     <main className="editor-app" aria-label="Vector Forge editor">
       <header className="app-bar">
-        <div className="brand"><span className="brand-mark">V</span><strong>Vector Forge</strong><span className="phase-badge">Phase 1A</span></div>
+        <div className="brand"><span className="brand-mark">V</span><strong>Vector Forge</strong><span className="phase-badge">Phase 1C</span></div>
         <div className="app-actions">
           <IconButton icon={Undo2} label="Undo (Ctrl+Z)" disabled={!response?.history.undo_depth} onClick={() => void engine.send("undo").catch(fail)} testId="undo" />
           <IconButton icon={Redo2} label="Redo (Ctrl+Y)" disabled={!response?.history.redo_depth} onClick={() => void engine.send("redo").catch(fail)} testId="redo" />
@@ -1397,7 +1512,7 @@ export function App() {
               <IconButton key={entry.id} icon={entry.icon} label={`${entry.label} (${entry.shortcut})`} active={tool === entry.id} onClick={() => setTool(entry.id)} testId={`tool-${entry.id}`} />
             ))}
           </nav>
-          <LayersPanel engine={engine} response={response} version={version} onError={fail} editRoot={editRoot} setEditRoot={(id) => { setEditRoot(id); setFsm(id ? "NestedEditing" : "Idle"); }} />
+          <LayersPanel engine={engine} response={response} version={version} onError={fail} editRoot={editRoot} activeRoot={activeSlideId ?? documentRoot} setEditRoot={(id) => { setEditRoot(id); setFsm(id ? "NestedEditing" : "Idle"); }} />
         </aside>
 
         <section className="canvas-column" aria-label="Canvas workspace">
@@ -1508,19 +1623,29 @@ export function App() {
                   data-testid="marquee"
                 />
               ) : null}
-              {overlay ? (
+              {transformOverlay ? (
                 <g>
-                  <polygon points={overlay.points.map((point) => point.join(",")).join(" ")} className="selection-outline" />
-                  {overlay.points.map((point, index) => <circle key={index} cx={point[0]} cy={point[1]} r="4" className="selection-handle" />)}
-                  <line x1={(overlay.points[0][0] + overlay.points[1][0]) / 2} y1={(overlay.points[0][1] + overlay.points[1][1]) / 2} x2={overlay.rotate[0]} y2={overlay.rotate[1]} className="rotation-stem" />
-                  <circle cx={overlay.rotate[0]} cy={overlay.rotate[1]} r="4" className="selection-handle rotate" />
+                  <polygon points={transformOverlay.points.map((point) => point.join(",")).join(" ")} className="selection-outline" />
+                  {RESIZE_HANDLES.map((handle) => <circle key={handle} cx={transformOverlay.handles[handle][0]} cy={transformOverlay.handles[handle][1]} r="4" className="selection-handle" />)}
+                  <line x1={transformOverlay.handles.n[0]} y1={transformOverlay.handles.n[1]} x2={transformOverlay.rotate[0]} y2={transformOverlay.rotate[1]} className="rotation-stem" />
+                  <circle cx={transformOverlay.rotate[0]} cy={transformOverlay.rotate[1]} r="4" className="selection-handle rotate" />
                 </g>
               ) : null}
             </svg>
-            {overlay ? (
+            {transformOverlay ? (
               <>
-                <button type="button" aria-label="Resize selection" data-testid="resize-handle" className="transform-handle-hit resize-hit" style={{ left: overlay.handle[0], top: overlay.handle[1] }} />
-                <button type="button" aria-label="Rotate selection" data-testid="rotate-handle" className="transform-handle-hit rotate-hit" style={{ left: overlay.rotate[0], top: overlay.rotate[1] }} />
+                {RESIZE_HANDLES.map((handle) => (
+                  <button
+                    key={handle}
+                    type="button"
+                    aria-label={`Resize selection ${handle}`}
+                    data-testid="resize-handle"
+                    data-resize-handle={handle}
+                    className={`transform-handle-hit resize-hit resize-${handle}`}
+                    style={{ left: transformOverlay.handles[handle][0], top: transformOverlay.handles[handle][1] }}
+                  />
+                ))}
+                <button type="button" aria-label="Rotate selection" data-testid="rotate-handle" className="transform-handle-hit rotate-hit" style={{ left: transformOverlay.rotate[0], top: transformOverlay.rotate[1] }} />
               </>
             ) : null}
             {!ready ? <div className="canvas-loading"><span className="spinner" /> Initializing Worker, WASM, and WebGPU…</div> : null}
@@ -1529,7 +1654,7 @@ export function App() {
         </section>
 
         <aside className="right-column">
-          <Inspector engine={engine} version={version} onError={fail} />
+          <Inspector engine={engine} version={version} activeSlideId={activeSlideId} onError={fail} />
         </aside>
       </div>
 

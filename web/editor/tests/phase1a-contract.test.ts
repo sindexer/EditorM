@@ -77,7 +77,7 @@ describe("Phase 1A visible frame and primitive appearance contract", () => {
     const actual = transformAffinePoint(matrix, point);
     expect(actual).toEqual([102, 231]);
     expect(actual).not.toEqual([140, 197]);
-    expect(app).toContain("transformAffinePoint(currentNode.world_transform!");
+    expect(app).toContain("transformAffinePoint(node.world_transform!");
     expect(shader).toContain("item.linear.x * local.x + item.linear.y * local.y");
     expect(shader).toContain("item.linear.z * local.x + item.linear.w * local.y");
     expect(browserProof).toContain("matrix[0] * x + matrix[1] * y + matrix[4]");
