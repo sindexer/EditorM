@@ -78,6 +78,8 @@ enum HostRequest {
         additive: bool,
         #[serde(default)]
         root_id: Option<String>,
+        #[serde(default)]
+        exclude_ids: Option<Vec<String>>,
     },
     TranslateSelection {
         dx: f64,
@@ -192,6 +194,16 @@ enum CameraRequest {
     Reset,
     Fit,
     FitSelection { node_id: String },
+}
+
+/// One rubber-band request in viewport coordinates.
+#[derive(Clone, Copy, Debug)]
+struct MarqueeRequest {
+    x0: f64,
+    y0: f64,
+    x1: f64,
+    y1: f64,
+    additive: bool,
 }
 
 /// Selection state captured when a transaction opens, so every drag frame is computed from the
@@ -582,7 +594,18 @@ impl EngineHost {
                 y1,
                 additive,
                 root_id,
-            } => self.marquee_select(x0, y0, x1, y1, additive, root_id.as_deref()),
+                exclude_ids,
+            } => self.marquee_select(
+                MarqueeRequest {
+                    x0,
+                    y0,
+                    x1,
+                    y1,
+                    additive,
+                },
+                root_id.as_deref(),
+                exclude_ids.as_deref(),
+            ),
             HostRequest::TranslateSelection {
                 dx,
                 dy,
@@ -729,13 +752,17 @@ impl EngineHost {
 
     fn marquee_select(
         &mut self,
-        x0: f64,
-        y0: f64,
-        x1: f64,
-        y1: f64,
-        additive: bool,
+        request: MarqueeRequest,
         root_id: Option<&str>,
+        exclude_ids: Option<&[String]>,
     ) -> Result<Value, HostFailure> {
+        let MarqueeRequest {
+            x0,
+            y0,
+            x1,
+            y1,
+            additive,
+        } = request;
         let first = self
             .runtime
             .camera()
@@ -752,7 +779,11 @@ impl EngineHost {
             Some(value) => parse_node_id(value)?,
             None => self.runtime.document().root_id(),
         };
-        let result = self.runtime.marquee_candidates(bounds, root)?;
+        let excluded = match exclude_ids {
+            Some(values) => parse_node_ids(values)?,
+            None => Vec::new(),
+        };
+        let result = self.runtime.marquee_candidates(bounds, root, &excluded)?;
         let selected = result.selected().to_vec();
         if additive {
             self.runtime.extend_selection(&selected)?;

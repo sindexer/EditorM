@@ -315,11 +315,14 @@ impl EngineRuntime {
     /// Resolves the top-level nodes a rubber-band rectangle covers inside `root`.
     ///
     /// Only direct children of `root` are returned: dragging a band across a group selects the
-    /// group, exactly as clicking one of its members would.
+    /// group, exactly as clicking one of its members would. `excluded` drops nodes the band was
+    /// drawn *on top of* rather than across, such as the Frame whose background the drag started
+    /// from; without it every band inside a Frame would also select that Frame.
     pub fn marquee_candidates(
         &mut self,
         world_bounds: Rect,
         root: NodeId,
+        excluded: &[NodeId],
     ) -> Result<MarqueeResult, RuntimeError> {
         if !world_bounds.is_finite() {
             return Err(RuntimeError::NonFiniteBounds(world_bounds));
@@ -328,10 +331,14 @@ impl EngineRuntime {
         let examined = query.ids().len() as u64;
         let mut selected = Vec::new();
         let mut seen = BTreeSet::new();
+        let excluded = excluded.iter().copied().collect::<BTreeSet<_>>();
         for id in query.ids() {
             let Some(top_level) = self.top_level_selectable(*id, root) else {
                 continue;
             };
+            if excluded.contains(&top_level) {
+                continue;
+            }
             if seen.insert(top_level) {
                 selected.push(top_level);
             }

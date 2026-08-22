@@ -1053,7 +1053,7 @@ export function App() {
           last: point,
           additive: event.shiftKey,
           nodeId: intent.target ?? undefined,
-          // Band within the container that was pressed, so its children are the candidates.
+          // The pressed container is the band's backdrop and is excluded from its result.
           marqueeRoot: intent.target ?? undefined,
         };
         setMarquee(marqueeRect(point, point));
@@ -1167,7 +1167,7 @@ export function App() {
       while (dragQueue.current.inFlight) await new Promise((resolve) => setTimeout(resolve, 4));
       if (active.kind === "marquee") {
         setMarquee(null);
-        const root = active.marqueeRoot ?? editRoot ?? engine.projection.rootId;
+        const root = editRoot ?? engine.projection.rootId;
         if (isMarqueeDrag(active.start, active.last)) {
           await engine.send("marquee_select", {
             x0: active.start[0],
@@ -1176,6 +1176,8 @@ export function App() {
             y1: active.last[1],
             additive: Boolean(active.additive),
             root_id: root,
+            // The container the band was drawn on is the backdrop, not a target.
+            exclude_ids: active.marqueeRoot ? [active.marqueeRoot] : [],
           });
         } else if (active.nodeId) {
           await engine.send("selection", { target: active.nodeId, mode: active.additive ? "toggle" : "replace" });

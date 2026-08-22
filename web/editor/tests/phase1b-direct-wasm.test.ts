@@ -64,3 +64,35 @@ describe("Phase 1B stored direct-WASM proof integrity", () => {
     expect(proof.gpu_evidence).toBe(false);
   });
 });
+
+const benchmark = JSON.parse(
+  readFileSync(path.join(workspace, "docs/PHASE_1B_METRICS_ENGINE_ONLY.json"), "utf8"),
+);
+
+describe("Phase 1B engine-only multi-drag benchmark", () => {
+  test("measures 10, 100, and 1,000 simultaneously dragged objects, snapped and unsnapped", () => {
+    for (const objects of [10, 100, 1000]) {
+      const series = benchmark.series.filter(
+        (entry: { objects: number }) => entry.objects === objects,
+      );
+      expect(series.length, `missing series for ${objects} objects`).toBe(2);
+      for (const entry of series) {
+        expect(entry.raw_frame_ms.length).toBe(entry.measured_iterations);
+        expect(entry.moved_nodes).toBe(objects);
+        expect(entry.dirty_slots).toBe(objects);
+      }
+    }
+  });
+
+  test("keeps drag work bounded: no full rebuilds, clones, or model scans", () => {
+    expect(benchmark.checks.no_full_rebuilds).toBe(true);
+    expect(benchmark.checks.no_document_clones).toBe(true);
+    expect(benchmark.checks.dirty_slots_match_selection_size).toBe(true);
+    expect(benchmark.all_passed).toBe(true);
+  });
+
+  test("does not claim browser or GPU evidence", () => {
+    expect(benchmark.gpu_evidence).toBe(false);
+    expect(benchmark.browser_evidence).toBe(false);
+  });
+});

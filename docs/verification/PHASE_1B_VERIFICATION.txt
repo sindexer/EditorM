@@ -10,8 +10,8 @@ cargo=cargo 1.89.0 (c24e10642 2025-06-23)
 wasm_bindgen=wasm-bindgen 0.2.126
 node=v22.22.2
 npm=10.9.7
-git_commit_at_start=8f5a5515eafa0eed8f1f9199f6b73dd51d351f0b
-started_at_utc=2026-08-22T03:44:54Z
+git_commit_at_start=826b123c9661c5a50615c46511d2e29cc26e967b
+started_at_utc=2026-08-22T04:53:26Z
 
 NOTE: This record was produced on Linux. The repository's PowerShell wrappers
 (tools/cargo.ps1, tools/build-phase0e-wasm.ps1) are Windows entry points; the equivalent
@@ -21,39 +21,39 @@ evidence was produced here, and none is claimed.
 
 ----------------------------------------------------------------
 command: cargo fmt --all -- --check
-started_at_utc=2026-08-22T03:44:54Z
+started_at_utc=2026-08-22T04:53:26Z
 exit_status=0
-finished_at_utc=2026-08-22T03:44:54Z
+finished_at_utc=2026-08-22T04:53:27Z
 output:
 
 ----------------------------------------------------------------
 command: cargo clippy --workspace --all-targets -- -D warnings
-started_at_utc=2026-08-22T03:44:54Z
+started_at_utc=2026-08-22T04:53:27Z
 exit_status=0
-finished_at_utc=2026-08-22T03:44:55Z
+finished_at_utc=2026-08-22T04:53:27Z
 output:
-      Checking visual_authoring_wasm_bridge v0.1.0 (/home/user/EditorM/crates/wasm_bridge)
-      Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.97s
+      Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.08s
 
 ----------------------------------------------------------------
 command: cargo build --workspace --all-targets
-started_at_utc=2026-08-22T03:44:55Z
+started_at_utc=2026-08-22T04:53:27Z
 exit_status=0
-finished_at_utc=2026-08-22T03:44:58Z
+finished_at_utc=2026-08-22T04:53:58Z
 output:
+     Compiling visual_authoring_runtime v0.1.0 (/home/user/EditorM/crates/runtime)
      Compiling visual_authoring_wasm_bridge v0.1.0 (/home/user/EditorM/crates/wasm_bridge)
-      Finished `dev` profile [unoptimized + debuginfo] target(s) in 2.39s
+      Finished `dev` profile [unoptimized + debuginfo] target(s) in 31.35s
 
 ----------------------------------------------------------------
 command: cargo test --workspace --all-targets
-started_at_utc=2026-08-22T03:44:58Z
+started_at_utc=2026-08-22T04:53:58Z
 exit_status=0
-finished_at_utc=2026-08-22T03:48:28Z
+finished_at_utc=2026-08-22T04:58:06Z
 output:
   running 12 tests
   test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
   running 50 tests
-  test result: ok. 50 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.20s
+  test result: ok. 50 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.26s
   running 3 tests
   test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
   running 8 tests
@@ -61,7 +61,7 @@ output:
   running 5 tests
   test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
   running 53 tests
-  test result: ok. 53 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 20.45s
+  test result: ok. 53 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 22.26s
   running 0 tests
   test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
   running 0 tests
@@ -73,19 +73,19 @@ output:
   running 0 tests
   test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
   running 2 tests
-  test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 20.94s
+  test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 22.25s
   running 1 test
   test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
   running 1 test
-  test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+  test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
   running 1 test
-  test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 22.26s
+  test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 23.24s
   running 1 test
   test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
   running 1 test
   test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
   running 2 tests
-  test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+  test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
   running 9 tests
   test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
   running 9 tests
@@ -97,78 +97,73 @@ output:
   running 1 test
   test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
   running 11 tests
-  test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.98s
+  test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.10s
   running 14 tests
-  test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 106.63s
+  test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 129.22s
   running 3 tests
   test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
   running 1 test
-  test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 37.55s
-  running 12 tests
-  test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+  test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 44.76s
+  running 13 tests
+  test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
 
 ----------------------------------------------------------------
 command: cargo build --release --target wasm32-unknown-unknown
-started_at_utc=2026-08-22T03:48:28Z
+started_at_utc=2026-08-22T04:58:06Z
 exit_status=0
-finished_at_utc=2026-08-22T03:48:38Z
+finished_at_utc=2026-08-22T04:58:19Z
 output:
-     Compiling visual_authoring_document v0.1.0 (/home/user/EditorM/crates/document)
-     Compiling visual_authoring_spatial v0.1.0 (/home/user/EditorM/crates/spatial)
-     Compiling visual_authoring_serialization v0.1.0 (/home/user/EditorM/crates/serialization)
-     Compiling visual_authoring_scene v0.1.0 (/home/user/EditorM/crates/scene)
-     Compiling visual_authoring_render_model v0.1.0 (/home/user/EditorM/crates/render_model)
      Compiling visual_authoring_runtime v0.1.0 (/home/user/EditorM/crates/runtime)
      Compiling visual_authoring_wasm_bridge v0.1.0 (/home/user/EditorM/crates/wasm_bridge)
-      Finished `release` profile [optimized] target(s) in 9.64s
+      Finished `release` profile [optimized] target(s) in 12.39s
 
 ----------------------------------------------------------------
 command: wasm-bindgen --target web --out-dir web/editor/public/pkg --out-name engine_host target/wasm32-unknown-unknown/release/visual_authoring_wasm_bridge.wasm
-started_at_utc=2026-08-22T03:48:38Z
+started_at_utc=2026-08-22T04:58:19Z
 exit_status=0
-finished_at_utc=2026-08-22T03:48:38Z
+finished_at_utc=2026-08-22T04:58:19Z
 output:
 
 ----------------------------------------------------------------
 command: node scripts/direct-wasm-phase1b.mjs
-started_at_utc=2026-08-22T03:48:38Z
+started_at_utc=2026-08-22T04:58:19Z
 exit_status=0
-finished_at_utc=2026-08-22T03:48:38Z
+finished_at_utc=2026-08-22T04:58:19Z
 output:
-  PHASE_1B_DIRECT_WASM_JSON={"phase":"1B","proof_kind":"actual-wasm-direct-node","gpu_evidence":false,"started_at":"2026-08-22T03:48:38.499Z","finished_at":"2026-08-22T03:48:38.543Z","node_version":"v22.22.2","platform":"linux-x64","wasm_path":"web/editor/public/pkg/engine_host_bg.wasm","wasm_bytes":1402869,"wasm_sha256":"b7c77e5cb8dee4543f25588ee28b746e0d07c5be8d647c57826f8231a229c84b","protocol_version":1,"render_binary_schema_version":2,"engine_sequence":48,"checks":[{"name":"initialize","passed":true,"detail":null},{"name":"load_editor_fixture","passed":true,"detail":null},{"name":"resize_camera","passed":true,"detail":null},{"name":"editor_fixture_has_frame","passed":true,"detail":null},{"name":"create_rectangle_0","passed":true,"detail":null},{"name":"create_rectangle_1","passed":true,"detail":null},{"name":"create_rectangle_2","passed":true,"detail":null},{"name":"selection_set","passed":true,"detail":null},{"name":"selection_set_count","passed":true,"detail":["00000000-0000-4000-8000-000000000100","00000000-0000-4000-8000-000000000101","00000000-0000-4000-8000-000000000102"]},{"name":"selection_set_rejects_unknown_id","passed":true,"detail":{"code":"runtime_error","message":"node 00000000-0000-4000-8000-999999999999 cannot be selected because it does not exist"}},{"name":"selection_survives_rejected_request","passed":true,"detail":["00000000-0000-4000-8000-000000000100","00000000-0000-4000-8000-000000000101","00000000-0000-4000-8000-000000000102"]},{"name":"marquee_select","passed":true,"detail":null},{"name":"marquee_selects_intersecting_top_level_nodes","passed":true,"detail":["00000000-0000-4000-8000-000000000100","00000000-0000-4000-8000-000000000101"]},{"name":"selection_replace_second","passed":true,"detail":null},{"name":"begin_transaction","passed":true,"detail":null},{"name":"drag_base_captured","passed":true,"detail":{"drag_targets":1,"transaction_active":true}},{"name":"translate_selection_snapped","passed":true,"detail":null},{"name":"translation_snapped","passed":true,"detail":{"applied_delta":[-300,0],"guides":[{"axis":"vertical","end":20,"position":-960,"start":-140,"target":"00000000-0000-4000-8000-000000000100"}],"moved":1,"preview":true,"requested_delta":[-297,0],"skipped_locked":0,"snap_candidates_examined":4,"snapped":true}},{"name":"snap_corrected_applied_delta","passed":true,"detail":[-300,0]},{"name":"snap_guide_reported","passed":true,"detail":[{"axis":"vertical","end":20,"position":-960,"start":-140,"target":"00000000-0000-4000-8000-000000000100"}]},{"name":"commit_transaction","passed":true,"detail":null},{"name":"snapped_node_left_edge_matches_first","passed":true,"detail":[-960,-960]},{"name":"undo_snapped_move","passed":true,"detail":null},{"name":"begin_drift_transaction","passed":true,"detail":null},{"name":"translate_frame_10","passed":true,"detail":null},{"name":"translate_frame_25","passed":true,"detail":null},{"name":"translate_frame_60","passed":true,"detail":null},{"name":"commit_drift_transaction","passed":true,"detail":null},{"name":"repeated_frames_measure_from_base","passed":true,"detail":[-660,-600]},{"name":"undo_drift","passed":true,"detail":null},{"name":"selection_set_all","passed":true,"detail":null},{"name":"arrange_align_left","passed":true,"detail":null},{"name":"align_moved_two_nodes","passed":true,"detail":{"changed":true,"moved":2,"operation":"align_left","reference":[-960,-140,-160,120],"unchanged":1}},{"name":"align_is_one_history_entry","passed":true,"detail":{"before":3,"after":4}},{"name":"aligned_left_edges_match","passed":true,"detail":[-960,-960,-960]},{"name":"undo_alignment","passed":true,"detail":null},{"name":"undo_restores_every_target","passed":true,"detail":[-960,-660,-260]},{"name":"arrange_distribute_horizontal","passed":true,"detail":null},{"name":"distribute_reported_change","passed":true,"detail":{"changed":true,"moved":1,"operation":"distribute_horizontal","reference":[-960,-140,-160,120],"unchanged":2}},{"name":"distribute_equalized_gaps","passed":true,"detail":[250,250]},{"name":"undo_distribution","passed":true,"detail":null},{"name":"translation_without_transaction_is_typed","passed":true,"detail":{"code":"no_transaction","message":"translate_selection requires an active transaction"}},{"name":"unknown_arrange_is_typed","passed":true,"detail":{"code":"invalid_arrange","message":"unknown arrange operation align_diagonal"}},{"name":"selection_two_only","passed":true,"detail":null},{"name":"distribute_requires_three","passed":true,"detail":{"code":"runtime_error","message":"distribute_horizontal requires at least 3 targets but received 2"}},{"name":"no_transaction_left_open","passed":true,"detail":{"redo_depth":1,"transaction_active":false,"undo_depth":3}}],"checks_passed":46,"checks_total":46,"all_passed":true}
+  PHASE_1B_DIRECT_WASM_JSON={"phase":"1B","proof_kind":"actual-wasm-direct-node","gpu_evidence":false,"started_at":"2026-08-22T04:58:19.696Z","finished_at":"2026-08-22T04:58:19.742Z","node_version":"v22.22.2","platform":"linux-x64","wasm_path":"web/editor/public/pkg/engine_host_bg.wasm","wasm_bytes":1404367,"wasm_sha256":"e32e22a9ad7865484fc3b0c2bc095f6ecd5238f4bc470305b52f1247a785c178","protocol_version":1,"render_binary_schema_version":2,"engine_sequence":48,"checks":[{"name":"initialize","passed":true,"detail":null},{"name":"load_editor_fixture","passed":true,"detail":null},{"name":"resize_camera","passed":true,"detail":null},{"name":"editor_fixture_has_frame","passed":true,"detail":null},{"name":"create_rectangle_0","passed":true,"detail":null},{"name":"create_rectangle_1","passed":true,"detail":null},{"name":"create_rectangle_2","passed":true,"detail":null},{"name":"selection_set","passed":true,"detail":null},{"name":"selection_set_count","passed":true,"detail":["00000000-0000-4000-8000-000000000100","00000000-0000-4000-8000-000000000101","00000000-0000-4000-8000-000000000102"]},{"name":"selection_set_rejects_unknown_id","passed":true,"detail":{"code":"runtime_error","message":"node 00000000-0000-4000-8000-999999999999 cannot be selected because it does not exist"}},{"name":"selection_survives_rejected_request","passed":true,"detail":["00000000-0000-4000-8000-000000000100","00000000-0000-4000-8000-000000000101","00000000-0000-4000-8000-000000000102"]},{"name":"marquee_select","passed":true,"detail":null},{"name":"marquee_selects_intersecting_top_level_nodes","passed":true,"detail":["00000000-0000-4000-8000-000000000100","00000000-0000-4000-8000-000000000101"]},{"name":"selection_replace_second","passed":true,"detail":null},{"name":"begin_transaction","passed":true,"detail":null},{"name":"drag_base_captured","passed":true,"detail":{"drag_targets":1,"transaction_active":true}},{"name":"translate_selection_snapped","passed":true,"detail":null},{"name":"translation_snapped","passed":true,"detail":{"applied_delta":[-300,0],"guides":[{"axis":"vertical","end":20,"position":-960,"start":-140,"target":"00000000-0000-4000-8000-000000000100"}],"moved":1,"preview":true,"requested_delta":[-297,0],"skipped_locked":0,"snap_candidates_examined":4,"snapped":true}},{"name":"snap_corrected_applied_delta","passed":true,"detail":[-300,0]},{"name":"snap_guide_reported","passed":true,"detail":[{"axis":"vertical","end":20,"position":-960,"start":-140,"target":"00000000-0000-4000-8000-000000000100"}]},{"name":"commit_transaction","passed":true,"detail":null},{"name":"snapped_node_left_edge_matches_first","passed":true,"detail":[-960,-960]},{"name":"undo_snapped_move","passed":true,"detail":null},{"name":"begin_drift_transaction","passed":true,"detail":null},{"name":"translate_frame_10","passed":true,"detail":null},{"name":"translate_frame_25","passed":true,"detail":null},{"name":"translate_frame_60","passed":true,"detail":null},{"name":"commit_drift_transaction","passed":true,"detail":null},{"name":"repeated_frames_measure_from_base","passed":true,"detail":[-660,-600]},{"name":"undo_drift","passed":true,"detail":null},{"name":"selection_set_all","passed":true,"detail":null},{"name":"arrange_align_left","passed":true,"detail":null},{"name":"align_moved_two_nodes","passed":true,"detail":{"changed":true,"moved":2,"operation":"align_left","reference":[-960,-140,-160,120],"unchanged":1}},{"name":"align_is_one_history_entry","passed":true,"detail":{"before":3,"after":4}},{"name":"aligned_left_edges_match","passed":true,"detail":[-960,-960,-960]},{"name":"undo_alignment","passed":true,"detail":null},{"name":"undo_restores_every_target","passed":true,"detail":[-960,-660,-260]},{"name":"arrange_distribute_horizontal","passed":true,"detail":null},{"name":"distribute_reported_change","passed":true,"detail":{"changed":true,"moved":1,"operation":"distribute_horizontal","reference":[-960,-140,-160,120],"unchanged":2}},{"name":"distribute_equalized_gaps","passed":true,"detail":[250,250]},{"name":"undo_distribution","passed":true,"detail":null},{"name":"translation_without_transaction_is_typed","passed":true,"detail":{"code":"no_transaction","message":"translate_selection requires an active transaction"}},{"name":"unknown_arrange_is_typed","passed":true,"detail":{"code":"invalid_arrange","message":"unknown arrange operation align_diagonal"}},{"name":"selection_two_only","passed":true,"detail":null},{"name":"distribute_requires_three","passed":true,"detail":{"code":"runtime_error","message":"distribute_horizontal requires at least 3 targets but received 2"}},{"name":"no_transaction_left_open","passed":true,"detail":{"redo_depth":1,"transaction_active":false,"undo_depth":3}}],"checks_passed":46,"checks_total":46,"all_passed":true}
 
 ----------------------------------------------------------------
 command: npm test
-started_at_utc=2026-08-22T03:48:38Z
+started_at_utc=2026-08-22T04:58:19Z
 exit_status=0
-finished_at_utc=2026-08-22T03:48:40Z
+finished_at_utc=2026-08-22T04:58:21Z
 output:
-   RUN  v3.2.7 /home/user/EditorM/web/editor
-  
-   ✓ tests/browser-proof-phase1a.test.ts (5 tests) 13ms
-   ✓ tests/phase1b-contract.test.ts (15 tests) 9ms
-   ✓ tests/phase1b-direct-wasm.test.ts (4 tests) 7ms
+   ✓ tests/phase1b-direct-wasm.test.ts (7 tests) 11ms
+   ✓ tests/browser-proof-phase1a.test.ts (5 tests) 20ms
+   ✓ tests/phase1b-contract.test.ts (15 tests) 8ms
+   ✓ tests/phase1b-gate-status.test.ts (3 tests) 12ms
    ✓ tests/phase1a-contract.test.ts (5 tests) 6ms
   stdout | tests/projection.test.ts > R2 React ProjectionStore bounded benchmark > 10k and 100k group/ungroup use 10 warmups and 30 measured iterations
-  PHASE0E_R2_REACT_JSON={"phase":"0E-R2","layer":"react-projection-store","fixtures":[{"node_count":10000,"target_ids":["node-0","node-5000","node-9999"],"warmups":10,"measured_iterations":30,"group":{"samples_ms":[0.035366999999951076,0.03509199999984958,0.03307599999993727,0.06567500000005566,0.057477999999946405,0.036769999999933134,0.07906000000002678,0.04014899999992849,0.03334699999982149,0.034830000000056316,0.032603999999992084,0.04591800000002877,0.12078700000006393,0.033074999999826105,0.03288399999996727,0.03248200000007273,0.03684700000007979,0.033003999999891676,0.032655999999860796,0.08006399999999303,0.034263000000009924,0.03672499999993306,0.032993000000033135,0.032881000000088534,0.03409699999997429,0.0332220000000234,0.06970000000001164,0.037044000000150845,0.03230499999995118,0.030806999999867912],"median_ms":0.034830000000056316,"p95_ms":0.08006399999999303,"work_samples":[453,453,453,453,453,453,453,453,453,453,453,453,453,453,453,453,453,453,453,453,453,453,453,453,453,453,453,453,453,453]},"ungroup":{"samples_ms":[0.03401299999995899,0.033877000000074986,0.03308999999990192,0.05700299999989511,0.05693100000007689,0.035008000000061656,0.038140000000112195,0.03477500000008149,0.035538999999971566,0.03212900000016816,0.031797999999980675,0.037119999999958964,0.03406799999993382,0.03202699999997094,0.03172200000017256,0.04690699999991921,0.032924000000093656,0.03203099999996084,0.03199900000004163,0.0422120000000632,0.04570699999999306,0.03358800000000883,0.03275800000005802,0.03262499999982538,0.03287199999999757,0.044189999999844076,0.03837300000009236,0.03286400000001777,0.028911999999991167,0.028823999999985972],"median_ms":0.033877000000074986,"p95_ms":0.05693100000007689,"work_samples":[476,476,476,476,476,476,476,476,476,476,476,476,476,476,476,476,476,476,476,476,476,476,476,476,476,476,476,476,476,476]}},{"node_count":100000,"target_ids":["node-0","node-50000","node-99999"],"warmups":10,"measured_iterations":30,"group":{"samples_ms":[0.03307599999993727,0.03337099999998827,0.03306099999986145,0.05037000000015723,0.0347399999998288,0.03305199999999786,0.035632000000077824,0.03305199999999786,0.03305500000010397,0.035429999999905704,0.037477999999964595,0.03336899999999332,0.034269999999878564,0.03387099999986276,0.037753000000066095,0.03424699999982295,0.03446899999994457,0.03385400000001937,0.035329999999930806,0.03627299999993738,0.03340400000001864,0.047854999999799475,0.026847000000088883,0.028154000000085944,0.02564499999994041,0.025294000000030792,0.02577500000006694,0.02536199999985911,0.02573300000017298,0.057821000000103595],"median_ms":0.03385400000001937,"p95_ms":0.05037000000015723,"work_samples":[558,558,558,558,558,558,558,558,558,558,558,558,558,558,558,558,558,558,558,558,558,558,558,558,558,558,558,558,558,558]},"ungroup":{"samples_ms":[0.031275999999934356,0.03161199999999553,0.03114800000003015,0.035768000000189204,0.031199000000015076,0.03131299999995463,0.03165600000011182,0.03141600000003564,0.04184999999984029,0.04037700000003497,0.03189199999997072,0.03146700000002056,0.0337050000000545,0.0846639999999752,0.03388700000004974,0.03286600000001272,0.03187899999988986,0.03226700000004712,0.041429999999991196,0.031970000000001164,0.041067999999995664,0.04282199999988734,0.03150000000005093,0.02791199999978744,0.026787000000012995,0.026395000000093205,0.02659999999991669,0.02645799999982046,0.03587700000002769,0.03276200000004792],"median_ms":0.03189199999997072,"p95_ms":0.04282199999988734,"work_samples":[600,600,600,600,600,600,600,600,600,600,600,600,600,600,600,600,600,600,600,600,600,600,600,600,600,600,600,600,600,600]}}],"ratios_100k_over_10k":{"groupWork":1.2317880794701987,"ungroupWork":1.2605042016806722,"groupMedianTime":0.9719781797291023,"ungroupMedianTime":0.9414056734628252},"all_passed":true}
+  PHASE0E_R2_REACT_JSON={"phase":"0E-R2","layer":"react-projection-store","fixtures":[{"node_count":10000,"target_ids":["node-0","node-5000","node-9999"],"warmups":10,"measured_iterations":30,"group":{"samples_ms":[0.04051800000002004,0.040786000000025524,0.032999999999901775,0.032960000000002765,0.03410899999994399,0.041065000000116925,0.03287899999986621,0.032151999999996406,0.0616179999999531,0.034506000000192216,0.03760699999997996,0.09465899999986505,0.034898999999995794,0.03712800000016614,0.03138100000001032,0.034839999999803695,0.033059000000093874,0.03379500000005464,0.040475000000014916,0.0869110000001001,0.035858999999845764,0.034186000000090644,0.031660999999985506,0.03350399999999354,0.039354000000003,0.033585000000130094,0.03144600000018727,0.03487700000005134,0.03219799999988027,0.03072199999996883],"median_ms":0.034506000000192216,"p95_ms":0.0869110000001001,"work_samples":[453,453,453,453,453,453,453,453,453,453,453,453,453,453,453,453,453,453,453,453,453,453,453,453,453,453,453,453,453,453]},"ungroup":{"samples_ms":[0.04124299999989489,0.033419000000094456,0.031041000000186614,0.03698199999985263,0.03040499999997337,0.031702999999879466,0.030185999999957858,0.02976300000000265,0.03684099999986756,0.030157000000144762,0.042764000000033775,0.03597399999989648,0.030528999999887674,0.03260000000000218,0.036848999999847365,0.032359999999926004,0.030029999999896972,0.03082999999992353,0.033496999999897525,0.03852699999993092,0.03128800000013143,0.03096000000005006,0.037755000000061045,0.03040899999996327,0.03287000000000262,0.030944999999974243,0.03025500000012471,0.040930000000116706,0.027959000000009837,0.028641000000106942],"median_ms":0.031702999999879466,"p95_ms":0.04124299999989489,"work_samples":[476,476,476,476,476,476,476,476,476,476,476,476,476,476,476,476,476,476,476,476,476,476,476,476,476,476,476,476,476,476]}},{"node_count":100000,"target_ids":["node-0","node-50000","node-99999"],"warmups":10,"measured_iterations":30,"group":{"samples_ms":[0.03658499999983178,0.060651000000007116,0.0342160000000149,0.033562999999958265,0.032715000000052896,0.05593399999997928,0.042901000000028944,0.03251199999999699,0.03238499999997657,0.04121399999985442,0.035078999999996086,0.03512399999999616,0.048334000000068045,0.032810000000154105,0.03870499999993626,0.10146000000008826,0.029644999999845822,0.025896999999986292,0.0324479999999312,0.026125999999976557,0.031234999999924185,0.03661299999998846,0.028102999999873646,0.025797000000011394,0.03303800000003321,0.025802000000112457,0.02592100000015307,0.0813660000001164,0.02665999999999258,0.031017000000019834],"median_ms":0.03303800000003321,"p95_ms":0.0813660000001164,"work_samples":[558,558,558,558,558,558,558,558,558,558,558,558,558,558,558,558,558,558,558,558,558,558,558,558,558,558,558,558,558,558]},"ungroup":{"samples_ms":[0.03216999999995096,0.037871999999879336,0.03158099999996011,0.030733000000054744,0.03657700000007935,0.04204500000014377,0.03361799999993309,0.03126499999984844,0.03311299999995754,0.0329060000001391,0.03922600000009879,0.031132999999954336,0.034697999999934837,0.10662900000011177,0.03541700000005221,0.0324030000001585,0.026999000000159867,0.027021000000104323,0.028009000000110973,0.02567599999997583,0.037931999999955224,0.028814999999895008,0.028127000000040425,0.026146000000153435,0.028980000000046857,0.027211000000079366,0.026008000000047105,0.031557999999904496,0.06338299999993069,0.028542000000015832],"median_ms":0.03158099999996011,"p95_ms":0.06338299999993069,"work_samples":[600,600,600,600,600,600,600,600,600,600,600,600,600,600,600,600,600,600,600,600,600,600,600,600,600,600,600,600,600,600]}}],"ratios_100k_over_10k":{"groupWork":1.2317880794701987,"ungroupWork":1.2605042016806722,"groupMedianTime":0.9574566741972169,"ungroupMedianTime":0.9961517837453926},"all_passed":true}
   
   stdout | tests/projection.test.ts > R2 Layers and engine z-order agreement > eight overlapping siblings retain exact noncontiguous group and ungroup order
   PHASE0E_R2_REACT_ORDER_JSON={"phase":"0E-R2","overlapping_sibling_count":8,"targets":["sibling-0","sibling-3","sibling-7"],"grouped_layers_order":["group-eight","sibling-0","sibling-3","sibling-7","sibling-1","sibling-2","sibling-4","sibling-5","sibling-6"],"engine_topmost_order":["sibling-6","sibling-5","sibling-4","sibling-2","sibling-1","sibling-7","sibling-3","sibling-0"],"restored_layers_order":["sibling-0","sibling-1","sibling-2","sibling-3","sibling-4","sibling-5","sibling-6","sibling-7"],"stale_dense_index_present":false,"all_passed":true}
   
-   ✓ tests/projection.test.ts (7 tests) 855ms
-     ✓ versioned UI projection > 100k group and ungroup use bounded structural operations without a full hierarchy rebuild  461ms
+   ✓ tests/projection.test.ts (7 tests) 997ms
+     ✓ versioned UI projection > 100k group and ungroup use bounded structural operations without a full hierarchy rebuild  544ms
+     ✓ R2 React ProjectionStore bounded benchmark > 10k and 100k group/ungroup use 10 warmups and 30 measured iterations  340ms
   
-   Test Files  5 passed (5)
-        Tests  36 passed (36)
-     Start at  03:48:39
-     Duration  1.35s (transform 304ms, setup 0ms, collect 434ms, tests 890ms, environment 1ms, prepare 416ms)
+   Test Files  6 passed (6)
+        Tests  42 passed (42)
+     Start at  04:58:20
+     Duration  1.50s (transform 247ms, setup 0ms, collect 432ms, tests 1.05s, environment 1ms, prepare 464ms)
   
 
 ----------------------------------------------------------------
 command: npm run build
-started_at_utc=2026-08-22T03:48:40Z
+started_at_utc=2026-08-22T04:58:21Z
 exit_status=0
-finished_at_utc=2026-08-22T03:48:45Z
+finished_at_utc=2026-08-22T04:58:26Z
 output:
   
   > visual-authoring-phase0e-editor@0.1.0 build
@@ -181,12 +176,80 @@ output:
   computing gzip size...
   dist/index.html                   0.48 kB │ gzip:  0.32 kB
   dist/assets/index-7mgYzBHV.css   16.36 kB │ gzip:  4.06 kB
-  dist/assets/index-BWKPvAOZ.js   230.76 kB │ gzip: 70.82 kB │ map: 607.78 kB
-  ✓ built in 1.77s
+  dist/assets/index-CpoF4ZoH.js   230.79 kB │ gzip: 70.84 kB │ map: 608.08 kB
+  ✓ built in 2.08s
 
 ----------------------------------------------------------------
 artifacts
-  engine_host_bg.wasm bytes=1402869
-  engine_host_bg.wasm sha256=b7c77e5cb8dee4543f25588ee28b746e0d07c5be8d647c57826f8231a229c84b
+  engine_host_bg.wasm bytes=1404367
+  engine_host_bg.wasm sha256=e32e22a9ad7865484fc3b0c2bc095f6ecd5238f4bc470305b52f1247a785c178
   rust test binaries executed: see cargo test output above
-finished_at_utc=2026-08-22T03:48:45Z
+finished_at_utc=2026-08-22T04:58:27Z
+
+================================================================
+Gate 1B closure runs
+================================================================
+chrome=Chromium 141.0.7390.37 
+gpu=none (container); navigator.gpu is exposed on the served origin but no WebGPU device can be held
+
+----------------------------------------------------------------
+command: node scripts/bench-multi-drag-phase1b.mjs
+started_at_utc=2026-08-22T05:00:58Z
+exit_status=0
+finished_at_utc=2026-08-22T05:02:02Z
+output:
+  objects=  10 snap=off median=1.969ms p95=2.397ms max=2.397ms dirty_slots=10
+  objects=  10 snap=on  median=2.591ms p95=2.870ms max=2.870ms dirty_slots=10
+  objects= 100 snap=off median=6.214ms p95=6.849ms max=6.849ms dirty_slots=100
+  objects= 100 snap=on  median=8.467ms p95=9.955ms max=9.955ms dirty_slots=100
+  objects=1000 snap=off median=228.846ms p95=238.853ms max=238.853ms dirty_slots=1000
+  objects=1000 snap=on  median=236.315ms p95=249.620ms max=249.620ms dirty_slots=1000
+  metrics=/home/user/EditorM/docs/PHASE_1B_METRICS_ENGINE_ONLY.json
+
+----------------------------------------------------------------
+command: node scripts/browser-proof-phase1b.mjs
+started_at_utc=2026-08-22T05:02:02Z
+exit_status=1
+finished_at_utc=2026-08-22T05:02:48Z
+output:
+      "OperationError: Instance dropped in popErrorScope",
+      "OperationError: Instance dropped in popErrorScope",
+      "OperationError: Instance dropped in popErrorScope",
+      "OperationError: Instance dropped in popErrorScope",
+      "OperationError: Instance dropped in popErrorScope",
+      "OperationError: Instance dropped in popErrorScope",
+      "OperationError: Instance dropped in popErrorScope",
+      "OperationError: Instance dropped in popErrorScope",
+      "OperationError: Instance dropped in popErrorScope",
+      "OperationError: Instance dropped in popErrorScope"
+    ],
+    "chrome_stderr_tail": "[26443:26456:0822/050202.897110:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory\n[26443:26456:0822/050202.903639:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are \"tcp\" and on UNIX \"unix\")\n[26443:26456:0822/050202.903709:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory\n[26443:26456:0822/050202.903734:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory\n[26443:26456:0822/050202.932797:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are \"tcp\" and on UNIX \"unix\")\n\nDevTools listening on ws://127.0.0.1:40551/devtools/browser/ec7bab1a-ca1f-4aaf-a9ac-f3bc407eb477\n[26443:26456:0822/050202.988443:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are \"tcp\" and on UNIX \"unix\")\n[26443:26443:0822/050203.043647:ERROR:dbus/object_proxy.cc:573] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: \n[26443:26456:0822/050203.043831:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are \"tcp\" and on UNIX \"unix\")\n[26443:26456:0822/050203.043907:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are \"tcp\" and on UNIX \"unix\")\n[26443:26456:0822/050203.043919:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are \"tcp\" and on UNIX \"unix\")\n[26443:26456:0822/050203.043928:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are \"tcp\" and on UNIX \"unix\")\n[26443:26456:0822/050203.043934:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are \"tcp\" and on UNIX \"unix\")\n[26443:26456:0822/050203.043940:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are \"tcp\" and on UNIX \"unix\")\n[26443:26443:0822/050203.047656:ERROR:dbus/object_proxy.cc:573] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: \n[26443:26443:0822/050203.053668:ERROR:dbus/object_proxy.cc:573] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: \n[26443:26456:0822/050203.055112:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are \"tcp\" and on UNIX \"unix\")\n[26443:26443:0822/050203.075463:ERROR:dbus/object_proxy.cc:573] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: \n[26443:26443:0822/050203.075493:ERROR:dbus/object_proxy.cc:573] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: \n[26443:26443:0822/050203.075505:ERROR:dbus/object_proxy.cc:573] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: \n[26443:26456:0822/050203.075500:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory\n[26443:26456:0822/050203.075537:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory\n[26443:26456:0822/050203.075548:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are \"tcp\" and on UNIX \"unix\")\n[26443:26443:0822/050203.077005:ERROR:dbus/object_proxy.cc:573] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: \n[26443:26456:0822/050203.077089:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are \"tcp\" and on UNIX \"unix\")\n[26443:26443:0822/050203.081999:ERROR:dbus/object_proxy.cc:573] Failed to call method: org.freedesktop.DBus.Properties.GetAll: object_path= /org/freedesktop/UPower/devices/DisplayDevice: unknown error type: \n[26443:26443:0822/050203.082021:ERROR:dbus/object_proxy.cc:573] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: \n[26443:26443:0822/050203.083394:ERROR:dbus/object_proxy.cc:573] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: \n[26443:26456:0822/050203.083836:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are \"tcp\" and on UNIX \"unix\")\n[26443:26443:0822/050203.110348:ERROR:dbus/object_proxy.cc:573] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: \n[26443:26456:0822/050203.111705:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are \"tcp\" and on UNIX \"unix\")\n[26443:26443:0822/050203.118868:ERROR:dbus/object_proxy.cc:573] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: \n[26471:26471:0822/050203.323810:ERROR:gpu/command_buffer/service/shared_image/shared_image_factory.cc:900] Could not find SharedImageBackingFactory with params: usage: RasterRead|DisplayRead|WebgpuRead|WebgpuSwapChainTexture|RasterWrite|WebgpuWrite, format: BGRA_8888, share_between_threads: 0, gmb_type: empty, size: 1024x768, debug_label: WebGPUSwapBufferProvider_Pid:0\n[26471:26471:0822/050203.323900:ERROR:gpu/ipc/service/shared_image_stub.cc:254] SharedImageStub: Unable to create shared image\n[26472:26490:0822/050207.959284:ERROR:net/socket/ssl_client_socket_impl.cc:902] handshake failed; returned -1, SSL error code 1, net_error -202\n[26472:26490:0822/050207.959593:ERROR:net/socket/ssl_client_socket_impl.cc:902] handshake failed; returned -1, SSL error code 1, net_error -202\n[26472:26490:0822/050207.959794:ERROR:net/socket/ssl_client_socket_impl.cc:902] handshake failed; returned -1, SSL error code 1, net_error -202\n[26472:26490:0822/050208.840327:ERROR:net/socket/ssl_client_socket_impl.cc:902] handshake failed; returned -1, SSL error code 1, net_error -202\n[26472:26490:0822/050208.903215:ERROR:net/socket/ssl_client_socket_impl.cc:902] handshake failed; returned -1, SSL error code 1, net_error -202\n[26472:26490:0822/050208.941174:ERROR:net/socket/ssl_client_socket_impl.cc:902] handshake failed; returned -1, SSL error code 1, net_error -202\n[26472:26490:0822/050209.332059:ERROR:net/socket/ssl_client_socket_impl.cc:902] handshake failed; returned -1, SSL error code 1, net_error -101\n[26472:26490:0822/050210.190752:ERROR:net/socket/ssl_client_socket_impl.cc:902] handshake failed; returned -1, SSL error code 1, net_error -202\n[26472:26490:0822/050210.192975:ERROR:net/socket/ssl_client_socket_impl.cc:902] handshake failed; returned -1, SSL error code 1, net_error -202\n[26472:26490:0822/050210.197339:ERROR:net/socket/ssl_client_socket_impl.cc:902] handshake failed; returned -1, SSL error code 1, net_error -202\n[26472:26490:0822/050212.254561:ERROR:net/socket/ssl_client_socket_impl.cc:902] handshake failed; returned -1, SSL error code 1, net_error -202\n[26472:26490:0822/050212.298359:ERROR:net/socket/ssl_client_socket_impl.cc:902] handshake failed; returned -1, SSL error code 1, net_error -202\n[26472:26490:0822/050212.305832:ERROR:net/socket/ssl_client_socket_impl.cc:902] handshake failed; returned -1, SSL error code 1, net_error -202\n[26472:26490:0822/050215.573725:ERROR:net/socket/ssl_client_socket_impl.cc:902] handshake failed; returned -1, SSL error code 1, net_error -101\n[26472:26490:0822/050215.577233:ERROR:net/socket/ssl_client_socket_impl.cc:902] handshake failed; returned -1, SSL error code 1, net_error -202\n[26472:26490:0822/050215.646030:ERROR:net/socket/ssl_client_socket_impl.cc:902] handshake failed; returned -1, SSL error code 1, net_error -202\n[26472:26490:0822/050215.648413:ERROR:net/socket/ssl_client_socket_impl.cc:902] handshake failed; returned -1, SSL error code 1, net_error -202\n[26472:26490:0822/050219.870751:ERROR:net/socket/ssl_client_socket_impl.cc:902] handshake failed; returned -1, SSL error code 1, net_error -202\n[26472:26490:0822/050220.287598:ERROR:net/socket/ssl_client_socket_impl.cc:902] handshake failed; returned -1, SSL error code 1, net_error -202\n[26472:26490:0822/050220.579649:ERROR:net/socket/ssl_client_socket_impl.cc:902] handshake failed; returned -1, SSL error code 1, net_error -202\n[26472:26490:0822/050222.789635:ERROR:net/socket/ssl_client_socket_impl.cc:902] handshake failed; returned -1, SSL error code 1, net_error -101\n[26472:26490:0822/050226.166696:ERROR:net/socket/ssl_client_socket_impl.cc:902] handshake failed; returned -1, SSL error code 1, net_error -202\n[26472:26490:0822/050227.223083:ERROR:net/socket/ssl_client_socket_impl.cc:902] handshake failed; returned -1, SSL error code 1, net_error -202\n[26472:26490:0822/050227.825142:ERROR:net/socket/ssl_client_socket_impl.cc:902] handshake failed; returned -1, SSL error code 1, net_error -202\n[26472:26490:0822/050229.111686:ERROR:net/socket/ssl_client_socket_impl.cc:902] handshake failed; returned -1, SSL error code 1, net_error -101\n[26472:26490:0822/050235.489384:ERROR:net/socket/ssl_client_socket_impl.cc:902] handshake failed; returned -1, SSL error code 1, net_error -202\n[26472:26490:0822/050237.195883:ERROR:net/socket/ssl_client_socket_impl.cc:902] handshake failed; returned -1, SSL error code 1, net_error -202\n[26472:26490:0822/050238.149586:ERROR:net/socket/ssl_client_socket_impl.cc:902] handshake failed; returned -1, SSL error code 1, net_error -202\n[26472:26490:0822/050238.225143:ERROR:net/socket/ssl_client_socket_impl.cc:902] handshake failed; returned -1, SSL error code 1, net_error -101\n[26472:26490:0822/050244.540078:ERROR:net/socket/ssl_client_socket_impl.cc:902] handshake failed; returned -1, SSL error code 1, net_error -101\n",
+    "gate_status": "UNVERIFIED"
+  }
+
+----------------------------------------------------------------
+command: node scripts/browser-proof-phase1b.mjs
+started_at_utc=2026-08-22T05:02:48Z
+exit_status=1
+finished_at_utc=2026-08-22T05:03:34Z
+output:
+      "OperationError: Instance dropped in popErrorScope",
+      "OperationError: Instance dropped in popErrorScope",
+      "OperationError: Instance dropped in popErrorScope",
+      "OperationError: Instance dropped in popErrorScope",
+      "OperationError: Instance dropped in popErrorScope",
+      "OperationError: Instance dropped in popErrorScope",
+      "OperationError: Instance dropped in popErrorScope",
+      "OperationError: Instance dropped in popErrorScope",
+      "OperationError: Instance dropped in popErrorScope",
+      "OperationError: Instance dropped in popErrorScope"
+    ],
+    "chrome_stderr_tail": "[26596:26609:0822/050248.854150:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory\n[26596:26609:0822/050248.860104:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are \"tcp\" and on UNIX \"unix\")\n[26596:26609:0822/050248.860152:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory\n[26596:26609:0822/050248.860180:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory\n[26596:26609:0822/050248.886381:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are \"tcp\" and on UNIX \"unix\")\n\nDevTools listening on ws://127.0.0.1:34831/devtools/browser/2e205d98-fb62-4d29-ac6f-5f2b8423482a\n[26596:26609:0822/050248.928185:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are \"tcp\" and on UNIX \"unix\")\n[26596:26596:0822/050248.985312:ERROR:dbus/object_proxy.cc:573] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: \n[26596:26609:0822/050248.985468:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are \"tcp\" and on UNIX \"unix\")\n[26596:26609:0822/050248.985495:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are \"tcp\" and on UNIX \"unix\")\n[26596:26609:0822/050248.985506:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are \"tcp\" and on UNIX \"unix\")\n[26596:26609:0822/050248.985516:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are \"tcp\" and on UNIX \"unix\")\n[26596:26609:0822/050248.985521:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are \"tcp\" and on UNIX \"unix\")\n[26596:26609:0822/050248.985526:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are \"tcp\" and on UNIX \"unix\")\n[26596:26596:0822/050248.989427:ERROR:dbus/object_proxy.cc:573] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: \n[26596:26596:0822/050248.994871:ERROR:dbus/object_proxy.cc:573] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: \n[26596:26609:0822/050248.996218:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are \"tcp\" and on UNIX \"unix\")\n[26596:26596:0822/050249.017222:ERROR:dbus/object_proxy.cc:573] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: \n[26596:26596:0822/050249.017271:ERROR:dbus/object_proxy.cc:573] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: \n[26596:26596:0822/050249.017280:ERROR:dbus/object_proxy.cc:573] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: \n[26596:26609:0822/050249.018070:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory\n[26596:26596:0822/050249.018742:ERROR:dbus/object_proxy.cc:573] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: \n[26596:26609:0822/050249.018909:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory\n[26596:26609:0822/050249.018940:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are \"tcp\" and on UNIX \"unix\")\n[26596:26609:0822/050249.018948:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are \"tcp\" and on UNIX \"unix\")\n[26596:26596:0822/050249.021832:ERROR:dbus/object_proxy.cc:573] Failed to call method: org.freedesktop.DBus.Properties.GetAll: object_path= /org/freedesktop/UPower/devices/DisplayDevice: unknown error type: \n[26596:26596:0822/050249.021855:ERROR:dbus/object_proxy.cc:573] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: \n[26596:26596:0822/050249.022095:ERROR:dbus/object_proxy.cc:573] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: \n[26596:26609:0822/050249.023090:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are \"tcp\" and on UNIX \"unix\")\n[26596:26596:0822/050249.027959:ERROR:dbus/object_proxy.cc:573] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: \n[26596:26609:0822/050249.036873:ERROR:dbus/bus.cc:408] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are \"tcp\" and on UNIX \"unix\")\n[26596:26596:0822/050249.042912:ERROR:dbus/object_proxy.cc:573] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: \n[26625:26625:0822/050249.761569:ERROR:gpu/command_buffer/service/shared_image/shared_image_factory.cc:900] Could not find SharedImageBackingFactory with params: usage: RasterRead|DisplayRead|WebgpuRead|WebgpuSwapChainTexture|RasterWrite|WebgpuWrite, format: BGRA_8888, share_between_threads: 0, gmb_type: empty, size: 1024x768, debug_label: WebGPUSwapBufferProvider_Pid:26665\n[26625:26625:0822/050249.761872:ERROR:gpu/ipc/service/shared_image_stub.cc:254] SharedImageStub: Unable to create shared image\n[26626:26647:0822/050253.930083:ERROR:net/socket/ssl_client_socket_impl.cc:902] handshake failed; returned -1, SSL error code 1, net_error -202\n[26626:26647:0822/050253.930392:ERROR:net/socket/ssl_client_socket_impl.cc:902] handshake failed; returned -1, SSL error code 1, net_error -202\n[26626:26647:0822/050253.930486:ERROR:net/socket/ssl_client_socket_impl.cc:902] handshake failed; returned -1, SSL error code 1, net_error -202\n[26626:26647:0822/050254.753159:ERROR:net/socket/ssl_client_socket_impl.cc:902] handshake failed; returned -1, SSL error code 1, net_error -202\n[26626:26647:0822/050254.774653:ERROR:net/socket/ssl_client_socket_impl.cc:902] handshake failed; returned -1, SSL error code 1, net_error -202\n[26626:26647:0822/050254.789840:ERROR:net/socket/ssl_client_socket_impl.cc:902] handshake failed; returned -1, SSL error code 1, net_error -202\n[26626:26647:0822/050255.292453:ERROR:net/socket/ssl_client_socket_impl.cc:902] handshake failed; returned -1, SSL error code 1, net_error -101\n[26626:26647:0822/050256.117472:ERROR:net/socket/ssl_client_socket_impl.cc:902] handshake failed; returned -1, SSL error code 1, net_error -202\n[26626:26647:0822/050256.176642:ERROR:net/socket/ssl_client_socket_impl.cc:902] handshake failed; returned -1, SSL error code 1, net_error -202\n[26626:26647:0822/050256.184872:ERROR:net/socket/ssl_client_socket_impl.cc:902] handshake failed; returned -1, SSL error code 1, net_error -202\n[26626:26647:0822/050258.018178:ERROR:net/socket/ssl_client_socket_impl.cc:902] handshake failed; returned -1, SSL error code 1, net_error -202\n[26626:26647:0822/050258.234887:ERROR:net/socket/ssl_client_socket_impl.cc:902] handshake failed; returned -1, SSL error code 1, net_error -202\n[26626:26647:0822/050258.352939:ERROR:net/socket/ssl_client_socket_impl.cc:902] handshake failed; returned -1, SSL error code 1, net_error -202\n[26626:26647:0822/050300.961819:ERROR:net/socket/ssl_client_socket_impl.cc:902] handshake failed; returned -1, SSL error code 1, net_error -202\n[26626:26647:0822/050301.362598:ERROR:net/socket/ssl_client_socket_impl.cc:902] handshake failed; returned -1, SSL error code 1, net_error -202\n[26626:26647:0822/050301.469146:ERROR:net/socket/ssl_client_socket_impl.cc:902] handshake failed; returned -1, SSL error code 1, net_error -202\n[26626:26647:0822/050301.571292:ERROR:net/socket/ssl_client_socket_impl.cc:902] handshake failed; returned -1, SSL error code 1, net_error -101\n[26626:26647:0822/050305.581848:ERROR:net/socket/ssl_client_socket_impl.cc:902] handshake failed; returned -1, SSL error code 1, net_error -202\n[26626:26647:0822/050305.732673:ERROR:net/socket/ssl_client_socket_impl.cc:902] handshake failed; returned -1, SSL error code 1, net_error -202\n[26626:26647:0822/050305.827084:ERROR:net/socket/ssl_client_socket_impl.cc:902] handshake failed; returned -1, SSL error code 1, net_error -202\n[26626:26647:0822/050308.721642:ERROR:net/socket/ssl_client_socket_impl.cc:902] handshake failed; returned -1, SSL error code 1, net_error -101\n[26626:26647:0822/050312.390837:ERROR:net/socket/ssl_client_socket_impl.cc:902] handshake failed; returned -1, SSL error code 1, net_error -202\n[26626:26647:0822/050312.466588:ERROR:net/socket/ssl_client_socket_impl.cc:902] handshake failed; returned -1, SSL error code 1, net_error -202\n[26626:26647:0822/050313.221319:ERROR:net/socket/ssl_client_socket_impl.cc:902] handshake failed; returned -1, SSL error code 1, net_error -202\n[26626:26647:0822/050314.987997:ERROR:net/socket/ssl_client_socket_impl.cc:902] handshake failed; returned -1, SSL error code 1, net_error -101\n[26626:26647:0822/050322.830532:ERROR:net/socket/ssl_client_socket_impl.cc:902] handshake failed; returned -1, SSL error code 1, net_error -202\n[26626:26647:0822/050322.839764:ERROR:net/socket/ssl_client_socket_impl.cc:902] handshake failed; returned -1, SSL error code 1, net_error -202\n[26626:26647:0822/050323.976270:ERROR:net/socket/ssl_client_socket_impl.cc:902] handshake failed; returned -1, SSL error code 1, net_error -202\n[26626:26647:0822/050324.123554:ERROR:net/socket/ssl_client_socket_impl.cc:902] handshake failed; returned -1, SSL error code 1, net_error -101\n[26626:26647:0822/050330.361573:ERROR:net/socket/ssl_client_socket_impl.cc:902] handshake failed; returned -1, SSL error code 1, net_error -101\n",
+    "gate_status": "UNVERIFIED"
+  }
+
+----------------------------------------------------------------
+Gate 1B conclusion: NOT PASSED. The Phase 1B browser proof harness executed and failed closed
+at the WebGPU device in both modes, as designed. See docs/verification/PHASE_1B_GATE_STATUS.json
+and docs/PHASE_1B_HARDWARE_RUN.md.
+finished_at_utc=2026-08-22T05:03:34Z

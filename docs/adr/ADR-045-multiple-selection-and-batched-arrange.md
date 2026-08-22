@@ -12,6 +12,8 @@ Phase 1A moved and edited one node at a time. Phase 1B adds multiple selection w
 
 Selection remains ephemeral editor state owned by the engine. `select_many` and `extend_selection` validate every requested ID before any selection state changes, so a rejected request leaves the previous selection intact. Rubber-band selection resolves through the scene's spatial index and returns only *top-level* nodes of the active root: a band crossing a group selects the group, matching what clicking one of its members does.
 
+A band also excludes the container it was drawn on. The rectangle tool creates shapes as siblings of a Frame rather than inside it, so a band started on a Frame's background crosses that Frame's own bounds and would otherwise select the artboard along with the shapes. The editor names the pressed container in `exclude_ids`, and the engine drops it from the result; the band still selects everything else it crosses.
+
 Alignment and distribution are planned in the runtime, not in the UI. Planning reads world bounds from the computed scene and emits typed `SetLocalTransform` commands. A world translation `d` for a node whose parent has world transform `P` becomes the parent-local translation `P_linear^-1 * d`, so rotation and scale are never disturbed. Planning is a pure function: it touches no document, scene, render, history, or selection state, and it reports how many targets it examined and how many needed no movement.
 
 Applying a plan opens one transaction, applies every command, and commits. Any failure inside the batch rolls the whole transaction back and returns a typed error. One alignment is therefore exactly one undo step, and a locked target rejects the operation instead of aligning the rest.

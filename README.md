@@ -59,12 +59,16 @@ Fill/stroke colors are stored as sRGB and converted to linear space at the Rende
     npm test
     npm run build
 
-Phase 1B adds two more checks:
+Phase 1B adds three more checks:
 
     cd web/editor
     npm run test:direct-wasm:phase1b
+    npm run bench:multi-drag:phase1b
+    npm run test:browser:phase1b
 
-That harness loads the pinned `engine_host` WASM package in Node and exercises multiple selection, rubber-band selection, snapped translation, alignment, distribution, and undo against the actual compiled engine. It produces no GPU evidence and never claims any.
+The first loads the pinned `engine_host` WASM package in Node and exercises multiple selection, rubber-band selection, snapped translation, alignment, distribution, and undo against the actual compiled engine. The second measures one multi-object drag frame for 10, 100, and 1,000 selected objects. Neither produces GPU evidence and neither claims any.
+
+The third is the Gate 1B proof: it builds the editor, launches a new Chrome process, and drives the real Editor through pointer and keyboard input across the Worker, WASM, and actual WebGPU, including pixel evidence for the selection overlay and the snap guide. It requires a real GPU and fails closed without one. See [docs/PHASE_1B_HARDWARE_RUN.md](docs/PHASE_1B_HARDWARE_RUN.md) for the hardware run, and [docs/verification/PHASE_1B_GATE_STATUS.json](docs/verification/PHASE_1B_GATE_STATUS.json) for what is still unverified.
 
 Browser proof commands and new evidence paths are recorded in the Phase 1A and Phase 1B review packets. Keep target, node_modules, dist, credentials, ZIP files, and temporary browser profiles out of commits.
 
@@ -74,4 +78,4 @@ Phase 1A includes visible Frame creation, solid primitive appearance, direct sin
 
 Phase 1B adds multiple selection, rubber-band selection, multi-object movement, object snapping with guides, alignment, and distribution. It intentionally excludes multi-selection resize and rotate, pixel-grid snapping, spacing measurements, rulers and user guides, Pen/Bezier, text, gradients, images, shadows, auto layout, components, motion, AI integration, export, and transform-aware Frame clipping.
 
-Phase 1B carries no browser, WebGPU, or pixel evidence yet; see [docs/REVIEW_PACKET_1B.md](docs/REVIEW_PACKET_1B.md) for exactly what has and has not been executed.
+Phase 1B carries no browser, WebGPU, or pixel evidence yet: its proof harness exists and fails closed without a GPU. See [docs/REVIEW_PACKET_1B.md](docs/REVIEW_PACKET_1B.md) for exactly what has and has not been executed.

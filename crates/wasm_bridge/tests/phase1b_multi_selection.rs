@@ -554,3 +554,54 @@ fn a_failed_drag_frame_rolls_the_transaction_back_instead_of_moving_part_of_it()
         );
     }
 }
+
+#[test]
+fn a_band_drawn_on_a_frame_excludes_that_frame_from_its_result() {
+    let mut fixture = scene();
+    // Pressing a Frame's own area bands across its siblings and children; the Frame itself is the
+    // backdrop the band was drawn on, so selecting it would move the whole artboard.
+    let response = send(
+        &mut fixture.host,
+        "marquee-exclude",
+        json!({
+            "type": "marquee_select",
+            "x0": 0.0,
+            "y0": 0.0,
+            "x1": 1920.0,
+            "y1": 1080.0,
+            "exclude_ids": [fixture.frame.clone()],
+        }),
+    );
+    assert!(ok(&response), "{response}");
+    let selected = response["result"]["selected"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|value| value.as_str().unwrap().to_owned())
+        .collect::<Vec<_>>();
+    assert!(
+        !selected.contains(&fixture.frame),
+        "the band selected its own backdrop: {selected:?}"
+    );
+
+    // Without the exclusion the same band selects the Frame, because the band crosses it.
+    let included = send(
+        &mut fixture.host,
+        "marquee-include",
+        json!({
+            "type": "marquee_select",
+            "x0": 0.0,
+            "y0": 0.0,
+            "x1": 1920.0,
+            "y1": 1080.0,
+        }),
+    );
+    assert!(ok(&included), "{included}");
+    let with_frame = included["result"]["selected"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|value| value.as_str().unwrap().to_owned())
+        .collect::<Vec<_>>();
+    assert!(with_frame.contains(&fixture.frame), "{with_frame:?}");
+}
