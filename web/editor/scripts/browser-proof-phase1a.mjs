@@ -1001,7 +1001,7 @@ async function proveAffineRenderHitOverlayParity(nodeId) {
     center_x: canvas.x + actualViewport[0],
     center_y: canvas.y + actualViewport[1],
   }, {
-    afterPressExpression: `window.__PHASE0E_PROOF__?.fsm === "Moving"`,
+    afterPressExpression: `["Moving", "MarqueeSelecting"].includes(window.__PHASE0E_PROOF__?.fsm)`,
   });
   await waitFor(
     `window.__PHASE0E_PROOF__?.primary_node?.id === ${JSON.stringify(nodeId)} && window.__PHASE0E_PROOF__?.fsm === "Idle"`,
@@ -1012,7 +1012,7 @@ async function proveAffineRenderHitOverlayParity(nodeId) {
     center_x: canvas.x + transposedViewport[0],
     center_y: canvas.y + transposedViewport[1],
   }, {
-    afterPressExpression: `window.__PHASE0E_PROOF__?.fsm === "Moving"`,
+    afterPressExpression: `["Moving", "MarqueeSelecting"].includes(window.__PHASE0E_PROOF__?.fsm)`,
   });
   await waitFor(`window.__PHASE0E_PROOF__?.fsm === "Idle"`);
   const transposedClick = await getProof();

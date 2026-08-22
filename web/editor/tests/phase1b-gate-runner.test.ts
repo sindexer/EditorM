@@ -4,6 +4,10 @@ import { describe, expect, test } from "vitest";
 
 const workspace = path.resolve(process.cwd(), "../..");
 const runner = readFileSync(path.join(workspace, "tools/run-phase1b-gate.ps1"), "utf8");
+const phase1aHarness = readFileSync(
+  path.join(workspace, "web/editor/scripts/browser-proof-phase1a.mjs"),
+  "utf8",
+);
 
 describe("Phase 1B Windows gate runner contract", () => {
   test("binds every child to one Gate run and source", () => {
@@ -30,6 +34,7 @@ describe("Phase 1B Windows gate runner contract", () => {
       'Id "cargo_build"',
       'Id "cargo_test"',
       'Id "wasm_build"',
+      'Id "wasm_smoke"',
       'Id "npm_ci"',
       'Id "phase1a_browser"',
       'Id "phase1b_browser"',
@@ -45,6 +50,16 @@ describe("Phase 1B Windows gate runner contract", () => {
       expect(current, `missing runner step ${marker}`).toBeGreaterThan(previous);
       previous = current;
     }
+  });
+
+  test("builds fresh WASM outside the tracked browser package", () => {
+    expect(runner).toContain('target\\phase1b-gate-wasm-pkg');
+    expect(runner).toContain('"-OutDir", $gateWasmOutDir');
+    expect(runner).not.toContain('-DisplayName "build shipped Phase 0E WASM"');
+  });
+
+  test("allows the Phase 1B Frame marquee state in the Phase 1A click proof", () => {
+    expect(phase1aHarness.match(/\["Moving", "MarqueeSelecting"\]/g)).toHaveLength(2);
   });
 
   test("finalizes before the default Gate guard and again on failure", () => {
