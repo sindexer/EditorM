@@ -336,7 +336,9 @@ try {
   const dprZoomMatrix = [];
   for (const [dpr, zoom] of [[1, 0.5], [2, 2]]) {
     await pageClient.send("Emulation.setDeviceMetricsOverride", { width: 1600, height: 1000, deviceScaleFactor: dpr, mobile: false });
-    await evaluate("window.dispatchEvent(new Event('resize'))"); await sleep(150);
+    const canvasMetrics = await boundsFor(".webgpu-canvas");
+    await send("camera", { camera: { kind: "resize", width: canvasMetrics.width, height: canvasMetrics.height, dpr } });
+    await waitFor(`window.__PHASE0E_PROOF__?.camera?.dpr === ${dpr}`, 30000, "camera_dpr_not_applied");
     const camera = await proof();
     await send("camera", { camera: { kind: "zoom", x: camera.camera.viewport[0] / 2, y: camera.camera.viewport[1] / 2, zoom } });
     const matrixNodes = await nodes(); const first = matrixNodes.get(rectangles[0]); const anchor = matrixNodes.get(rectangles[1]);
@@ -345,7 +347,7 @@ try {
     const from = await clientForNode(rectangles[0]); const requestedCss = (anchor.world_bounds.min[0] - first.world_bounds.min[0]) * zoom - 5;
     await drag(from, { x: from.x + requestedCss, y: from.y }, { ready: "window.__PHASE0E_PROOF__?.fsm === 'Moving'" });
     const snapped = await nodes(); const error = snapped.get(rectangles[0]).world_bounds.min[0] - snapped.get(rectangles[1]).world_bounds.min[0];
-    dprZoomMatrix.push({ dpr, zoom, snap_error_world: error, passed: close(error, 0) });
+    dprZoomMatrix.push({ dpr, zoom, engine_dpr: (await proof()).camera.dpr, snap_error_world: error, passed: close(error, 0) });
     if ((await proof()).history.undo_depth > matrixHistory) {
       await key("z", "KeyZ", 90, 2);
       await waitFor(`window.__PHASE0E_PROOF__?.history?.undo_depth === ${matrixHistory}`);
