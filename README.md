@@ -1,6 +1,6 @@
 # EditorM Visual Authoring Engine
 
-Phase 0E-R3 is complete and preserved as the approved GitHub baseline. Phase 1A merged to `main`: the editor opens on a real 1920×1080 Frame and uses shared analytic anti-aliasing for rectangle, rounded rectangle, Frame, and ellipse rendering. Phase 1B is in development: multiple selection, rubber-band selection, alignment, distribution, and object snapping, all computed by the Rust engine and all undoable in one step.
+Phase 0E-R3 is complete and preserved as the approved GitHub baseline. Phase 1A and the Phase 1B implementation have merged to `main`. The editor opens on a real 1920×1080 Frame and supports engine-owned multiple selection, rubber-band selection, alignment, distribution, and object snapping, all undoable in one step. Gate 1B remains not passed until the merged source is verified on the required Windows hardware path.
 
 The live product path is not mocked. A Dedicated Worker owns the Rust/WASM EngineRuntime; versioned projection and render deltas cross the Worker boundary; the main thread submits them to actual WebGPU. React owns only disposable UI projection and interaction state.
 

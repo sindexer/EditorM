@@ -1,6 +1,7 @@
 import { describe, expect, test } from "vitest";
 
 import {
+  EXPECTED_BRANCH,
   benchmarkErrors,
   calculateConclusion,
   calculateSummary,
@@ -31,6 +32,10 @@ function metrics(p95For100 = 10, p95For1000 = 500) {
 }
 
 describe("Phase 1B gate finalizer rules", () => {
+  test("accepts evidence only from the post-merge main branch", () => {
+    expect(EXPECTED_BRANCH).toBe("main");
+  });
+
   test("summary is derived only from item statuses", () => {
     expect(calculateSummary([item("PASS"), item("PASS"), item("FAIL"), item("UNVERIFIED")])).toEqual({
       pass: 2,

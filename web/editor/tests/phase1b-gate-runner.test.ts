@@ -13,6 +13,11 @@ describe("Phase 1B Windows gate runner contract", () => {
     expect(runner).toContain("PHASE_1B_GATE_RUN.json");
   });
 
+  test("runs against the post-merge main branch", () => {
+    expect(runner).toContain('$expectedBranch = "main"');
+    expect(runner).not.toContain("claude/editorm-technical-spec-itwm6l");
+  });
+
   test("enters web/editor exactly once", () => {
     expect(runner.match(/Set-Location \$editorRoot/g)).toHaveLength(1);
     expect(runner).not.toMatch(/cd\s+web[\\/]editor/i);

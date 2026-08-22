@@ -8,7 +8,7 @@ Phase 0A through Phase 0E-R3 established finite math, typed reversible document 
 
 ## Phase 1 — Direct-manipulation editor foundation
 
-Status: Phase 1A (analytic anti-aliasing, Frame tool and presets, single-selection direct manipulation, appearance, undo/redo) merged to `main`. Phase 1B (multiple selection, alignment, distribution, snapping) is in development; see `docs/PHASE_1B_AUTHORIZATION.md`. Phase 2 and later remain unapproved and unimplemented.
+Status: Phase 1A and the Phase 1B implementation (multiple selection, alignment, distribution, snapping) merged to `main`. Gate 1B remains not passed pending the required hardware verification; see `docs/PHASE_1B_AUTHORIZATION.md` and `docs/PHASE_1B_HARDWARE_RUN.md`. Phase 2 and later remain unapproved and unimplemented.
 
 - analytic coverage anti-aliasing for circles and ellipses;
 - MSAA only where its need is demonstrated;

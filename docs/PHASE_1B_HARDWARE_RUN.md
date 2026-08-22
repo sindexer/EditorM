@@ -6,8 +6,7 @@ GTX 970 workstation. Software GPU output is diagnostic only and can never satisf
 
 ## Prerequisites
 
-- Check out `claude/editorm-technical-spec-itwm6l` with no production or harness changes after the
-  commit that will be tested.
+- Check out `main` with no production or harness changes after the commit that will be tested.
 - Install Google Chrome with working WebGPU. Set `PHASE0E_CHROME` only when Chrome is not at
   `C:\Program Files\Google\Chrome\Application\chrome.exe`.
 - Install the pinned Rust toolchain and `wasm-bindgen` 0.2.126. The existing `VAE_TOOL_ROOT` and
