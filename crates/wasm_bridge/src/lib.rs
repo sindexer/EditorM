@@ -3009,7 +3009,10 @@ mod tests {
 
         let snapshot = response(
             &mut host,
-            request("snapshot-frame-bounds", json!({ "type": "get_ui_snapshot" })),
+            request(
+                "snapshot-frame-bounds",
+                json!({ "type": "get_ui_snapshot" }),
+            ),
         );
         let slide_projection = snapshot["projection"]["upserts"]
             .as_array()
