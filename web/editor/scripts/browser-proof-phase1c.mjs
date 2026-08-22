@@ -200,7 +200,7 @@ async function clientForNode(id) { const node = (await nodes()).get(id); return 
 async function createRectangle(slideBounds, index) {
   await click("[data-testid='tool-rectangle']");
   await waitFor("window.__PHASE0E_PROOF__?.tool === 'rectangle'", 30000, "rectangle_tool_not_active");
-  const start = await clientForWorld([slideBounds.min[0] + 140 + index * 220, slideBounds.min[1] + 140 + index * 100]);
+  const start = await clientForWorld([slideBounds.min[0] + 140 + index * 320, slideBounds.min[1] + 140 + index * 100]);
   const end = { x: start.x + 110, y: start.y + 70 };
   await drag(start, end, { ready: "window.__PHASE0E_PROOF__?.fsm === 'CreatingRectangle'", steps: 8 });
   await waitFor("window.__PHASE0E_PROOF__?.primary_node?.kind === 'rectangle'");
