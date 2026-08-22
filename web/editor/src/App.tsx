@@ -35,9 +35,10 @@ import {
 } from "react";
 import { EngineClient, EngineFailure } from "./engine";
 import type { StoredProjectionNode } from "./engine";
-import { transformAffinePoint } from "./affine";
+import { inverseTransformAffinePoint, transformAffinePoint } from "./affine";
 import {
   axisAlignedBox,
+  around,
   handlePoint,
   orientedBox,
   RESIZE_HANDLES,
@@ -513,22 +514,46 @@ function Inspector({ engine, version, activeSlideId, onError }: { engine: Engine
   const isSlideContext = nodes.length === 0 && Boolean(activeSlideId);
   const node = nodes[0] ?? (activeSlideId ? engine.projection.nodes.get(activeSlideId) : undefined);
   const editableNodes = isSlideContext ? (node ? [node] : []) : nodes;
-  const xValue = commonValue(editableNodes.map((candidate) => candidate.local_transform[4]));
-  const yValue = commonValue(editableNodes.map((candidate) => candidate.local_transform[5]));
+  const xValue = commonValue(editableNodes.map((candidate) => candidate.kind === "group" && candidate.world_bounds
+    ? candidate.world_bounds.min[0]
+    : candidate.local_transform[4]));
+  const yValue = commonValue(editableNodes.map((candidate) => candidate.kind === "group" && candidate.world_bounds
+    ? candidate.world_bounds.min[1]
+    : candidate.local_transform[5]));
   const widthValue = commonValue(editableNodes.flatMap((candidate) => candidate.geometry
     ? [candidate.geometry.width * Math.hypot(candidate.local_transform[0], candidate.local_transform[2])]
-    : []));
+    : candidate.kind === "group" && candidate.world_bounds
+      ? [candidate.world_bounds.max[0] - candidate.world_bounds.min[0]]
+      : []));
   const heightValue = commonValue(editableNodes.flatMap((candidate) => candidate.geometry
     ? [candidate.geometry.height * Math.hypot(candidate.local_transform[1], candidate.local_transform[3])]
-    : []));
+    : candidate.kind === "group" && candidate.world_bounds
+      ? [candidate.world_bounds.max[1] - candidate.world_bounds.min[1]]
+      : []));
   const rotationValue = commonValue(editableNodes.map((candidate) => Math.atan2(candidate.local_transform[2], candidate.local_transform[0]) * (180 / Math.PI)));
   const appearance = node?.appearance ?? DEFAULT_APPEARANCE;
   const sendBatch = (commands: Array<Record<string, unknown>>) => {
     if (!commands.length) return;
     void engine.send("command_batch", { commands }).catch(onError);
   };
+  const transformSingleGroup = async (matrix: [number, number, number, number, number, number]) => {
+    try {
+      await engine.send("begin_transaction");
+      await engine.send("transform_selection", { matrix });
+      await engine.send("commit_transaction");
+    } catch (reason) {
+      await engine.send("rollback_transaction").catch(() => undefined);
+      onError(reason);
+    }
+  };
   const setAxis = (axis: "x" | "y", value: number) => {
     if (isSlideContext) return;
+    if (editableNodes.length === 1 && editableNodes[0].kind === "group" && editableNodes[0].world_bounds) {
+      const bounds = editableNodes[0].world_bounds;
+      const delta = value - bounds.min[axis === "x" ? 0 : 1];
+      void transformSingleGroup([1, 0, 0, 1, axis === "x" ? delta : 0, axis === "y" ? delta : 0]);
+      return;
+    }
     sendBatch(editableNodes.map((candidate) => ({
       kind: "set_transform", node_id: candidate.id,
       matrix: candidate.local_transform.map((entry, index) => index === (axis === "x" ? 4 : 5) ? value : entry),
@@ -546,6 +571,15 @@ function Inspector({ engine, version, activeSlideId, onError }: { engine: Engine
   };
   const setGeometryAxis = (axis: "width" | "height", value: number) => {
     if (!Number.isFinite(value) || value <= 0) return;
+    if (editableNodes.length === 1 && editableNodes[0].kind === "group" && editableNodes[0].world_bounds) {
+      const bounds = editableNodes[0].world_bounds;
+      const width = bounds.max[0] - bounds.min[0];
+      const height = bounds.max[1] - bounds.min[1];
+      const scale = value / (axis === "width" ? width : height);
+      if (!Number.isFinite(scale) || scale <= 0) return;
+      void transformSingleGroup(around(bounds.min, axis === "width" ? [scale, 0, 0, 1, 0, 0] : [1, 0, 0, scale, 0, 0]));
+      return;
+    }
     sendBatch(editableNodes.flatMap((candidate) => {
       if (!candidate.geometry || (candidate.kind !== "frame" && candidate.kind !== "rectangle" && candidate.kind !== "ellipse")) return [];
       const scaleX = Math.hypot(candidate.local_transform[0], candidate.local_transform[2]);
@@ -612,8 +646,8 @@ function Inspector({ engine, version, activeSlideId, onError }: { engine: Engine
           <div className="field-grid">
             <NumericField label="X" value={xValue.value} mixed={xValue.mixed} disabled={isSlideContext} onCommit={(value) => setAxis("x", value)} />
             <NumericField label="Y" value={yValue.value} mixed={yValue.mixed} disabled={isSlideContext} onCommit={(value) => setAxis("y", value)} />
-            <NumericField label="W" value={widthValue.value} mixed={widthValue.mixed} positive disabled={!editableNodes.every((candidate) => candidate.geometry)} onCommit={(value) => setGeometryAxis("width", value)} />
-            <NumericField label="H" value={heightValue.value} mixed={heightValue.mixed} positive disabled={!editableNodes.every((candidate) => candidate.geometry)} onCommit={(value) => setGeometryAxis("height", value)} />
+            <NumericField label="W" value={widthValue.value} mixed={widthValue.mixed} positive disabled={!editableNodes.every((candidate) => candidate.geometry || (candidate.kind === "group" && candidate.world_bounds))} onCommit={(value) => setGeometryAxis("width", value)} />
+            <NumericField label="H" value={heightValue.value} mixed={heightValue.mixed} positive disabled={!editableNodes.every((candidate) => candidate.geometry || (candidate.kind === "group" && candidate.world_bounds))} onCommit={(value) => setGeometryAxis("height", value)} />
             <NumericField label="Rotation" value={rotationValue.value} mixed={rotationValue.mixed} disabled={isSlideContext} unit="°" onCommit={updateRotation} />
             <NumericField
               label="Opacity"
@@ -953,6 +987,10 @@ export function App() {
       (point[1] - camera.viewport[1] / 2) / camera.zoom + camera.center[1],
     ];
   }, [response]);
+  const worldToParent = useCallback((parentId: string, point: [number, number]): [number, number] | null => {
+    const parent = engine.projection.nodes.get(parentId);
+    return parent?.world_transform ? inverseTransformAffinePoint(parent.world_transform, point) : point;
+  }, [engine]);
 
   const selectedNodes = useMemo(
     () => engine.projection.selection
@@ -1233,14 +1271,17 @@ export function App() {
     }
     if (active.kind === "create" && active.nodeId && active.nodeKind) {
       active.last = point;
-      const start = viewportToWorld(active.start);
-      const end = viewportToWorld(point);
+      const startWorld = viewportToWorld(active.start);
+      const endWorld = viewportToWorld(point);
+      const root = active.nodeKind === "frame" ? documentRoot : selectionRoot;
+      if (!root) return;
+      const start = worldToParent(root, startWorld);
+      const end = worldToParent(root, endWorld);
+      if (!start || !end) return;
       const x = Math.min(start[0], end[0]);
       const y = Math.min(start[1], end[1]);
       const width = Math.max(1, Math.abs(end[0] - start[0]));
       const height = Math.max(1, Math.abs(end[1] - start[1]));
-      const root = active.nodeKind === "frame" ? documentRoot : selectionRoot;
-      if (!root) return;
       if (!active.created) {
         active.created = true;
         scheduleDrag(() => engine.send("update_transaction", {
@@ -1316,9 +1357,11 @@ export function App() {
       }
       if (active.kind !== "pan") {
         if (active.kind === "create" && !active.created && active.nodeId && active.nodeKind) {
-          const start = viewportToWorld(active.start);
+          const startWorld = viewportToWorld(active.start);
           const root = active.nodeKind === "frame" ? documentRoot : selectionRoot;
           if (root) {
+            const start = worldToParent(root, startWorld);
+            if (!start) throw new EngineFailure("invalid_parent_transform", "Creation parent transform is not invertible");
             await engine.send("update_transaction", { command: { kind: "create_shape", node_id: active.nodeId, parent_id: root, index: engine.projection.nodes.get(root)?.children.length ?? 0, shape: active.nodeKind, name: shapeName(active.nodeKind!), x: start[0], y: start[1], width: 24, height: 24 } });
           }
         }

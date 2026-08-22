@@ -1411,7 +1411,10 @@ impl EngineHost {
         let local = node.local_transform();
         let scene = self.runtime.scene().node(id);
         let world = scene.and_then(visual_authoring_scene::SceneNode::world_transform);
-        let bounds = scene.and_then(visual_authoring_scene::SceneNode::own_world_bounds);
+        let bounds = scene.and_then(|scene_node| match node.kind() {
+            NodeKind::Group => scene_node.subtree_world_bounds(),
+            _ => scene_node.own_world_bounds(),
+        });
         let size = node.geometry().map(Geometry::size);
         Ok(json!({
             "id": id.to_string(),
@@ -2909,6 +2912,124 @@ mod tests {
             ),
         );
         assert!(!old_slide_rejected["ok"].as_bool().unwrap());
+    }
+
+    #[test]
+    fn projection_uses_subtree_bounds_for_groups_without_changing_frame_bounds() {
+        let mut host = EngineHost::new_inner().unwrap();
+        let loaded = response(
+            &mut host,
+            request(
+                "load-editor-bounds",
+                json!({ "type": "load_fixture", "fixture": "editor" }),
+            ),
+        );
+        let slide = fixture_node_id(1);
+        let slide_projection = loaded["projection"]["upserts"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|node| node["id"] == slide.to_string())
+            .unwrap();
+        let initial_slide_own = host
+            .runtime
+            .scene()
+            .node(slide)
+            .and_then(visual_authoring_scene::SceneNode::own_world_bounds)
+            .unwrap();
+        assert_eq!(
+            slide_projection["world_bounds"],
+            json!({
+                "min": [initial_slide_own.min.x, initial_slide_own.min.y],
+                "max": [initial_slide_own.max.x, initial_slide_own.max.y]
+            })
+        );
+
+        let first = fixture_node_id(100);
+        let second = fixture_node_id(101);
+        for (id, index, x, y) in [(first, 0, 10.0, 20.0), (second, 1, 100.0, 80.0)] {
+            response(
+                &mut host,
+                request(
+                    "create-group-child",
+                    json!({
+                        "type": "command",
+                        "command": {
+                            "kind": "create_shape",
+                            "node_id": id.to_string(),
+                            "parent_id": slide.to_string(),
+                            "index": index,
+                            "shape": "rectangle",
+                            "name": "Group child",
+                            "x": x,
+                            "y": y,
+                            "width": 40.0,
+                            "height": 30.0
+                        }
+                    }),
+                ),
+            );
+        }
+        let group = fixture_node_id(102);
+        let grouped = response(
+            &mut host,
+            request(
+                "group-bounds",
+                json!({
+                    "type": "command",
+                    "command": {
+                        "kind": "group",
+                        "group_id": group.to_string(),
+                        "name": "Projected group",
+                        "targets": [first.to_string(), second.to_string()]
+                    }
+                }),
+            ),
+        );
+        let group_projection = grouped["projection"]["upserts"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|node| node["id"] == group.to_string())
+            .unwrap();
+        let group_subtree = host
+            .runtime
+            .scene()
+            .node(group)
+            .and_then(visual_authoring_scene::SceneNode::subtree_world_bounds)
+            .unwrap();
+        assert_eq!(group_projection["kind"], "group");
+        assert_eq!(
+            group_projection["world_bounds"],
+            json!({
+                "min": [group_subtree.min.x, group_subtree.min.y],
+                "max": [group_subtree.max.x, group_subtree.max.y]
+            })
+        );
+
+        let snapshot = response(
+            &mut host,
+            request("snapshot-frame-bounds", json!({ "type": "get_ui_snapshot" })),
+        );
+        let slide_projection = snapshot["projection"]["upserts"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|node| node["id"] == slide.to_string())
+            .unwrap();
+        let slide_own = host
+            .runtime
+            .scene()
+            .node(slide)
+            .and_then(visual_authoring_scene::SceneNode::own_world_bounds)
+            .unwrap();
+        assert_eq!(
+            slide_projection["world_bounds"],
+            json!({
+                "min": [slide_own.min.x, slide_own.min.y],
+                "max": [slide_own.max.x, slide_own.max.y]
+            })
+        );
     }
 
     #[test]
