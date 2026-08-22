@@ -160,7 +160,7 @@ async function boundsFor(selector) {
   return result;
 }
 async function clickPoint(point, modifiers = 0) {
-  const x = point.x ?? point.center_x; const y = point.y ?? point.center_y;
+  const x = point.center_x ?? point.x; const y = point.center_y ?? point.y;
   await pageClient.send("Input.dispatchMouseEvent", { type: "mousePressed", x, y, button: "left", buttons: 1, clickCount: 1, modifiers });
   await pageClient.send("Input.dispatchMouseEvent", { type: "mouseReleased", x, y, button: "left", buttons: 0, clickCount: 1, modifiers });
 }
