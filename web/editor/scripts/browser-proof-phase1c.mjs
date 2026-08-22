@@ -238,6 +238,9 @@ try {
   const adapter = String(initial.adapter ?? activeDevice.deviceString ?? "");
   const software = /swiftshader|llvmpipe|software|lavapipe|basic render/i.test(`${adapter} ${activeDevice.deviceString ?? ""}`);
   if (software && !allowSoftwareGpu) throw new GateFailure("software_gpu_rejected", adapter, activeDevice);
+  const beforeFitSequence = (await proof()).engine_sequence;
+  await send("camera", { camera: { kind: "fit" } });
+  await waitFor(`window.__PHASE0E_PROOF__?.engine_sequence > ${beforeFitSequence}`, 30000, "fit_document_failed");
   const initialNodes = await nodes();
   const slide = initialSnapshot.active_root;
   const slideNode = initialNodes.get(slide);
@@ -398,7 +401,25 @@ try {
   console.log(`gpu=${adapter}`); console.log(`proof=${proofPath}`);
   if (!result.all_passed) { console.log(JSON.stringify(checks, null, 2)); process.exitCode = 1; }
 } catch (error) {
-  const failure = { phase: "1C", captured_at_utc: new Date().toISOString(), code: error.code ?? "unexpected_error", message: error.message, details: error.details ?? null, console_errors: consoleErrors, chrome_stderr_tail: chromeStderr };
+  const browser_diagnostics = pageClient ? await evaluate(`(() => {
+    const shell = document.querySelector('[data-testid="canvas-shell"]')?.getBoundingClientRect();
+    return {
+      tool: window.__PHASE0E_PROOF__?.tool ?? null,
+      fsm: window.__PHASE0E_PROOF__?.fsm ?? null,
+      camera: window.__PHASE0E_PROOF__?.camera ?? null,
+      shell: shell ? { x: shell.left, y: shell.top, width: shell.width, height: shell.height } : null,
+    };
+  })()`).catch((diagnosticError) => ({ diagnostic_error: diagnosticError.message })) : null;
+  const failure = {
+    phase: "1C", proof_kind: "actual-browser-gate-failure",
+    gate_run_id: process.env.PHASE1C_GATE_RUN_ID ?? null,
+    tested_source_commit: process.env.PHASE1C_GATE_SOURCE_COMMIT ?? null,
+    tested_branch: process.env.PHASE1C_GATE_SOURCE_BRANCH ?? null,
+    execution: { command: "npm run test:browser:phase1c", started_at_utc: startedAt, finished_at_utc: new Date().toISOString(), exit_status: 1 },
+    code: error.code ?? "unexpected_error", message: error.message,
+    details: error.details ?? null, browser_diagnostics,
+    console_errors: consoleErrors, chrome_stderr_tail: chromeStderr,
+  };
   await writeFile(failurePath, `${JSON.stringify(failure, null, 2)}\n`, "utf8").catch(() => undefined);
   console.error(`Phase 1C browser proof failed: ${failure.code}: ${failure.message}`);
   process.exitCode = 1;
