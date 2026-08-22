@@ -13,7 +13,9 @@ const webRoot = path.resolve(scriptRoot, "..");
 const workspace = path.resolve(webRoot, "../..");
 const verificationRoot = path.join(workspace, "docs", "verification");
 const proofPath = path.join(verificationRoot, "PHASE_1C_BROWSER_PROOF.json");
-const failurePath = path.join(verificationRoot, "PHASE_1C_BROWSER_FAILURE.json");
+const gateRunId = process.env.PHASE1C_GATE_RUN_ID ?? "unbound-run";
+const safeGateRunId = gateRunId.replace(/[^a-zA-Z0-9._-]+/g, "-");
+const failurePath = path.join(verificationRoot, `PHASE_1C_BROWSER_FAILURE_${safeGateRunId}.json`);
 const screenshotPath = path.join(verificationRoot, "phase1c-direct-editing.png");
 const wasmPath = path.join(webRoot, "public", "pkg", "engine_host_bg.wasm");
 const chrome = process.env.PHASE0E_CHROME ?? "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe";
@@ -197,6 +199,7 @@ async function clientForWorld(world) {
 async function clientForNode(id) { const node = (await nodes()).get(id); return clientForWorld(center(node.world_bounds)); }
 async function createRectangle(slideBounds, index) {
   await click("[data-testid='tool-rectangle']");
+  await waitFor("window.__PHASE0E_PROOF__?.tool === 'rectangle'", 30000, "rectangle_tool_not_active");
   const start = await clientForWorld([slideBounds.min[0] + 140 + index * 220, slideBounds.min[1] + 140 + index * 100]);
   const end = { x: start.x + 110, y: start.y + 70 };
   await drag(start, end, { ready: "window.__PHASE0E_PROOF__?.fsm === 'CreatingRectangle'", steps: 8 });
@@ -249,6 +252,7 @@ try {
 
   const rectangles = [await createRectangle(slideNode.world_bounds, 0), await createRectangle(slideNode.world_bounds, 1), await createRectangle(slideNode.world_bounds, 2)];
   await click("[data-testid='tool-select']");
+  await waitFor("window.__PHASE0E_PROOF__?.tool === 'select'", 30000, "select_tool_not_active");
   await clickPoint(await clientForNode(rectangles[0]));
   await clickPoint(await clientForNode(rectangles[1]), 8);
   await waitFor("window.__PHASE0E_PROOF__?.selection_count === 2");
@@ -384,7 +388,7 @@ try {
   };
   const result = {
     phase: "1C", proof_kind: allowSoftwareGpu ? "software-gpu-diagnostic-not-gate-evidence" : "actual-hardware-browser",
-    gate_run_id: process.env.PHASE1C_GATE_RUN_ID ?? null,
+    gate_run_id: gateRunId,
     tested_source_commit: process.env.PHASE1C_GATE_SOURCE_COMMIT ?? null,
     tested_branch: process.env.PHASE1C_GATE_SOURCE_BRANCH ?? null,
     started_at_utc: startedAt, finished_at_utc: new Date().toISOString(),
@@ -414,7 +418,7 @@ try {
   })()`).catch((diagnosticError) => ({ diagnostic_error: diagnosticError.message })) : null;
   const failure = {
     phase: "1C", proof_kind: "actual-browser-gate-failure",
-    gate_run_id: process.env.PHASE1C_GATE_RUN_ID ?? null,
+    gate_run_id: gateRunId,
     tested_source_commit: process.env.PHASE1C_GATE_SOURCE_COMMIT ?? null,
     tested_branch: process.env.PHASE1C_GATE_SOURCE_BRANCH ?? null,
     execution: { command: "npm run test:browser:phase1c", started_at_utc: startedAt, finished_at_utc: new Date().toISOString(), exit_status: 1 },
