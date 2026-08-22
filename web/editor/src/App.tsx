@@ -36,6 +36,18 @@ import {
 import { EngineClient, EngineFailure } from "./engine";
 import type { StoredProjectionNode } from "./engine";
 import { transformAffinePoint } from "./affine";
+import {
+  arrangeAvailability,
+  guideSegment,
+  isMarqueeDrag,
+  marqueeRect,
+  pressStartsMarquee,
+  selectionIntent,
+  unionWorldBounds,
+  SNAP_THRESHOLD_PX,
+  type SnapGuideProjection,
+  type ViewportRect,
+} from "./selectionGeometry";
 import type { EngineResponse, ProjectionNode } from "./types";
 
 declare global {
@@ -61,11 +73,12 @@ type FsmState =
   | "CreatingRectangle"
   | "CreatingEllipse"
   | "CreatingFrame"
+  | "MarqueeSelecting"
   | "NestedEditing";
 
 type Interaction = {
   pointerId: number;
-  kind: "move" | "resize" | "rotate" | "pan" | "create";
+  kind: "move" | "resize" | "rotate" | "pan" | "create" | "marquee";
   start: [number, number];
   last: [number, number];
   nodeId?: string;
@@ -74,6 +87,9 @@ type Interaction = {
   geometry?: { width: number; height: number };
   created?: boolean;
   panPending?: [number, number];
+  additive?: boolean;
+  suspendSnap?: boolean;
+  marqueeRoot?: string;
 };
 
 const tools: Array<{ id: Tool; label: string; shortcut: string; icon: LucideIcon }> = [
@@ -83,6 +99,43 @@ const tools: Array<{ id: Tool; label: string; shortcut: string; icon: LucideIcon
   { id: "rectangle", label: "Rectangle", shortcut: "R", icon: Square },
   { id: "ellipse", label: "Ellipse", shortcut: "O", icon: Circle },
 ];
+
+const arrangeOperations: Array<{ id: string; label: string; kind: "align" | "distribute" }> = [
+  { id: "align_left", label: "Align left", kind: "align" },
+  { id: "align_horizontal_center", label: "Align horizontal centers", kind: "align" },
+  { id: "align_right", label: "Align right", kind: "align" },
+  { id: "align_top", label: "Align top", kind: "align" },
+  { id: "align_vertical_center", label: "Align vertical centers", kind: "align" },
+  { id: "align_bottom", label: "Align bottom", kind: "align" },
+  { id: "distribute_horizontal", label: "Distribute horizontally", kind: "distribute" },
+  { id: "distribute_vertical", label: "Distribute vertically", kind: "distribute" },
+];
+
+const arrangeGlyphs: Record<string, string> = {
+  align_left: "⇤",
+  align_horizontal_center: "↔",
+  align_right: "⇥",
+  align_top: "⤒",
+  align_vertical_center: "↕",
+  align_bottom: "⤓",
+  distribute_horizontal: "⇹",
+  distribute_vertical: "⇳",
+};
+
+/** Reads the snap guides an engine response reported for the current drag frame. */
+function readGuides(result: EngineResponse["result"]): SnapGuideProjection[] {
+  const guides = (result as { guides?: unknown } | null)?.guides;
+  if (!Array.isArray(guides)) return [];
+  return guides.filter((guide): guide is SnapGuideProjection => {
+    const candidate = guide as Partial<SnapGuideProjection>;
+    return (
+      (candidate.axis === "vertical" || candidate.axis === "horizontal") &&
+      Number.isFinite(candidate.position) &&
+      Number.isFinite(candidate.start) &&
+      Number.isFinite(candidate.end)
+    );
+  });
+}
 
 type AppearanceProjection = NonNullable<ProjectionNode["appearance"]>;
 
@@ -726,6 +779,9 @@ export function App() {
   const [ready, setReady] = useState(false);
   const [customFrameWidth, setCustomFrameWidth] = useState(1440);
   const [customFrameHeight, setCustomFrameHeight] = useState(900);
+  const [marquee, setMarquee] = useState<ViewportRect | null>(null);
+  const [guides, setGuides] = useState<SnapGuideProjection[]>([]);
+  const [snapEnabled, setSnapEnabled] = useState(true);
 
   const fail = useCallback((reason: unknown) => {
     const message = reason instanceof Error ? `${"code" in reason ? `${String((reason as EngineFailure).code)}: ` : ""}${reason.message}` : String(reason);
@@ -797,6 +853,10 @@ export function App() {
       resources: response?.resources ?? null,
       binary: response?.binary ?? null,
       interaction_active: interaction.current ? { pointer_id: interaction.current.pointerId, kind: interaction.current.kind } : null,
+      selection_count: engine.projection.selection.length,
+      snap_enabled: snapEnabled,
+      snap_guides: guides.length,
+      marquee_active: Boolean(marquee),
       interaction_queue: {
         generation: dragQueue.current.generation,
         in_flight: dragQueue.current.inFlight,
@@ -804,7 +864,7 @@ export function App() {
         latest: Boolean(dragQueue.current.latest),
       },
     });
-  }, [engine, response, version, heartbeatTick, fsm, tool, editRoot, error]);
+  }, [engine, response, version, heartbeatTick, fsm, tool, editRoot, error, snapEnabled, guides, marquee]);
 
   const currentNode = engine.projection.primary ? engine.projection.nodes.get(engine.projection.primary) : undefined;
   const worldToViewport = useCallback((point: [number, number]): [number, number] => {
@@ -870,12 +930,16 @@ export function App() {
   const cancelInteraction = useCallback(async () => {
     const active = interaction.current;
     interaction.current = null;
+    setMarquee(null);
+    setGuides([]);
     const queue = dragQueue.current;
     queue.generation += 1;
     queue.scheduled = null;
     queue.latest = null;
     while (queue.inFlight) await new Promise((resolve) => setTimeout(resolve, 4));
-    if (active && active.kind !== "pan") await engine.send("rollback_transaction");
+    if (active && active.kind !== "pan" && active.kind !== "marquee") {
+      await engine.send("rollback_transaction");
+    }
     setFsm(editRoot ? "NestedEditing" : "Idle");
   }, [engine, editRoot]);
 
@@ -884,6 +948,8 @@ export function App() {
     return [event.clientX - rect.left, event.clientY - rect.top];
   };
 
+  // The engine captures the transform of every selected node when the transaction opens, so a
+  // move only sends one world delta per frame no matter how many nodes are selected.
   const beginMove = async (
     pointerId: number,
     node: StoredProjectionNode,
@@ -898,7 +964,6 @@ export function App() {
       start: point,
       last: point,
       nodeId: node.id,
-      matrix: [...node.local_transform],
     };
     captureTarget.setPointerCapture(pointerId);
     setFsm("Moving");
@@ -963,14 +1028,43 @@ export function App() {
       setFsm("Selecting");
       const hit = await engine.send("hit_test", { x: point[0], y: point[1] });
       const target = (hit.result?.topmost as string | null | undefined) ?? null;
-      if (!target) {
-        await engine.send("selection", { target: null, mode: "clear" });
-        setFsm("Idle");
+      const intent = selectionIntent(target, engine.projection.selection, event.shiftKey);
+      if (intent.mode === "marquee") {
+        interaction.current = { pointerId, kind: "marquee", start: point, last: point, additive: event.shiftKey };
+        // No node under the pointer: a release without travel clears the selection.
+        setMarquee(marqueeRect(point, point));
+        captureTarget.setPointerCapture(pointerId);
+        setFsm("MarqueeSelecting");
         return;
       }
-      await engine.send("selection", { target, mode: event.shiftKey ? "toggle" : "replace" });
-      const node = engine.projection.nodes.get(target);
-      if (node && !event.shiftKey) await beginMove(pointerId, node, point, captureTarget);
+      if (intent.mode === "toggle") {
+        await engine.send("selection", { target: intent.target, mode: "toggle" });
+        setFsm(editRoot ? "NestedEditing" : "Idle");
+        return;
+      }
+      const node = intent.target ? engine.projection.nodes.get(intent.target) : undefined;
+      if (pressStartsMarquee(node?.kind, intent.mode === "keep")) {
+        // Pressing a Frame's own area bands across its children; a press without travel still
+        // selects the Frame itself when the pointer is released.
+        interaction.current = {
+          pointerId,
+          kind: "marquee",
+          start: point,
+          last: point,
+          additive: event.shiftKey,
+          nodeId: intent.target ?? undefined,
+          // The pressed container is the band's backdrop and is excluded from its result.
+          marqueeRoot: intent.target ?? undefined,
+        };
+        setMarquee(marqueeRect(point, point));
+        captureTarget.setPointerCapture(pointerId);
+        setFsm("MarqueeSelecting");
+        return;
+      }
+      if (intent.mode === "replace") {
+        await engine.send("selection", { target: intent.target, mode: "replace" });
+      }
+      if (node) await beginMove(pointerId, node, point, captureTarget);
       else setFsm(editRoot ? "NestedEditing" : "Idle");
     } catch (reason) {
       fail(reason);
@@ -997,14 +1091,22 @@ export function App() {
       });
       return;
     }
-    if (active.kind === "move" && active.matrix && active.nodeId) {
+    if (active.kind === "marquee") {
+      active.last = point;
+      setMarquee(marqueeRect(active.start, point));
+      return;
+    }
+    if (active.kind === "move") {
       const zoom = response?.camera.zoom ?? 1;
       const dx = (point[0] - active.start[0]) / zoom;
       const dy = (point[1] - active.start[1]) / zoom;
-      const next: [number, number, number, number, number, number] = [
-        active.matrix[0], active.matrix[1], active.matrix[2], active.matrix[3], active.matrix[4] + dx, active.matrix[5] + dy,
-      ];
-      scheduleDrag(() => engine.send("update_transaction", { command: { kind: "set_transform", node_id: active.nodeId, matrix: next } }).then(() => undefined));
+      // Alt suspends snapping for the rest of this drag frame, as in other vector editors.
+      const snap = snapEnabled && !event.altKey;
+      scheduleDrag(() => engine
+        .send("translate_selection", { dx, dy, snap, snap_threshold_px: SNAP_THRESHOLD_PX })
+        .then((next) => {
+          setGuides(snap ? readGuides(next.result) : []);
+        }));
       return;
     }
     if (active.kind === "create" && active.nodeId && active.nodeKind) {
@@ -1060,8 +1162,31 @@ export function App() {
     const active = interaction.current;
     if (!active || active.pointerId !== event.pointerId) return;
     interaction.current = null;
+    setGuides([]);
     try {
       while (dragQueue.current.inFlight) await new Promise((resolve) => setTimeout(resolve, 4));
+      if (active.kind === "marquee") {
+        setMarquee(null);
+        const root = editRoot ?? engine.projection.rootId;
+        if (isMarqueeDrag(active.start, active.last)) {
+          await engine.send("marquee_select", {
+            x0: active.start[0],
+            y0: active.start[1],
+            x1: active.last[0],
+            y1: active.last[1],
+            additive: Boolean(active.additive),
+            root_id: root,
+            // The container the band was drawn on is the backdrop, not a target.
+            exclude_ids: active.marqueeRoot ? [active.marqueeRoot] : [],
+          });
+        } else if (active.nodeId) {
+          await engine.send("selection", { target: active.nodeId, mode: active.additive ? "toggle" : "replace" });
+        } else if (!active.additive) {
+          await engine.send("selection", { target: null, mode: "clear" });
+        }
+        setFsm(editRoot ? "NestedEditing" : "Idle");
+        return;
+      }
       if (active.kind !== "pan") {
         if (active.kind === "create" && !active.created && active.nodeId && active.nodeKind) {
           const start = viewportToWorld(active.start);
@@ -1088,6 +1213,65 @@ export function App() {
     scheduleDrag(() => engine.send("camera", { camera: { kind: "zoom", x: point[0], y: point[1], zoom } }).then(() => undefined));
   };
 
+  const selectedNodes = useMemo(
+    () => engine.projection.selection
+      .map((id) => engine.projection.nodes.get(id))
+      .filter((node): node is StoredProjectionNode => Boolean(node)),
+    // The projection version changes whenever the engine reports new node data.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [engine, version, response],
+  );
+
+  /** Outline polygons for every selected node, drawn under the primary transform handles. */
+  const selectionOutlines = useMemo(() => selectedNodes
+    .filter((node) => node.geometry && node.world_transform)
+    .map((node) => ({
+      id: node.id,
+      points: ([[0, 0], [node.geometry!.width, 0], [node.geometry!.width, node.geometry!.height], [0, node.geometry!.height]] as Array<[number, number]>)
+        .map((point) => worldToViewport(transformAffinePoint(node.world_transform!, point))),
+    })), [selectedNodes, worldToViewport]);
+
+  /** Viewport rectangle around a multiple selection. */
+  const selectionUnion = useMemo(() => {
+    if (selectedNodes.length < 2) return null;
+    const bounds = unionWorldBounds(selectedNodes.map((node) => node.world_bounds));
+    if (!bounds) return null;
+    const [x1, y1] = worldToViewport(bounds.min);
+    const [x2, y2] = worldToViewport(bounds.max);
+    return { x: Math.min(x1, x2), y: Math.min(y1, y2), width: Math.abs(x2 - x1), height: Math.abs(y2 - y1) };
+  }, [selectedNodes, worldToViewport]);
+
+  const guideSegments = useMemo(
+    () => guides.map((guide) => ({ guide, segment: guideSegment(guide, worldToViewport) })),
+    [guides, worldToViewport],
+  );
+
+  const availability = arrangeAvailability(engine.projection.selection.length);
+  const arrangeSelection = async (operation: string) => {
+    try {
+      await engine.send("arrange", { operation });
+    } catch (reason) {
+      fail(reason);
+    }
+  };
+
+  const selectAllInRoot = async () => {
+    const root = editRoot ?? engine.projection.rootId;
+    if (!root) return;
+    const container = engine.projection.nodes.get(root);
+    if (!container) return;
+    const targets = container.children.toArray().filter((id) => {
+      const node = engine.projection.nodes.get(id);
+      return Boolean(node) && !node!.locked;
+    });
+    try {
+      if (targets.length === 0) await engine.send("selection", { target: null, mode: "clear" });
+      else await engine.send("selection", { mode: "set", targets });
+    } catch (reason) {
+      fail(reason);
+    }
+  };
+
   useEffect(() => {
     const keydown = (event: KeyboardEvent) => {
       const target = event.target as HTMLElement | null;
@@ -1102,6 +1286,9 @@ export function App() {
       } else if (modifier && event.key.toLowerCase() === "y") {
         event.preventDefault();
         void engine.send("redo").catch(fail);
+      } else if (modifier && event.key.toLowerCase() === "a") {
+        event.preventDefault();
+        void selectAllInRoot();
       } else if (!modifier) {
         const shortcut = tools.find((entry) => entry.shortcut.toLowerCase() === event.key.toLowerCase());
         if (shortcut) setTool(shortcut.id);
@@ -1111,14 +1298,18 @@ export function App() {
     return () => window.removeEventListener("keydown", keydown);
   }, [engine, response, editRoot, fail, cancelInteraction]);
 
+  // Transform handles stay on a single selection: Phase 1B moves multiple nodes together but
+  // does not resize or rotate them as one shape.
   const overlay = useMemo(() => {
+    if (engine.projection.selection.length > 1) return null;
     if (!currentNode?.geometry || !currentNode.world_transform || !response) return null;
     const corners: Array<[number, number]> = [[0, 0], [currentNode.geometry.width, 0], [currentNode.geometry.width, currentNode.geometry.height], [0, currentNode.geometry.height]];
     const points = corners.map((point) => worldToViewport(transformAffinePoint(currentNode.world_transform!, point)));
     const handle = points[2];
     const topMid: [number, number] = [(points[0][0] + points[1][0]) / 2, (points[0][1] + points[1][1]) / 2];
     return { points, handle, rotate: [topMid[0], topMid[1] - 24] as [number, number] };
-  }, [currentNode, response, worldToViewport]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentNode, response, worldToViewport, engine, version]);
 
   const loadFixture = (fixture: string) => {
     setEditRoot(null);
@@ -1213,6 +1404,33 @@ export function App() {
           <div className="canvas-toolbar">
             <span className="tool-state"><MousePointer2 size={14} /> {tool} · {fsm}</span>
             {editRoot ? <span className="nested-breadcrumb">Root / {engine.projection.nodes.get(editRoot)?.name}</span> : null}
+            <div className="arrange-bar" role="group" aria-label="Align and distribute">
+              {arrangeOperations.map((operation) => (
+                <button
+                  key={operation.id}
+                  type="button"
+                  className="arrange-button"
+                  data-testid={operation.id.replace(/_/g, "-")}
+                  aria-label={operation.label}
+                  title={operation.label}
+                  disabled={operation.kind === "align" ? !availability.canAlign : !availability.canDistribute}
+                  onClick={() => void arrangeSelection(operation.id)}
+                >
+                  <span aria-hidden="true">{arrangeGlyphs[operation.id]}</span>
+                </button>
+              ))}
+              <button
+                type="button"
+                className={`arrange-button snap-toggle${snapEnabled ? " is-active" : ""}`}
+                data-testid="snap-toggle"
+                aria-pressed={snapEnabled}
+                aria-label="Snap to objects"
+                title="Snap to objects (hold Alt to suspend)"
+                onClick={() => setSnapEnabled((current) => !current)}
+              >
+                <span aria-hidden="true">⊹</span>
+              </button>
+            </div>
             <div className="canvas-toolbar-actions">
               <button onClick={() => void engine.send("camera", { camera: { kind: "fit" } }).catch(fail)}><Scan size={15} /> Fit document</button>
               <button disabled={!currentNode?.world_bounds} onClick={() => currentNode && void engine.send("camera", { camera: { kind: "fit_selection", node_id: currentNode.id } }).catch(fail)}><Focus size={15} /> Fit selection</button>
@@ -1253,7 +1471,43 @@ export function App() {
                 <small>Or drag on canvas to create a custom frame.</small>
               </div>
             ) : null}            <canvas ref={canvasRef} className="webgpu-canvas" aria-label="Actual WebGPU document canvas" tabIndex={0} />
-            <svg className="selection-overlay" aria-hidden="true" data-sequence={response?.engine_sequence ?? 0}>
+            <svg className="selection-overlay" aria-hidden="true" data-sequence={response?.engine_sequence ?? 0} data-selection-count={engine.projection.selection.length}>
+              {selectionOutlines.length > 1
+                ? selectionOutlines.map((entry) => (
+                    <polygon key={entry.id} points={entry.points.map((point) => point.join(",")).join(" ")} className="selection-outline secondary" />
+                  ))
+                : null}
+              {selectionUnion ? (
+                <rect
+                  x={selectionUnion.x}
+                  y={selectionUnion.y}
+                  width={selectionUnion.width}
+                  height={selectionUnion.height}
+                  className="selection-union"
+                  data-testid="selection-union"
+                />
+              ) : null}
+              {guideSegments.map(({ guide, segment }, index) => (
+                <line
+                  key={`${guide.axis}-${guide.target}-${index}`}
+                  x1={segment.x1}
+                  y1={segment.y1}
+                  x2={segment.x2}
+                  y2={segment.y2}
+                  className="snap-guide"
+                  data-testid={`snap-guide-${guide.axis}`}
+                />
+              ))}
+              {marquee ? (
+                <rect
+                  x={marquee.x}
+                  y={marquee.y}
+                  width={marquee.width}
+                  height={marquee.height}
+                  className="marquee-rect"
+                  data-testid="marquee"
+                />
+              ) : null}
               {overlay ? (
                 <g>
                   <polygon points={overlay.points.map((point) => point.join(",")).join(" ")} className="selection-outline" />

@@ -1,3 +1,5 @@
+use thiserror::Error;
+
 use crate::NodeId;
 
 /// Persistent hierarchy placement before or after a semantic mutation.
@@ -121,4 +123,42 @@ impl DocumentChangeSet {
     pub fn changed_document(&self) -> bool {
         self.revision.before != self.revision.after
     }
+
+    /// Merges consecutive change sets produced by one batched edit into a single set.
+    ///
+    /// Callers that apply several typed commands inside one transaction still owe consumers a
+    /// single revisioned description of what changed. Merging is rejected when the parts do not
+    /// form one contiguous revision chain, so a caller can never present unrelated or reordered
+    /// revisions as one atomic batch.
+    pub fn merge_consecutive(parts: &[Self], base_revision: u64) -> Result<Self, ChangeMergeError> {
+        let mut current = base_revision;
+        let mut changes = Vec::new();
+        for part in parts {
+            if part.revision.before != current {
+                return Err(ChangeMergeError::NonConsecutive {
+                    expected: current,
+                    found: part.revision.before,
+                });
+            }
+            current = part.revision.after;
+            changes.extend(part.changes.iter().cloned());
+        }
+        if current == base_revision {
+            return Ok(Self::unchanged(base_revision));
+        }
+        Ok(Self {
+            revision: DocumentRevision {
+                before: base_revision,
+                after: current,
+            },
+            changes,
+        })
+    }
+}
+
+/// Failure of an attempted [`DocumentChangeSet`] merge.
+#[derive(Clone, Copy, Debug, Eq, Error, PartialEq)]
+pub enum ChangeMergeError {
+    #[error("change set starts at revision {found} but revision {expected} was expected")]
+    NonConsecutive { expected: u64, found: u64 },
 }

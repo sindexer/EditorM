@@ -144,6 +144,19 @@ button:disabled { cursor: not-allowed; color: var(--ui-label-assistive) !importa
 .selection-handle { fill: #fff; stroke: var(--ui-primary); stroke-width: 1.5; }
 .selection-handle.rotate { fill: var(--ui-primary); }
 .rotation-stem { stroke: var(--ui-primary); stroke-width: 1; }
+.selection-outline.secondary { fill: rgba(0, 102, 255, 0.02); stroke-width: 1; stroke-dasharray: 3 2; }
+.selection-union { fill: none; stroke: var(--ui-primary); stroke-width: 1; stroke-dasharray: 4 3; vector-effect: non-scaling-stroke; }
+.marquee-rect { fill: rgba(0, 102, 255, 0.1); stroke: var(--ui-primary); stroke-width: 1; }
+.snap-guide { stroke: #ff2d55; stroke-width: 1; shape-rendering: crispEdges; }
+.arrange-bar { display: flex; align-items: center; gap: 2px; margin-left: 12px; }
+.arrange-button {
+  display: inline-grid; place-items: center; width: 26px; height: 26px; padding: 0;
+  border: 1px solid transparent; border-radius: var(--radius-sm);
+  background: transparent; color: var(--ui-label-alternative); font-size: 13px; line-height: 1; cursor: pointer;
+}
+.arrange-button:hover:not(:disabled) { color: var(--ui-label-normal); background: rgba(23, 23, 25, 0.05); }
+.arrange-button.snap-toggle { margin-left: 6px; }
+.arrange-button.snap-toggle.is-active { color: var(--ui-primary); background: var(--ui-primary-soft); border-color: rgba(0, 102, 255, 0.12); }
 .transform-handle-hit { position: absolute; width: 20px; height: 20px; padding: 0; border: 0; border-radius: 50%; background: transparent; transform: translate(-50%, -50%); z-index: 4; }
 .resize-hit { cursor: nwse-resize; }
 .rotate-hit { cursor: grab; }

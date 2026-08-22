@@ -744,7 +744,12 @@ fn collect_scene_subtree(
     Ok(())
 }
 
-fn coalesce_ranges(slots: &[u32]) -> Vec<DirtySlotRange> {
+/// Coalesces an ascending, de-duplicated slot list into contiguous upload ranges.
+///
+/// Callers that merge several deltas into one batched frame reuse this so batched and
+/// single-command uploads describe ranges identically.
+#[must_use]
+pub fn coalesce_ranges(slots: &[u32]) -> Vec<DirtySlotRange> {
     let mut ranges = Vec::new();
     let Some(&first) = slots.first() else {
         return ranges;

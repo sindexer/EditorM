@@ -9,6 +9,11 @@ const scriptRoot = path.dirname(fileURLToPath(import.meta.url));
 const webRoot = path.resolve(scriptRoot, "..");
 const workspace = path.resolve(webRoot, "../..");
 const verificationRoot = path.join(workspace, "docs", "verification");
+const gateEvidence = {
+  gate_run_id: process.env.PHASE1B_GATE_RUN_ID ?? null,
+  tested_source_commit: process.env.PHASE1B_GATE_SOURCE_COMMIT ?? null,
+  tested_branch: process.env.PHASE1B_GATE_SOURCE_BRANCH ?? null,
+};
 const proofPath = path.join(verificationRoot, "PHASE_1A_BROWSER_PROOF.json");
 const pixelPath = path.join(
   verificationRoot,
@@ -1621,6 +1626,7 @@ try {
   };
   const pixelReadback = {
     phase: "1A",
+    ...gateEvidence,
     proof_kind: "actual-hardware-webgpu-pixel-readback",
     captured_at_utc: new Date().toISOString(),
     color_contract: "sRGB UI to linear premultiplied WebGPU output",
@@ -1732,6 +1738,7 @@ try {
   const browserProofFinishedAtUtc = new Date().toISOString();
   const proof = {
     phase: "1A",
+    ...gateEvidence,
     proof_kind: "actual-hardware-browser",
     captured_at_utc: browserProofFinishedAtUtc,
     browser: version.Browser,
@@ -1809,6 +1816,7 @@ try {
     : null;
   const failure = {
     phase: "1A",
+    ...gateEvidence,
     captured_at_utc: new Date().toISOString(),
     code: error?.code ?? "browser_test_failed",
     message: error?.message ?? String(error),
