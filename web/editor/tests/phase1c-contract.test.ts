@@ -5,6 +5,7 @@ import { describe, expect, test } from "vitest";
 const root = path.resolve(import.meta.dirname, "../../..");
 const app = fs.readFileSync(path.join(root, "web/editor/src/App.tsx"), "utf8");
 const bridge = fs.readFileSync(path.join(root, "crates/wasm_bridge/src/lib.rs"), "utf8");
+const browserGate = fs.readFileSync(path.join(root, "web/editor/scripts/browser-proof-phase1c.mjs"), "utf8");
 
 describe("Phase 1C direct editing contract", () => {
   test("canvas hit testing and marquee are scoped to the active slide", () => {
@@ -39,5 +40,16 @@ describe("Phase 1C direct editing contract", () => {
     expect(app).toContain('modifier && event.key.toLowerCase() === "g"');
     expect(app).toContain("if (event.shiftKey) void ungroupSelection()");
     expect(app).toContain("else void groupSelection()");
+  });
+
+  test("the final Gate requires real input, hardware WebGPU, DPR/zoom, and zero errors", () => {
+    expect(browserGate).toContain('actual_nvidia_gtx_970:');
+    expect(browserGate).toContain('ready: "window.__PHASE0E_PROOF__?.fsm === \'Moving\'"');
+    expect(browserGate).toContain('ready: "window.__PHASE0E_PROOF__?.fsm === \'Resizing\'"');
+    expect(browserGate).toContain('ready: "window.__PHASE0E_PROOF__?.fsm === \'Rotating\'"');
+    expect(browserGate).toContain("dpr_zoom_snap_matrix:");
+    expect(browserGate).toContain("console_errors_zero:");
+    expect(browserGate).toContain("gpu_validation_errors_zero:");
+    expect(browserGate).toContain("unverified_count: 0");
   });
 });

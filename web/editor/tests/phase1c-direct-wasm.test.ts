@@ -43,6 +43,12 @@ function createShape(host: EngineHost, parent: string, index: number, x: number,
   return id;
 }
 
+function snapshotNodes(host: EngineHost): Map<string, HostResponse> {
+  const response = send(host, "get_ui_snapshot");
+  expect(response.ok).toBe(true);
+  return new Map(response.projection.upserts.map((node: HostResponse) => [node.id, node]));
+}
+
 beforeAll(() => {
   initSync({ module: new WebAssembly.Module(fs.readFileSync(wasmPath)) });
 });
@@ -107,5 +113,47 @@ describe("Phase 1C direct WASM contract", () => {
     const after = send(host, "get_ui_snapshot").projection.upserts
       .find((node: HostResponse) => node.id === first).local_transform;
     expect(after).toEqual(before);
+  });
+
+  test("rollback restores a transform preview without adding undo history", () => {
+    const { host, slide } = editorHost();
+    const first = createShape(host, slide, 0, 10, 20);
+    const selected = send(host, "selection", { mode: "replace", target: first });
+    const beforeDepth = selected.history.undo_depth;
+    const before = snapshotNodes(host).get(first)!.local_transform;
+    expect(send(host, "begin_transaction").ok).toBe(true);
+    expect(send(host, "transform_selection", { matrix: [1, 0, 0, 1, 80, 40] }).ok).toBe(true);
+    expect(snapshotNodes(host).get(first)!.local_transform).not.toEqual(before);
+    const rolledBack = send(host, "rollback_transaction");
+    expect(rolledBack.ok).toBe(true);
+    expect(rolledBack.history.undo_depth).toBe(beforeDepth);
+    expect(rolledBack.history.transaction_active).toBe(false);
+    expect(snapshotNodes(host).get(first)!.local_transform).toEqual(before);
+  });
+
+  test("group and ungroup preserve child world transforms and each add one undo step", () => {
+    const { host, slide } = editorHost();
+    const first = createShape(host, slide, 0, 10, 20);
+    const second = createShape(host, slide, 1, 100, 80);
+    const before = snapshotNodes(host);
+    const group = randomUUID();
+    const beforeDepth = send(host, "get_ui_snapshot").history.undo_depth;
+    const grouped = send(host, "command", {
+      command: { kind: "group", group_id: group, name: "Group", targets: [first, second] },
+    });
+    expect(grouped.ok).toBe(true);
+    expect(grouped.history.undo_depth).toBe(beforeDepth + 1);
+    const groupedNodes = snapshotNodes(host);
+    expect(groupedNodes.get(group)!.world_bounds).not.toBeNull();
+    expect(groupedNodes.get(first)!.world_transform).toEqual(before.get(first)!.world_transform);
+    expect(groupedNodes.get(second)!.world_transform).toEqual(before.get(second)!.world_transform);
+
+    const ungrouped = send(host, "command", { command: { kind: "ungroup", node_id: group } });
+    expect(ungrouped.ok).toBe(true);
+    expect(ungrouped.history.undo_depth).toBe(beforeDepth + 2);
+    const restored = snapshotNodes(host);
+    expect(restored.has(group)).toBe(false);
+    expect(restored.get(first)!.world_transform).toEqual(before.get(first)!.world_transform);
+    expect(restored.get(second)!.world_transform).toEqual(before.get(second)!.world_transform);
   });
 });

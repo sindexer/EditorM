@@ -857,13 +857,14 @@ impl EngineHost {
     }
 
     fn ensure_active_root(&mut self) {
+        let document_root = self.runtime.document().root_id();
         let valid = self
             .runtime
             .document()
             .node(self.active_root)
             .is_some_and(|node| {
-                node.kind() == NodeKind::Frame
-                    && node.parent() == Some(self.runtime.document().root_id())
+                self.active_root == document_root
+                    || (node.kind() == NodeKind::Frame && node.parent() == Some(document_root))
             });
         if !valid {
             self.active_root = default_active_root(self.runtime.document());

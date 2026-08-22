@@ -19,7 +19,8 @@
     "test:browser:phase1b": "npm run build && node scripts/browser-proof-phase1b.mjs && vitest run tests/browser-proof-phase1b.test.ts",
     "bench:multi-drag:phase1b": "node scripts/bench-multi-drag-phase1b.mjs",
     "finalize:gate:phase1b": "node scripts/finalize-gate-phase1b.mjs",
-    "test:browser:phase1a": "npm run build && node scripts/browser-proof-phase1a.mjs && vitest run tests/browser-proof-phase1a.test.ts"
+    "test:browser:phase1a": "npm run build && node scripts/browser-proof-phase1a.mjs && vitest run tests/browser-proof-phase1a.test.ts",
+    "test:browser:phase1c": "npm run build && node scripts/browser-proof-phase1c.mjs"
   },
   "dependencies": {
     "@vitejs/plugin-react": "4.7.0",
