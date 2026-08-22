@@ -683,9 +683,7 @@ impl EngineHost {
                 snap,
                 snap_threshold_px,
             } => self.translate_selection(dx, dy, snap, snap_threshold_px),
-            HostRequest::TransformSelection { matrix } => {
-                self.transform_selection(matrix)
-            }
+            HostRequest::TransformSelection { matrix } => self.transform_selection(matrix),
             HostRequest::Arrange { operation } => self.arrange_selection(&operation),
             HostRequest::GetUiSnapshot => {
                 self.prepare_full_projection()?;
@@ -859,10 +857,14 @@ impl EngineHost {
     }
 
     fn ensure_active_root(&mut self) {
-        let valid = self.runtime.document().node(self.active_root).is_some_and(|node| {
-            node.kind() == NodeKind::Frame
-                && node.parent() == Some(self.runtime.document().root_id())
-        });
+        let valid = self
+            .runtime
+            .document()
+            .node(self.active_root)
+            .is_some_and(|node| {
+                node.kind() == NodeKind::Frame
+                    && node.parent() == Some(self.runtime.document().root_id())
+            });
         if !valid {
             self.active_root = default_active_root(self.runtime.document());
         }
@@ -896,7 +898,11 @@ impl EngineHost {
         if id == root {
             return false;
         }
-        let mut current = self.runtime.document().node(id).and_then(|node| node.parent());
+        let mut current = self
+            .runtime
+            .document()
+            .node(id)
+            .and_then(|node| node.parent());
         let mut depth = 0_usize;
         while let Some(candidate) = current {
             if candidate == root {
@@ -1132,10 +1138,8 @@ impl EngineHost {
                     format!("node {} has no invertible parent transform", target.id),
                 )
             })?;
-            let transform = parent_inverse
-                * world_delta
-                * target.parent_world
-                * target.local_transform;
+            let transform =
+                parent_inverse * world_delta * target.parent_world * target.local_transform;
             if !transform.is_finite() || transform.inverse().is_none() {
                 return Err(HostFailure::new(
                     "invalid_selection_transform",
@@ -2691,8 +2695,18 @@ mod tests {
         let mut host = EngineHost::new_inner().unwrap();
         let first = fixture_node_id(1);
         let second = fixture_node_id(2);
-        let before_first = host.runtime.document().node(first).unwrap().local_transform();
-        let before_second = host.runtime.document().node(second).unwrap().local_transform();
+        let before_first = host
+            .runtime
+            .document()
+            .node(first)
+            .unwrap()
+            .local_transform();
+        let before_second = host
+            .runtime
+            .document()
+            .node(second)
+            .unwrap()
+            .local_transform();
         response(
             &mut host,
             request(
@@ -2725,13 +2739,24 @@ mod tests {
             request("transform-commit", json!({ "type": "commit_transaction" })),
         );
         assert_eq!(host.runtime.history_state().undo_depth, 1);
-        response(&mut host, request("transform-undo", json!({ "type": "undo" })));
+        response(
+            &mut host,
+            request("transform-undo", json!({ "type": "undo" })),
+        );
         assert_eq!(
-            host.runtime.document().node(first).unwrap().local_transform(),
+            host.runtime
+                .document()
+                .node(first)
+                .unwrap()
+                .local_transform(),
             before_first
         );
         assert_eq!(
-            host.runtime.document().node(second).unwrap().local_transform(),
+            host.runtime
+                .document()
+                .node(second)
+                .unwrap()
+                .local_transform(),
             before_second
         );
     }
@@ -2740,7 +2765,12 @@ mod tests {
     fn command_batch_failure_rolls_back_every_prior_command() {
         let mut host = EngineHost::new_inner().unwrap();
         let first = fixture_node_id(1);
-        let before = host.runtime.document().node(first).unwrap().local_transform();
+        let before = host
+            .runtime
+            .document()
+            .node(first)
+            .unwrap()
+            .local_transform();
         let failed = response(
             &mut host,
             request(
@@ -2755,7 +2785,14 @@ mod tests {
             ),
         );
         assert!(!failed["ok"].as_bool().unwrap());
-        assert_eq!(host.runtime.document().node(first).unwrap().local_transform(), before);
+        assert_eq!(
+            host.runtime
+                .document()
+                .node(first)
+                .unwrap()
+                .local_transform(),
+            before
+        );
         assert_eq!(host.runtime.history_state().undo_depth, 0);
         assert!(!host.runtime.transaction_active());
     }
