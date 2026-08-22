@@ -17,6 +17,7 @@ const gateRunId = process.env.PHASE1C_GATE_RUN_ID ?? "unbound-run";
 const safeGateRunId = gateRunId.replace(/[^a-zA-Z0-9._-]+/g, "-");
 const failurePath = path.join(verificationRoot, `PHASE_1C_BROWSER_FAILURE_${safeGateRunId}.json`);
 const screenshotPath = path.join(verificationRoot, "phase1c-direct-editing.png");
+const failureScreenshotPath = path.join(verificationRoot, `phase1c-direct-editing-failure-${safeGateRunId}.png`);
 const wasmPath = path.join(webRoot, "public", "pkg", "engine_host_bg.wasm");
 const chrome = process.env.PHASE0E_CHROME ?? "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe";
 const profile = path.join(os.tmpdir(), `phase1c-chrome-${process.pid}-${Date.now()}`);
@@ -257,7 +258,8 @@ try {
   await click(`[data-node-id='${rectangles[1]}']`, 8);
   await waitFor("window.__PHASE0E_PROOF__?.selection_count === 2", 30000, "layers_shift_selection_failed");
   const shiftSelection = await selection();
-  const layersSynchronized = await evaluate("document.querySelectorAll('.layer-row.is-selected').length === 2");
+  await waitFor("document.querySelectorAll('.layer-row.is-selected').length === 2", 30000, "layers_canvas_sync_failed");
+  const layersSynchronized = true;
 
   const tableForMarquee = await nodes();
   const firstBounds = tableForMarquee.get(rectangles[0]).world_bounds;
@@ -362,7 +364,7 @@ try {
 
   await pageClient.send("Emulation.setDeviceMetricsOverride", { width: 1600, height: 1000, deviceScaleFactor: 1, mobile: false });
   const screenshot = await pageClient.send("Page.captureScreenshot", { format: "png", captureBeyondViewport: false, fromSurface: true });
-  await writeFile(screenshotPath, Buffer.from(screenshot.data, "base64"));
+  const screenshotBuffer = Buffer.from(screenshot.data, "base64");
   const final = await proof(); const wasm = await readFile(wasmPath);
   const checks = {
     actual_chrome: Boolean(chromeProcess.pid) && version.Browser.includes("Chrome"),
@@ -388,8 +390,13 @@ try {
     gpu_validation_errors_zero: Number(final.gpu_validation_errors ?? final.gpu?.validation_errors ?? 0) === 0,
     response_gpu_overlay_sequences_match: final.response_gpu_overlay_sequence_match === true,
   };
+  const allPassed = Object.values(checks).every(Boolean);
+  const resultScreenshotPath = allPassed ? screenshotPath : failureScreenshotPath;
+  await writeFile(resultScreenshotPath, screenshotBuffer);
   const result = {
-    phase: "1C", proof_kind: allowSoftwareGpu ? "software-gpu-diagnostic-not-gate-evidence" : "actual-hardware-browser",
+    phase: "1C", proof_kind: allPassed
+      ? (allowSoftwareGpu ? "software-gpu-diagnostic-not-gate-evidence" : "actual-hardware-browser")
+      : "actual-browser-gate-failure",
     gate_run_id: gateRunId,
     tested_source_commit: process.env.PHASE1C_GATE_SOURCE_COMMIT ?? null,
     tested_branch: process.env.PHASE1C_GATE_SOURCE_BRANCH ?? null,
@@ -399,14 +406,15 @@ try {
     wasm: { path: "web/editor/public/pkg/engine_host_bg.wasm", bytes: wasm.length, sha256: createHash("sha256").update(wasm).digest("hex"), protocol_version: 1, render_binary_schema_version: 2 },
     preview: { url: preview.url, health: preview.health, assets: preview.assets },
     interactions: { rectangles, move_deltas: moveDeltas, rotation_degrees: rectangles.slice(0, 2).map((id) => rotationDegrees(rotateAfter.get(id))), distribution_gaps: gaps, dpr_zoom_matrix: dprZoomMatrix },
-    screenshot: { path: path.relative(workspace, screenshotPath).replaceAll("\\", "/"), bytes: (await stat(screenshotPath)).size },
+    screenshot: { path: path.relative(workspace, resultScreenshotPath).replaceAll("\\", "/"), bytes: (await stat(resultScreenshotPath)).size },
     console_errors: consoleErrors, chrome_stderr_tail: chromeStderr, checks,
     fail_count: Object.values(checks).filter((passed) => !passed).length,
-    unverified_count: 0, all_passed: Object.values(checks).every(Boolean),
+    unverified_count: 0, all_passed: allPassed,
   };
-  await writeFile(proofPath, `${JSON.stringify(result, null, 2)}\n`, "utf8");
+  const resultPath = result.all_passed ? proofPath : failurePath;
+  await writeFile(resultPath, `${JSON.stringify(result, null, 2)}\n`, "utf8");
   console.log(`Phase 1C actual browser proof: ${result.all_passed ? "PASS" : "FAIL"}`);
-  console.log(`gpu=${adapter}`); console.log(`proof=${proofPath}`);
+  console.log(`gpu=${adapter}`); console.log(`${result.all_passed ? "proof" : "failure"}=${resultPath}`);
   if (!result.all_passed) { console.log(JSON.stringify(checks, null, 2)); process.exitCode = 1; }
 } catch (error) {
   const browser_diagnostics = pageClient ? await evaluate(`(() => {
