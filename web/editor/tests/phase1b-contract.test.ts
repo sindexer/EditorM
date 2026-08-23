@@ -16,8 +16,37 @@ const workspace = path.resolve(editorRoot, "../..");
 const app = readFileSync(path.join(editorRoot, "src/App.tsx"), "utf8");
 const styles = readFileSync(path.join(editorRoot, "src/styles.css"), "utf8");
 const bridge = readFileSync(path.join(workspace, "crates/wasm_bridge/src/lib.rs"), "utf8");
+const browserProof = readFileSync(
+  path.join(editorRoot, "scripts/browser-proof-phase1b.mjs"),
+  "utf8",
+);
 
 describe("Phase 1B selection geometry", () => {
+  test("browser proof allows Chrome time to expose WebGPU", () => {
+    const readinessLoop = browserProof.slice(
+      browserProof.indexOf("async function waitForReady()"),
+      browserProof.indexOf("async function getProof()"),
+    );
+    expect(readinessLoop.indexOf("await sleep(100)")).toBeLessThan(
+      readinessLoop.indexOf("if (status?.navigator_gpu === false)"),
+    );
+    expect(readinessLoop).toContain(
+      "navigator.gpu was not exposed before the readiness deadline",
+    );
+    expect(browserProof).toContain(
+      `await waitFor("window.__PHASE0E_PROOF__?.tool === 'rectangle'")`,
+    );
+    expect(browserProof.match(/x: point\.center_x \?\? point\.x/g)).toHaveLength(2);
+    expect(browserProof.match(/y: point\.center_y \?\? point\.y/g)).toHaveLength(2);
+    expect(browserProof).toContain(
+      'await send("selection", { target: id, mode: "toggle" })',
+    );
+    expect(browserProof).toContain("snap-guide-horizontal");
+    expect(browserProof).toContain(
+      "entry.exterior_average_red > entry.interior_average_red + 4",
+    );
+  });
+
   test("a rubber band normalizes to a positive rectangle in either drag direction", () => {
     expect(marqueeRect([120, 90], [40, 220])).toEqual({ x: 40, y: 90, width: 80, height: 130 });
     expect(marqueeRect([40, 90], [120, 220])).toEqual({ x: 40, y: 90, width: 80, height: 130 });

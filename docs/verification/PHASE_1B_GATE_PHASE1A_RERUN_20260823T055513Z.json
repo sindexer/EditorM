@@ -1,0 +1,13 @@
+{
+  "phase": "1B",
+  "record": "Phase 1A browser regression result for the current Gate 1B run",
+  "gate_run_id": "phase1b-20260823T055513Z-8f266d26e939-3347dc0e",
+  "tested_source_commit": "8f266d26e939df06eedd9b8a6a5a43e917e0bf26",
+  "tested_branch": "main",
+  "captured_at_utc": "2026-08-23T06:02:35.836Z",
+  "status": "PASS",
+  "reason": "Current Gate run evidence passed every required check.",
+  "artifacts": [
+    "docs/verification/PHASE_1A_BROWSER_PROOF.json"
+  ]
+}
