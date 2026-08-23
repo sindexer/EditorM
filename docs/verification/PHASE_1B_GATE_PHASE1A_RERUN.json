@@ -1,11 +1,13 @@
 {
   "phase": "1B",
   "record": "Phase 1A browser regression result for the current Gate 1B run",
-  "gate_run_id": null,
-  "tested_source_commit": null,
-  "tested_branch": null,
-  "captured_at_utc": "2026-08-22T07:34:36.098Z",
-  "status": "UNVERIFIED",
-  "reason": "No evidence from the current Gate run is available.",
-  "artifacts": []
+  "gate_run_id": "phase1b-20260823T062230Z-330476b57ba4-daa2b79a",
+  "tested_source_commit": "330476b57ba4f16963f5160e24ceb82a21d66438",
+  "tested_branch": "main",
+  "captured_at_utc": "2026-08-23T06:32:44.113Z",
+  "status": "PASS",
+  "reason": "Current Gate run evidence passed every required check.",
+  "artifacts": [
+    "docs/verification/PHASE_1A_BROWSER_PROOF.json"
+  ]
 }

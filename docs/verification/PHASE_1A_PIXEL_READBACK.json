@@ -1,7 +1,10 @@
 {
   "phase": "1A",
+  "gate_run_id": "phase1b-20260823T062230Z-330476b57ba4-daa2b79a",
+  "tested_source_commit": "330476b57ba4f16963f5160e24ceb82a21d66438",
+  "tested_branch": "main",
   "proof_kind": "actual-hardware-webgpu-pixel-readback",
-  "captured_at_utc": "2026-08-20T05:22:10.383Z",
+  "captured_at_utc": "2026-08-23T06:29:50.456Z",
   "color_contract": "sRGB UI to linear premultiplied WebGPU output",
   "analytic_aa": "fwidth + smoothstep; no fragment discard",
   "surface_base_format": "bgra8unorm",
@@ -5699,7 +5702,7 @@
           32
         ],
         "viewport_edge": [
-          458.1666666666667,
+          458,
           439.5
         ],
         "viewport_normal": [
@@ -5709,13 +5712,13 @@
         "physical_pixels_per_local_unit": 1.5,
         "requested_local_width": 8,
         "requested_physical_width": 12,
-        "measured_local_width": 7.788120606146173,
-        "measured_physical_width": 11.68218090921926,
+        "measured_local_width": 7.891039239028241,
+        "measured_physical_width": 11.836558858542361,
         "measurement_method": "integrated connected linear coverage over an isolated black backdrop",
         "tolerance_physical": 1,
         "tolerance_local": 0.6666666666666666,
-        "absolute_error_physical": 0.31781909078073944,
-        "absolute_error_local": 0.2118793938538266,
+        "absolute_error_physical": 0.1634411414576391,
+        "absolute_error_local": 0.10896076097175911,
         "clipping_free": true,
         "uniform_within_tolerance": true,
         "profile": [
@@ -5772,22 +5775,22 @@
           {
             "offset_physical": -7,
             "rgba": [
-              61,
-              61,
-              61,
+              111,
+              111,
+              111,
               255
             ],
-            "linear_luminance": 0.046665086336880095
+            "linear_luminance": 0.1589608350608804
           },
           {
             "offset_physical": -6,
             "rgba": [
-              215,
-              215,
-              215,
+              236,
+              236,
+              236,
               255
             ],
-            "linear_luminance": 0.6795424696330938
+            "linear_luminance": 0.83879901174074
           },
           {
             "offset_physical": -5,
@@ -5892,12 +5895,12 @@
           {
             "offset_physical": 5,
             "rgba": [
-              250,
-              250,
-              250,
+              236,
+              236,
+              236,
               255
             ],
-            "linear_luminance": 0.9559733532492861
+            "linear_luminance": 0.83879901174074
           },
           {
             "offset_physical": 6,
@@ -5978,7 +5981,7 @@
           0
         ],
         "viewport_edge": [
-          426.1666666666667,
+          426,
           407.5
         ],
         "viewport_normal": [
@@ -6250,7 +6253,7 @@
           }
         ]
       },
-      "major_minor_delta_local": 0.21181417432234007,
+      "major_minor_delta_local": 0.10889554144027258,
       "passed": true
     },
     {
@@ -6270,7 +6273,7 @@
           32
         ],
         "viewport_edge": [
-          512.8333333333333,
+          512.1666666666667,
           463.5
         ],
         "viewport_normal": [
@@ -6909,7 +6912,7 @@
           0
         ],
         "viewport_edge": [
-          384.83333333333326,
+          384.16666666666674,
           335.5
         ],
         "viewport_normal": [
@@ -7972,7 +7975,7 @@
           32
         ],
         "viewport_edge": [
-          458.625,
+          458.125,
           439.5
         ],
         "viewport_normal": [
@@ -8291,7 +8294,7 @@
           0
         ],
         "viewport_edge": [
-          426.625,
+          426.125,
           407.5
         ],
         "viewport_normal": [
@@ -8623,7 +8626,7 @@
           32
         ],
         "viewport_edge": [
-          514.625,
+          512.625,
           463.5
         ],
         "viewport_normal": [
@@ -9422,7 +9425,7 @@
           0
         ],
         "viewport_edge": [
-          386.625,
+          384.625,
           335.5
         ],
         "viewport_normal": [
@@ -36720,7 +36723,7 @@
         430.69103383271795,
         307.80871667070977
       ],
-      "hit_topmost": "d3c90c45-b2ab-427b-939c-ddcf8ab7f16e",
+      "hit_topmost": "0198dade-def5-4171-873d-898f312dba42",
       "pixel": {
         "x": 430.69103383271795,
         "y": 307.80871667070977,
@@ -36737,7 +36740,7 @@
           255
         ]
       },
-      "click_selected": "d3c90c45-b2ab-427b-939c-ddcf8ab7f16e"
+      "click_selected": "0198dade-def5-4171-873d-898f312dba42"
     },
     "transposed_only": {
       "local": [
@@ -36753,7 +36756,7 @@
         418.9337907199665,
         236.29881492690595
       ],
-      "hit_topmost": "c8f97f7a-8cfa-42b5-8dd6-175b96b93d53",
+      "hit_topmost": "0a1c582b-4bdd-44b9-97bc-8bdecc1fd459",
       "pixel": {
         "x": 418.9337907199665,
         "y": 236.29881492690595,
@@ -36770,7 +36773,7 @@
           255
         ]
       },
-      "click_selected": "c8f97f7a-8cfa-42b5-8dd6-175b96b93d53"
+      "click_selected": "0a1c582b-4bdd-44b9-97bc-8bdecc1fd459"
     },
     "expected_overlay_points": [
       [

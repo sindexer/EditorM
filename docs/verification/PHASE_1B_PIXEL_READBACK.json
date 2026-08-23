@@ -1,0 +1,209 @@
+{
+  "phase": "1B",
+  "gate_run_id": "phase1b-20260823T062230Z-330476b57ba4-daa2b79a",
+  "tested_source_commit": "330476b57ba4f16963f5160e24ceb82a21d66438",
+  "tested_branch": "main",
+  "proof_kind": "actual-hardware-webgpu-and-composited-overlay-readback",
+  "captured_at_utc": "2026-08-23T06:31:28.526Z",
+  "surface_base_format": "bgra8unorm",
+  "pipeline_view_format": "bgra8unorm-srgb",
+  "readback_view_format": "bgra8unorm-srgb",
+  "overlay_sampling_note": "Interaction overlays are SVG in the composited page, not WebGPU surface content. They are measured by decoding a Page.captureScreenshot in the page; document rendering itself remains WebGPU only.",
+  "neighbourhood_radius_css_px": 2,
+  "colour_tolerance": 60,
+  "expected_primary_srgb": [
+    0,
+    102,
+    255
+  ],
+  "expected_guide_srgb": [
+    255,
+    45,
+    85
+  ],
+  "cases": [
+    {
+      "case": "selection_outline_rendered",
+      "method": "composited screenshot neighbourhood sampling",
+      "expected_srgb": [
+        0,
+        102,
+        255
+      ],
+      "samples": [
+        {
+          "label": "outline-top-edge",
+          "minimum_distance": 4.47213595499958,
+          "matched": true
+        },
+        {
+          "label": "outline-left-edge",
+          "minimum_distance": 16.673332000533065,
+          "matched": true
+        }
+      ]
+    },
+    {
+      "case": "selection_union_rendered",
+      "method": "composited screenshot neighbourhood sampling",
+      "expected_srgb": [
+        0,
+        102,
+        255
+      ],
+      "samples": [
+        {
+          "label": "union-top-edge",
+          "minimum_distance": 22.47220505424423,
+          "matched": true
+        },
+        {
+          "label": "union-right-edge-0.25",
+          "minimum_distance": 134.12680567284082,
+          "matched": false
+        },
+        {
+          "label": "union-right-edge-0.5",
+          "minimum_distance": 134.12680567284082,
+          "matched": false
+        },
+        {
+          "label": "union-right-edge-0.75",
+          "minimum_distance": 35.482389998420345,
+          "matched": true
+        },
+        {
+          "label": "union-bottom-edge",
+          "minimum_distance": 0,
+          "matched": true
+        },
+        {
+          "label": "union-interior",
+          "minimum_distance": 287.4613017433825,
+          "matched": false
+        }
+      ]
+    },
+    {
+      "case": "marquee_band_rendered",
+      "method": "composited screenshot: band edge colour plus interior/exterior blue comparison",
+      "expected_srgb": [
+        0,
+        102,
+        255
+      ],
+      "marquee_active": true,
+      "samples": [
+        {
+          "label": "band-top-edge",
+          "minimum_distance": 25.059928172283335,
+          "matched": true,
+          "average_blue": 252
+        },
+        {
+          "label": "band-left-edge",
+          "minimum_distance": 79.76214641043707,
+          "matched": false,
+          "average_blue": 251.8
+        },
+        {
+          "label": "band-interior",
+          "minimum_distance": 258.30989140952386,
+          "matched": false,
+          "average_blue": 251
+        },
+        {
+          "label": "outside-band",
+          "minimum_distance": 287.4613017433825,
+          "matched": false,
+          "average_blue": 251
+        }
+      ],
+      "interior_average_blue": 251,
+      "exterior_average_blue": 251,
+      "interior_average_red": 222,
+      "exterior_average_red": 247
+    },
+    {
+      "case": "dragged_rectangle_moved_on_webgpu_surface",
+      "method": "WebGPU surface readback at the vacated and occupied centres",
+      "moved_pixel": {
+        "x": 255.13793678422695,
+        "y": 336.54944527589794,
+        "physical_x": 255,
+        "physical_y": 336,
+        "surface_base_format": "bgra8unorm",
+        "readback_view_format": "bgra8unorm-srgb",
+        "raw_channel_order": "BGRA",
+        "normalized_channel_order": "RGBA",
+        "rgba": [
+          51,
+          148,
+          245,
+          255
+        ]
+      },
+      "vacated_pixel": {
+        "x": 210.16137428422695,
+        "y": 306.56507027589794,
+        "physical_x": 210,
+        "physical_y": 306,
+        "surface_base_format": "bgra8unorm",
+        "readback_view_format": "bgra8unorm-srgb",
+        "raw_channel_order": "BGRA",
+        "normalized_channel_order": "RGBA",
+        "rgba": [
+          247,
+          249,
+          251,
+          255
+        ]
+      },
+      "distinct": true
+    },
+    {
+      "case": "snap_guide_rendered",
+      "method": "composited screenshot neighbourhood sampling along the engine-reported guide",
+      "expected_srgb": [
+        255,
+        45,
+        85
+      ],
+      "guide_elements": 1,
+      "engine_reported_guides": 2,
+      "samples": [
+        {
+          "label": "guide-0.25",
+          "minimum_distance": 0,
+          "matched": true
+        },
+        {
+          "label": "guide-0.5",
+          "minimum_distance": 0,
+          "matched": true
+        },
+        {
+          "label": "guide-0.75",
+          "minimum_distance": 0,
+          "matched": true
+        },
+        {
+          "label": "guide-offset-control",
+          "minimum_distance": 263.12734559524597,
+          "matched": false
+        }
+      ]
+    }
+  ],
+  "assertions": {
+    "selection_outline_rendered": true,
+    "selection_union_rendered": true,
+    "union_absent_for_single_selection": true,
+    "marquee_band_rendered": true,
+    "snap_guide_rendered": true,
+    "dragged_rectangle_moved_on_webgpu_surface": true
+  },
+  "assertion_count": 6,
+  "passed_assertion_count": 6,
+  "all_passed": true
+}

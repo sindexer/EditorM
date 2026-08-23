@@ -8,7 +8,7 @@ Phase 0A through Phase 0E-R3 established finite math, typed reversible document 
 
 ## Phase 1 — Direct-manipulation editor foundation
 
-Status: Phase 1A and the Phase 1B implementation (multiple selection, alignment, distribution, snapping) merged to `main`. Gate 1B remains not passed pending the required hardware verification; see `docs/PHASE_1B_AUTHORIZATION.md` and `docs/PHASE_1B_HARDWARE_RUN.md`. Phase 2 and later remain unapproved and unimplemented.
+Status: Phase 1A and Phase 1B are implemented, merged, and verified. Gate 1B passed on clean `main` commit `330476b57ba4f16963f5160e24ceb82a21d66438`; see `docs/verification/PHASE_1B_GATE_STATUS.json`. Phase 2 and later remain unapproved and unimplemented.
 
 - analytic coverage anti-aliasing for circles and ellipses;
 - MSAA only where its need is demonstrated;

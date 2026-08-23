@@ -1,21 +1,86 @@
 {
   "phase": "1B",
   "gate": "Gate 1B",
-  "generated_at_utc": "2026-08-22T07:34:36.101Z",
-  "gate_run_id": null,
-  "tested_source_commit": null,
-  "tested_branch": null,
-  "current_head": "0c157f8ceeb025b980b404e9473f3350de8701f7",
-  "gate_conclusion": "NOT PASSED",
-  "runner_status": null,
-  "browser_proof_present": false,
-  "current_browser_proof_accepted": false,
+  "generated_at_utc": "2026-08-23T06:32:44.117Z",
+  "gate_run_id": "phase1b-20260823T062230Z-330476b57ba4-daa2b79a",
+  "tested_source_commit": "330476b57ba4f16963f5160e24ceb82a21d66438",
+  "tested_branch": "main",
+  "current_head": "330476b57ba4f16963f5160e24ceb82a21d66438",
+  "gate_conclusion": "PASSED",
+  "runner_status": "PASS",
+  "browser_proof_present": true,
+  "current_browser_proof_accepted": true,
   "hardware_run_instructions": "docs/PHASE_1B_HARDWARE_RUN.md",
-  "environment": null,
+  "environment": {
+    "windows": {
+      "os_version": "Microsoft Windows NT 10.0.19045.0",
+      "caption": "Microsoft Windows 10 Pro",
+      "version": "10.0.19045",
+      "build_number": "19045"
+    },
+    "chrome_executable": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+    "chrome_exists": true,
+    "node": {
+      "command": "node.exe System.String[]",
+      "available": true,
+      "exit_code": 0,
+      "output": "v24.19.0"
+    },
+    "rust_toolchain": {
+      "command": "D:\\Codex\\EditorM\\.tools\\cargo\\bin\\rustup.exe System.String[]",
+      "available": true,
+      "exit_code": 0,
+      "output": "1.89.0-x86_64-pc-windows-msvc (overridden by 'D:\\Codex\\EditorM\\rust-toolchain.toml')"
+    },
+    "rustc": {
+      "command": "D:\\Codex\\EditorM\\.tools\\cargo\\bin\\rustc.exe System.String[]",
+      "available": true,
+      "exit_code": 0,
+      "output": "rustc 1.89.0 (29483883e 2025-08-04)\r\nbinary: rustc\r\ncommit-hash: 29483883eed69d5fb4db01964cdf2af4d86e9cb2\r\ncommit-date: 2025-08-04\r\nhost: x86_64-pc-windows-msvc\r\nrelease: 1.89.0\r\nLLVM version: 20.1.7"
+    },
+    "cargo": {
+      "command": "D:\\Codex\\EditorM\\.tools\\cargo\\bin\\cargo.exe System.String[]",
+      "available": true,
+      "exit_code": 0,
+      "output": "cargo 1.89.0 (c24e10642 2025-06-23)"
+    },
+    "wasm_bindgen_executable": "D:\\Codex\\EditorM\\.tools\\wasm-bindgen-0.2.126\\bin\\wasm-bindgen.exe",
+    "wasm_bindgen": {
+      "command": "D:\\Codex\\EditorM\\.tools\\wasm-bindgen-0.2.126\\bin\\wasm-bindgen.exe System.String[]",
+      "available": true,
+      "exit_code": 0,
+      "output": "wasm-bindgen 0.2.126"
+    }
+  },
   "source_relation": {
-    "valid": false,
-    "reason": "Gate environment and run manifest are missing or inconsistent.",
-    "currentHead": "0c157f8ceeb025b980b404e9473f3350de8701f7"
+    "valid": true,
+    "reason": "Current HEAD is the tested source commit; only generated evidence is dirty.",
+    "currentHead": "330476b57ba4f16963f5160e24ceb82a21d66438",
+    "committedEvidencePaths": [],
+    "workingTreePaths": [
+      "docs/PHASE_1B_METRICS.json",
+      "docs/PHASE_1B_METRICS_ENGINE_ONLY.json",
+      "docs/verification/PHASE_1A_BROWSER_PROOF.json",
+      "docs/verification/PHASE_1A_PIXEL_READBACK.json",
+      "docs/verification/PHASE_1B_BROWSER_PROOF.json",
+      "docs/verification/PHASE_1B_DIRECT_WASM_PROOF.json",
+      "docs/verification/PHASE_1B_GATE_PHASE1A_RERUN.json",
+      "docs/verification/PHASE_1B_GATE_RUN.json",
+      "docs/verification/PHASE_1B_GATE_STATUS.json",
+      "docs/verification/PHASE_1B_PIXEL_READBACK.json",
+      "docs/verification/phase1a-affine-parity.png",
+      "docs/verification/phase1a-appearance-aa.png",
+      "docs/verification/phase1a-color-contract.png",
+      "docs/verification/phase1a-dpr-zoom-matrix.png",
+      "docs/verification/phase1a-editor-default.png",
+      "docs/verification/phase1a-frame-4k.png",
+      "docs/verification/phase1b-aligned.png",
+      "docs/verification/phase1b-distributed.png",
+      "docs/verification/phase1b-marquee.png",
+      "docs/verification/phase1b-multi-selection.png",
+      "docs/verification/phase1b-snap-guide.png"
+    ],
+    "disallowedPaths": []
   },
   "items": [
     {
@@ -46,189 +111,229 @@
       "requirement": "All Gate evidence is bound to one run, branch, and tested source commit",
       "required": true,
       "requires_gpu": false,
-      "status": "UNVERIFIED",
-      "evidence": "Gate environment and run manifest are missing or inconsistent.",
-      "artifacts": []
+      "status": "PASS",
+      "evidence": "Current HEAD is the tested source commit; only generated evidence is dirty.",
+      "artifacts": [
+        "docs/verification/PHASE_1B_GATE_RUN.json"
+      ]
     },
     {
       "id": "phase1a_regression",
       "requirement": "The current Gate run passes the Phase 1A browser regression",
       "required": true,
       "requires_gpu": true,
-      "status": "UNVERIFIED",
-      "evidence": "No evidence from the current Gate run is available.",
-      "artifacts": []
+      "status": "PASS",
+      "evidence": "Current Gate run evidence passed every required check.",
+      "artifacts": [
+        "docs/verification/PHASE_1A_BROWSER_PROOF.json"
+      ]
     },
     {
       "id": "shift_multi_selection",
       "requirement": "Shift multi-selection is verified in the browser",
       "required": true,
       "requires_gpu": true,
-      "status": "UNVERIFIED",
-      "evidence": "No evidence from the current Gate run is available.",
-      "artifacts": []
+      "status": "PASS",
+      "evidence": "Current Gate run evidence passed every required check.",
+      "artifacts": [
+        "docs/verification/PHASE_1B_BROWSER_PROOF.json"
+      ]
     },
     {
       "id": "marquee_selection",
       "requirement": "Rubber-band selection is verified in the browser",
       "required": true,
       "requires_gpu": true,
-      "status": "UNVERIFIED",
-      "evidence": "No evidence from the current Gate run is available.",
-      "artifacts": []
+      "status": "PASS",
+      "evidence": "Current Gate run evidence passed every required check.",
+      "artifacts": [
+        "docs/verification/PHASE_1B_BROWSER_PROOF.json"
+      ]
     },
     {
       "id": "select_all",
       "requirement": "Ctrl/Cmd+A is verified in the browser",
       "required": true,
       "requires_gpu": true,
-      "status": "UNVERIFIED",
-      "evidence": "No evidence from the current Gate run is available.",
-      "artifacts": []
+      "status": "PASS",
+      "evidence": "Current Gate run evidence passed every required check.",
+      "artifacts": [
+        "docs/verification/PHASE_1B_BROWSER_PROOF.json"
+      ]
     },
     {
       "id": "multi_object_drag",
       "requirement": "Multi-object drag is verified in the browser",
       "required": true,
       "requires_gpu": true,
-      "status": "UNVERIFIED",
-      "evidence": "No evidence from the current Gate run is available.",
-      "artifacts": []
+      "status": "PASS",
+      "evidence": "Current Gate run evidence passed every required check.",
+      "artifacts": [
+        "docs/verification/PHASE_1B_BROWSER_PROOF.json"
+      ]
     },
     {
       "id": "coalesced_drag_no_drift",
       "requirement": "Coalesced drag frames do not drift",
       "required": true,
       "requires_gpu": true,
-      "status": "UNVERIFIED",
-      "evidence": "No evidence from the current Gate run is available.",
-      "artifacts": []
+      "status": "PASS",
+      "evidence": "Current Gate run evidence passed every required check.",
+      "artifacts": [
+        "docs/verification/PHASE_1B_BROWSER_PROOF.json"
+      ]
     },
     {
       "id": "edge_center_snapping",
       "requirement": "Edge and center snapping are verified in the browser",
       "required": true,
       "requires_gpu": true,
-      "status": "UNVERIFIED",
-      "evidence": "No evidence from the current Gate run is available.",
-      "artifacts": []
+      "status": "PASS",
+      "evidence": "Current Gate run evidence passed every required check.",
+      "artifacts": [
+        "docs/verification/PHASE_1B_BROWSER_PROOF.json"
+      ]
     },
     {
       "id": "alt_snap_suspend",
       "requirement": "Alt snap suspension is verified in the browser",
       "required": true,
       "requires_gpu": true,
-      "status": "UNVERIFIED",
-      "evidence": "No evidence from the current Gate run is available.",
-      "artifacts": []
+      "status": "PASS",
+      "evidence": "Current Gate run evidence passed every required check.",
+      "artifacts": [
+        "docs/verification/PHASE_1B_BROWSER_PROOF.json"
+      ]
     },
     {
       "id": "snap_toggle",
       "requirement": "The snap toggle is verified in the browser",
       "required": true,
       "requires_gpu": true,
-      "status": "UNVERIFIED",
-      "evidence": "No evidence from the current Gate run is available.",
-      "artifacts": []
+      "status": "PASS",
+      "evidence": "Current Gate run evidence passed every required check.",
+      "artifacts": [
+        "docs/verification/PHASE_1B_BROWSER_PROOF.json"
+      ]
     },
     {
       "id": "snap_guide_rendered",
       "requirement": "The snap guide is proven by actual pixels",
       "required": true,
       "requires_gpu": true,
-      "status": "UNVERIFIED",
-      "evidence": "No evidence from the current Gate run is available.",
-      "artifacts": []
+      "status": "PASS",
+      "evidence": "Current Gate run evidence passed every required check.",
+      "artifacts": [
+        "docs/verification/PHASE_1B_BROWSER_PROOF.json"
+      ]
     },
     {
       "id": "align_six_ways",
       "requirement": "All six alignment operations are verified in the browser",
       "required": true,
       "requires_gpu": true,
-      "status": "UNVERIFIED",
-      "evidence": "No evidence from the current Gate run is available.",
-      "artifacts": []
+      "status": "PASS",
+      "evidence": "Current Gate run evidence passed every required check.",
+      "artifacts": [
+        "docs/verification/PHASE_1B_BROWSER_PROOF.json"
+      ]
     },
     {
       "id": "distribute_both_axes",
       "requirement": "Horizontal and vertical distribution are verified",
       "required": true,
       "requires_gpu": true,
-      "status": "UNVERIFIED",
-      "evidence": "No evidence from the current Gate run is available.",
-      "artifacts": []
+      "status": "PASS",
+      "evidence": "Current Gate run evidence passed every required check.",
+      "artifacts": [
+        "docs/verification/PHASE_1B_BROWSER_PROOF.json"
+      ]
     },
     {
       "id": "arrange_undo",
       "requirement": "Arrange operations restore through one undo",
       "required": true,
       "requires_gpu": true,
-      "status": "UNVERIFIED",
-      "evidence": "No evidence from the current Gate run is available.",
-      "artifacts": []
+      "status": "PASS",
+      "evidence": "Current Gate run evidence passed every required check.",
+      "artifacts": [
+        "docs/verification/PHASE_1B_BROWSER_PROOF.json"
+      ]
     },
     {
       "id": "multi_drag_undo",
       "requirement": "A multi-object drag restores through one undo",
       "required": true,
       "requires_gpu": true,
-      "status": "UNVERIFIED",
-      "evidence": "No evidence from the current Gate run is available.",
-      "artifacts": []
+      "status": "PASS",
+      "evidence": "Current Gate run evidence passed every required check.",
+      "artifacts": [
+        "docs/verification/PHASE_1B_BROWSER_PROOF.json"
+      ]
     },
     {
       "id": "pixel_readback_overlays",
       "requirement": "Pixel evidence passes for selections, marquee, guide, and moved content",
       "required": true,
       "requires_gpu": true,
-      "status": "UNVERIFIED",
-      "evidence": "No evidence from the current Gate run is available.",
-      "artifacts": []
+      "status": "PASS",
+      "evidence": "Current Gate run evidence passed every required check.",
+      "artifacts": [
+        "docs/verification/PHASE_1B_PIXEL_READBACK.json"
+      ]
     },
     {
       "id": "browser_multi_drag_benchmark",
       "requirement": "Browser multi-drag has 10/100/1,000 series and keeps existing 10/100 thresholds",
       "required": true,
       "requires_gpu": true,
-      "status": "UNVERIFIED",
-      "evidence": "No evidence from the current Gate run is available.",
-      "artifacts": []
+      "status": "PASS",
+      "evidence": "Current Gate run evidence passed every required check.",
+      "artifacts": [
+        "docs/PHASE_1B_METRICS.json"
+      ]
     },
     {
       "id": "engine_behaviour_proof",
       "requirement": "Direct shipped-WASM behavior proof passes 46/46",
       "required": true,
       "requires_gpu": false,
-      "status": "UNVERIFIED",
-      "evidence": "No evidence from the current Gate run is available.",
-      "artifacts": []
+      "status": "PASS",
+      "evidence": "Current Gate run evidence passed every required check.",
+      "artifacts": [
+        "docs/verification/PHASE_1B_DIRECT_WASM_PROOF.json"
+      ]
     },
     {
       "id": "engine_multi_drag_benchmark",
       "requirement": "Engine benchmark records passing 10/100/1,000 series",
       "required": true,
       "requires_gpu": false,
-      "status": "UNVERIFIED",
-      "evidence": "No evidence from the current Gate run is available.",
-      "artifacts": []
+      "status": "PASS",
+      "evidence": "Current Gate run evidence passed every required check.",
+      "artifacts": [
+        "docs/PHASE_1B_METRICS_ENGINE_ONLY.json"
+      ]
     },
     {
       "id": "workspace_checks",
       "requirement": "Repository, toolchain, dependency, and build verification passes",
       "required": true,
       "requires_gpu": false,
-      "status": "UNVERIFIED",
-      "evidence": "The complete runner prerequisite sequence has not passed.",
-      "artifacts": []
+      "status": "PASS",
+      "evidence": "Every required repository, toolchain, dependency, and build step passed.",
+      "artifacts": [
+        "docs/verification/PHASE_1B_GATE_RUN.json"
+      ]
     }
   ],
   "summary": {
-    "pass": 2,
+    "pass": 22,
     "fail": 0,
-    "unverified": 20
+    "unverified": 0
   },
   "first_failure": null,
-  "first_unverified": "source_evidence_binding",
+  "first_unverified": null,
   "findings": [
     "The 1,000-object drag result is measured performance debt and has no new Gate threshold.",
     "Primitive creation currently places shapes as siblings of the default Frame; marquee exclude_ids avoids selecting its own backdrop, while Frame containment remains future work."
