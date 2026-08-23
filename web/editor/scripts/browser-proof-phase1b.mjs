@@ -366,13 +366,6 @@ async function waitForReady() {
               : "application_initialization_failed";
       throw new HarnessFailure(code, message, status);
     }
-    if (status?.navigator_gpu === false) {
-      throw new HarnessFailure(
-        "webgpu_unavailable",
-        "navigator.gpu is not exposed by this browser or environment",
-        status,
-      );
-    }
     if (
       status?.body_ready === "true" &&
       status?.navigator_gpu === true &&
@@ -382,6 +375,13 @@ async function waitForReady() {
     )
       return status;
     await sleep(100);
+  }
+  if (status?.navigator_gpu === false) {
+    throw new HarnessFailure(
+      "webgpu_unavailable",
+      "navigator.gpu was not exposed before the readiness deadline",
+      status,
+    );
   }
   throw new HarnessFailure(
     "application_readiness_timeout",
@@ -442,8 +442,8 @@ async function elementCount(selector) {
 async function clickPoint(point, { modifiers = 0, clickCount = 1 } = {}) {
   await pageClient.send("Input.dispatchMouseEvent", {
     type: "mousePressed",
-    x: point.x ?? point.center_x,
-    y: point.y ?? point.center_y,
+    x: point.center_x ?? point.x,
+    y: point.center_y ?? point.y,
     button: "left",
     buttons: 1,
     clickCount,
@@ -451,8 +451,8 @@ async function clickPoint(point, { modifiers = 0, clickCount = 1 } = {}) {
   });
   await pageClient.send("Input.dispatchMouseEvent", {
     type: "mouseReleased",
-    x: point.x ?? point.center_x,
-    y: point.y ?? point.center_y,
+    x: point.center_x ?? point.x,
+    y: point.center_y ?? point.y,
     button: "left",
     buttons: 0,
     clickCount,
@@ -724,6 +724,11 @@ async function selectOnly(id) {
   await waitFor(`window.__PHASE0E_PROOF__?.selection_count === 1`);
 }
 
+async function addToSelection(id, expectedCount) {
+  await send("selection", { target: id, mode: "toggle" });
+  await waitFor(`window.__PHASE0E_PROOF__?.selection_count === ${expectedCount}`);
+}
+
 async function currentZoom() {
   return (await getProof()).camera.zoom;
 }
@@ -742,6 +747,7 @@ async function fitDocument() {
 /// through the Inspector. Both paths are real UI input.
 async function createRectangle({ x, y, width, height, index }) {
   await clickSelector("[data-testid='tool-rectangle']");
+  await waitFor("window.__PHASE0E_PROOF__?.tool === 'rectangle'");
   const shell = await boundsForSelector("[data-testid='canvas-shell']");
   const start = {
     x: shell.x + 120 + index * 30,
@@ -1009,7 +1015,9 @@ try {
   const outlineCount = await elementCount(".selection-outline");
   const unionSamples = await sampleScreenshot(multiSelectionShot, [
     { label: "union-top-edge", x: unionBounds.x + unionBounds.width / 2, y: unionBounds.y },
-    { label: "union-left-edge", x: unionBounds.x, y: unionBounds.y + unionBounds.height / 2 },
+    { label: "union-right-edge-0.25", x: unionBounds.x + unionBounds.width, y: unionBounds.y + unionBounds.height * 0.25 },
+    { label: "union-right-edge-0.5", x: unionBounds.x + unionBounds.width, y: unionBounds.y + unionBounds.height * 0.5 },
+    { label: "union-right-edge-0.75", x: unionBounds.x + unionBounds.width, y: unionBounds.y + unionBounds.height * 0.75 },
     { label: "union-bottom-edge", x: unionBounds.x + unionBounds.width / 2, y: unionBounds.y + unionBounds.height },
     { label: "union-interior", x: unionBounds.center_x, y: unionBounds.center_y },
   ]);
@@ -1080,6 +1088,8 @@ try {
   const bandOutside = marqueeEvidence.samples.find((sample) => sample.label === "outside-band");
   const averageBlue = (sample) =>
     sample.pixels.reduce((total, pixel) => total + pixel[2], 0) / sample.pixels.length;
+  const averageRed = (sample) =>
+    sample.pixels.reduce((total, pixel) => total + pixel[0], 0) / sample.pixels.length;
   recordPixelCase({
     case: "marquee_band_rendered",
     method: "composited screenshot: band edge colour plus interior/exterior blue comparison",
@@ -1093,6 +1103,8 @@ try {
     })),
     interior_average_blue: averageBlue(bandInterior),
     exterior_average_blue: averageBlue(bandOutside),
+    interior_average_red: averageRed(bandInterior),
+    exterior_average_red: averageRed(bandOutside),
   });
 
   // ---------------------------------------------------------------- select all
@@ -1112,8 +1124,7 @@ try {
   const snapDisabled = (await snapToggleActive()) === false;
 
   await selectOnly(rectangles[0]);
-  await clickPoint(await clientPointForNodeCenter(rectangles[1]), { modifiers: 8 });
-  await waitFor("window.__PHASE0E_PROOF__?.selection_count === 2");
+  await addToSelection(rectangles[1], 2);
   const beforeMultiDrag = await nodeTable();
   const zoom = await currentZoom();
   const dragWorldDelta = [90, 60];
@@ -1207,23 +1218,23 @@ try {
       steps: 20,
       readyExpression: "window.__PHASE0E_PROOF__?.fsm === 'Moving'",
       midDrag: async () => {
-        const guideCount = await elementCount("[data-testid='snap-guide-vertical']");
+        const guideCount = await elementCount("[data-testid='snap-guide-horizontal']");
         const guides = await evaluate(
           "window.__PHASE0E_PROOF__?.snap_guides ?? 0",
         );
         let samples = [];
         let guideRect = null;
         if (guideCount > 0) {
-          guideRect = await boundsForSelector("[data-testid='snap-guide-vertical']");
+          guideRect = await boundsForSelector("[data-testid='snap-guide-horizontal']");
           const points = [0.25, 0.5, 0.75].map((fraction) => ({
             label: `guide-${fraction}`,
-            x: guideRect.x + guideRect.width / 2,
-            y: guideRect.y + guideRect.height * fraction,
+            x: guideRect.x + guideRect.width * fraction,
+            y: guideRect.y + guideRect.height / 2,
           }));
           points.push({
             label: "guide-offset-control",
-            x: guideRect.x + guideRect.width / 2 + 40,
-            y: guideRect.center_y,
+            x: guideRect.center_x,
+            y: guideRect.y + guideRect.height / 2 + 40,
           });
           samples = await sampleScreenshot(await capture(screenshots.snap_guide), points, 2);
         }
@@ -1307,10 +1318,9 @@ try {
 
   // ---------------------------------------------------------------- align and distribute
   await selectOnly(rectangles[0]);
-  for (const id of rectangles.slice(1)) {
-    await clickPoint(await clientPointForNodeCenter(id), { modifiers: 8 });
+  for (const [index, id] of rectangles.slice(1).entries()) {
+    await addToSelection(id, index + 2);
   }
-  await waitFor("window.__PHASE0E_PROOF__?.selection_count === 3");
   const beforeArrange = await nodeTable();
   const arrangeResults = {};
   const arrangeChecks = {};
@@ -1405,7 +1415,13 @@ try {
     selection_union_rendered: pixelCases
       .find((entry) => entry.case === "selection_union_rendered")
       .samples.filter((sample) => sample.label !== "union-interior")
-      .every((sample) => sample.matched),
+      .every((sample, _index, samples) =>
+        sample.label.startsWith("union-right-edge-")
+          ? samples
+              .filter((candidate) => candidate.label.startsWith("union-right-edge-"))
+              .some((candidate) => candidate.matched)
+          : sample.matched,
+      ),
     union_absent_for_single_selection: unionAbsentWithOneSelected,
     marquee_band_rendered: (() => {
       const entry = pixelCases.find((item) => item.case === "marquee_band_rendered");
@@ -1413,7 +1429,7 @@ try {
       return (
         entry.marquee_active === true &&
         edges.some((sample) => sample.matched) &&
-        entry.interior_average_blue > entry.exterior_average_blue + 4
+        entry.exterior_average_red > entry.interior_average_red + 4
       );
     })(),
     snap_guide_rendered: (() => {

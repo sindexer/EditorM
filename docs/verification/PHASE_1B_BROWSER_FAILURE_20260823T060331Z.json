@@ -1,0 +1,66 @@
+{
+  "phase": "1B",
+  "gate_run_id": null,
+  "tested_source_commit": null,
+  "tested_branch": null,
+  "captured_at_utc": "2026-08-23T06:03:32.960Z",
+  "execution": {
+    "command": "npm run test:browser:phase1b",
+    "started_at_utc": "2026-08-23T06:03:31.785Z",
+    "finished_at_utc": "2026-08-23T06:03:32.960Z",
+    "chrome_executable": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+    "host_platform": "win32-x64",
+    "node_version": "v24.19.0"
+  },
+  "code": "webgpu_unavailable",
+  "message": "navigator.gpu is not exposed by this browser or environment",
+  "details": {
+    "body_ready": null,
+    "state": null,
+    "proof": null,
+    "navigator_gpu": false
+  },
+  "stack": "HarnessFailure: navigator.gpu is not exposed by this browser or environment\n    at waitForReady (file:///D:/Codex/EditorM/web/editor/scripts/browser-proof-phase1b.mjs:370:13)\n    at async file:///D:/Codex/EditorM/web/editor/scripts/browser-proof-phase1b.mjs:951:3",
+  "preview_url": "http://127.0.0.1:51595/",
+  "preview_health": {
+    "ok": true,
+    "status": 200,
+    "body": {
+      "ok": true,
+      "phase": "0E"
+    }
+  },
+  "preview_assets": {
+    "/index.html": {
+      "status": 200,
+      "content_type": "text/html; charset=utf-8"
+    },
+    "/worker.js": {
+      "status": 200,
+      "content_type": "text/javascript; charset=utf-8"
+    },
+    "/pkg/engine_host.js": {
+      "status": 200,
+      "content_type": "text/javascript; charset=utf-8"
+    },
+    "/pkg/engine_host_bg.wasm": {
+      "status": 200,
+      "content_type": "application/wasm"
+    }
+  },
+  "preview_server": {
+    "exited": false,
+    "exit_code": null,
+    "stdout": "Phase 0E editor: http://127.0.0.1:51595/\n",
+    "stderr": ""
+  },
+  "browser": {
+    "body_ready": null,
+    "state": null,
+    "proof": null,
+    "navigator_gpu": false
+  },
+  "console_errors": [],
+  "chrome_stderr_tail": "\r\nDevTools listening on ws://127.0.0.1:51600/devtools/browser/e4b062d5-732c-4ea1-ae10-45165d9a1a69\r\n",
+  "gate_status": "UNVERIFIED"
+}
