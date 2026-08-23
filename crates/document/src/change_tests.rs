@@ -2,7 +2,7 @@ use visual_authoring_core_math::{Affine2, Vec2};
 
 use crate::{
     Command, Document, DocumentChange, Geometry, HeadlessEditorCore, NodeId, NodePlacement,
-    NodeSpec, PersistentProperty,
+    NodeSpec, PathAnchor, PathAnchorId, PathGeometry, PersistentProperty,
 };
 
 fn create_rectangle(editor: &mut HeadlessEditorCore) -> NodeId {
@@ -16,6 +16,86 @@ fn create_rectangle(editor: &mut HeadlessEditorCore) -> NodeId {
         })
         .unwrap();
     id
+}
+
+fn open_path(points: &[(PathAnchorId, Vec2)]) -> PathGeometry {
+    PathGeometry {
+        closed: false,
+        anchors: points
+            .iter()
+            .map(|(id, position)| PathAnchor::new(*id, *position))
+            .collect(),
+    }
+}
+
+#[test]
+fn path_creation_preserves_anchor_identity_and_conservative_bounds() {
+    let mut editor = HeadlessEditorCore::blank("Root");
+    let root = editor.document().root_id();
+    let path_id = NodeId::new();
+    let first = PathAnchorId::new();
+    let second = PathAnchorId::new();
+    let mut path = open_path(&[
+        (first, Vec2::new(10.0, 20.0)),
+        (second, Vec2::new(70.0, 80.0)),
+    ]);
+    path.anchors[0].handle_out = Some(Vec2::new(-15.0, 30.0));
+
+    editor
+        .dispatch(Command::CreateNode {
+            spec: NodeSpec::path(path_id, "Path", path),
+            parent: root,
+            index: 0,
+        })
+        .unwrap();
+
+    let stored = editor.document().node(path_id).unwrap().geometry().unwrap();
+    let Geometry::Path(stored_path) = stored else {
+        panic!("path node must retain path geometry");
+    };
+    assert_eq!(stored_path.anchors[0].id, first);
+    assert_eq!(stored_path.anchors[1].id, second);
+    assert_eq!(
+        editor.document().local_bounds(path_id).unwrap().unwrap(),
+        visual_authoring_core_math::Rect::from_min_max(
+            Vec2::new(-15.0, 20.0),
+            Vec2::new(70.0, 80.0)
+        )
+    );
+}
+
+#[test]
+fn invalid_path_geometry_command_is_failure_atomic() {
+    let mut editor = HeadlessEditorCore::blank("Root");
+    let root = editor.document().root_id();
+    let path_id = NodeId::new();
+    let first = PathAnchorId::new();
+    let second = PathAnchorId::new();
+    editor
+        .dispatch(Command::CreateNode {
+            spec: NodeSpec::path(
+                path_id,
+                "Path",
+                open_path(&[(first, Vec2::ZERO), (second, Vec2::new(10.0, 10.0))]),
+            ),
+            parent: root,
+            index: 0,
+        })
+        .unwrap();
+    let before = editor.document().snapshot();
+    let history_before = editor.history_state();
+
+    let result = editor.dispatch(Command::SetGeometry {
+        target: path_id,
+        geometry: Geometry::Path(open_path(&[
+            (first, Vec2::ZERO),
+            (first, Vec2::new(20.0, 20.0)),
+        ])),
+    });
+
+    assert!(result.is_err());
+    assert_eq!(editor.document().snapshot(), before);
+    assert_eq!(editor.history_state(), history_before);
 }
 
 #[test]

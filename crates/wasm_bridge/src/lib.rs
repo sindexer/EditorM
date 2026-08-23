@@ -1864,6 +1864,7 @@ fn node_kind_label(kind: NodeKind) -> &'static str {
         NodeKind::Group => "group",
         NodeKind::Rectangle => "rectangle",
         NodeKind::Ellipse => "ellipse",
+        NodeKind::Path => "path",
     }
 }
 

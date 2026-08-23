@@ -1416,6 +1416,8 @@ impl ComputedScene {
                     && local.y <= size.y + half_stroke
             }
             Geometry::Ellipse { .. } => ellipse_distance(local, size) <= half_stroke,
+            // Path hit-testing arrives with the Phase 2A editing/rendering checkpoint.
+            Geometry::Path(_) => false,
         }
     }
 
@@ -1527,6 +1529,13 @@ fn geometry_world_bounds(
             world.transform_rect(Rect::from_min_max(
                 Vec2::new(-half_stroke, -half_stroke),
                 size + Vec2::new(half_stroke, half_stroke),
+            ))
+        }
+        Geometry::Path(_) => {
+            let local = geometry.local_bounds();
+            world.transform_rect(Rect::from_min_max(
+                local.min - Vec2::new(half_stroke, half_stroke),
+                local.max + Vec2::new(half_stroke, half_stroke),
             ))
         }
     };
