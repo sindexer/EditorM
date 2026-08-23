@@ -139,6 +139,45 @@ fallback rebuilds = 0
 draw calls and uploaded vertex bytes recorded
 ```
 
+## Shipped WASM matches the committed source
+
+The tracked package under `web/editor/public/pkg/` is what a hardware run actually serves, so it
+must be built from the commit being proved. It is verified by rebuilding and comparing:
+
+```
+cargo build --release --target wasm32-unknown-unknown -p visual_authoring_wasm_bridge
+wasm-bindgen --target web --out-dir <scratch> --out-name engine_host \
+  target/wasm32-unknown-unknown/release/visual_authoring_wasm_bridge.wasm
+```
+
+Two `wasm-bindgen` runs of the same build produce byte-identical output, so a mismatch is a real
+signal rather than build noise. The package committed with the first Phase 2A commit did **not**
+match: it differed in 132 bytes, all inside panic-location metadata, because it was built before a
+later `clippy` fix moved `union_rect` in `crates/document/src/lib.rs` and shifted line numbers by
+six. The behaviour was identical, but the artifact no longer described the committed source, so it
+was rebuilt and `PHASE_2A_DIRECT_WASM_PROOF.json` regenerated against it
+(`sha256 673050e5…`, 42/42 checks).
+
+## Pre-flight for the hardware run
+
+Before the GPU run, the requests the browser harness issues were exercised against the shipped
+WASM in Node, so a harness-shaped defect cannot waste a hardware run. All 23 checks passed:
+
+- the fitted camera keeps the 6-unit strokes about 9 device pixels wide, so pixel sampling is not
+  measuring a sub-pixel line;
+- every one of the nine sample points — straight stroke, its background control, the Bezier curve
+  point, the chord control, the fill interior, the bounding-box corner outside the outline, the
+  ring stroke, the ring fill and the far background — lands inside the canvas after `fit`;
+- hit testing at those exact viewport coordinates picks the expected node: fill interior picks the
+  filled path, the bbox corner picks nothing, the straight stroke picks the straight path, the
+  curve point picks the cubic path, the open path's interior and the background are misses;
+- `save_document` returns JSON whose shape the harness parses (four `kind.type == "path"` nodes
+  with string anchor ids, `version: 3`), bounds survive `load_document`, and save → load → save is
+  byte stable.
+
+What remains unproven without hardware is only the GPU half: whether those triangles actually
+appear on the WebGPU surface with the expected colours.
+
 ## Harness dry run in this container (diagnostic only, never evidence)
 
 The Phase 2A browser harness was executed here once in software-GPU diagnostic mode
