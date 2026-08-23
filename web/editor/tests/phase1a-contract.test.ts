@@ -86,4 +86,14 @@ describe("Phase 1A visible frame and primitive appearance contract", () => {
     expect(browserProof).toContain("srgb_render_view_active");
   });
 
+  test("browser hardware proof fails closed on stalled CDP commands and reports progress", () => {
+    expect(browserProof).toContain('send(method, params = {}, timeoutMs = 60000)');
+    expect(browserProof).toContain('"cdp_command_timeout"');
+    expect(browserProof).toContain('"cdp_connection_closed"');
+    expect(browserProof).toContain('PHASE1A_PROGRESS=edge-sample:${label}:start');
+    expect(browserProof).toContain('PHASE1A_PROGRESS=edge-sample:${label}:complete');
+    expect(browserProof).toContain("PHASE1A_PROGRESS=affine-parity:start");
+    expect(browserProof).toContain("PHASE1A_PROGRESS=affine-parity:complete");
+  });
+
 });
