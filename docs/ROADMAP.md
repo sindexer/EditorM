@@ -37,6 +37,8 @@ Status: Phase 1A and the Phase 1B implementation (multiple selection, alignment,
 
 - auto layout;
 - constraints;
+- editable per-object transform pivot/origin, with canvas and numeric controls;
+- pivot-aware move, rotate, scale, resize, serialization, and undo/redo semantics;
 - reusable components and instances;
 - component properties and variants;
 - structures that remain directly editable by people.
@@ -50,11 +52,18 @@ Status: Phase 1A and the Phase 1B implementation (multiple selection, alignment,
 - rendering that preserves effects;
 - native image objects that remain selectable and editable.
 
-## Phase 5 — Motion
+## Phase 5 — Slides and motion
 
+- one document file containing an ordered collection of slides;
+- a full-height slide browser at the left edge of the workspace;
+- slide add, duplicate, delete, rename, reorder, and selection workflows;
+- slide-local object ownership, layer order, duration, playhead, and animation state;
 - keyframes;
 - easing;
-- timeline;
+- one bottom timeline that begins to the right of the full-height slide browser;
+- layer-tree functions integrated into timeline rows rather than a separate Layers tab;
+- per-layer time bars, keyframes, visibility, locking, hierarchy, ordering, and selection;
+- canvas, timeline-row, property, history, Worker, and GPU state synchronized to the selected slide;
 - editable motion properties;
 - explicit separation between static editor state and animation state.
 
@@ -72,6 +81,7 @@ Qwen is first defined as an internal-network LLM command controller, not merely 
 
 - internal-network Qwen connection;
 - editor control through a chat tab;
+- an AI tab integrated into the right property panel, with no separate floating AI workspace required;
 - natural language converted into typed editor commands;
 - dry-run and change previews;
 - deterministic replay;
@@ -95,6 +105,12 @@ Internal Qwen IP addresses, tokens, and account data must never be committed. `.
 - unsaved-change warnings;
 - Worker/GPU response isolation during tab changes;
 - asset and external-format compatibility.
+
+## Future workspace layout contract
+
+ADR-045 defines the cross-phase workspace destination without authorizing an unapproved phase. The left slide browser spans the full workspace height. The remaining workspace places a horizontal graphics toolbar above the canvas, a property/AI tab panel on the right, and a combined layer/timeline panel below the canvas and property region. The slide browser must not be shortened or covered by the timeline.
+
+The boundaries between the slide browser and work area, canvas and property panel, canvas/property region and timeline, and timeline layer columns and time tracks are draggable splitters with bounded minimum and maximum sizes. Pane sizes, collapsed state, and selected property tab are workspace preferences rather than document undo/redo mutations.
 
 ## Gate policy
 
