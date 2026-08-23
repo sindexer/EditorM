@@ -109,12 +109,41 @@ class CdpClient {
       for (const listener of this.listeners.get(message.method) ?? [])
         listener(message.params);
     });
+    this.socket.addEventListener("close", () => {
+      for (const [id, pending] of this.pending) {
+        this.pending.delete(id);
+        pending.reject(
+          new HarnessFailure("cdp_connection_closed", "Chrome DevTools connection closed", {
+            method: pending.method,
+          }),
+        );
+      }
+    });
   }
 
-  send(method, params = {}) {
+  send(method, params = {}, timeoutMs = 60000) {
     const id = ++this.nextId;
     return new Promise((resolve, reject) => {
-      this.pending.set(id, { resolve, reject });
+      const timer = setTimeout(() => {
+        this.pending.delete(id);
+        reject(
+          new HarnessFailure("cdp_command_timeout", `Timed out waiting for ${method}`, {
+            method,
+            timeout_ms: timeoutMs,
+          }),
+        );
+      }, timeoutMs);
+      this.pending.set(id, {
+        method,
+        resolve: (value) => {
+          clearTimeout(timer);
+          resolve(value);
+        },
+        reject: (error) => {
+          clearTimeout(timer);
+          reject(error);
+        },
+      });
       this.socket.send(JSON.stringify({ id, method, params }));
     });
   }
@@ -941,6 +970,7 @@ function discriminatingAffinePoints(matrix, width, height) {
 }
 
 async function proveAffineRenderHitOverlayParity(nodeId) {
+  console.log("PHASE1A_PROGRESS=affine-parity:start");
   await send("selection", { target: nodeId, mode: "replace" });
   const proof = await getProof();
   const node = proof.primary_node;
@@ -1016,7 +1046,7 @@ async function proveAffineRenderHitOverlayParity(nodeId) {
   });
   await waitFor(`window.__PHASE0E_PROOF__?.fsm === "Idle"`);
   const transposedClick = await getProof();
-  return {
+  const result = {
     matrix_order: "[m11,m12,m21,m22,tx,ty]",
     matrix,
     transposed_matrix: points.transposed,
@@ -1046,6 +1076,8 @@ async function proveAffineRenderHitOverlayParity(nodeId) {
     actual_click_selects_shape: actualClick.primary_node?.id === nodeId,
     transposed_click_does_not_select_shape: transposedClick.primary_node?.id !== nodeId,
   };
+  console.log("PHASE1A_PROGRESS=affine-parity:complete");
+  return result;
 }
 async function pressKey(key, code, keyCode, modifiers = 0) {
   await pageClient.send("Input.dispatchKeyEvent", {
@@ -1090,6 +1122,7 @@ async function send(type, payload = {}) {
 }
 
 async function selectedEdgeSample(label) {
+  console.log(`PHASE1A_PROGRESS=edge-sample:${label}:start`);
   const proof = await getProof();
   const node = proof.primary_node;
   const matrix = node.world_transform;
@@ -1130,7 +1163,7 @@ async function selectedEdgeSample(label) {
   const partial = rgbs.some(
     (rgb) => rgbDistance(rgb, first) > 4 && rgbDistance(rgb, last) > 4
   );
-  return {
+  const result = {
     label,
     sampling: { local_edge: [width, height / 2], viewport_edge: edge, normal, radius },
     ...samples,
@@ -1138,6 +1171,8 @@ async function selectedEdgeSample(label) {
     endpoint_distance: rgbDistance(first, last),
     partial_coverage_present: partial && unique.size >= 3,
   };
+  console.log(`PHASE1A_PROGRESS=edge-sample:${label}:complete`);
+  return result;
 }
 async function setSelectionZoom(dpr, zoom) {
   const canvas = await boundsForSelector(".webgpu-canvas");
