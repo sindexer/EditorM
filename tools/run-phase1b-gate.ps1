@@ -297,7 +297,7 @@ try {
     Invoke-GateStep -Id "npm_ci" -DisplayName "install exact editor dependencies" -Executable $npm -Arguments @("ci")
     Invoke-GateStep -Id "phase1a_browser" -DisplayName "Phase 1A browser regression" -Executable $npm -Arguments @("run", "test:browser:phase1a") -Artifacts @("docs/verification/PHASE_1A_BROWSER_PROOF.json", "docs/verification/PHASE_1A_PIXEL_READBACK.json")
     Invoke-GateStep -Id "phase1b_browser" -DisplayName "Phase 1B actual browser/WebGPU proof" -Executable $npm -Arguments @("run", "test:browser:phase1b") -Artifacts @("docs/verification/PHASE_1B_BROWSER_PROOF.json", "docs/verification/PHASE_1B_PIXEL_READBACK.json", "docs/PHASE_1B_METRICS.json")
-    Invoke-GateStep -Id "direct_wasm" -DisplayName "Phase 1B direct WASM proof" -Executable $npm -Arguments @("run", "test:direct-wasm:phase1b") -Artifacts @("docs/verification/PHASE_1B_DIRECT_WASM_PROOF.json")
+    Invoke-GateStep -Id "direct_wasm" -DisplayName "Phase 1B direct WASM proof" -Executable $npm -Arguments @("run", "test:direct-wasm:phase1b:gate") -Artifacts @("docs/verification/PHASE_1B_DIRECT_WASM_PROOF.json")
     Invoke-GateStep -Id "engine_benchmark" -DisplayName "Phase 1B engine multi-drag benchmark" -Executable $npm -Arguments @("run", "bench:multi-drag:phase1b") -Artifacts @("docs/PHASE_1B_METRICS_ENGINE_ONLY.json")
     Invoke-GateStep -Id "editor_build" -DisplayName "production editor build" -Executable $npm -Arguments @("run", "build")
 

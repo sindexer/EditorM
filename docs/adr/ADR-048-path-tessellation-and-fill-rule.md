@@ -36,4 +36,6 @@ The cost is a CPU tessellation step that primitives do not have. One geometry ed
 
 Even-odd was chosen over non-zero because it is decidable on a flattened polyline without winding bookkeeping and matches what the triangulator can honestly produce. If a later phase needs non-zero fills or self-intersecting shapes, it replaces the triangulator and the containment test together, in this one module, and both consumers follow.
 
+**This is a Phase 2A limitation, not the final vector fill capability.** Refusing to fill a self-intersecting closed path is a deliberate scope boundary for this checkpoint, not a statement about what the engine can eventually draw. General polygon resolution — self-intersection resolution, non-zero winding, and boolean operations over paths — is later-phase work. Until then the rule is that the hit test and the renderer agree, even when that means both decline.
+
 Stroke joins, caps, miter limits, and dashes are deliberately absent: Phase 2A strokes each segment as a quad with a feather on both sides. That is enough to draw and pick a stroked path, and it is honest about what Phase 2B still owes.

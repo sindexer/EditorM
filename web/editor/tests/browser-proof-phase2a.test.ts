@@ -58,6 +58,8 @@ describe("Phase 2A browser proof", () => {
       "redo_reapplies_path_geometry",
       "undo_removes_the_created_path",
       "camera_only_uploads_no_triangles",
+      "save_load_preserves_path_identity",
+      "reloaded_path_still_renders",
       "gpu_validation_errors_zero",
       "fallback_rebuild_zero",
     ]) {
@@ -82,6 +84,7 @@ describe("Phase 2A browser proof", () => {
       "closed_curve_stroke_visible",
       "closed_curve_fill_visible",
       "background_control_captured",
+      "closed_fill_survives_save_and_load",
     ]) {
       expect(Object.keys(pixels.assertions), `missing pixel assertion ${name}`).toContain(name);
       expect(pixels.assertions[name], `failed pixel assertion ${name}`).toBe(true);
@@ -99,5 +102,13 @@ describe("Phase 2A browser proof", () => {
     expect(metrics.camera_only_frame.path_tessellations).toBe(0);
     expect(metrics.camera_only_frame.path_vertices_uploaded).toBe(0);
     expect(metrics.camera_only_frame.path_vertices_sent).toBe(false);
+    expect(metrics.camera_only_frame.path_vertex_upload_bytes).toBe(0);
+    // Draw calls and uploaded vertex bytes are recorded, not asserted to a fixed number: the
+    // count depends on how many path runs survive culling in that frame.
+    expect(metrics.camera_only_frame.gpu_draw_calls).toBeGreaterThan(0);
+    expect(metrics.document_round_trip.reloaded_ok).toBe(true);
+    expect(metrics.document_round_trip.saved_anchor_ids).toEqual(
+      metrics.document_round_trip.resaved_anchor_ids,
+    );
   });
 });

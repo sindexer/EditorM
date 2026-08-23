@@ -1484,7 +1484,11 @@ try {
       initial.worker_runtime_owner === "dedicated-worker" &&
       initial.wasm_initialized === true &&
       initial.heartbeat >= 1,
-    schema_v2:
+    // The instance layout this phase depends on is frozen at 112/116 bytes; the schema version
+    // itself moved to 3 when Phase 2A added the path records beside it. The check is named for
+    // what it asserts — the current shipped contract — so the evidence cannot read as a claim
+    // that the product is still on schema 2.
+    schema_current_v3:
       initial.render_binary_schema_version === 3 &&
       initial.resources.instance_stride_bytes === 112 &&
       initial.resources.dirty_record_stride_bytes === 116,

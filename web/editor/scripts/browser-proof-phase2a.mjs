@@ -12,6 +12,7 @@
 //     produce the expected colours on the WebGPU surface, against background controls;
 //   * hit testing picks paths by their real geometry, including a filled interior;
 //   * creating and editing a path, then undo and redo, stay correct end to end;
+//   * a save and load round trip preserves anchor identity, bounds and rendered pixels;
 //   * a camera-only frame re-uploads no triangles and re-tessellates nothing.
 
 import { spawn } from "node:child_process";
@@ -772,7 +773,41 @@ try {
   const removedResponse = await send("undo");
   const removedFromProjection = (await nodeTable())[createdId] === undefined;
 
+  // ------------------------------------------------------- save, load, and anchor identity
+  // The document round trip runs through the same serialization the file format uses, so the
+  // proof shows that a rendered path survives a save and load with its anchor identities intact.
+  const saved = await send("save_document");
+  const savedDocument = JSON.parse(saved.result.document_json);
+  const savedPaths = savedDocument.document.nodes.filter(
+    (node) => node.kind?.type === "path",
+  );
+  const savedAnchorIds = savedPaths.map((node) =>
+    node.kind.anchors.map((anchor) => anchor.id),
+  );
+  const beforeReloadBounds = Object.fromEntries(
+    pathNodes.map((node) => [node.name, node.world_bounds]),
+  );
+  const reloaded = await send("load_document", {
+    document_json: saved.result.document_json,
+  });
+  const reloadedNodes = Object.values(await nodeTable()).filter((node) => node.kind === "path");
+  const afterReloadBounds = Object.fromEntries(
+    reloadedNodes.map((node) => [node.name, node.world_bounds]),
+  );
+  const resaved = await send("save_document");
+  const resavedDocument = JSON.parse(resaved.result.document_json);
+  const resavedAnchorIds = resavedDocument.document.nodes
+    .filter((node) => node.kind?.type === "path")
+    .map((node) => node.kind.anchors.map((anchor) => anchor.id));
+  await fitDocument();
+  const reloadedFillPixel = await samplePath(
+    "closed_fill_interior_after_reload",
+    [180, -130],
+    TRIANGLE_FILL_SRGB,
+  );
+
   // ------------------------------------------------------------------ camera-only frame contract
+  const beforeCameraGpu = (await getProof()).gpu ?? {};
   const cameraResponse = await send("camera", { camera: { kind: "pan", dx: 24, dy: 18 } });
   const afterCamera = await getProof();
 
@@ -786,6 +821,7 @@ try {
     closed_curve_stroke_visible: ringStroke.matched,
     closed_curve_fill_visible: ringFill.matched,
     background_control_captured: Array.isArray(backgroundControl.rgba),
+    closed_fill_survives_save_and_load: reloadedFillPixel.matched,
   };
   const pixelReadback = {
     phase: "2A",
@@ -827,8 +863,21 @@ try {
     camera_only_frame: {
       path_tessellations: cameraResponse.metrics.path_tessellations,
       path_vertices_uploaded: cameraResponse.metrics.path_vertices_uploaded,
+      path_vertex_upload_bytes: cameraResponse.metrics.path_vertex_upload_bytes,
       path_vertices_sent: Boolean(cameraResponse.binary.path_vertices),
       gpu_draw_calls: afterCamera.gpu?.draw_calls ?? null,
+      gpu_batches: afterCamera.gpu?.batches ?? null,
+      gpu_path_vertices_uploaded: afterCamera.gpu?.path_vertices_uploaded ?? null,
+      gpu_path_vertex_upload_bytes: afterCamera.gpu?.path_vertex_upload_bytes ?? null,
+      gpu_draw_calls_before_camera_frame: beforeCameraGpu.draw_calls ?? null,
+    },
+    document_round_trip: {
+      saved_path_count: savedPaths.length,
+      saved_anchor_ids: savedAnchorIds,
+      resaved_anchor_ids: resavedAnchorIds,
+      bounds_before_reload: beforeReloadBounds,
+      bounds_after_reload: afterReloadBounds,
+      reloaded_ok: reloaded.ok === true,
     },
     gpu: afterCamera.gpu,
     note:
@@ -898,7 +947,16 @@ try {
       cameraResponse.ok === true &&
       cameraResponse.binary.path_vertices === false &&
       cameraResponse.metrics.path_vertices_uploaded === 0 &&
+      cameraResponse.metrics.path_vertex_upload_bytes === 0 &&
       cameraResponse.metrics.path_tessellations === 0,
+    save_load_preserves_path_identity:
+      saved.ok === true &&
+      reloaded.ok === true &&
+      savedPaths.length === 4 &&
+      reloadedNodes.length === 4 &&
+      JSON.stringify(savedAnchorIds) === JSON.stringify(resavedAnchorIds) &&
+      JSON.stringify(beforeReloadBounds) === JSON.stringify(afterReloadBounds),
+    reloaded_path_still_renders: reloadedFillPixel.matched,
     console_errors_zero: consoleErrors.length === 0,
     gpu_validation_errors_zero:
       Number(
@@ -982,6 +1040,7 @@ try {
       removed_from_projection: removedFromProjection,
     },
     camera_only_frame: metrics.camera_only_frame,
+    document_round_trip: metrics.document_round_trip,
     pixel_readback_artifact: path.relative(workspace, pixelPath).replaceAll("\\", "/"),
     performance_artifact: path.relative(workspace, metricsPath).replaceAll("\\", "/"),
     screenshots: screenshotInfo,

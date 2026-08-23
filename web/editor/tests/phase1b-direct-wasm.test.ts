@@ -5,9 +5,11 @@ import { describe, expect, test } from "vitest";
 
 const editorRoot = path.resolve(process.cwd());
 const workspace = path.resolve(editorRoot, "../..");
-const proof = JSON.parse(
-  readFileSync(path.join(workspace, "docs/verification/PHASE_1B_DIRECT_WASM_PROOF.json"), "utf8"),
-);
+const proofRelativePath = "docs/verification/PHASE_1B_DIRECT_WASM_PROOF.json";
+// SHA-256 of the artifact as approved on main at 016622d. It is pinned here so that a stray
+// regeneration fails the default suite instead of quietly replacing Gate 1B evidence.
+const GATE_1B_PROOF_SHA256 = "fe8f32cfdf032f57c784ededf582b4a766f5feb6132c522536220812e86ec733";
+const proof = JSON.parse(readFileSync(path.join(workspace, proofRelativePath), "utf8"));
 
 const requiredChecks = [
   "selection_set_count",
@@ -42,12 +44,30 @@ describe("Phase 1B stored direct-WASM proof integrity", () => {
     expect(proof.engine_sequence).toBeGreaterThan(0);
   });
 
-  test("the proof was produced by the WASM package this repository ships", () => {
-    const wasm = readFileSync(path.join(workspace, proof.wasm_path));
-    expect(wasm.length).toBe(proof.wasm_bytes);
-    expect(createHash("sha256").update(wasm).digest("hex")).toBe(proof.wasm_sha256);
+  // The Phase 1B proof is a historical artifact of the Gate 1B run on commit
+  // 330476b5. It records the WASM package that existed at that commit, and later phases rebuild
+  // that package, so it must NOT be re-pinned to whatever the working tree ships today. What is
+  // guarded here is that the artifact names the exact build it tested. The claim that the WASM
+  // this repository ships right now still works lives in the Phase 2A direct-WASM proof.
+  test("the proof names the exact WASM build and gate run it tested", () => {
+    expect(proof.wasm_path).toBe("web/editor/public/pkg/engine_host_bg.wasm");
+    expect(proof.wasm_bytes).toBeGreaterThan(0);
+    expect(proof.wasm_sha256).toMatch(/^[0-9a-f]{64}$/);
+    expect(proof.tested_source_commit).toMatch(/^[0-9a-f]{40}$/);
+    expect(proof.tested_branch).toBe("main");
+    expect(proof.gate_run_id).toMatch(/^phase1b-/);
     expect(proof.protocol_version).toBe(1);
-    expect(proof.render_binary_schema_version).toBe(3);
+    // Schema 2 was the shipped contract at Gate 1B. Phase 2A moved the product to schema 3
+    // without rewriting this record.
+    expect(proof.render_binary_schema_version).toBe(2);
+  });
+
+  test("the stored Gate 1B artifact is byte-identical to the approved run", () => {
+    // Any command that regenerates this file has changed history rather than adding evidence.
+    const digest = createHash("sha256")
+      .update(readFileSync(path.join(workspace, proofRelativePath)))
+      .digest("hex");
+    expect(digest).toBe(GATE_1B_PROOF_SHA256);
   });
 
   test("every Phase 1B behaviour is covered and passed", () => {

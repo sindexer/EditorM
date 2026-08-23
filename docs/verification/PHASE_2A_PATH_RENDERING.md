@@ -21,37 +21,74 @@ hardware PASS.
 | Undo/redo of create-path and set-path-geometry across Document/Scene/RenderModel/hit test | PASS | `crates/runtime/src/tests.rs`, `crates/wasm_bridge/src/lib.rs` |
 | Negative cases: duplicate anchor id, non-finite anchor or handle, invalid open/closed counts, wrong node kind, failure atomicity | PASS | `crates/runtime/src/tests.rs`, `crates/wasm_bridge/src/lib.rs`, `crates/serialization/src/lib.rs` |
 | Serialization: v1/v2/v3 load, v3 path round trip, save→load→save stability, anchor UUID preservation | PASS | `cargo test -p visual_authoring_serialization` |
+| Phase 2A direct-WASM proof against the shipped package (42 checks) | PASS | `docs/verification/PHASE_2A_DIRECT_WASM_PROOF.json` |
+| Gate 1B evidence unchanged by Phase 2A verification | PASS | `docs/verification/PHASE_1B_DIRECT_WASM_PROOF.json` unmodified; SHA-256 pinned in `web/editor/tests/phase1b-direct-wasm.test.ts` |
 | Render binary schema v3 + WGSL path pipeline published and consumed | PASS | `cargo test -p visual_authoring_renderer_wgpu`, `web/phase0d-preview` unit tests, `npm test` |
 | Path CPU performance at 10/100/1000 paths, split into initial tessellation / static frame / single edit / camera-only | PASS | `docs/PHASE_2A_PATH_METRICS.json` |
-| Actual Chrome + Dedicated Worker + WASM + actual WebGPU renders paths | UNVERIFIED (no GPU here) | run `npm run test:browser:phase2a:path-render` |
+| Actual Chrome + Dedicated Worker + WASM + actual WebGPU renders paths | UNVERIFIED (no GPU here) | run `npm.cmd run test:browser:phase2a:path-render` on the GPU machine |
 | WebGPU surface pixel readback for straight path, Bezier path, closed fill, stroke, background control | UNVERIFIED (no GPU here) | same command; writes `docs/verification/PHASE_2A_PIXEL_READBACK.json` |
 | Actual-GPU frame behaviour (draw calls, no triangle re-upload on camera frames) | UNVERIFIED (no GPU here) | same command; writes `docs/PHASE_2A_BROWSER_METRICS.json` |
 
 ## Commands
 
-CPU and contract verification (runs anywhere):
+CPU and contract verification (runs anywhere, no GPU needed):
 
 ```
 cargo fmt --all -- --check
 cargo clippy --workspace --all-targets -- -D warnings
 cargo test --workspace --all-targets
 cargo run --release -p visual_authoring_runtime --bin phase2a_path_bench
-cd web/editor && npm test && npm run build
-```
-
-Hardware verification (Windows machine with a real GPU, from the repository root):
-
-```
 cd web\editor
-npm run test:browser:phase2a:path-render
+npm.cmd test
+npm.cmd run test:direct-wasm:phase2a
+npm.cmd run build
+cd ..\phase0d-preview
+npm.cmd test
+```
+
+On Windows PowerShell use `npm.cmd`, not `npm`: the execution policy blocks `npm.ps1`.
+
+### Before running the hardware proof
+
+The proof must describe committed source, not a dirty tree. On the GPU machine:
+
+```
+git switch feat/phase2a-path-rendering
+git pull --ff-only
+git status --short
+```
+
+Do **not** run the hardware proof if any of these is modified:
+
+```
+crates/**
+shared/**
+web/editor/src/**
+web/editor/scripts/**
+web/editor/public/worker.js
+```
+
+`web/editor/public/pkg/**` is the generated WASM package this repository tracks. It is expected to
+match the committed build; if it differs, rebuild it from the committed source
+(`tools/build-phase0e-wasm.ps1`) and confirm `node tools/ci-wasm-smoke.mjs` reports
+`render_binary_schema_version: 3` before proceeding, so the proof describes the shipped package.
+
+### Hardware verification (Windows machine with a real GPU)
+
+```
+cd D:\Codex\EditorM\web\editor
+npm.cmd run test:browser:phase2a:path-render
 ```
 
 Optional environment variables, matching the Phase 1B harness:
 
 - `PHASE0E_CHROME` — path to `chrome.exe` when it is not in the default location.
 - `PHASE2A_NO_SANDBOX=1` — only when Chrome refuses to start sandboxed (container/root runs).
-- `PHASE2A_ALLOW_SOFTWARE_GPU=1` — diagnostic only. It writes to separate
-  `*_SOFTWARE_RUN.json` paths and can never be hardware evidence.
+- `PHASE2A_ALLOW_SOFTWARE_GPU=1` — diagnostic only. It writes to separate `*_SOFTWARE_RUN.json`
+  paths and can never be hardware evidence. A software renderer is never a PASS.
+
+The run must exercise the whole real path: Chrome → React editor → Dedicated Worker → WASM →
+RenderModel → WebGPU → hardware GPU.
 
 Artifacts produced by a hardware run:
 
@@ -59,6 +96,78 @@ Artifacts produced by a hardware run:
 - `docs/verification/PHASE_2A_PIXEL_READBACK.json`
 - `docs/verification/phase2a-paths.png`
 - `docs/PHASE_2A_BROWSER_METRICS.json`
+
+### What the hardware run must show
+
+Environment:
+
+```
+actual_webgpu            = true
+software_renderer        = false
+worker_runtime_owner     = dedicated-worker
+wasm_initialized         = true
+render_binary_schema_version = 3
+gpu validation errors    = 0
+fallback rebuilds        = 0
+```
+
+Path behaviour, each asserted from a WebGPU surface readback rather than a page screenshot:
+
+```
+open straight path visible
+open cubic path visible
+closed filled path interior visible
+stroked closed cubic visible
+background control reads as background
+
+stroke hit test          PASS
+filled interior hit test PASS
+outside-the-outline miss PASS
+
+undo restores geometry   PASS
+redo reapplies geometry  PASS
+create/edit round trip   PASS
+```
+
+Frame behaviour recorded in `docs/PHASE_2A_BROWSER_METRICS.json`:
+
+```
+camera-only frame : path triangle upload = 0, retessellation = 0
+static frame      : retessellation = 0
+single path edit  : retessellated paths = 1
+fallback rebuilds = 0
+draw calls and uploaded vertex bytes recorded
+```
+
+## Harness dry run in this container (diagnostic only, never evidence)
+
+The Phase 2A browser harness was executed here once in software-GPU diagnostic mode
+(`PHASE2A_ALLOW_SOFTWARE_GPU=1`, bundled Chromium, `--no-sandbox`) purely to check that the
+harness itself starts the preview server, launches Chrome, attaches CDP and reaches the editor.
+
+It stopped at `application_readiness_timeout` with `actual_webgpu: false` and
+`wasm_initialized: false`: Chromium's SwiftShader path in this container cannot create the WebGPU
+swap chain (`Could not find SharedImageBackingFactory ... WebGPUSwapChainTexture`), so the editor
+never finishes booting. The Phase 1B harness fails at exactly the same point in this container —
+see `PHASE_1B_BROWSER_SOFTWARE_RUN_FAILURE.json` — so this is an environment limit, not a defect
+in the Phase 2A harness. The diagnostic output is kept at
+`PHASE_2A_BROWSER_SOFTWARE_RUN_FAILURE.json` and is **not** evidence of anything about paths:
+gate status remains UNVERIFIED until the run happens on real GPU hardware.
+
+## Evidence separation
+
+Phase 1B evidence is an immutable historical artifact of the Gate 1B run on commit `330476b5`. No
+Phase 2A command regenerates it:
+
+- `scripts/direct-wasm-phase1b.mjs` now writes nothing unless an explicit `--output=<path>` is
+  given, so running it as a regression check cannot overwrite history. Only
+  `npm.cmd run test:direct-wasm:phase1b:gate`, which the Gate 1B runner invokes, passes that path.
+- `tests/phase1b-direct-wasm.test.ts` pins the artifact's SHA-256, so any stray regeneration fails
+  the default suite instead of silently replacing Gate 1B evidence.
+- Phase 2A has its own direct-WASM artifact, `docs/verification/PHASE_2A_DIRECT_WASM_PROOF.json`,
+  produced by `scripts/direct-wasm-phase2a.mjs` against the WASM package this repository currently
+  ships (42 checks: PATH-A buffers and batches, camera-only upload contract, create/edit/undo/redo,
+  and the negative cases).
 
 ## Measured CPU path performance
 

@@ -6,7 +6,7 @@
   "description": "Phase 0E professional React editor shell backed by the Worker-owned Rust/WASM runtime and actual WebGPU.",
   "scripts": {
     "build": "tsc -b && vite build",
-    "test": "vitest run tests/projection.test.ts tests/phase1a-contract.test.ts tests/browser-proof-phase1a.test.ts tests/phase1b-contract.test.ts tests/phase1b-direct-wasm.test.ts tests/phase1b-gate-finalizer.test.ts tests/phase1b-gate-runner.test.ts tests/phase1b-gate-status.test.ts tests/phase2a-path-contract.test.ts",
+    "test": "vitest run tests/projection.test.ts tests/phase1a-contract.test.ts tests/browser-proof-phase1a.test.ts tests/phase1b-contract.test.ts tests/phase1b-direct-wasm.test.ts tests/phase1b-gate-finalizer.test.ts tests/phase1b-gate-runner.test.ts tests/phase1b-gate-status.test.ts tests/phase2a-path-contract.test.ts tests/phase2a-direct-wasm.test.ts",
     "test:browser": "npm run build && node scripts/browser-proof.mjs && vitest run tests/browser-proof.test.ts",
     "start": "node server.mjs",
     "test:browser:r2": "npm run build && node scripts/browser-proof-r2.mjs && vitest run tests/browser-proof-r2.test.ts",
@@ -16,11 +16,13 @@
     "test:phase1a": "vitest run tests/phase1a-contract.test.ts tests/browser-proof-phase1a.test.ts",
     "test:phase1b": "vitest run tests/phase1b-contract.test.ts tests/phase1b-direct-wasm.test.ts tests/phase1b-gate-finalizer.test.ts tests/phase1b-gate-runner.test.ts tests/phase1b-gate-status.test.ts",
     "test:direct-wasm:phase1b": "node scripts/direct-wasm-phase1b.mjs && vitest run tests/phase1b-direct-wasm.test.ts",
+    "test:direct-wasm:phase1b:gate": "node scripts/direct-wasm-phase1b.mjs --output=docs/verification/PHASE_1B_DIRECT_WASM_PROOF.json && vitest run tests/phase1b-direct-wasm.test.ts",
+    "test:direct-wasm:phase2a": "node scripts/direct-wasm-phase2a.mjs --output=docs/verification/PHASE_2A_DIRECT_WASM_PROOF.json && vitest run tests/phase2a-direct-wasm.test.ts",
     "test:browser:phase1b": "npm run build && node scripts/browser-proof-phase1b.mjs && vitest run tests/browser-proof-phase1b.test.ts",
     "bench:multi-drag:phase1b": "node scripts/bench-multi-drag-phase1b.mjs",
     "finalize:gate:phase1b": "node scripts/finalize-gate-phase1b.mjs",
     "test:browser:phase1a": "npm run build && node scripts/browser-proof-phase1a.mjs && vitest run tests/browser-proof-phase1a.test.ts",
-    "test:phase2a": "vitest run tests/phase2a-path-contract.test.ts",
+    "test:phase2a": "vitest run tests/phase2a-path-contract.test.ts tests/phase2a-direct-wasm.test.ts",
     "test:browser:phase2a:path-render": "npm run build && node scripts/browser-proof-phase2a.mjs && vitest run tests/browser-proof-phase2a.test.ts"
   },
   "dependencies": {
