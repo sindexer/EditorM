@@ -1,0 +1,13 @@
+{
+  "phase": "1B",
+  "record": "Phase 1A browser regression result for the current Gate 1B run",
+  "gate_run_id": "phase1b-20260823T050029Z-b0e815c48f6a-4f5648ec",
+  "tested_source_commit": "b0e815c48f6a6eec642bc7ef7a9c1f4d49a0b32e",
+  "tested_branch": "main",
+  "captured_at_utc": "2026-08-23T05:09:18.494Z",
+  "status": "FAIL",
+  "reason": "browser_test_failed: -32000: Target crashed",
+  "artifacts": [
+    "docs/verification/PHASE_1A_BROWSER_FAILURE.json"
+  ]
+}
