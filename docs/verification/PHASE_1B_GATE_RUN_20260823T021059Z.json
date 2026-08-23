@@ -1,0 +1,77 @@
+{
+    "phase":  "1B",
+    "record":  "Windows Gate 1B orchestration run",
+    "gate_run_id":  "phase1b-20260823T021059Z-206955b3107d-448e4df3",
+    "tested_source_commit":  "206955b3107d17bb2964ca7d69d3b7e7faf7e209",
+    "tested_branch":  "main",
+    "started_at_utc":  "2026-08-23T02:10:59.9770036Z",
+    "finished_at_utc":  "2026-08-23T02:11:09.5017486Z",
+    "status":  "FAIL",
+    "gate_conclusion":  "NOT PASSED",
+    "environment":  {
+                        "windows":  {
+                                        "os_version":  "Microsoft Windows NT 10.0.19045.0",
+                                        "caption":  "Unavailable: 액세스가 거부되었습니다. ",
+                                        "version":  null,
+                                        "build_number":  null
+                                    },
+                        "chrome_executable":  "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+                        "chrome_exists":  true,
+                        "node":  {
+                                     "command":  "node.exe System.String[]",
+                                     "available":  false,
+                                     "exit_code":  null,
+                                     "output":  "The term \u0027node.exe\u0027 is not recognized as the name of a cmdlet, function, script file, or operable program. Check the spelling of the name, or if a path was included, verify that the path is correct and try again."
+                                 },
+                        "rust_toolchain":  {
+                                               "command":  "D:\\Codex\\EditorM\\.tools\\cargo\\bin\\rustup.exe System.String[]",
+                                               "available":  true,
+                                               "exit_code":  0,
+                                               "output":  "1.89.0-x86_64-pc-windows-msvc (overridden by \u0027D:\\Codex\\EditorM\\rust-toolchain.toml\u0027)"
+                                           },
+                        "rustc":  {
+                                      "command":  "D:\\Codex\\EditorM\\.tools\\cargo\\bin\\rustc.exe System.String[]",
+                                      "available":  true,
+                                      "exit_code":  0,
+                                      "output":  "rustc 1.89.0 (29483883e 2025-08-04)\r\nbinary: rustc\r\ncommit-hash: 29483883eed69d5fb4db01964cdf2af4d86e9cb2\r\ncommit-date: 2025-08-04\r\nhost: x86_64-pc-windows-msvc\r\nrelease: 1.89.0\r\nLLVM version: 20.1.7"
+                                  },
+                        "cargo":  {
+                                      "command":  "D:\\Codex\\EditorM\\.tools\\cargo\\bin\\cargo.exe System.String[]",
+                                      "available":  true,
+                                      "exit_code":  0,
+                                      "output":  "cargo 1.89.0 (c24e10642 2025-06-23)"
+                                  },
+                        "wasm_bindgen_executable":  "D:\\Codex\\EditorM\\.tools\\wasm-bindgen-0.2.126\\bin\\wasm-bindgen.exe",
+                        "wasm_bindgen":  {
+                                             "command":  "D:\\Codex\\EditorM\\.tools\\wasm-bindgen-0.2.126\\bin\\wasm-bindgen.exe System.String[]",
+                                             "available":  true,
+                                             "exit_code":  0,
+                                             "output":  "wasm-bindgen 0.2.126"
+                                         }
+                    },
+    "source_tree":  {
+                        "initially_dirty":  false,
+                        "initial_status":  [
+
+                                           ],
+                        "initial_paths":  [
+
+                                          ],
+                        "unexpected_paths":  [
+
+                                             ],
+                        "note":  "Generated verification artifacts may make the tree dirty after this snapshot."
+                    },
+    "steps":  [
+
+              ],
+    "first_failure":  {
+                          "step_id":  "startup",
+                          "message":  "The term \u0027node.exe\u0027 is not recognized as the name of a cmdlet, function, script file, or operable program. Check the spelling of the name, or if a path was included, verify that the path is correct and try again.",
+                          "exit_code":  1,
+                          "captured_at_utc":  "2026-08-23T02:11:09.4861227Z",
+                          "artifacts":  [
+
+                                        ]
+                      }
+}
