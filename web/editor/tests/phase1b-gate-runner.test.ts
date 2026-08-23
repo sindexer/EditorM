@@ -54,6 +54,8 @@ describe("Phase 1B Windows gate runner contract", () => {
 
   test("builds fresh WASM outside the tracked browser package", () => {
     expect(runner).toContain('target\\phase1b-gate-wasm-pkg');
+    expect(runner).toContain('$gateWasmOutDir = "target\\phase1b-gate-wasm-pkg"');
+    expect(runner).not.toContain('$gateWasmOutDir = Join-Path $repoRoot');
     expect(runner).toContain('"-OutDir", $gateWasmOutDir');
     expect(runner).not.toContain('-DisplayName "build shipped Phase 0E WASM"');
   });

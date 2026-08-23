@@ -280,7 +280,9 @@ try {
     $cargoScript = Join-Path $repoRoot "tools\cargo.ps1"
     $wasmScript = Join-Path $repoRoot "tools\build-phase0e-wasm.ps1"
     $wasmSmokeScript = Join-Path $repoRoot "tools\ci-wasm-smoke.mjs"
-    $gateWasmOutDir = Join-Path $repoRoot "target\phase1b-gate-wasm-pkg"
+    # The WASM builder resolves OutDir relative to the repository root. Passing
+    # an absolute child path through Join-Path produces an invalid Windows path.
+    $gateWasmOutDir = "target\phase1b-gate-wasm-pkg"
     $nodeExecutable = (Get-Command node.exe -ErrorAction Stop).Source
 
     Invoke-GateStep -Id "cargo_fmt" -DisplayName "cargo fmt check" -Executable $powerShell -Arguments @("-NoProfile", "-ExecutionPolicy", "Bypass", "-File", $cargoScript, "fmt", "--all", "--", "--check")
