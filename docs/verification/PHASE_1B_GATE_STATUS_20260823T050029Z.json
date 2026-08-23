@@ -1,0 +1,305 @@
+{
+  "phase": "1B",
+  "gate": "Gate 1B",
+  "generated_at_utc": "2026-08-23T05:09:18.498Z",
+  "gate_run_id": "phase1b-20260823T050029Z-b0e815c48f6a-4f5648ec",
+  "tested_source_commit": "b0e815c48f6a6eec642bc7ef7a9c1f4d49a0b32e",
+  "tested_branch": "main",
+  "current_head": "b0e815c48f6a6eec642bc7ef7a9c1f4d49a0b32e",
+  "gate_conclusion": "NOT PASSED",
+  "runner_status": "FAIL",
+  "browser_proof_present": false,
+  "current_browser_proof_accepted": false,
+  "hardware_run_instructions": "docs/PHASE_1B_HARDWARE_RUN.md",
+  "environment": {
+    "windows": {
+      "os_version": "Microsoft Windows NT 10.0.19045.0",
+      "caption": "Unavailable: 액세스가 거부되었습니다. ",
+      "version": null,
+      "build_number": null
+    },
+    "chrome_executable": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+    "chrome_exists": true,
+    "node": {
+      "command": "node.exe System.String[]",
+      "available": true,
+      "exit_code": 0,
+      "output": "v24.19.0"
+    },
+    "rust_toolchain": {
+      "command": "D:\\Codex\\EditorM\\.tools\\cargo\\bin\\rustup.exe System.String[]",
+      "available": true,
+      "exit_code": 0,
+      "output": "1.89.0-x86_64-pc-windows-msvc (overridden by 'D:\\Codex\\EditorM\\rust-toolchain.toml')"
+    },
+    "rustc": {
+      "command": "D:\\Codex\\EditorM\\.tools\\cargo\\bin\\rustc.exe System.String[]",
+      "available": true,
+      "exit_code": 0,
+      "output": "rustc 1.89.0 (29483883e 2025-08-04)\r\nbinary: rustc\r\ncommit-hash: 29483883eed69d5fb4db01964cdf2af4d86e9cb2\r\ncommit-date: 2025-08-04\r\nhost: x86_64-pc-windows-msvc\r\nrelease: 1.89.0\r\nLLVM version: 20.1.7"
+    },
+    "cargo": {
+      "command": "D:\\Codex\\EditorM\\.tools\\cargo\\bin\\cargo.exe System.String[]",
+      "available": true,
+      "exit_code": 0,
+      "output": "cargo 1.89.0 (c24e10642 2025-06-23)"
+    },
+    "wasm_bindgen_executable": "D:\\Codex\\EditorM\\.tools\\wasm-bindgen-0.2.126\\bin\\wasm-bindgen.exe",
+    "wasm_bindgen": {
+      "command": "D:\\Codex\\EditorM\\.tools\\wasm-bindgen-0.2.126\\bin\\wasm-bindgen.exe System.String[]",
+      "available": true,
+      "exit_code": 0,
+      "output": "wasm-bindgen 0.2.126"
+    }
+  },
+  "source_relation": {
+    "valid": true,
+    "reason": "Current HEAD is the tested source commit; only generated evidence is dirty.",
+    "currentHead": "b0e815c48f6a6eec642bc7ef7a9c1f4d49a0b32e",
+    "committedEvidencePaths": [],
+    "workingTreePaths": [
+      "docs/verification/PHASE_1A_BROWSER_FAILURE.json",
+      "docs/verification/PHASE_1B_GATE_RUN.json"
+    ],
+    "disallowedPaths": []
+  },
+  "items": [
+    {
+      "id": "harness_exists",
+      "requirement": "A Phase 1B browser/WebGPU proof harness exists and runs with one command",
+      "required": true,
+      "requires_gpu": false,
+      "status": "PASS",
+      "evidence": "The Phase 1B hardware harness and one-command npm entry point exist.",
+      "artifacts": [
+        "web/editor/scripts/browser-proof-phase1b.mjs",
+        "web/editor/package.json"
+      ]
+    },
+    {
+      "id": "real_path_only",
+      "requirement": "The harness drives Chrome -> React -> Dedicated Worker -> WASM -> WebGPU without substitutes",
+      "required": true,
+      "requires_gpu": false,
+      "status": "PASS",
+      "evidence": "Harness source requires actual Chrome, Dedicated Worker, shipped WASM, and WebGPU.",
+      "artifacts": [
+        "web/editor/scripts/browser-proof-phase1b.mjs"
+      ]
+    },
+    {
+      "id": "source_evidence_binding",
+      "requirement": "All Gate evidence is bound to one run, branch, and tested source commit",
+      "required": true,
+      "requires_gpu": false,
+      "status": "PASS",
+      "evidence": "Current HEAD is the tested source commit; only generated evidence is dirty.",
+      "artifacts": [
+        "docs/verification/PHASE_1B_GATE_RUN.json"
+      ]
+    },
+    {
+      "id": "phase1a_regression",
+      "requirement": "The current Gate run passes the Phase 1A browser regression",
+      "required": true,
+      "requires_gpu": true,
+      "status": "FAIL",
+      "evidence": "browser_test_failed: -32000: Target crashed",
+      "artifacts": [
+        "docs/verification/PHASE_1A_BROWSER_FAILURE.json"
+      ]
+    },
+    {
+      "id": "shift_multi_selection",
+      "requirement": "Shift multi-selection is verified in the browser",
+      "required": true,
+      "requires_gpu": true,
+      "status": "UNVERIFIED",
+      "evidence": "No evidence from the current Gate run is available.",
+      "artifacts": []
+    },
+    {
+      "id": "marquee_selection",
+      "requirement": "Rubber-band selection is verified in the browser",
+      "required": true,
+      "requires_gpu": true,
+      "status": "UNVERIFIED",
+      "evidence": "No evidence from the current Gate run is available.",
+      "artifacts": []
+    },
+    {
+      "id": "select_all",
+      "requirement": "Ctrl/Cmd+A is verified in the browser",
+      "required": true,
+      "requires_gpu": true,
+      "status": "UNVERIFIED",
+      "evidence": "No evidence from the current Gate run is available.",
+      "artifacts": []
+    },
+    {
+      "id": "multi_object_drag",
+      "requirement": "Multi-object drag is verified in the browser",
+      "required": true,
+      "requires_gpu": true,
+      "status": "UNVERIFIED",
+      "evidence": "No evidence from the current Gate run is available.",
+      "artifacts": []
+    },
+    {
+      "id": "coalesced_drag_no_drift",
+      "requirement": "Coalesced drag frames do not drift",
+      "required": true,
+      "requires_gpu": true,
+      "status": "UNVERIFIED",
+      "evidence": "No evidence from the current Gate run is available.",
+      "artifacts": []
+    },
+    {
+      "id": "edge_center_snapping",
+      "requirement": "Edge and center snapping are verified in the browser",
+      "required": true,
+      "requires_gpu": true,
+      "status": "UNVERIFIED",
+      "evidence": "No evidence from the current Gate run is available.",
+      "artifacts": []
+    },
+    {
+      "id": "alt_snap_suspend",
+      "requirement": "Alt snap suspension is verified in the browser",
+      "required": true,
+      "requires_gpu": true,
+      "status": "UNVERIFIED",
+      "evidence": "No evidence from the current Gate run is available.",
+      "artifacts": []
+    },
+    {
+      "id": "snap_toggle",
+      "requirement": "The snap toggle is verified in the browser",
+      "required": true,
+      "requires_gpu": true,
+      "status": "UNVERIFIED",
+      "evidence": "No evidence from the current Gate run is available.",
+      "artifacts": []
+    },
+    {
+      "id": "snap_guide_rendered",
+      "requirement": "The snap guide is proven by actual pixels",
+      "required": true,
+      "requires_gpu": true,
+      "status": "UNVERIFIED",
+      "evidence": "No evidence from the current Gate run is available.",
+      "artifacts": []
+    },
+    {
+      "id": "align_six_ways",
+      "requirement": "All six alignment operations are verified in the browser",
+      "required": true,
+      "requires_gpu": true,
+      "status": "UNVERIFIED",
+      "evidence": "No evidence from the current Gate run is available.",
+      "artifacts": []
+    },
+    {
+      "id": "distribute_both_axes",
+      "requirement": "Horizontal and vertical distribution are verified",
+      "required": true,
+      "requires_gpu": true,
+      "status": "UNVERIFIED",
+      "evidence": "No evidence from the current Gate run is available.",
+      "artifacts": []
+    },
+    {
+      "id": "arrange_undo",
+      "requirement": "Arrange operations restore through one undo",
+      "required": true,
+      "requires_gpu": true,
+      "status": "UNVERIFIED",
+      "evidence": "No evidence from the current Gate run is available.",
+      "artifacts": []
+    },
+    {
+      "id": "multi_drag_undo",
+      "requirement": "A multi-object drag restores through one undo",
+      "required": true,
+      "requires_gpu": true,
+      "status": "UNVERIFIED",
+      "evidence": "No evidence from the current Gate run is available.",
+      "artifacts": []
+    },
+    {
+      "id": "pixel_readback_overlays",
+      "requirement": "Pixel evidence passes for selections, marquee, guide, and moved content",
+      "required": true,
+      "requires_gpu": true,
+      "status": "UNVERIFIED",
+      "evidence": "No evidence from the current Gate run is available.",
+      "artifacts": []
+    },
+    {
+      "id": "browser_multi_drag_benchmark",
+      "requirement": "Browser multi-drag has 10/100/1,000 series and keeps existing 10/100 thresholds",
+      "required": true,
+      "requires_gpu": true,
+      "status": "UNVERIFIED",
+      "evidence": "No evidence from the current Gate run is available.",
+      "artifacts": []
+    },
+    {
+      "id": "engine_behaviour_proof",
+      "requirement": "Direct shipped-WASM behavior proof passes 46/46",
+      "required": true,
+      "requires_gpu": false,
+      "status": "UNVERIFIED",
+      "evidence": "No evidence from the current Gate run is available.",
+      "artifacts": []
+    },
+    {
+      "id": "engine_multi_drag_benchmark",
+      "requirement": "Engine benchmark records passing 10/100/1,000 series",
+      "required": true,
+      "requires_gpu": false,
+      "status": "UNVERIFIED",
+      "evidence": "No evidence from the current Gate run is available.",
+      "artifacts": []
+    },
+    {
+      "id": "workspace_checks",
+      "requirement": "Repository, toolchain, dependency, and build verification passes",
+      "required": true,
+      "requires_gpu": false,
+      "status": "FAIL",
+      "evidence": "Gate runner failed at phase1a_browser.",
+      "artifacts": [
+        "docs/verification/PHASE_1B_GATE_RUN.json"
+      ]
+    }
+  ],
+  "summary": {
+    "pass": 3,
+    "fail": 2,
+    "unverified": 17
+  },
+  "first_failure": {
+    "assertion": "phase1a_browser",
+    "gate_run_id": "phase1b-20260823T050029Z-b0e815c48f6a-4f5648ec",
+    "tested_source_commit": "b0e815c48f6a6eec642bc7ef7a9c1f4d49a0b32e",
+    "tested_branch": "main",
+    "chrome": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+    "gpu": {},
+    "runner_failure": {
+      "step_id": "phase1a_browser",
+      "message": "Phase 1A browser regression failed.",
+      "exit_code": 1,
+      "captured_at_utc": "2026-08-23T05:09:18.0691720Z",
+      "artifacts": [
+        "docs/verification/PHASE_1A_BROWSER_PROOF.json",
+        "docs/verification/PHASE_1A_PIXEL_READBACK.json"
+      ]
+    }
+  },
+  "first_unverified": "shift_multi_selection",
+  "findings": [
+    "The 1,000-object drag result is measured performance debt and has no new Gate threshold.",
+    "Primitive creation currently places shapes as siblings of the default Frame; marquee exclude_ids avoids selecting its own backdrop, while Frame containment remains future work."
+  ]
+}

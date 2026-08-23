@@ -1,0 +1,48 @@
+{
+  "phase": "1A",
+  "gate_run_id": "phase1b-20260823T050029Z-b0e815c48f6a-4f5648ec",
+  "tested_source_commit": "b0e815c48f6a6eec642bc7ef7a9c1f4d49a0b32e",
+  "tested_branch": "main",
+  "captured_at_utc": "2026-08-23T05:09:17.634Z",
+  "code": "browser_test_failed",
+  "message": "-32000: Target crashed",
+  "details": null,
+  "preview_url": "http://127.0.0.1:64828/",
+  "preview_health": {
+    "ok": true,
+    "status": 200,
+    "body": {
+      "ok": true,
+      "phase": "0E"
+    }
+  },
+  "preview_assets": {
+    "/index.html": {
+      "status": 200,
+      "content_type": "text/html; charset=utf-8"
+    },
+    "/worker.js": {
+      "status": 200,
+      "content_type": "text/javascript; charset=utf-8"
+    },
+    "/pkg/engine_host.js": {
+      "status": 200,
+      "content_type": "text/javascript; charset=utf-8"
+    },
+    "/pkg/engine_host_bg.wasm": {
+      "status": 200,
+      "content_type": "application/wasm"
+    }
+  },
+  "preview_server": {
+    "exited": false,
+    "exit_code": null,
+    "stdout": "Phase 0E editor: http://127.0.0.1:64828/\n",
+    "stderr": ""
+  },
+  "browser": {
+    "diagnostic_error": "Timed out waiting for Runtime.evaluate"
+  },
+  "console_errors": [],
+  "chrome_stderr_tail": "[21252:11392:0823/140816.271:ERROR:components\\os_crypt\\async\\browser\\os_crypt_win.cc:63] Failed to encrypt: 지정된 파일을 찾을 수 없습니다. (0x2)\r\n[21252:9032:0823/140816.320:ERROR:chrome\\installer\\util\\google_update_settings_win.cc:270] Failed opening key Software\\Google\\Update\\ClientStateMedium\\{8A69D345-D564-463c-AFF1-A69D9E530F96} to set usagestats; result: 5\r\n\r\nDevTools listening on ws://127.0.0.1:64832/devtools/browser/a592a6ff-c6c4-4e1c-ba22-74df2d19c841\r\n[21252:10108:0823/140816.642:ERROR:services\\device\\public\\cpp\\geolocation\\system_geolocation_source_win.cc:259] Failed to get location access status: 매개 변수가 틀립니다. (0x80070057)\r\n[21252:1276:0823/140816.830:ERROR:components\\password_manager\\core\\browser\\password_store\\login_database_async_helper.cc:99] Encryption is not available.\r\n[21252:18068:0823/140816.880:ERROR:components\\password_manager\\core\\browser\\password_store\\login_database_async_helper.cc:99] Encryption is not available.\r\n[21252:11392:0823/140848.471:ERROR:components\\webapps\\browser\\web_contents\\web_app_url_loader.cc:180] Error loading about:blank page took too long to load.\r\n"
+}
