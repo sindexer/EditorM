@@ -1,0 +1,176 @@
+{
+  "phase": "1B",
+  "record": "Windows Gate 1B orchestration run",
+  "gate_run_id": "phase1b-20260823T023319Z-99a2cafd152d-1b28b617",
+  "tested_source_commit": "99a2cafd152d8816b9b5b677c8e037ac7e0a68e7",
+  "tested_branch": "main",
+  "started_at_utc": "2026-08-23T02:33:19.0004388Z",
+  "finished_at_utc": "2026-08-23T02:55:51.5154386Z",
+  "status": "FAIL",
+  "gate_conclusion": "NOT PASSED",
+  "environment": {
+    "windows": {
+      "os_version": "Microsoft Windows NT 10.0.19045.0",
+      "caption": "Unavailable: 액세스가 거부되었습니다. ",
+      "version": null,
+      "build_number": null
+    },
+    "chrome_executable": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+    "chrome_exists": true,
+    "node": {
+      "command": "node.exe System.String[]",
+      "available": true,
+      "exit_code": 0,
+      "output": "v24.19.0"
+    },
+    "rust_toolchain": {
+      "command": "D:\\Codex\\EditorM\\.tools\\cargo\\bin\\rustup.exe System.String[]",
+      "available": true,
+      "exit_code": 0,
+      "output": "1.89.0-x86_64-pc-windows-msvc (overridden by 'D:\\Codex\\EditorM\\rust-toolchain.toml')"
+    },
+    "rustc": {
+      "command": "D:\\Codex\\EditorM\\.tools\\cargo\\bin\\rustc.exe System.String[]",
+      "available": true,
+      "exit_code": 0,
+      "output": "rustc 1.89.0 (29483883e 2025-08-04)\r\nbinary: rustc\r\ncommit-hash: 29483883eed69d5fb4db01964cdf2af4d86e9cb2\r\ncommit-date: 2025-08-04\r\nhost: x86_64-pc-windows-msvc\r\nrelease: 1.89.0\r\nLLVM version: 20.1.7"
+    },
+    "cargo": {
+      "command": "D:\\Codex\\EditorM\\.tools\\cargo\\bin\\cargo.exe System.String[]",
+      "available": true,
+      "exit_code": 0,
+      "output": "cargo 1.89.0 (c24e10642 2025-06-23)"
+    },
+    "wasm_bindgen_executable": "D:\\Codex\\EditorM\\.tools\\wasm-bindgen-0.2.126\\bin\\wasm-bindgen.exe",
+    "wasm_bindgen": {
+      "command": "D:\\Codex\\EditorM\\.tools\\wasm-bindgen-0.2.126\\bin\\wasm-bindgen.exe System.String[]",
+      "available": true,
+      "exit_code": 0,
+      "output": "wasm-bindgen 0.2.126"
+    }
+  },
+  "source_tree": {
+    "initially_dirty": false,
+    "initial_status": [],
+    "initial_paths": [],
+    "unexpected_paths": [],
+    "note": "Generated verification artifacts may make the tree dirty after this snapshot."
+  },
+  "steps": [
+    {
+      "id": "cargo_fmt",
+      "display_name": "cargo fmt check",
+      "command": "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe System.String[]",
+      "working_directory": "D:\\Codex\\EditorM",
+      "started_at_utc": "2026-08-23T02:33:20.6973432Z",
+      "finished_at_utc": "2026-08-23T02:33:23.0142564Z",
+      "status": "PASS",
+      "exit_code": 0,
+      "error": null,
+      "artifacts": []
+    },
+    {
+      "id": "cargo_clippy",
+      "display_name": "cargo clippy workspace/all-targets",
+      "command": "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe System.String[]",
+      "working_directory": "D:\\Codex\\EditorM",
+      "started_at_utc": "2026-08-23T02:33:23.0174984Z",
+      "finished_at_utc": "2026-08-23T02:33:25.9544614Z",
+      "status": "PASS",
+      "exit_code": 0,
+      "error": null,
+      "artifacts": []
+    },
+    {
+      "id": "cargo_build",
+      "display_name": "cargo build workspace/all-targets",
+      "command": "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe System.String[]",
+      "working_directory": "D:\\Codex\\EditorM",
+      "started_at_utc": "2026-08-23T02:33:25.9561676Z",
+      "finished_at_utc": "2026-08-23T02:33:28.2361516Z",
+      "status": "PASS",
+      "exit_code": 0,
+      "error": null,
+      "artifacts": []
+    },
+    {
+      "id": "cargo_test",
+      "display_name": "cargo test workspace/all-targets",
+      "command": "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe System.String[]",
+      "working_directory": "D:\\Codex\\EditorM",
+      "started_at_utc": "2026-08-23T02:33:28.2385979Z",
+      "finished_at_utc": "2026-08-23T02:40:08.4609310Z",
+      "status": "PASS",
+      "exit_code": 0,
+      "error": null,
+      "artifacts": []
+    },
+    {
+      "id": "wasm_build",
+      "display_name": "build fresh Phase 0E WASM outside the tracked package",
+      "command": "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe System.String[]",
+      "working_directory": "D:\\Codex\\EditorM",
+      "started_at_utc": "2026-08-23T02:40:08.4626560Z",
+      "finished_at_utc": "2026-08-23T02:40:14.6716981Z",
+      "status": "PASS",
+      "exit_code": 0,
+      "error": null,
+      "artifacts": [
+        "target/phase1b-gate-wasm-pkg/engine_host.js",
+        "target/phase1b-gate-wasm-pkg/engine_host_bg.wasm"
+      ]
+    },
+    {
+      "id": "wasm_smoke",
+      "display_name": "verify fresh WASM bindings, ABI, and EngineHost initialization",
+      "command": "C:\\Users\\thdwl\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe System.String[]",
+      "working_directory": "D:\\Codex\\EditorM",
+      "started_at_utc": "2026-08-23T02:40:14.6741095Z",
+      "finished_at_utc": "2026-08-23T02:40:15.0544799Z",
+      "status": "PASS",
+      "exit_code": 0,
+      "error": null,
+      "artifacts": [
+        "target/phase1b-gate-wasm-pkg/engine_host.js",
+        "target/phase1b-gate-wasm-pkg/engine_host_bg.wasm"
+      ]
+    },
+    {
+      "id": "npm_ci",
+      "display_name": "install exact editor dependencies",
+      "command": "D:\\Codex\\EditorM\\.tools\\node-bin\\npm.cmd System.String[]",
+      "working_directory": "D:\\Codex\\EditorM\\web\\editor",
+      "started_at_utc": "2026-08-23T02:40:15.0655263Z",
+      "finished_at_utc": "2026-08-23T02:40:55.4681700Z",
+      "status": "PASS",
+      "exit_code": 0,
+      "error": null,
+      "artifacts": []
+    },
+    {
+      "id": "phase1a_browser",
+      "display_name": "Phase 1A browser regression",
+      "command": "D:\\Codex\\EditorM\\.tools\\node-bin\\npm.cmd System.String[]",
+      "working_directory": "D:\\Codex\\EditorM\\web\\editor",
+      "started_at_utc": "2026-08-23T02:40:55.4693090Z",
+      "finished_at_utc": "2026-08-23T02:55:51.4917163Z",
+      "status": "FAIL",
+      "exit_code": -1,
+      "error": null,
+      "artifacts": [
+        "docs/verification/PHASE_1A_BROWSER_PROOF.json",
+        "docs/verification/PHASE_1A_PIXEL_READBACK.json"
+      ]
+    }
+  ],
+  "first_failure": {
+    "step_id": "phase1a_browser",
+    "message": "Phase 1A browser regression failed.",
+    "exit_code": -1,
+    "captured_at_utc": "2026-08-23T02:55:51.5016256Z",
+    "artifacts": [
+      "docs/verification/PHASE_1A_BROWSER_PROOF.json",
+      "docs/verification/PHASE_1A_PIXEL_READBACK.json"
+    ]
+  }
+}

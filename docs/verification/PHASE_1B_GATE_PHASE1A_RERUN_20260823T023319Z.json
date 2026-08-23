@@ -1,0 +1,13 @@
+{
+  "phase": "1B",
+  "record": "Phase 1A browser regression result for the current Gate 1B run",
+  "gate_run_id": "phase1b-20260823T023319Z-99a2cafd152d-1b28b617",
+  "tested_source_commit": "99a2cafd152d8816b9b5b677c8e037ac7e0a68e7",
+  "tested_branch": "main",
+  "captured_at_utc": "2026-08-23T02:55:51.824Z",
+  "status": "FAIL",
+  "reason": "phase1a_browser exited with -1; no correctly bound failure artifact was produced.",
+  "artifacts": [
+    "docs/verification/PHASE_1A_BROWSER_FAILURE.json"
+  ]
+}
