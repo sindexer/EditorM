@@ -1,0 +1,11 @@
+{
+  "phase": "1B",
+  "record": "Phase 1A browser regression result for the current Gate 1B run",
+  "gate_run_id": "phase1b-20260823T021348Z-d00a1c1aaa70-9a65beb4",
+  "tested_source_commit": "d00a1c1aaa705ad8ad808de521cae577e236eefe",
+  "tested_branch": "main",
+  "captured_at_utc": "2026-08-23T02:20:18.904Z",
+  "status": "UNVERIFIED",
+  "reason": "No evidence from the current Gate run is available.",
+  "artifacts": []
+}

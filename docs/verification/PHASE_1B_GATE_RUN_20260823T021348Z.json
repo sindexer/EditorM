@@ -1,0 +1,134 @@
+{
+  "phase": "1B",
+  "record": "Windows Gate 1B orchestration run",
+  "gate_run_id": "phase1b-20260823T021348Z-d00a1c1aaa70-9a65beb4",
+  "tested_source_commit": "d00a1c1aaa705ad8ad808de521cae577e236eefe",
+  "tested_branch": "main",
+  "started_at_utc": "2026-08-23T02:13:48.3799212Z",
+  "finished_at_utc": "2026-08-23T02:20:18.2541390Z",
+  "status": "FAIL",
+  "gate_conclusion": "NOT PASSED",
+  "environment": {
+    "windows": {
+      "os_version": "Microsoft Windows NT 10.0.19045.0",
+      "caption": "Unavailable: 액세스가 거부되었습니다. ",
+      "version": null,
+      "build_number": null
+    },
+    "chrome_executable": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+    "chrome_exists": true,
+    "node": {
+      "command": "node.exe System.String[]",
+      "available": true,
+      "exit_code": 0,
+      "output": "v24.19.0"
+    },
+    "rust_toolchain": {
+      "command": "D:\\Codex\\EditorM\\.tools\\cargo\\bin\\rustup.exe System.String[]",
+      "available": true,
+      "exit_code": 0,
+      "output": "1.89.0-x86_64-pc-windows-msvc (overridden by 'D:\\Codex\\EditorM\\rust-toolchain.toml')"
+    },
+    "rustc": {
+      "command": "D:\\Codex\\EditorM\\.tools\\cargo\\bin\\rustc.exe System.String[]",
+      "available": true,
+      "exit_code": 0,
+      "output": "rustc 1.89.0 (29483883e 2025-08-04)\r\nbinary: rustc\r\ncommit-hash: 29483883eed69d5fb4db01964cdf2af4d86e9cb2\r\ncommit-date: 2025-08-04\r\nhost: x86_64-pc-windows-msvc\r\nrelease: 1.89.0\r\nLLVM version: 20.1.7"
+    },
+    "cargo": {
+      "command": "D:\\Codex\\EditorM\\.tools\\cargo\\bin\\cargo.exe System.String[]",
+      "available": true,
+      "exit_code": 0,
+      "output": "cargo 1.89.0 (c24e10642 2025-06-23)"
+    },
+    "wasm_bindgen_executable": "D:\\Codex\\EditorM\\.tools\\wasm-bindgen-0.2.126\\bin\\wasm-bindgen.exe",
+    "wasm_bindgen": {
+      "command": "D:\\Codex\\EditorM\\.tools\\wasm-bindgen-0.2.126\\bin\\wasm-bindgen.exe System.String[]",
+      "available": true,
+      "exit_code": 0,
+      "output": "wasm-bindgen 0.2.126"
+    }
+  },
+  "source_tree": {
+    "initially_dirty": false,
+    "initial_status": [],
+    "initial_paths": [],
+    "unexpected_paths": [],
+    "note": "Generated verification artifacts may make the tree dirty after this snapshot."
+  },
+  "steps": [
+    {
+      "id": "cargo_fmt",
+      "display_name": "cargo fmt check",
+      "command": "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe System.String[]",
+      "working_directory": "D:\\Codex\\EditorM",
+      "started_at_utc": "2026-08-23T02:13:50.1090171Z",
+      "finished_at_utc": "2026-08-23T02:13:54.3411691Z",
+      "status": "PASS",
+      "exit_code": 0,
+      "error": null,
+      "artifacts": []
+    },
+    {
+      "id": "cargo_clippy",
+      "display_name": "cargo clippy workspace/all-targets",
+      "command": "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe System.String[]",
+      "working_directory": "D:\\Codex\\EditorM",
+      "started_at_utc": "2026-08-23T02:13:54.3489343Z",
+      "finished_at_utc": "2026-08-23T02:14:25.1495725Z",
+      "status": "PASS",
+      "exit_code": 0,
+      "error": null,
+      "artifacts": []
+    },
+    {
+      "id": "cargo_build",
+      "display_name": "cargo build workspace/all-targets",
+      "command": "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe System.String[]",
+      "working_directory": "D:\\Codex\\EditorM",
+      "started_at_utc": "2026-08-23T02:14:25.1528095Z",
+      "finished_at_utc": "2026-08-23T02:14:38.6847468Z",
+      "status": "PASS",
+      "exit_code": 0,
+      "error": null,
+      "artifacts": []
+    },
+    {
+      "id": "cargo_test",
+      "display_name": "cargo test workspace/all-targets",
+      "command": "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe System.String[]",
+      "working_directory": "D:\\Codex\\EditorM",
+      "started_at_utc": "2026-08-23T02:14:38.6870753Z",
+      "finished_at_utc": "2026-08-23T02:20:08.0488064Z",
+      "status": "PASS",
+      "exit_code": 0,
+      "error": null,
+      "artifacts": []
+    },
+    {
+      "id": "wasm_build",
+      "display_name": "build fresh Phase 0E WASM outside the tracked package",
+      "command": "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe System.String[]",
+      "working_directory": "D:\\Codex\\EditorM",
+      "started_at_utc": "2026-08-23T02:20:08.0503400Z",
+      "finished_at_utc": "2026-08-23T02:20:18.2373617Z",
+      "status": "FAIL",
+      "exit_code": 1,
+      "error": null,
+      "artifacts": [
+        "target/phase1b-gate-wasm-pkg/engine_host.js",
+        "target/phase1b-gate-wasm-pkg/engine_host_bg.wasm"
+      ]
+    }
+  ],
+  "first_failure": {
+    "step_id": "wasm_build",
+    "message": "build fresh Phase 0E WASM outside the tracked package failed.",
+    "exit_code": 1,
+    "captured_at_utc": "2026-08-23T02:20:18.2444014Z",
+    "artifacts": [
+      "target/phase1b-gate-wasm-pkg/engine_host.js",
+      "target/phase1b-gate-wasm-pkg/engine_host_bg.wasm"
+    ]
+  }
+}
