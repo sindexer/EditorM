@@ -4,7 +4,7 @@
 
 Work is limited to the remaining Phase 1 capabilities in `docs/ROADMAP.md` that Phase 1A intentionally excluded: multiple selection, alignment, distribution, and snapping, each fully undoable. The user requested continued product development on 2026-08-22 after Phase 1A merged to `main` as commit `8f5a551`.
 
-This document does not claim Gate 1A or Gate 1B approval. It does not authorize Phase 2 or later capabilities, and it does not pull Pen/Bezier, text, gradients, images, shadows, components, motion, AI, or export into Phase 1.
+Gate 1B passed on 2026-08-23 for clean `main` commit `330476b57ba4f16963f5160e24ceb82a21d66438`. This document does not authorize Phase 2 or later capabilities, and it does not pull Pen/Bezier, text, gradients, images, shadows, components, motion, AI, or export into Phase 1.
 
 ## Direct baseline
 
@@ -35,4 +35,4 @@ All Phase 0 documents, ADR-001 through ADR-041, `CHECKSUMS.sha256`, and every `d
 
 Every new behaviour requires executed evidence, recorded with its command, timestamps, environment, and exit status. Stored JSON must never be presented as a fresh execution.
 
-Gate 1B additionally requires actual Chrome, Worker, WASM, and WebGPU evidence on real hardware, including pixel readback for the new overlay. That hardware evidence was **not** produced by this task's environment, which has no GPU, display, or browser harness. The Phase 1B verification record states exactly which commands ran and which did not.
+Gate 1B additionally requires actual Chrome, Worker, WASM, and WebGPU evidence on real hardware, including pixel readback for the new overlay. Run `phase1b-20260823T062230Z-330476b57ba4-daa2b79a` produced that evidence on Windows 10 with Chrome 151.0.7922.174 and an NVIDIA GeForce GTX 970. The authoritative result is `docs/verification/PHASE_1B_GATE_STATUS.json`: 22 PASS, 0 FAIL, 0 UNVERIFIED, conclusion PASSED.

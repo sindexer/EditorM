@@ -2,7 +2,7 @@
 
 ## Disposition
 
-This packet requests external review of Phase 1B: multiple selection, alignment, distribution, and snapping. It does not claim Gate 1A or Gate 1B approval, and it does not start Phase 2. No review ZIP was created.
+This packet records review and completed Gate evidence for Phase 1B: multiple selection, alignment, distribution, and snapping. It does not start Phase 2. No review ZIP was created.
 
 Baseline: `main` merge commit `8f5a551` (Phase 1A); approved Phase 0E-R3 payload `39085167a1b9d2ce1ba78060b3fee4d9327aaf27`; approved tag `phase-0e-r3-approved`.
 
@@ -74,15 +74,14 @@ conclusion. The record must not be hand-edited. `web/editor/tests/phase1b-gate-s
 checks summary/conclusion consistency, browser proof integrity, and evidence binding in the default
 suite.
 
-The branch-preparation snapshot has two static tooling items at `PASS`; every run-bound item is
-`UNVERIFIED` until the Windows runner creates one consistently bound evidence set. The generated
-JSON is authoritative; this packet intentionally does not duplicate a table that could drift from
-the finalizer's output.
+The clean-main Windows run `phase1b-20260823T062230Z-330476b57ba4-daa2b79a` bound every proof to
+source commit `330476b57ba4f16963f5160e24ceb82a21d66438`. The generated JSON is authoritative; this packet
+does not duplicate its item table.
 
-Gate conclusion: **NOT PASSED**. Every UNVERIFIED hardware item above is implemented and asserted
-by the harness; none has been executed against a GPU in the branch-preparation environment.
-`docs/PHASE_1B_HARDWARE_RUN.md` now provides one repository-root Windows command and automatic
-finalization rather than a hand-edited PASS/FAIL record.
+Gate conclusion: **PASSED** — 22 PASS, 0 FAIL, 0 UNVERIFIED. The run used Chrome 151.0.7922.174
+and an NVIDIA GeForce GTX 970 and completed Rust, fresh WASM, Phase 1A regression, Phase 1B actual
+browser/WebGPU and pixel proof, direct-WASM proof, engine benchmark, production build, finalizer,
+and the default Gate guard.
 
 ## Measured multi-selection drag cost
 
@@ -115,28 +114,13 @@ dragging is ever required.
   ADR-045. This is the only Phase 1B behaviour change in this pass.
 - No other behaviour changed: this pass adds verification, not scope.
 
-## Evidence this packet does not have
+## Hardware evidence produced
 
-This environment has no GPU, no display, and no Chrome harness, so **no browser, Worker, WebGPU, or pixel-readback evidence was produced for Phase 1B**, and none is claimed. `docs/verification/PHASE_1B_DIRECT_WASM_PROOF.json` records `gpu_evidence: false`.
-
-The Phase 1B harness now exists and was executed twice in this container. Both runs failed closed
-at the WebGPU device and wrote their failure artifacts:
-
-- `docs/verification/PHASE_1B_BROWSER_FAILURE.json` - default (hardware-required) run.
-- `docs/verification/PHASE_1B_BROWSER_SOFTWARE_RUN_FAILURE.json` - diagnostic run with
-  `--enable-unsafe-swiftshader`, which also failed; software WebGPU is unavailable here too.
-- `docs/verification/PHASE_1B_GATE_PHASE1A_RERUN.json` - the Phase 1A regression re-run attempt.
-
-In this container `navigator.gpu` is exposed over the secure localhost origin, but the GPU process
-cannot hold a WebGPU instance (`OperationError: Instance dropped in popErrorScope`), so no adapter
-or device is usable and the Editor never reaches readiness. The preview server, asset MIME checks,
-Worker boot, and WASM delivery all succeeded first.
-
-Gate 1B therefore still requires, on real hardware, the commands in
-[PHASE_1B_HARDWARE_RUN.md](PHASE_1B_HARDWARE_RUN.md):
-
-- `npm run test:browser:phase1a` to confirm Phase 1A behaviour did not regress;
-- `npm run test:browser:phase1b` for the Phase 1B behaviour, pixel, and benchmark evidence;
-- the Windows `tools/*.ps1` verification path recorded in `PHASE_1A_VERIFICATION.txt`, since this record was produced with direct cargo and wasm-bindgen invocations on Linux instead.
+The completed Windows run produced actual Chrome, dedicated Worker, WASM, WebGPU, composited
+overlay, and WebGPU pixel-readback evidence. It also preserved every earlier fail-closed run under
+timestamped filenames. `docs/verification/PHASE_1B_GATE_RUN.json` records the command, timestamps,
+environment, exit status, and each executed step; `docs/verification/PHASE_1B_GATE_STATUS.json`
+records the final machine-checked decision. `docs/PHASE_1B_HARDWARE_RUN.md` remains the procedure
+for any future fresh execution.
 
 The rebuilt `web/editor/public/pkg/engine_host_bg.wasm` in this branch was produced by the wasm32 release build recorded in the verification file: 1,404,367 bytes, SHA-256 `e32e22a9ad7865484fc3b0c2bc095f6ecd5238f4bc470305b52f1247a785c178`. The same values appear in the direct-WASM proof, and `web/editor/tests/phase1b-direct-wasm.test.ts` re-hashes the shipped file to confirm the proof describes it.

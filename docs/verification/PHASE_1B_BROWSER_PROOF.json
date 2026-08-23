@@ -1,0 +1,743 @@
+{
+  "phase": "1B",
+  "gate_run_id": "phase1b-20260823T062230Z-330476b57ba4-daa2b79a",
+  "tested_source_commit": "330476b57ba4f16963f5160e24ceb82a21d66438",
+  "tested_branch": "main",
+  "proof_kind": "actual-hardware-browser",
+  "captured_at_utc": "2026-08-23T06:31:28.535Z",
+  "browser": "Chrome/151.0.7922.174",
+  "browser_mode": "actual Chrome; no mock; no Canvas2D fallback",
+  "execution": {
+    "command": "npm run test:browser:phase1b",
+    "started_at_utc": "2026-08-23T06:30:01.084Z",
+    "finished_at_utc": "2026-08-23T06:31:28.535Z",
+    "software_gpu_allowed": false,
+    "chrome_sandbox_disabled": false
+  },
+  "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/151.0.0.0 Safari/537.36",
+  "chrome_process_id": 15312,
+  "chrome_profile": "C:\\Users\\thdwl\\AppData\\Local\\Temp\\phase1b-chrome-17108-1787466601084",
+  "gpu": {
+    "adapter": "maxwell",
+    "backend": "browser-webgpu (implementation backend not exposed by Web API)",
+    "software_renderer": false,
+    "surface_base_format": "bgra8unorm",
+    "pipeline_view_format": "bgra8unorm-srgb",
+    "readback_view_format": "bgra8unorm-srgb",
+    "active_device": {
+      "vendorId": 4318,
+      "deviceId": 5058,
+      "subSysId": 913970264,
+      "revision": 161,
+      "vendorString": "",
+      "deviceString": "NVIDIA GeForce GTX 970",
+      "driverVendor": "NVIDIA",
+      "driverVersion": "32.0.15.8157"
+    }
+  },
+  "preview": {
+    "url": "http://127.0.0.1:52344/",
+    "health": {
+      "ok": true,
+      "status": 200,
+      "body": {
+        "ok": true,
+        "phase": "0E"
+      }
+    },
+    "assets": {
+      "/index.html": {
+        "status": 200,
+        "content_type": "text/html; charset=utf-8"
+      },
+      "/worker.js": {
+        "status": 200,
+        "content_type": "text/javascript; charset=utf-8"
+      },
+      "/pkg/engine_host.js": {
+        "status": 200,
+        "content_type": "text/javascript; charset=utf-8"
+      },
+      "/pkg/engine_host_bg.wasm": {
+        "status": 200,
+        "content_type": "application/wasm"
+      }
+    },
+    "stdout": "Phase 0E editor: http://127.0.0.1:52344/\n",
+    "stderr": ""
+  },
+  "initial": {
+    "phase": "0E",
+    "ready": true,
+    "actual_webgpu": true,
+    "adapter": "maxwell",
+    "backend": "browser-webgpu (implementation backend not exposed by Web API)",
+    "surface_base_format": "bgra8unorm",
+    "pipeline_view_format": "bgra8unorm-srgb",
+    "readback_view_format": "bgra8unorm-srgb",
+    "worker_runtime_owner": "dedicated-worker",
+    "wasm_initialized": true,
+    "heartbeat": 1,
+    "engine_sequence": 5,
+    "gpu_frame_sequence": 5,
+    "overlay_sequence": 5,
+    "revisions": {
+      "document": 1,
+      "render": 1,
+      "scene": 1
+    },
+    "fixture": "EDITOR",
+    "metrics": {
+      "allocation_growth_count": 0,
+      "cpu_update_ms": 0,
+      "culling_candidates": 1,
+      "document_full_clones": 0,
+      "document_nodes": 2,
+      "document_nodes_scanned": 0,
+      "document_nodes_touched": 0,
+      "document_sequence_allocated_bytes": 0,
+      "document_sequence_dense_index_rewrites": 0,
+      "document_sequence_entries_copied": 0,
+      "document_sequence_entries_examined": 0,
+      "document_sequence_entries_moved_or_shifted": 0,
+      "document_sequence_fallback_or_rebuild_count": 0,
+      "document_sequence_full_copies": 0,
+      "document_sequence_full_scans": 0,
+      "document_sequence_maximum_depth": 0,
+      "document_sequence_nodes_allocated": 0,
+      "document_sequence_rank_order_comparisons": 0,
+      "document_sequence_tree_rebalances": 0,
+      "fallback_rebuild_count": 0,
+      "full_render_model_scans": 0,
+      "gpu_encode_attempted": 0,
+      "gpu_encode_omitted": 0,
+      "indexed_nodes": 1,
+      "instance_upload_bytes": 0,
+      "invalid_derived_nodes": 0,
+      "order_nodes_visited": 0,
+      "render_items_cloned": 0,
+      "render_items_planned": 0,
+      "render_items_read": 1,
+      "render_items_written": 0,
+      "scene_nodes_visited": 0,
+      "scene_sequence_allocated_bytes": 0,
+      "scene_sequence_dense_index_rewrites": 0,
+      "scene_sequence_entries_copied": 0,
+      "scene_sequence_entries_examined": 0,
+      "scene_sequence_entries_moved_or_shifted": 0,
+      "scene_sequence_fallback_or_rebuild_count": 0,
+      "scene_sequence_full_copies": 0,
+      "scene_sequence_full_scans": 0,
+      "scene_sequence_maximum_depth": 0,
+      "scene_sequence_nodes_allocated": 0,
+      "scene_sequence_rank_order_comparisons": 0,
+      "scene_sequence_tree_rebalances": 0,
+      "sibling_search_steps": 0,
+      "ui_child_ids_serialized": 0,
+      "ui_delta_nodes": 0,
+      "ui_full_snapshots": 0,
+      "ui_nodes_serialized": 0,
+      "ui_projection_payload_bytes": 0,
+      "ui_structural_operations": 0,
+      "visible_items": 1,
+      "visible_slot_upload_bytes": 4
+    },
+    "gpu": {
+      "draw_calls": 1,
+      "batches": 1,
+      "submitted_instances": 1,
+      "buffer_count": 3,
+      "buffer_bytes": 264,
+      "upload_calls": 2,
+      "frame_upload_bytes": 36,
+      "render_submit_ms": 2.1000000089406967,
+      "frame_ms": 2.2000000029802322,
+      "validation_errors": 0,
+      "frame_sequence": 5,
+      "gpu_encode_attempted": 0,
+      "gpu_encode_omitted": 0,
+      "instance_upload_bytes": 0,
+      "visible_slot_upload_bytes": 4,
+      "allocation_growth_count": 4
+    },
+    "ui": {
+      "projectionFullSnapshots": 2,
+      "projectionDeltaNodes": 0,
+      "layersFullSerializes": 2,
+      "hierarchyRebuilds": 2,
+      "hierarchyNodesVisited": 5,
+      "hierarchyFullRebuilds": 2,
+      "projectionStructuralOperations": 0,
+      "layersFlattenedNodesVisited": 19,
+      "mountedRows": 2,
+      "pointerRawIntents": 0,
+      "pointerRequestsSent": 0,
+      "pointerRequestsCoalesced": 0,
+      "sequenceEntriesExamined": 14,
+      "sequenceEntriesCopied": 14,
+      "sequenceEntriesMovedOrShifted": 8,
+      "sequenceRankOrderComparisons": 0,
+      "sequenceNodesAllocated": 8,
+      "sequenceAllocatedBytes": 640,
+      "sequenceTreeRebalances": 0,
+      "sequenceMaximumDepth": 2,
+      "sequenceFallbackOrRebuildCount": 0,
+      "sequenceFullScans": 0,
+      "sequenceFullCopies": 0,
+      "sequenceDenseIndexRewrites": 0
+    },
+    "selection": [],
+    "response_gpu_overlay_sequence_match": true,
+    "fsm": "Idle",
+    "tool": "select",
+    "nested_edit_root": null,
+    "console_errors": 0,
+    "fallback_rebuild_count": 0,
+    "gpu_validation_errors": 0,
+    "history": {
+      "redo_depth": 0,
+      "transaction_active": false,
+      "undo_depth": 0
+    },
+    "camera": {
+      "center": [
+        0,
+        0
+      ],
+      "dpr": 1,
+      "viewport": [
+        1040,
+        863
+      ],
+      "zoom": 0.4997397188964081
+    },
+    "projection_nodes": 2,
+    "projection_schema_version": 2,
+    "primary_node": null,
+    "render_delta": {
+      "dirty_ranges": 0,
+      "dirty_slots": 0,
+      "full": false,
+      "removed_slots": 0,
+      "render_full_rebuilds": 0,
+      "scene_full_rebuilds": 0,
+      "upload_bytes": 0
+    },
+    "render_binary_schema_version": 2,
+    "resources": {
+      "allocated_slots": 1,
+      "dirty_record_stride_bytes": 116,
+      "free_slots": 0,
+      "gpu_encodable_items": 1,
+      "gpu_omitted_items": 0,
+      "instance_capacity": 1,
+      "instance_stride_bytes": 112,
+      "renderable_items": 1,
+      "total_render_items": 1
+    },
+    "binary": {
+      "dirty_instances": false,
+      "full_instances": false,
+      "removed_slots": false,
+      "visible_slots": true
+    },
+    "interaction_active": null,
+    "selection_count": 0,
+    "snap_enabled": true,
+    "snap_guides": 0,
+    "marquee_active": false,
+    "interaction_queue": {
+      "generation": 0,
+      "in_flight": false,
+      "scheduled": false,
+      "latest": false
+    }
+  },
+  "scene": {
+    "frame_id": "00000000-0000-0000-0000-000000000002",
+    "rectangles": [
+      "c2fac09e-f2f0-47d7-88ac-199b454d31da",
+      "053bdc06-37f4-46d8-9c1c-0e05df538fcb",
+      "601a3246-5f82-4478-99c1-781f1f0f4049"
+    ],
+    "layout": [
+      {
+        "x": -700,
+        "y": -300,
+        "width": 160,
+        "height": 100
+      },
+      {
+        "x": -300,
+        "y": -100,
+        "width": 160,
+        "height": 100
+      },
+      {
+        "x": 200,
+        "y": 150,
+        "width": 160,
+        "height": 100
+      }
+    ]
+  },
+  "interactions": {
+    "shift_selection": [
+      "c2fac09e-f2f0-47d7-88ac-199b454d31da",
+      "053bdc06-37f4-46d8-9c1c-0e05df538fcb"
+    ],
+    "marquee_selection": [
+      "c2fac09e-f2f0-47d7-88ac-199b454d31da",
+      "053bdc06-37f4-46d8-9c1c-0e05df538fcb"
+    ],
+    "select_all_selection": [
+      "00000000-0000-0000-0000-000000000002",
+      "c2fac09e-f2f0-47d7-88ac-199b454d31da",
+      "053bdc06-37f4-46d8-9c1c-0e05df538fcb",
+      "601a3246-5f82-4478-99c1-781f1f0f4049"
+    ],
+    "multi_drag_requested_world_delta": [
+      90,
+      60
+    ],
+    "multi_drag_world_deltas": [
+      [
+        89.99997558593748,
+        59.99998372395834
+      ],
+      [
+        89.9999755859375,
+        59.99998372395834
+      ]
+    ],
+    "multi_drag_undo_restored": true,
+    "pointer_tolerance_css_px": 1.5,
+    "coalesced_drag": {
+      "requested_world_delta": [
+        120,
+        -45
+      ],
+      "pointer_frames": 64,
+      "error": [
+        -0.00003255208332575421,
+        0.000012207031247157829
+      ],
+      "pointer_raw_intents": 112,
+      "pointer_requests_sent": 61,
+      "pointer_requests_coalesced": 51
+    },
+    "snapping": {
+      "anchor_left_edge": -700,
+      "requested_offset_world": 10,
+      "snapped_left_edge": -700,
+      "error": 0,
+      "guide_elements": 1,
+      "engine_guides": 2
+    },
+    "alt_suspend": {
+      "expected_left_edge": -690,
+      "actual_left_edge": -689.9999552726746,
+      "error": 0.00004472732541671576,
+      "guide_elements": 0
+    },
+    "snap_toggle_off": {
+      "expected_left_edge": -690,
+      "actual_left_edge": -689.9999552726746,
+      "error": 0.00004472732541671576,
+      "guide_elements": 0
+    },
+    "arrange": {
+      "align-left": {
+        "values": [
+          -700,
+          -700,
+          -700
+        ],
+        "aligned": true,
+        "undo_restored": true
+      },
+      "align-horizontal-center": {
+        "values": [
+          -170,
+          -170,
+          -170
+        ],
+        "aligned": true,
+        "undo_restored": true
+      },
+      "align-right": {
+        "values": [
+          360,
+          360,
+          360
+        ],
+        "aligned": true,
+        "undo_restored": true
+      },
+      "align-top": {
+        "values": [
+          -300,
+          -300,
+          -300
+        ],
+        "aligned": true,
+        "undo_restored": true
+      },
+      "align-vertical-center": {
+        "values": [
+          -25,
+          -25,
+          -25
+        ],
+        "aligned": true,
+        "undo_restored": true
+      },
+      "align-bottom": {
+        "values": [
+          250,
+          250,
+          250
+        ],
+        "aligned": true,
+        "undo_restored": true
+      },
+      "distribute-horizontal": {
+        "gaps": [
+          290,
+          290
+        ],
+        "equal_gaps": true,
+        "undo_restored": true
+      },
+      "distribute-vertical": {
+        "gaps": [
+          125,
+          125
+        ],
+        "equal_gaps": true,
+        "undo_restored": true
+      }
+    },
+    "benchmark_started_at_engine_sequence": 233
+  },
+  "pixel_readback_artifact": "docs/verification/PHASE_1B_PIXEL_READBACK.json",
+  "performance_artifact": "docs/PHASE_1B_METRICS.json",
+  "screenshots": {
+    "multi_selection": {
+      "path": "docs/verification/phase1b-multi-selection.png",
+      "bytes": 53960,
+      "modified_utc": "2026-08-23T06:30:06.501Z"
+    },
+    "marquee": {
+      "path": "docs/verification/phase1b-marquee.png",
+      "bytes": 54932,
+      "modified_utc": "2026-08-23T06:30:07.283Z"
+    },
+    "snap_guide": {
+      "path": "docs/verification/phase1b-snap-guide.png",
+      "bytes": 51861,
+      "modified_utc": "2026-08-23T06:30:10.185Z"
+    },
+    "aligned": {
+      "path": "docs/verification/phase1b-aligned.png",
+      "bytes": 55573,
+      "modified_utc": "2026-08-23T06:30:11.888Z"
+    },
+    "distributed": {
+      "path": "docs/verification/phase1b-distributed.png",
+      "bytes": 55908,
+      "modified_utc": "2026-08-23T06:30:12.823Z"
+    }
+  },
+  "console_errors": [],
+  "chrome_stderr_tail": "\r\nDevTools listening on ws://127.0.0.1:52348/devtools/browser/c1b84d67-46aa-44c6-971a-b72d8bb2c1e2\r\n[15312:20704:0823/153005.239:ERROR:google_apis\\gcm\\engine\\registration_request.cc:291] Registration response error message: DEPRECATED_ENDPOINT\r\nCreated TensorFlow Lite XNNPACK delegate for CPU.\r\n[15312:20704:0823/153030.259:ERROR:google_apis\\gcm\\engine\\registration_request.cc:291] Registration response error message: DEPRECATED_ENDPOINT\r\n[15312:20704:0823/153119.702:ERROR:google_apis\\gcm\\engine\\registration_request.cc:291] Registration response error message: DEPRECATED_ENDPOINT\r\n",
+  "max_fallback_rebuild_count_seen": 0,
+  "fallback_checkpoints": [
+    {
+      "engine_sequence": 5,
+      "fixture": "EDITOR",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 19,
+      "fixture": "EDITOR",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 20,
+      "fixture": "EDITOR",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 21,
+      "fixture": "EDITOR",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 22,
+      "fixture": "EDITOR",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 23,
+      "fixture": "EDITOR",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 35,
+      "fixture": "EDITOR",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 36,
+      "fixture": "EDITOR",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 37,
+      "fixture": "EDITOR",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 39,
+      "fixture": "EDITOR",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 40,
+      "fixture": "EDITOR",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 52,
+      "fixture": "EDITOR",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 53,
+      "fixture": "EDITOR",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 54,
+      "fixture": "EDITOR",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 55,
+      "fixture": "EDITOR",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 56,
+      "fixture": "EDITOR",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 56,
+      "fixture": "EDITOR",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 61,
+      "fixture": "EDITOR",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 63,
+      "fixture": "EDITOR",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 65,
+      "fixture": "EDITOR",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 65,
+      "fixture": "EDITOR",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 66,
+      "fixture": "EDITOR",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 70,
+      "fixture": "EDITOR",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 73,
+      "fixture": "EDITOR",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 74,
+      "fixture": "EDITOR",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 91,
+      "fixture": "EDITOR",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 91,
+      "fixture": "EDITOR",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 91,
+      "fixture": "EDITOR",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 95,
+      "fixture": "EDITOR",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 96,
+      "fixture": "EDITOR",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 135,
+      "fixture": "EDITOR",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 139,
+      "fixture": "EDITOR",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 140,
+      "fixture": "EDITOR",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 159,
+      "fixture": "EDITOR",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 160,
+      "fixture": "EDITOR",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 178,
+      "fixture": "EDITOR",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 179,
+      "fixture": "EDITOR",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 200,
+      "fixture": "EDITOR",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 204,
+      "fixture": "EDITOR",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 208,
+      "fixture": "EDITOR",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 213,
+      "fixture": "EDITOR",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 217,
+      "fixture": "EDITOR",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 221,
+      "fixture": "EDITOR",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 225,
+      "fixture": "EDITOR",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 229,
+      "fixture": "EDITOR",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 233,
+      "fixture": "EDITOR",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 1516,
+      "fixture": "BENCH-A",
+      "fallback_rebuild_count": 0
+    }
+  ],
+  "checks": {
+    "server_health": true,
+    "asset_http_and_wasm_mime": true,
+    "new_chrome_process": true,
+    "temporary_chrome_profile": true,
+    "navigator_gpu": true,
+    "hardware_gpu_adapter": true,
+    "dedicated_worker_wasm": true,
+    "schema_v2": true,
+    "three_rectangles_created_through_ui": true,
+    "shift_click_selects_two": true,
+    "multiple_selection_draws_every_outline": true,
+    "marquee_selects_intersecting_nodes": true,
+    "select_all_selects_every_top_level_node": true,
+    "snap_toggle_disables_snapping": true,
+    "multi_drag_moves_every_node_by_one_delta": true,
+    "multi_drag_undo_restores_every_node": true,
+    "multi_drag_leaves_unselected_nodes_alone": true,
+    "coalesced_drag_has_no_drift": true,
+    "coalesced_drag_coalesced_requests": true,
+    "snapping_aligns_edges_exactly": true,
+    "snap_guide_reported_and_rendered": true,
+    "alt_suspends_snapping": true,
+    "snap_toggle_off_suspends_snapping": true,
+    "snap_toggle_restored": true,
+    "align_left_aligned": true,
+    "align_left_undo_restored": true,
+    "align_horizontal_center_aligned": true,
+    "align_horizontal_center_undo_restored": true,
+    "align_right_aligned": true,
+    "align_right_undo_restored": true,
+    "align_top_aligned": true,
+    "align_top_undo_restored": true,
+    "align_vertical_center_aligned": true,
+    "align_vertical_center_undo_restored": true,
+    "align_bottom_aligned": true,
+    "align_bottom_undo_restored": true,
+    "distribute_horizontal_equal_gaps": true,
+    "distribute_horizontal_undo_restored": true,
+    "distribute_vertical_equal_gaps": true,
+    "distribute_vertical_undo_restored": true,
+    "benchmark_all_passed": true,
+    "actual_pixel_readback": true,
+    "console_errors_zero": true,
+    "gpu_validation_errors_zero": true,
+    "fallback_rebuild_zero": true,
+    "latest_sequences_match": true
+  },
+  "assertion_count": 46,
+  "passed_assertion_count": 46,
+  "all_passed": true
+}
