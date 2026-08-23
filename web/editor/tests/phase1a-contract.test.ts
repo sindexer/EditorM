@@ -39,7 +39,9 @@ describe("Phase 1A visible frame and primitive appearance contract", () => {
   });
 
   test("render schema versions appearance independently and declares color contract", () => {
-    expect(schema.version).toBe(2);
+    // The instance layout Phase 1A depends on is frozen; the version moved to 3 when Phase 2A
+    // added the path records beside it.
+    expect(schema.version).toBe(3);
     expect(schema.instance_stride_bytes).toBe(112);
     expect(schema.dirty_record_stride_bytes).toBe(116);
     expect(schema.alpha_contract).toBe("premultiplied-linear");

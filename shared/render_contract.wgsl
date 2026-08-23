@@ -22,9 +22,35 @@ struct View {
     _padding: f32,
 };
 
+// One path node: the transform and colours shared by every triangle of that path.
+struct PathInstance {
+    linear: vec4<f32>,
+    translation_hi: vec2<f32>,
+    translation_lo: vec2<f32>,
+    fill_linear: vec4<f32>,
+    stroke_linear: vec4<f32>,
+    opacity: f32,
+    _padding_0: f32,
+    _padding_1: f32,
+    _padding_2: f32,
+};
+
+// One tessellated vertex in its path's local space. `normal` is the outward feather direction
+// (zero for interior vertices) and `coverage` is 1.0 inside the shape and 0.0 at the feather rim.
+struct PathVertexRecord {
+    position: vec2<f32>,
+    normal: vec2<f32>,
+    coverage: f32,
+    kind: u32,
+    path_index: u32,
+    _padding: u32,
+};
+
 @group(0) @binding(0) var<storage, read> instances: array<Instance>;
 @group(0) @binding(1) var<storage, read> visible_slots: array<u32>;
 @group(0) @binding(2) var<uniform> view: View;
+@group(0) @binding(3) var<storage, read> path_instances: array<PathInstance>;
+@group(0) @binding(4) var<storage, read> path_vertices: array<PathVertexRecord>;
 
 struct VertexOutput {
     @builtin(position) position: vec4<f32>,
@@ -155,4 +181,66 @@ fn fs_main(input: VertexOutput) -> @location(0) vec4<f32> {
         input.fill_linear.rgb * fill_alpha +
         input.stroke_linear.rgb * stroke_alpha;
     return vec4<f32>(premultiplied, alpha) * input.opacity;
+}
+
+struct PathVertexOutput {
+    @builtin(position) position: vec4<f32>,
+    @location(0) @interpolate(flat) fill_linear: vec4<f32>,
+    @location(1) @interpolate(flat) stroke_linear: vec4<f32>,
+    @location(2) @interpolate(flat) kind: u32,
+    @location(3) @interpolate(flat) opacity: f32,
+    @location(4) coverage: f32,
+};
+
+// Paths are pre-tessellated on the CPU in local space and cached, so this stage only transforms
+// vertices and pushes feather vertices one pixel outward in screen space. That keeps a single
+// cached tessellation antialiased at every zoom level without MSAA.
+@vertex
+fn vs_path(@builtin(vertex_index) vertex_index: u32) -> PathVertexOutput {
+    let vertex = path_vertices[vertex_index];
+    let item = path_instances[vertex.path_index];
+    let local = vertex.position;
+    let transformed = vec2<f32>(
+        item.linear.x * local.x + item.linear.y * local.y,
+        item.linear.z * local.x + item.linear.w * local.y,
+    );
+    let relative_translation =
+        (item.translation_hi - view.center_hi) +
+        (item.translation_lo - view.center_lo);
+    let world = transformed + relative_translation;
+    var viewport_position = world * view.zoom + view.viewport * 0.5;
+
+    let transformed_normal = vec2<f32>(
+        item.linear.x * vertex.normal.x + item.linear.y * vertex.normal.y,
+        item.linear.z * vertex.normal.x + item.linear.w * vertex.normal.y,
+    );
+    let screen_normal = transformed_normal * view.zoom;
+    let normal_length = length(screen_normal);
+    if normal_length > 0.000001 {
+        viewport_position = viewport_position + screen_normal / normal_length;
+    }
+
+    let clip = vec2<f32>(
+        viewport_position.x / view.viewport.x * 2.0 - 1.0,
+        1.0 - viewport_position.y / view.viewport.y * 2.0,
+    );
+
+    var output: PathVertexOutput;
+    output.position = vec4<f32>(clip, 0.0, 1.0);
+    output.fill_linear = item.fill_linear;
+    output.stroke_linear = item.stroke_linear;
+    output.kind = vertex.kind;
+    output.opacity = item.opacity;
+    output.coverage = vertex.coverage;
+    return output;
+}
+
+@fragment
+fn fs_path(input: PathVertexOutput) -> @location(0) vec4<f32> {
+    var color = input.fill_linear;
+    if input.kind == 1u {
+        color = input.stroke_linear;
+    }
+    let alpha = color.a * clamp(input.coverage, 0.0, 1.0) * input.opacity;
+    return vec4<f32>(color.rgb * alpha, alpha);
 }

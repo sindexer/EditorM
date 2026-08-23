@@ -10,6 +10,8 @@ export const enginehost_takeFullInstances: (a: number) => any;
 export const enginehost_takeDirtyInstances: (a: number) => any;
 export const enginehost_takeRemovedSlots: (a: number) => any;
 export const enginehost_takeVisibleSlots: (a: number) => any;
+export const enginehost_takePathInstances: (a: number) => any;
+export const enginehost_takePathVertices: (a: number) => any;
 export const __wbindgen_externrefs: WebAssembly.Table;
 export const __wbindgen_malloc: (a: number, b: number) => number;
 export const __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;

@@ -604,6 +604,59 @@ mod tests {
     }
 
     #[test]
+    fn saving_a_loaded_path_document_reproduces_the_same_bytes() {
+        let mut editor = HeadlessEditorCore::blank("Root");
+        let root = editor.document().root_id();
+        let mut anchors = vec![
+            PathAnchor::new(PathAnchorId::new(), Vec2::new(0.0, 0.0)),
+            PathAnchor::new(PathAnchorId::new(), Vec2::new(120.0, 0.0)),
+            PathAnchor::new(PathAnchorId::new(), Vec2::new(60.0, 90.0)),
+        ];
+        anchors[1].handle_in = Some(Vec2::new(40.0, -30.0));
+        anchors[2].handle_out = Some(Vec2::new(10.0, 70.0));
+        let identities = anchors.iter().map(|anchor| anchor.id).collect::<Vec<_>>();
+        editor
+            .dispatch(Command::CreateNode {
+                spec: NodeSpec::path(
+                    NodeId::new(),
+                    "Closed curve",
+                    PathGeometry {
+                        closed: true,
+                        anchors,
+                    },
+                ),
+                parent: root,
+                index: 0,
+            })
+            .unwrap();
+
+        let first = to_json_pretty(editor.document()).unwrap();
+        let loaded = from_json(&first).unwrap();
+        let second = to_json_pretty(&loaded).unwrap();
+        assert_eq!(first, second, "save -> load -> save must be byte stable");
+
+        let stored = loaded
+            .nodes()
+            .find_map(|node| match node.geometry() {
+                Some(Geometry::Path(path)) => Some(path.clone()),
+                _ => None,
+            })
+            .expect("the reloaded document keeps its path");
+        assert_eq!(
+            stored
+                .anchors
+                .iter()
+                .map(|anchor| anchor.id)
+                .collect::<Vec<_>>(),
+            identities,
+            "anchor identities survive a round trip"
+        );
+        assert!(stored.closed);
+        assert_eq!(stored.anchors[1].handle_in, Some(Vec2::new(40.0, -30.0)));
+        assert_eq!(stored.anchors[2].handle_out, Some(Vec2::new(10.0, 70.0)));
+    }
+
+    #[test]
     fn duplicate_path_anchor_ids_are_rejected_during_load() {
         let mut editor = HeadlessEditorCore::blank("Root");
         let root = editor.document().root_id();

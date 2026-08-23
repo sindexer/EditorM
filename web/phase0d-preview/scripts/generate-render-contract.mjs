@@ -13,6 +13,8 @@ const generated = `// Generated from shared/render_contract.wgsl and render_bina
   `export const RENDER_BINARY_SCHEMA_VERSION = RENDER_BINARY_SCHEMA.version;\n` +
   `export const INSTANCE_STRIDE = RENDER_BINARY_SCHEMA.instance_stride_bytes;\n` +
   `export const DIRTY_STRIDE = RENDER_BINARY_SCHEMA.dirty_record_stride_bytes;\n` +
+  `export const PATH_INSTANCE_STRIDE = RENDER_BINARY_SCHEMA.path_instance_stride_bytes;\n` +
+  `export const PATH_VERTEX_STRIDE = RENDER_BINARY_SCHEMA.path_vertex_stride_bytes;\n` +
   `export const SHADER_SOURCE = ${JSON.stringify(shader)};\n`;
 const destination = path.join(webRoot, "src", "render_contract.js");
 if (process.argv.includes("--check")) {

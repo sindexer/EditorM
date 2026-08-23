@@ -71,6 +71,20 @@ export class EngineHost {
         return ret;
     }
     /**
+     * @returns {Uint8Array}
+     */
+    takePathInstances() {
+        const ret = wasm.enginehost_takePathInstances(this.__wbg_ptr);
+        return ret;
+    }
+    /**
+     * @returns {Uint8Array}
+     */
+    takePathVertices() {
+        const ret = wasm.enginehost_takePathVertices(this.__wbg_ptr);
+        return ret;
+    }
+    /**
      * @returns {Uint32Array}
      */
     takeRemovedSlots() {

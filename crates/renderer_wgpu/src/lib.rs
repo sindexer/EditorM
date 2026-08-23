@@ -8,13 +8,16 @@ use bytemuck::{Pod, Zeroable};
 use thiserror::Error;
 use visual_authoring_core_math::Vec2;
 use visual_authoring_render_model::{
-    CullingResult, PrimitiveKind, RenderDelta, RenderItem, RenderModel,
+    encode_path_instances, encode_path_vertices, CullingResult, DrawBatch, PrimitiveKind,
+    RenderDelta, RenderItem, RenderModel, PATH_INSTANCE_STRIDE_BYTES, PATH_VERTEX_STRIDE_BYTES,
 };
 use wgpu::util::DeviceExt;
 
-pub const RENDER_BINARY_SCHEMA_VERSION: u32 = 2;
+pub const RENDER_BINARY_SCHEMA_VERSION: u32 = 3;
 pub const INSTANCE_STRIDE_BYTES: usize = 112;
 pub const DIRTY_RECORD_STRIDE_BYTES: usize = 116;
+pub const PATH_INSTANCE_STRIDE: usize = PATH_INSTANCE_STRIDE_BYTES;
+pub const PATH_VERTEX_STRIDE: usize = PATH_VERTEX_STRIDE_BYTES;
 pub const VIEW_UNIFORM_BYTES: usize = 32;
 pub const SHADER_SOURCE: &str = include_str!("../../../shared/render_contract.wgsl");
 
@@ -45,6 +48,10 @@ pub struct GpuResourceMetrics {
     pub instance_upload_bytes: u64,
     pub visible_slot_upload_bytes: u64,
     pub allocation_growth_count: u64,
+    /// Path triangles uploaded this frame. Zero while only the camera or a colour changed.
+    pub path_vertices_uploaded: u64,
+    pub path_instance_upload_bytes: u64,
+    pub path_vertex_upload_bytes: u64,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -116,8 +123,14 @@ pub struct WgpuRenderer {
     instance_buffer: wgpu::Buffer,
     visible_buffer: wgpu::Buffer,
     view_buffer: wgpu::Buffer,
+    path_instance_buffer: wgpu::Buffer,
+    path_vertex_buffer: wgpu::Buffer,
     instance_capacity: usize,
     visible_capacity: usize,
+    path_instance_capacity_bytes: usize,
+    path_vertex_capacity_bytes: usize,
+    uploaded_path_vertex_revision: Option<u64>,
+    path_pipeline: wgpu::RenderPipeline,
     capabilities: RendererCapabilities,
     metrics: GpuResourceMetrics,
     last_frame: GpuResourceMetrics,
@@ -166,6 +179,8 @@ impl WgpuRenderer {
                     },
                     count: None,
                 },
+                storage_layout_entry(3),
+                storage_layout_entry(4),
             ],
         });
         let pipeline_layout = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
@@ -208,6 +223,43 @@ impl WgpuRenderer {
             }),
             multiview: None,
         });
+        // The path pipeline shares the shader module, the bind group and the blend contract with
+        // the analytic primitives; only the vertex source differs.
+        let path_pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
+            label: Some("visual-authoring-engine-path-pipeline"),
+            layout: Some(&pipeline_layout),
+            vertex: wgpu::VertexState {
+                module: &shader,
+                entry_point: "vs_path",
+                buffers: &[],
+                compilation_options: wgpu::PipelineCompilationOptions::default(),
+            },
+            primitive: wgpu::PrimitiveState::default(),
+            depth_stencil: None,
+            multisample: wgpu::MultisampleState::default(),
+            fragment: Some(wgpu::FragmentState {
+                module: &shader,
+                entry_point: "fs_path",
+                targets: &[Some(wgpu::ColorTargetState {
+                    format: wgpu::TextureFormat::Rgba8UnormSrgb,
+                    blend: Some(wgpu::BlendState {
+                        color: wgpu::BlendComponent {
+                            src_factor: wgpu::BlendFactor::One,
+                            dst_factor: wgpu::BlendFactor::OneMinusSrcAlpha,
+                            operation: wgpu::BlendOperation::Add,
+                        },
+                        alpha: wgpu::BlendComponent {
+                            src_factor: wgpu::BlendFactor::One,
+                            dst_factor: wgpu::BlendFactor::OneMinusSrcAlpha,
+                            operation: wgpu::BlendOperation::Add,
+                        },
+                    }),
+                    write_mask: wgpu::ColorWrites::ALL,
+                })],
+                compilation_options: wgpu::PipelineCompilationOptions::default(),
+            }),
+            multiview: None,
+        });
         let instance_buffer = create_buffer(
             &device,
             "visual-authoring-instances",
@@ -225,20 +277,37 @@ impl WgpuRenderer {
             contents: bytemuck::bytes_of(&ViewRaw::default()),
             usage: wgpu::BufferUsages::UNIFORM | wgpu::BufferUsages::COPY_DST,
         });
+        let path_instance_buffer = create_buffer(
+            &device,
+            "visual-authoring-path-instances",
+            PATH_INSTANCE_STRIDE as u64,
+            wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_DST,
+        );
+        let path_vertex_buffer = create_buffer(
+            &device,
+            "visual-authoring-path-vertices",
+            PATH_VERTEX_STRIDE as u64,
+            wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_DST,
+        );
         let bind_group = create_bind_group(
             &device,
             &bind_group_layout,
             &instance_buffer,
             &visible_buffer,
             &view_buffer,
+            &path_instance_buffer,
+            &path_vertex_buffer,
         );
         device.poll(wgpu::Maintain::Wait);
         if let Some(error) = device.pop_error_scope().await {
             return Err(RendererError::Pipeline(error.to_string()));
         }
 
-        let buffer_bytes =
-            size_of::<InstanceRaw>() as u64 + size_of::<u32>() as u64 + size_of::<ViewRaw>() as u64;
+        let buffer_bytes = size_of::<InstanceRaw>() as u64
+            + size_of::<u32>() as u64
+            + size_of::<ViewRaw>() as u64
+            + PATH_INSTANCE_STRIDE as u64
+            + PATH_VERTEX_STRIDE as u64;
         Ok(Self {
             device,
             queue,
@@ -248,8 +317,14 @@ impl WgpuRenderer {
             instance_buffer,
             visible_buffer,
             view_buffer,
+            path_instance_buffer,
+            path_vertex_buffer,
             instance_capacity: 1,
             visible_capacity: 1,
+            path_instance_capacity_bytes: PATH_INSTANCE_STRIDE,
+            path_vertex_capacity_bytes: PATH_VERTEX_STRIDE,
+            uploaded_path_vertex_revision: None,
+            path_pipeline,
             capabilities: RendererCapabilities {
                 adapter_name: info.name,
                 backend: format!("{:?}", info.backend),
@@ -258,7 +333,7 @@ impl WgpuRenderer {
                 driver_info: info.driver_info,
             },
             metrics: GpuResourceMetrics {
-                buffer_count: 3,
+                buffer_count: 5,
                 buffer_bytes,
                 ..GpuResourceMetrics::default()
             },
@@ -347,8 +422,79 @@ impl WgpuRenderer {
                 self.last_frame.dirty_instance_ranges += 1;
             }
         }
+        self.sync_path_buffers(model);
         self.finish_last_frame();
         Ok(self.last_frame)
+    }
+
+    /// Uploads the path instance array, and the path vertex buffer only when its revision moved.
+    ///
+    /// A camera move or a colour change never bumps the vertex revision, so those frames upload
+    /// no triangles at all.
+    fn sync_path_buffers(&mut self, model: &RenderModel) {
+        if model.path_item_count() == 0 && self.uploaded_path_vertex_revision.is_none() {
+            return;
+        }
+        let instances = encode_path_instances(model);
+        if !instances.is_empty() {
+            self.ensure_path_instance_capacity(instances.len());
+            self.queue
+                .write_buffer(&self.path_instance_buffer, 0, &instances);
+            self.record_upload(instances.len() as u64);
+            self.last_frame.path_instance_upload_bytes += instances.len() as u64;
+        }
+        if self.uploaded_path_vertex_revision == Some(model.path_vertex_revision()) {
+            return;
+        }
+        let vertices = encode_path_vertices(model);
+        self.uploaded_path_vertex_revision = Some(model.path_vertex_revision());
+        if vertices.is_empty() {
+            return;
+        }
+        self.ensure_path_vertex_capacity(vertices.len());
+        self.queue
+            .write_buffer(&self.path_vertex_buffer, 0, &vertices);
+        self.record_upload(vertices.len() as u64);
+        self.last_frame.path_vertex_upload_bytes += vertices.len() as u64;
+        self.last_frame.path_vertices_uploaded += model.path_vertex_count() as u64;
+    }
+
+    fn ensure_path_instance_capacity(&mut self, required_bytes: usize) {
+        if required_bytes <= self.path_instance_capacity_bytes {
+            return;
+        }
+        self.path_instance_capacity_bytes = required_bytes.next_power_of_two();
+        self.last_frame.allocation_growth_count += 1;
+        self.path_instance_buffer = create_buffer(
+            &self.device,
+            "visual-authoring-path-instances",
+            self.path_instance_capacity_bytes as u64,
+            wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_DST,
+        );
+        self.recreate_bind_group();
+    }
+
+    fn ensure_path_vertex_capacity(&mut self, required_bytes: usize) {
+        if required_bytes <= self.path_vertex_capacity_bytes {
+            return;
+        }
+        self.path_vertex_capacity_bytes = required_bytes.next_power_of_two();
+        self.last_frame.allocation_growth_count += 1;
+        self.path_vertex_buffer = create_buffer(
+            &self.device,
+            "visual-authoring-path-vertices",
+            self.path_vertex_capacity_bytes as u64,
+            wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_DST,
+        );
+        self.recreate_bind_group();
+    }
+
+    fn total_buffer_bytes(&self) -> u64 {
+        (self.instance_capacity * size_of::<InstanceRaw>()
+            + self.visible_capacity * size_of::<u32>()
+            + size_of::<ViewRaw>()
+            + self.path_instance_capacity_bytes
+            + self.path_vertex_capacity_bytes) as u64
     }
 
     pub async fn render_offscreen(
@@ -395,6 +541,7 @@ impl WgpuRenderer {
         });
         let texture_view = texture.create_view(&wgpu::TextureViewDescriptor::default());
         let start = Instant::now();
+        let mut draw_calls = 0_u64;
         let mut encoder = self
             .device
             .create_command_encoder(&wgpu::CommandEncoderDescriptor {
@@ -420,16 +567,33 @@ impl WgpuRenderer {
                 timestamp_writes: None,
                 occlusion_query_set: None,
             });
-            if !culling.slots_bottom_to_top.is_empty() {
-                pass.set_pipeline(&self.pipeline);
-                pass.set_bind_group(0, &self.bind_group, &[]);
-                pass.draw(0..6, 0..culling.slots_bottom_to_top.len() as u32);
+            pass.set_bind_group(0, &self.bind_group, &[]);
+            // Batches keep paths and analytic primitives in scene order.
+            for batch in &culling.draw_batches {
+                match *batch {
+                    DrawBatch::Primitives {
+                        first_visible,
+                        count,
+                    } => {
+                        pass.set_pipeline(&self.pipeline);
+                        pass.draw(0..6, first_visible..first_visible + count);
+                        draw_calls += 1;
+                    }
+                    DrawBatch::Paths {
+                        first_vertex,
+                        vertex_count,
+                    } => {
+                        pass.set_pipeline(&self.path_pipeline);
+                        pass.draw(first_vertex..first_vertex + vertex_count, 0..1);
+                        draw_calls += 1;
+                    }
+                }
             }
         }
         self.queue.submit(Some(encoder.finish()));
         self.device.poll(wgpu::Maintain::Wait);
-        self.last_frame.draw_calls = u64::from(!culling.slots_bottom_to_top.is_empty());
-        self.last_frame.batches = self.last_frame.draw_calls;
+        self.last_frame.draw_calls = draw_calls;
+        self.last_frame.batches = draw_calls;
         self.last_frame.submitted_instances = culling.slots_bottom_to_top.len() as u64;
         self.last_frame.render_submit_micros = start.elapsed().as_micros() as u64;
         if let Some(error) = self.device.pop_error_scope().await {
@@ -454,9 +618,7 @@ impl WgpuRenderer {
             wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_DST,
         );
         self.recreate_bind_group();
-        self.metrics.buffer_bytes = (self.instance_capacity * size_of::<InstanceRaw>()
-            + self.visible_capacity * size_of::<u32>()
-            + size_of::<ViewRaw>()) as u64;
+        self.metrics.buffer_bytes = self.total_buffer_bytes();
     }
 
     fn recreate_bind_group(&mut self) {
@@ -466,10 +628,10 @@ impl WgpuRenderer {
             &self.instance_buffer,
             &self.visible_buffer,
             &self.view_buffer,
+            &self.path_instance_buffer,
+            &self.path_vertex_buffer,
         );
-        self.metrics.buffer_bytes = (self.instance_capacity * size_of::<InstanceRaw>()
-            + self.visible_capacity * size_of::<u32>()
-            + size_of::<ViewRaw>()) as u64;
+        self.metrics.buffer_bytes = self.total_buffer_bytes();
     }
 
     fn record_upload(&mut self, bytes: u64) {
@@ -494,6 +656,9 @@ impl WgpuRenderer {
         self.metrics.instance_upload_bytes += self.last_frame.instance_upload_bytes;
         self.metrics.visible_slot_upload_bytes += self.last_frame.visible_slot_upload_bytes;
         self.metrics.allocation_growth_count += self.last_frame.allocation_growth_count;
+        self.metrics.path_vertices_uploaded += self.last_frame.path_vertices_uploaded;
+        self.metrics.path_instance_upload_bytes += self.last_frame.path_instance_upload_bytes;
+        self.metrics.path_vertex_upload_bytes += self.last_frame.path_vertex_upload_bytes;
     }
 }
 
@@ -524,12 +689,15 @@ fn create_buffer(
     })
 }
 
+#[allow(clippy::too_many_arguments)]
 fn create_bind_group(
     device: &wgpu::Device,
     layout: &wgpu::BindGroupLayout,
     instances: &wgpu::Buffer,
     visible: &wgpu::Buffer,
     view: &wgpu::Buffer,
+    path_instances: &wgpu::Buffer,
+    path_vertices: &wgpu::Buffer,
 ) -> wgpu::BindGroup {
     device.create_bind_group(&wgpu::BindGroupDescriptor {
         label: Some("visual-authoring-bind-group"),
@@ -546,6 +714,14 @@ fn create_bind_group(
             wgpu::BindGroupEntry {
                 binding: 2,
                 resource: view.as_entire_binding(),
+            },
+            wgpu::BindGroupEntry {
+                binding: 3,
+                resource: path_instances.as_entire_binding(),
+            },
+            wgpu::BindGroupEntry {
+                binding: 4,
+                resource: path_vertices.as_entire_binding(),
             },
         ],
     })
@@ -693,6 +869,8 @@ mod tests {
             renderable: true,
             gpu_encodable: true,
             encoding_diagnostic: None,
+            path: None,
+            path_index: None,
         }
     }
 
@@ -739,16 +917,45 @@ mod tests {
     #[test]
     fn shared_shader_and_binary_schema_match_native_layout() {
         let schema = include_str!("../../../shared/render_binary_schema.json");
-        assert_eq!(RENDER_BINARY_SCHEMA_VERSION, 2);
+        assert_eq!(RENDER_BINARY_SCHEMA_VERSION, 3);
         assert_eq!(size_of::<InstanceRaw>(), INSTANCE_STRIDE_BYTES);
         assert_eq!(size_of::<ViewRaw>(), VIEW_UNIFORM_BYTES);
         assert_eq!(DIRTY_RECORD_STRIDE_BYTES, 4 + INSTANCE_STRIDE_BYTES);
-        assert!(schema.contains("\"version\": 2"));
+        assert!(schema.contains("\"version\": 3"));
         assert!(schema.contains("\"instance_stride_bytes\": 112"));
         assert!(schema.contains("\"dirty_record_stride_bytes\": 116"));
         assert!(schema.contains("\"rectangle\": 0"));
         assert!(schema.contains("\"ellipse\": 1"));
         assert!(SHADER_SOURCE.contains("visible_slots[visible_index]"));
         assert!(SHADER_SOURCE.contains("input.primitive == 1u"));
+    }
+
+    #[test]
+    fn schema_version_3_publishes_the_path_layout_the_shader_reads() {
+        let schema = include_str!("../../../shared/render_binary_schema.json");
+        assert!(schema.contains("\"path_instance_stride_bytes\": 80"));
+        assert!(schema.contains("\"path_vertex_stride_bytes\": 32"));
+        // CPU hit testing and GPU triangles must agree on one fill rule.
+        assert!(schema.contains("\"path_fill_rule\": \"even-odd\""));
+        assert_eq!(PATH_INSTANCE_STRIDE, 80);
+        assert_eq!(PATH_VERTEX_STRIDE, 32);
+        assert!(SHADER_SOURCE.contains("fn vs_path"));
+        assert!(SHADER_SOURCE.contains("fn fs_path"));
+        assert!(SHADER_SOURCE.contains("path_vertices[vertex_index]"));
+        // The feather is a screen-space expansion, never MSAA or a discard.
+        assert!(!SHADER_SOURCE.contains("discard"));
+    }
+
+    #[test]
+    fn primitive_only_frames_submit_exactly_one_batch() {
+        let culling = CullingResult {
+            draw_batches: vec![DrawBatch::Primitives {
+                first_visible: 0,
+                count: 3,
+            }],
+            slots_bottom_to_top: vec![0, 1, 2],
+            ..CullingResult::default()
+        };
+        assert_eq!(culling.draw_batches.len(), 1);
     }
 }

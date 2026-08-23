@@ -12,6 +12,7 @@ crate-type = ["cdylib", "rlib"]
 js-sys.workspace = true
 serde.workspace = true
 serde_json.workspace = true
+uuid.workspace = true
 wasm-bindgen.workspace = true
 visual_authoring_core_math = { path = "../core_math" }
 visual_authoring_document = { path = "../document" }

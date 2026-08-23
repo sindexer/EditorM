@@ -1,15 +1,23 @@
 {
-  "version": 2,
+  "version": 3,
   "endianness": "little",
   "instance_stride_bytes": 112,
   "dirty_record_stride_bytes": 116,
   "uniform_stride_bytes": 32,
+  "path_instance_stride_bytes": 80,
+  "path_vertex_stride_bytes": 32,
   "alpha_contract": "premultiplied-linear",
   "color_input": "srgb",
   "stroke_alignment": "center",
+  "path_fill_rule": "even-odd",
   "primitive": {
     "rectangle": 0,
-    "ellipse": 1
+    "ellipse": 1,
+    "path": 2
+  },
+  "path_vertex_kind": {
+    "fill": 0,
+    "stroke": 1
   },
   "instance_fields": {
     "linear": 0,
@@ -23,5 +31,22 @@
     "stroke_linear": 80,
     "stroke_width": 96,
     "padding": 100
+  },
+  "path_instance_fields": {
+    "linear": 0,
+    "translation_hi": 16,
+    "translation_lo": 24,
+    "fill_linear": 32,
+    "stroke_linear": 48,
+    "opacity": 64,
+    "padding": 68
+  },
+  "path_vertex_fields": {
+    "position": 0,
+    "normal": 8,
+    "coverage": 16,
+    "kind": 20,
+    "path_index": 24,
+    "padding": 28
   }
 }

@@ -1485,7 +1485,7 @@ try {
       initial.wasm_initialized === true &&
       initial.heartbeat >= 1,
     schema_v2:
-      initial.render_binary_schema_version === 2 &&
+      initial.render_binary_schema_version === 3 &&
       initial.resources.instance_stride_bytes === 112 &&
       initial.resources.dirty_record_stride_bytes === 116,
     three_rectangles_created_through_ui:

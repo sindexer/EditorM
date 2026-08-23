@@ -26,7 +26,9 @@ use std::fmt;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 use uuid::Uuid;
-use visual_authoring_core_math::{Affine2, Rect, Vec2, DEFAULT_EPSILON};
+use visual_authoring_core_math::{
+    Affine2, FlattenedPath, PathSegment, Rect, Vec2, DEFAULT_EPSILON,
+};
 
 /// Stable persistent identity for a document node.
 #[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
@@ -132,6 +134,9 @@ pub struct PathGeometry {
 
 impl PathGeometry {
     /// Conservative local bound including anchors and explicit control points.
+    ///
+    /// Kept for callers that need a cheap outer box without evaluating curves. Product geometry
+    /// uses [`PathGeometry::bounds`], which is the box the curve actually occupies.
     #[must_use]
     pub fn conservative_bounds(&self) -> Option<Rect> {
         Rect::from_points(self.anchors.iter().flat_map(|anchor| {
@@ -139,6 +144,82 @@ impl PathGeometry {
                 .into_iter()
                 .flatten()
         }))
+    }
+
+    /// The segments between consecutive anchors, including the closing segment of a closed path.
+    ///
+    /// Bounds, hit testing, and tessellation all read the path through this one iterator, so no
+    /// consumer can interpret an anchor pair differently from another.
+    pub fn segments(&self) -> impl Iterator<Item = PathSegment> + '_ {
+        let count = self.anchors.len();
+        let wrap = usize::from(self.closed && count > 2);
+        (0..count.saturating_sub(1) + wrap).map(move |index| {
+            let current = &self.anchors[index];
+            let next = &self.anchors[(index + 1) % count];
+            PathSegment::between(
+                current.position,
+                current.handle_out,
+                next.handle_in,
+                next.position,
+            )
+        })
+    }
+
+    /// Exact local bounds: cubic extrema are evaluated instead of taking the control-point hull.
+    ///
+    /// A single anchor still contributes its own position so a degenerate path has a point bound
+    /// rather than none.
+    #[must_use]
+    pub fn bounds(&self) -> Option<Rect> {
+        let mut bounds: Option<Rect> = None;
+        for segment in self.segments() {
+            let Some(segment_bounds) = segment.bounds() else {
+                return self.conservative_bounds();
+            };
+            bounds = Some(match bounds {
+                Some(current) => union_rect(current, segment_bounds),
+                None => segment_bounds,
+            });
+        }
+        bounds.or_else(|| Rect::from_points(self.anchors.iter().map(|anchor| anchor.position)))
+    }
+
+    /// Flattening tolerance in local units.
+    ///
+    /// The tolerance is derived from the path's own size rather than from the camera, so a cached
+    /// tessellation stays valid while the view pans and zooms. A larger path is allowed a
+    /// proportionally larger error, which keeps vertex counts bounded for very large artwork.
+    #[must_use]
+    pub fn flatten_tolerance(&self) -> f64 {
+        const RELATIVE_TOLERANCE: f64 = 1.0 / 4_096.0;
+        const MINIMUM_TOLERANCE: f64 = 1.0e-4;
+        let extent = self
+            .bounds()
+            .map(|bounds| bounds.width().max(bounds.height()))
+            .filter(|extent| extent.is_finite() && *extent > 0.0)
+            .unwrap_or(0.0);
+        (extent * RELATIVE_TOLERANCE).max(MINIMUM_TOLERANCE)
+    }
+
+    /// The flattened outline every renderer and hit test measures.
+    #[must_use]
+    pub fn flatten(&self, tolerance: f64) -> FlattenedPath {
+        let mut points = Vec::new();
+        let mut segments = self.segments().peekable();
+        if segments.peek().is_some() {
+            points.push(self.anchors[0].position);
+        }
+        for segment in segments {
+            segment.flatten_into(tolerance, &mut points);
+        }
+        if self.closed && points.len() > 1 {
+            // The wrap-around edge is implied by `closed`; the duplicated closing point is not.
+            points.pop();
+        }
+        FlattenedPath {
+            points,
+            closed: self.closed,
+        }
     }
 
     fn is_valid(&self) -> bool {
@@ -177,7 +258,7 @@ impl Geometry {
     pub fn size(&self) -> Vec2 {
         match self {
             Self::Frame { size } | Self::Rectangle { size } | Self::Ellipse { size } => *size,
-            Self::Path(path) => path.conservative_bounds().map_or(Vec2::ZERO, |bounds| {
+            Self::Path(path) => path.bounds().map_or(Vec2::ZERO, |bounds| {
                 Vec2::new(bounds.width(), bounds.height())
             }),
         }
@@ -189,9 +270,7 @@ impl Geometry {
             Self::Frame { size } | Self::Rectangle { size } | Self::Ellipse { size } => {
                 Rect::from_size(*size)
             }
-            Self::Path(path) => path
-                .conservative_bounds()
-                .unwrap_or_else(|| Rect::from_size(Vec2::ZERO)),
+            Self::Path(path) => path.bounds().unwrap_or_else(|| Rect::from_size(Vec2::ZERO)),
         }
     }
 }
@@ -1615,6 +1694,14 @@ fn appearance_is_valid(appearance: Appearance) -> bool {
         && appearance.stroke.color.is_valid()
         && appearance.stroke.width.is_finite()
         && appearance.stroke.width >= 0.0
+}
+
+/// Smallest box containing both inputs.
+fn union_rect(left: Rect, right: Rect) -> Rect {
+    Rect::from_min_max(
+        Vec2::new(left.min.x.min(right.min.x), left.min.y.min(right.min.y)),
+        Vec2::new(left.max.x.max(right.max.x), left.max.y.max(right.max.y)),
+    )
 }
 
 #[cfg(test)]

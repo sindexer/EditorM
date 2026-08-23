@@ -2,8 +2,10 @@ use std::collections::BTreeMap;
 
 use visual_authoring_core_math::{Affine2, Rect, Vec2, DEFAULT_EPSILON};
 use visual_authoring_document::{
-    Appearance, Command, Document, EditorError, Geometry, Metadata, NodeId, NodeSpec,
+    Appearance, ColorRgba, Command, Document, EditorError, Geometry, Metadata, NodeId, NodeSpec,
+    PathAnchor, PathAnchorId, PathGeometry, Stroke,
 };
+use visual_authoring_render_model::DrawBatch;
 use visual_authoring_scene::{ComputedScene, InvalidDerivedState};
 
 use crate::fixtures::{build_fixture, fixture_node_id, FixtureKind};
@@ -1398,4 +1400,415 @@ fn asymmetric_affine_ellipse_stroke_bounds_and_hit_test_share_semantics() {
         assert!(point.x >= bounds.min.x && point.x <= bounds.max.x);
         assert!(point.y >= bounds.min.y && point.y <= bounds.max.y);
     }
+}
+
+// ---------------------------------------------------------------------------
+// Phase 2A: persistent paths through hit testing, the render model and history.
+// ---------------------------------------------------------------------------
+
+fn anchor(index: u128, position: Vec2) -> PathAnchor {
+    PathAnchor::new(
+        PathAnchorId::from_uuid(uuid::Uuid::from_u128(index)),
+        position,
+    )
+}
+
+fn path_node(
+    runtime: &mut EngineRuntime,
+    parent: NodeId,
+    id: NodeId,
+    geometry: PathGeometry,
+    appearance: Appearance,
+) -> NodeId {
+    let mut spec = NodeSpec::path(id, "Path", geometry);
+    spec.appearance = appearance;
+    create_node(runtime, spec, parent)
+}
+
+fn stroked(width: f64) -> Appearance {
+    Appearance {
+        fill: ColorRgba::new(0.0, 0.0, 0.0, 0.0),
+        stroke: Stroke {
+            color: ColorRgba::new(0.0, 0.0, 0.0, 1.0),
+            width,
+        },
+        ..Appearance::default()
+    }
+}
+
+fn straight_path() -> PathGeometry {
+    PathGeometry {
+        closed: false,
+        anchors: vec![
+            anchor(1, Vec2::new(0.0, 0.0)),
+            anchor(2, Vec2::new(100.0, 0.0)),
+        ],
+    }
+}
+
+fn cubic_path() -> PathGeometry {
+    let mut anchors = vec![
+        anchor(3, Vec2::new(0.0, 0.0)),
+        anchor(4, Vec2::new(100.0, 0.0)),
+    ];
+    anchors[0].handle_out = Some(Vec2::new(0.0, 80.0));
+    anchors[1].handle_in = Some(Vec2::new(100.0, 80.0));
+    PathGeometry {
+        closed: false,
+        anchors,
+    }
+}
+
+fn closed_triangle() -> PathGeometry {
+    PathGeometry {
+        closed: true,
+        anchors: vec![
+            anchor(5, Vec2::new(0.0, 0.0)),
+            anchor(6, Vec2::new(100.0, 0.0)),
+            anchor(7, Vec2::new(50.0, 80.0)),
+        ],
+    }
+}
+
+#[test]
+fn a_straight_stroked_path_hits_along_the_stroke_and_misses_beside_it() {
+    let mut runtime = EngineRuntime::blank("Root").unwrap();
+    let root = runtime.document().root_id();
+    let id = path_node(
+        &mut runtime,
+        root,
+        NodeId::new(),
+        straight_path(),
+        stroked(10.0),
+    );
+
+    assert_eq!(
+        hit_world(&mut runtime, Vec2::new(50.0, 0.0)).topmost(),
+        Some(id)
+    );
+    // The stroke is centre-aligned, so half of its width is pickable on each side.
+    assert_eq!(
+        hit_world(&mut runtime, Vec2::new(50.0, 4.5)).topmost(),
+        Some(id)
+    );
+    assert_ne!(
+        hit_world(&mut runtime, Vec2::new(50.0, 12.0)).topmost(),
+        Some(id)
+    );
+    // An open path never fills, however close the point is to the chord's interior side.
+    assert_ne!(
+        hit_world(&mut runtime, Vec2::new(50.0, 40.0)).topmost(),
+        Some(id)
+    );
+}
+
+#[test]
+fn a_cubic_path_hits_on_the_curve_and_not_on_its_chord() {
+    let mut runtime = EngineRuntime::blank("Root").unwrap();
+    let root = runtime.document().root_id();
+    let id = path_node(
+        &mut runtime,
+        root,
+        NodeId::new(),
+        cubic_path(),
+        stroked(6.0),
+    );
+
+    // The curve's midpoint sits at three quarters of the handle height, well away from the
+    // straight chord between the two anchors.
+    let midpoint = Vec2::new(50.0, 60.0);
+    assert_eq!(hit_world(&mut runtime, midpoint).topmost(), Some(id));
+    assert_ne!(
+        hit_world(&mut runtime, Vec2::new(50.0, 0.0)).topmost(),
+        Some(id)
+    );
+}
+
+#[test]
+fn a_closed_filled_path_hits_its_interior_and_an_unfilled_one_does_not() {
+    let mut runtime = EngineRuntime::blank("Root").unwrap();
+    let root = runtime.document().root_id();
+    let filled = path_node(
+        &mut runtime,
+        root,
+        NodeId::new(),
+        closed_triangle(),
+        Appearance::default(),
+    );
+    let interior = Vec2::new(50.0, 30.0);
+    assert_eq!(hit_world(&mut runtime, interior).topmost(), Some(filled));
+    // Outside the triangle but inside its bounding box.
+    assert_ne!(
+        hit_world(&mut runtime, Vec2::new(5.0, 70.0)).topmost(),
+        Some(filled)
+    );
+
+    runtime
+        .dispatch(Command::SetAppearance {
+            target: filled,
+            appearance: stroked(2.0),
+        })
+        .unwrap();
+    assert_ne!(hit_world(&mut runtime, interior).topmost(), Some(filled));
+    // The outline itself still picks.
+    assert_eq!(
+        hit_world(&mut runtime, Vec2::new(50.0, 0.0)).topmost(),
+        Some(filled)
+    );
+}
+
+#[test]
+fn editing_one_path_tessellates_only_that_path() {
+    let mut runtime = EngineRuntime::blank("Root").unwrap();
+    let root = runtime.document().root_id();
+    let first = path_node(
+        &mut runtime,
+        root,
+        NodeId::new(),
+        closed_triangle(),
+        Appearance::default(),
+    );
+    let mut second_geometry = closed_triangle();
+    for (index, anchor) in second_geometry.anchors.iter_mut().enumerate() {
+        anchor.id = PathAnchorId::from_uuid(uuid::Uuid::from_u128(100 + index as u128));
+        anchor.position = anchor.position + Vec2::new(300.0, 0.0);
+    }
+    let second = path_node(
+        &mut runtime,
+        root,
+        NodeId::new(),
+        second_geometry,
+        Appearance::default(),
+    );
+    assert_eq!(runtime.render_model().path_item_count(), 2);
+
+    let mut edited = closed_triangle();
+    edited.anchors[2].position = Vec2::new(50.0, 140.0);
+    runtime
+        .dispatch(Command::SetGeometry {
+            target: first,
+            geometry: Geometry::Path(edited),
+        })
+        .unwrap();
+    assert_eq!(
+        runtime.render_model().last_update().path_tessellations,
+        1,
+        "one geometry edit re-tessellates exactly one path"
+    );
+    assert_eq!(
+        runtime
+            .render_model()
+            .last_update()
+            .full_render_rebuild_count,
+        0
+    );
+
+    // Colour is not a silhouette input, so it reuses the cached triangles.
+    let vertex_revision = runtime.render_model().path_vertex_revision();
+    runtime
+        .dispatch(Command::SetAppearance {
+            target: second,
+            appearance: Appearance {
+                fill: ColorRgba::new(1.0, 0.0, 0.0, 1.0),
+                ..Appearance::default()
+            },
+        })
+        .unwrap();
+    assert_eq!(runtime.render_model().last_update().path_tessellations, 0);
+    assert_eq!(
+        runtime.render_model().path_vertex_revision(),
+        vertex_revision
+    );
+
+    // A camera-only frame re-tessellates nothing at all.
+    let before = runtime.render_model().cumulative().path_tessellations;
+    runtime.camera_mut().pan(Vec2::new(40.0, 25.0)).unwrap();
+    runtime.cull_viewport().unwrap();
+    assert_eq!(
+        runtime.render_model().cumulative().path_tessellations,
+        before
+    );
+    assert_eq!(
+        runtime.render_model().path_vertex_revision(),
+        vertex_revision
+    );
+}
+
+#[test]
+fn undo_and_redo_restore_path_geometry_across_document_scene_and_render_model() {
+    let mut runtime = EngineRuntime::blank("Root").unwrap();
+    let root = runtime.document().root_id();
+    let id = path_node(
+        &mut runtime,
+        root,
+        NodeId::new(),
+        closed_triangle(),
+        Appearance::default(),
+    );
+    let created_bounds = runtime
+        .scene()
+        .node(id)
+        .unwrap()
+        .own_world_bounds()
+        .unwrap();
+    let created_vertices = runtime.render_model().path_vertex_count();
+    let interior = Vec2::new(50.0, 30.0);
+
+    let mut taller = closed_triangle();
+    taller.anchors[2].position = Vec2::new(50.0, 200.0);
+    runtime
+        .dispatch(Command::SetGeometry {
+            target: id,
+            geometry: Geometry::Path(taller.clone()),
+        })
+        .unwrap();
+    let taller_bounds = runtime
+        .scene()
+        .node(id)
+        .unwrap()
+        .own_world_bounds()
+        .unwrap();
+    assert!(taller_bounds.height() > created_bounds.height());
+    assert_eq!(
+        hit_world(&mut runtime, Vec2::new(50.0, 150.0)).topmost(),
+        Some(id)
+    );
+
+    runtime.undo().unwrap();
+    assert_eq!(
+        runtime
+            .scene()
+            .node(id)
+            .unwrap()
+            .own_world_bounds()
+            .unwrap(),
+        created_bounds
+    );
+    assert_eq!(runtime.render_model().path_vertex_count(), created_vertices);
+    assert_ne!(
+        hit_world(&mut runtime, Vec2::new(50.0, 150.0)).topmost(),
+        Some(id)
+    );
+    assert_eq!(hit_world(&mut runtime, interior).topmost(), Some(id));
+
+    runtime.redo().unwrap();
+    assert_eq!(
+        runtime
+            .scene()
+            .node(id)
+            .unwrap()
+            .own_world_bounds()
+            .unwrap(),
+        taller_bounds
+    );
+    assert_eq!(
+        hit_world(&mut runtime, Vec2::new(50.0, 150.0)).topmost(),
+        Some(id)
+    );
+
+    // Undoing the creation itself removes the path from every derived structure.
+    runtime.undo().unwrap();
+    runtime.undo().unwrap();
+    assert!(runtime.document().node(id).is_none());
+    assert!(runtime.scene().node(id).is_none());
+    assert!(runtime.render_model().item(id).is_none());
+    assert_eq!(runtime.render_model().path_item_count(), 0);
+    assert_eq!(runtime.render_model().path_vertex_count(), 0);
+    assert_eq!(hit_world(&mut runtime, interior).topmost(), None);
+
+    runtime.redo().unwrap();
+    assert_eq!(runtime.render_model().path_item_count(), 1);
+    assert_eq!(runtime.render_model().path_vertex_count(), created_vertices);
+    assert_eq!(hit_world(&mut runtime, interior).topmost(), Some(id));
+}
+
+#[test]
+fn a_failed_path_geometry_command_leaves_document_history_and_render_model_unchanged() {
+    let mut runtime = EngineRuntime::blank("Root").unwrap();
+    let root = runtime.document().root_id();
+    let id = path_node(
+        &mut runtime,
+        root,
+        NodeId::new(),
+        closed_triangle(),
+        Appearance::default(),
+    );
+    let snapshot = runtime.document().snapshot();
+    let vertices = runtime.render_model().path_vertex_count();
+    let revision = runtime.document_revision();
+
+    for invalid in [
+        // Two anchors cannot close a region.
+        PathGeometry {
+            closed: true,
+            anchors: vec![anchor(5, Vec2::ZERO), anchor(6, Vec2::new(10.0, 10.0))],
+        },
+        // A duplicated anchor identity is not a valid path.
+        PathGeometry {
+            closed: false,
+            anchors: vec![anchor(5, Vec2::ZERO), anchor(5, Vec2::new(10.0, 10.0))],
+        },
+        // Non-finite coordinates never reach derived state.
+        PathGeometry {
+            closed: false,
+            anchors: vec![
+                anchor(5, Vec2::new(f64::NAN, 0.0)),
+                anchor(6, Vec2::new(10.0, 10.0)),
+            ],
+        },
+        PathGeometry {
+            closed: false,
+            anchors: {
+                let mut anchors = vec![anchor(5, Vec2::ZERO), anchor(6, Vec2::new(10.0, 10.0))];
+                anchors[0].handle_out = Some(Vec2::new(f64::INFINITY, 0.0));
+                anchors
+            },
+        },
+    ] {
+        let result = runtime.dispatch(Command::SetGeometry {
+            target: id,
+            geometry: Geometry::Path(invalid),
+        });
+        assert!(result.is_err(), "invalid path geometry must be rejected");
+        assert_eq!(runtime.document().snapshot(), snapshot);
+        assert_eq!(runtime.document_revision(), revision);
+        assert_eq!(runtime.render_model().path_vertex_count(), vertices);
+    }
+}
+
+#[test]
+fn a_path_never_enters_the_instanced_primitive_draw_list() {
+    let mut runtime = EngineRuntime::blank("Root").unwrap();
+    let root = runtime.document().root_id();
+    rectangle(
+        &mut runtime,
+        root,
+        NodeId::new(),
+        Vec2::new(60.0, 40.0),
+        Affine2::translation(Vec2::new(-200.0, -20.0)),
+    );
+    let path = path_node(
+        &mut runtime,
+        root,
+        NodeId::new(),
+        closed_triangle(),
+        Appearance::default(),
+    );
+
+    let culling = runtime.cull_viewport().unwrap();
+    let path_slot = runtime.render_model().item(path).unwrap().slot;
+    assert!(!culling.slots_bottom_to_top.contains(&path_slot));
+    assert_eq!(culling.visible_path_indices.len(), 1);
+    // Scene order is preserved by alternating batches, and the rectangle keeps its instanced
+    // draw untouched.
+    assert!(matches!(
+        culling.draw_batches.as_slice(),
+        [
+            DrawBatch::Primitives {
+                first_visible: 0,
+                count: 1
+            },
+            DrawBatch::Paths { vertex_count, .. }
+        ] if *vertex_count > 0
+    ));
 }

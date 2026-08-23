@@ -29,7 +29,7 @@ fn open_path(points: &[(PathAnchorId, Vec2)]) -> PathGeometry {
 }
 
 #[test]
-fn path_creation_preserves_anchor_identity_and_conservative_bounds() {
+fn path_creation_preserves_anchor_identity_and_exact_curve_bounds() {
     let mut editor = HeadlessEditorCore::blank("Root");
     let root = editor.document().root_id();
     let path_id = NodeId::new();
@@ -55,8 +55,18 @@ fn path_creation_preserves_anchor_identity_and_conservative_bounds() {
     };
     assert_eq!(stored_path.anchors[0].id, first);
     assert_eq!(stored_path.anchors[1].id, second);
+    // Phase 2A renders paths, so bounds are the box the curve actually occupies: the outgoing
+    // handle at x = -15 pulls the curve left of both anchors, but only as far as x ≈ 5.398.
+    let bounds = editor.document().local_bounds(path_id).unwrap().unwrap();
+    assert!(
+        (bounds.min.x - 5.397_764_628_538_05).abs() < 1e-9,
+        "{bounds:?}"
+    );
+    assert_eq!(bounds.min.y, 20.0);
+    assert_eq!(bounds.max, Vec2::new(70.0, 80.0));
+    // The control hull stays available for callers that want the cheap outer box.
     assert_eq!(
-        editor.document().local_bounds(path_id).unwrap().unwrap(),
+        stored_path.conservative_bounds().unwrap(),
         visual_authoring_core_math::Rect::from_min_max(
             Vec2::new(-15.0, 20.0),
             Vec2::new(70.0, 80.0)

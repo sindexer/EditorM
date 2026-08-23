@@ -2,6 +2,8 @@ import { splitF64 } from "./protocol.js";
 import {
   DIRTY_STRIDE,
   INSTANCE_STRIDE,
+  PATH_INSTANCE_STRIDE,
+  PATH_VERTEX_STRIDE,
   RENDER_BINARY_SCHEMA_VERSION,
   SHADER_SOURCE,
 } from "./render_contract.js";
@@ -61,9 +63,15 @@ export class WebGpuRenderer {
     this.readbackViewFormat = this.pipelineViewFormat;
     this.instanceBuffer = null;
     this.visibleBuffer = null;
+    this.pathInstanceBuffer = null;
+    this.pathVertexBuffer = null;
     this.instanceBufferBytes = 0;
     this.visibleBufferBytes = 0;
+    this.pathInstanceBufferBytes = 0;
+    this.pathVertexBufferBytes = 0;
     this.visibleCount = 0;
+    // Ordered pipeline switches for the current frame, bottom to top.
+    this.drawBatches = [];
     this.lastDpr = 1;
     this.validationErrors = 0;
     this.lastError = null;
@@ -71,7 +79,7 @@ export class WebGpuRenderer {
       draw_calls: 0,
       batches: 0,
       submitted_instances: 0,
-      buffer_count: 3,
+      buffer_count: 5,
       buffer_bytes: 0,
       upload_calls: 0,
       frame_upload_bytes: 0,
@@ -84,6 +92,9 @@ export class WebGpuRenderer {
       instance_upload_bytes: 0,
       visible_slot_upload_bytes: 0,
       allocation_growth_count: 0,
+      path_instance_upload_bytes: 0,
+      path_vertex_upload_bytes: 0,
+      path_vertices_uploaded: 0,
     };
     this.adapterInfo = adapter.info ?? {};
     this.deviceLabel = device.label || "Phase 0D WebGPU device";
@@ -136,6 +147,16 @@ export class WebGpuRenderer {
           visibility: GPUShaderStage.VERTEX,
           buffer: { type: "uniform" },
         },
+        {
+          binding: 3,
+          visibility: GPUShaderStage.VERTEX,
+          buffer: { type: "read-only-storage" },
+        },
+        {
+          binding: 4,
+          visibility: GPUShaderStage.VERTEX,
+          buffer: { type: "read-only-storage" },
+        },
       ],
     });
     const layout = this.device.createPipelineLayout({ bindGroupLayouts: [this.bindGroupLayout] });
@@ -158,6 +179,27 @@ export class WebGpuRenderer {
       },
       primitive: { topology: "triangle-list" },
     });
+    // Paths arrive as pre-tessellated triangles from Rust; this pipeline only transforms them
+    // and applies the one-pixel screen-space feather.
+    this.pathPipeline = this.device.createRenderPipeline({
+      label: "Phase 2A tessellated path pipeline",
+      layout,
+      vertex: { module: shader, entryPoint: "vs_path" },
+      fragment: {
+        module: shader,
+        entryPoint: "fs_path",
+        targets: [
+          {
+            format: this.pipelineViewFormat,
+            blend: {
+              color: { srcFactor: "one", dstFactor: "one-minus-src-alpha", operation: "add" },
+              alpha: { srcFactor: "one", dstFactor: "one-minus-src-alpha", operation: "add" },
+            },
+          },
+        ],
+      },
+      primitive: { topology: "triangle-list" },
+    });
     this.viewBuffer = this.device.createBuffer({
       label: "Phase 0D view uniform",
       size: 32,
@@ -165,6 +207,8 @@ export class WebGpuRenderer {
     });
     this.ensureInstanceBuffer(INSTANCE_STRIDE);
     this.ensureVisibleBuffer(4);
+    this.ensurePathInstanceBuffer(PATH_INSTANCE_STRIDE);
+    this.ensurePathVertexBuffer(PATH_VERTEX_STRIDE);
     this.configureSurface();
     const pipelineError = await this.device.popErrorScope();
     if (pipelineError) {
@@ -253,8 +297,45 @@ export class WebGpuRenderer {
     this.rebuildBindGroup();
   }
 
+  ensurePathInstanceBuffer(byteLength) {
+    const required = Math.max(PATH_INSTANCE_STRIDE, Math.ceil(byteLength / 4) * 4);
+    if (this.pathInstanceBuffer && this.pathInstanceBufferBytes >= required) return;
+    this.pathInstanceBuffer?.destroy();
+    this.metrics.allocation_growth_count += 1;
+    this.pathInstanceBuffer = this.device.createBuffer({
+      label: "Phase 2A path instance storage",
+      size: required,
+      usage: GPU.STORAGE | GPU.COPY_DST,
+    });
+    this.pathInstanceBufferBytes = required;
+    this.rebuildBindGroup();
+  }
+
+  ensurePathVertexBuffer(byteLength) {
+    const required = Math.max(PATH_VERTEX_STRIDE, Math.ceil(byteLength / 4) * 4);
+    if (this.pathVertexBuffer && this.pathVertexBufferBytes >= required) return;
+    this.pathVertexBuffer?.destroy();
+    this.metrics.allocation_growth_count += 1;
+    this.pathVertexBuffer = this.device.createBuffer({
+      label: "Phase 2A path vertex storage",
+      size: required,
+      usage: GPU.STORAGE | GPU.COPY_DST,
+    });
+    this.pathVertexBufferBytes = required;
+    this.rebuildBindGroup();
+  }
+
   rebuildBindGroup() {
-    if (!this.instanceBuffer || !this.visibleBuffer || !this.viewBuffer || !this.bindGroupLayout) return;
+    if (
+      !this.instanceBuffer ||
+      !this.visibleBuffer ||
+      !this.viewBuffer ||
+      !this.pathInstanceBuffer ||
+      !this.pathVertexBuffer ||
+      !this.bindGroupLayout
+    ) {
+      return;
+    }
     this.bindGroup = this.device.createBindGroup({
       label: "Phase 0D render bind group",
       layout: this.bindGroupLayout,
@@ -262,8 +343,31 @@ export class WebGpuRenderer {
         { binding: 0, resource: { buffer: this.instanceBuffer } },
         { binding: 1, resource: { buffer: this.visibleBuffer } },
         { binding: 2, resource: { buffer: this.viewBuffer } },
+        { binding: 3, resource: { buffer: this.pathInstanceBuffer } },
+        { binding: 4, resource: { buffer: this.pathVertexBuffer } },
       ],
     });
+  }
+
+  // Records the frame's draw calls in scene order, switching pipelines only where the batch
+  // list says the kind changes.
+  encodeDrawBatches(pass) {
+    let drawCalls = 0;
+    pass.setBindGroup(0, this.bindGroup);
+    for (const batch of this.drawBatches) {
+      if (batch.kind === "primitives") {
+        if (batch.count === 0) continue;
+        pass.setPipeline(this.pipeline);
+        pass.draw(6, batch.count, 0, batch.first_visible);
+        drawCalls += 1;
+      } else if (batch.kind === "paths") {
+        if (batch.vertex_count === 0) continue;
+        pass.setPipeline(this.pathPipeline);
+        pass.draw(batch.vertex_count, 1, batch.first_vertex, 0);
+        drawCalls += 1;
+      }
+    }
+    return drawCalls;
   }
 
   upload(response, payload) {
@@ -328,6 +432,42 @@ export class WebGpuRenderer {
       }
       this.visibleCount = visible.length;
     }
+    if (payload.pathInstances) {
+      const data = new Uint8Array(payload.pathInstances);
+      if (data.byteLength % PATH_INSTANCE_STRIDE !== 0) {
+        throw new RendererFailure("invalid_path_payload", "Path instance payload has an invalid stride");
+      }
+      if (data.byteLength > 0) {
+        this.ensurePathInstanceBuffer(data.byteLength);
+        this.queue.writeBuffer(this.pathInstanceBuffer, 0, data);
+        calls += 1;
+        bytes += data.byteLength;
+        this.metrics.path_instance_upload_bytes = data.byteLength;
+      }
+    } else {
+      this.metrics.path_instance_upload_bytes = 0;
+    }
+    if (payload.pathVertices) {
+      const data = new Uint8Array(payload.pathVertices);
+      if (data.byteLength % PATH_VERTEX_STRIDE !== 0) {
+        throw new RendererFailure("invalid_path_payload", "Path vertex payload has an invalid stride");
+      }
+      if (data.byteLength > 0) {
+        this.ensurePathVertexBuffer(data.byteLength);
+        this.queue.writeBuffer(this.pathVertexBuffer, 0, data);
+        calls += 1;
+        bytes += data.byteLength;
+      }
+      this.metrics.path_vertex_upload_bytes = data.byteLength;
+      this.metrics.path_vertices_uploaded = data.byteLength / PATH_VERTEX_STRIDE;
+    } else {
+      // A frame that changed only the camera or a colour re-sends no triangles at all.
+      this.metrics.path_vertex_upload_bytes = 0;
+      this.metrics.path_vertices_uploaded = 0;
+    }
+    this.drawBatches = Array.isArray(response.resources?.draw_batches)
+      ? response.resources.draw_batches
+      : [{ kind: "primitives", first_visible: 0, count: this.visibleCount }];
 
     const [centerXHigh, centerXLow] = splitF64(response.camera.center[0]);
     const [centerYHigh, centerYLow] = splitF64(response.camera.center[1]);
@@ -385,11 +525,7 @@ export class WebGpuRenderer {
         },
       ],
     });
-    if (this.visibleCount > 0) {
-      pass.setPipeline(this.pipeline);
-      pass.setBindGroup(0, this.bindGroup);
-      pass.draw(6, this.visibleCount);
-    }
+    const drawCalls = this.encodeDrawBatches(pass);
     pass.end();
     this.queue.submit([encoder.finish()]);
     const validation = await this.device.popErrorScope();
@@ -398,10 +534,15 @@ export class WebGpuRenderer {
       this.metrics.validation_errors = this.validationErrors;
       throw new RendererFailure("gpu_validation_error", validation.message);
     }
-    this.metrics.draw_calls = this.visibleCount > 0 ? 1 : 0;
-    this.metrics.batches = this.visibleCount > 0 ? 1 : 0;
+    this.metrics.draw_calls = drawCalls;
+    this.metrics.batches = drawCalls;
     this.metrics.submitted_instances = this.visibleCount;
-    this.metrics.buffer_bytes = this.instanceBufferBytes + this.visibleBufferBytes + 32;
+    this.metrics.buffer_bytes =
+      this.instanceBufferBytes +
+      this.visibleBufferBytes +
+      this.pathInstanceBufferBytes +
+      this.pathVertexBufferBytes +
+      32;
     this.metrics.render_submit_ms = performance.now() - started;
     return this.metrics;
   }
@@ -451,11 +592,7 @@ export class WebGpuRenderer {
         },
       ],
     });
-    if (this.visibleCount > 0) {
-      pass.setPipeline(this.pipeline);
-      pass.setBindGroup(0, this.bindGroup);
-      pass.draw(6, this.visibleCount);
-    }
+    this.encodeDrawBatches(pass);
     pass.end();
     encoder.copyTextureToBuffer(
       {

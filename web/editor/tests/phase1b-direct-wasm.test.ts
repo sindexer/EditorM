@@ -47,7 +47,7 @@ describe("Phase 1B stored direct-WASM proof integrity", () => {
     expect(wasm.length).toBe(proof.wasm_bytes);
     expect(createHash("sha256").update(wasm).digest("hex")).toBe(proof.wasm_sha256);
     expect(proof.protocol_version).toBe(1);
-    expect(proof.render_binary_schema_version).toBe(2);
+    expect(proof.render_binary_schema_version).toBe(3);
   });
 
   test("every Phase 1B behaviour is covered and passed", () => {
