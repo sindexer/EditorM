@@ -62,6 +62,34 @@ impl fmt::Display for NodeId {
     }
 }
 
+/// Stable persistent identity for a path anchor, independent of its position in the path.
+#[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
+#[serde(transparent)]
+pub struct PathAnchorId(Uuid);
+
+impl PathAnchorId {
+    #[must_use]
+    pub fn new() -> Self {
+        Self(Uuid::new_v4())
+    }
+
+    #[must_use]
+    pub const fn from_uuid(uuid: Uuid) -> Self {
+        Self(uuid)
+    }
+
+    #[must_use]
+    pub const fn as_uuid(self) -> Uuid {
+        self.0
+    }
+}
+
+impl Default for PathAnchorId {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Persistent semantic node category, independent of any renderer type.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum NodeKind {
@@ -70,6 +98,62 @@ pub enum NodeKind {
     Group,
     Rectangle,
     Ellipse,
+    Path,
+}
+
+/// A path anchor and its optional incoming/outgoing Bezier control points.
+/// Handle coordinates are absolute points in the node's local coordinate space.
+#[derive(Clone, Debug, PartialEq)]
+pub struct PathAnchor {
+    pub id: PathAnchorId,
+    pub position: Vec2,
+    pub handle_in: Option<Vec2>,
+    pub handle_out: Option<Vec2>,
+}
+
+impl PathAnchor {
+    #[must_use]
+    pub const fn new(id: PathAnchorId, position: Vec2) -> Self {
+        Self {
+            id,
+            position,
+            handle_in: None,
+            handle_out: None,
+        }
+    }
+}
+
+/// Ordered persistent path geometry. Anchor IDs remain stable across edits.
+#[derive(Clone, Debug, PartialEq)]
+pub struct PathGeometry {
+    pub closed: bool,
+    pub anchors: Vec<PathAnchor>,
+}
+
+impl PathGeometry {
+    /// Conservative local bound including anchors and explicit control points.
+    #[must_use]
+    pub fn conservative_bounds(&self) -> Option<Rect> {
+        Rect::from_points(self.anchors.iter().flat_map(|anchor| {
+            [Some(anchor.position), anchor.handle_in, anchor.handle_out]
+                .into_iter()
+                .flatten()
+        }))
+    }
+
+    fn is_valid(&self) -> bool {
+        let minimum = if self.closed { 3 } else { 2 };
+        if self.anchors.len() < minimum {
+            return false;
+        }
+        let mut ids = BTreeSet::new();
+        self.anchors.iter().all(|anchor| {
+            ids.insert(anchor.id)
+                && anchor.position.is_finite()
+                && anchor.handle_in.map_or(true, Vec2::is_finite)
+                && anchor.handle_out.map_or(true, Vec2::is_finite)
+        })
+    }
 }
 
 impl NodeKind {
@@ -85,13 +169,29 @@ pub enum Geometry {
     Frame { size: Vec2 },
     Rectangle { size: Vec2 },
     Ellipse { size: Vec2 },
+    Path(PathGeometry),
 }
 
 impl Geometry {
     #[must_use]
-    pub const fn size(&self) -> Vec2 {
+    pub fn size(&self) -> Vec2 {
         match self {
             Self::Frame { size } | Self::Rectangle { size } | Self::Ellipse { size } => *size,
+            Self::Path(path) => path.conservative_bounds().map_or(Vec2::ZERO, |bounds| {
+                Vec2::new(bounds.width(), bounds.height())
+            }),
+        }
+    }
+
+    #[must_use]
+    pub fn local_bounds(&self) -> Rect {
+        match self {
+            Self::Frame { size } | Self::Rectangle { size } | Self::Ellipse { size } => {
+                Rect::from_size(*size)
+            }
+            Self::Path(path) => path
+                .conservative_bounds()
+                .unwrap_or_else(|| Rect::from_size(Vec2::ZERO)),
         }
     }
 }
@@ -267,6 +367,11 @@ impl NodeSpec {
             NodeKind::Ellipse,
             Some(Geometry::Ellipse { size }),
         )
+    }
+
+    #[must_use]
+    pub fn path(id: NodeId, name: impl Into<String>, path: PathGeometry) -> Self {
+        Self::new(id, name, NodeKind::Path, Some(Geometry::Path(path)))
     }
 
     #[must_use]
@@ -1177,10 +1282,7 @@ impl Document {
 
     pub fn local_bounds(&self, id: NodeId) -> Result<Option<Rect>, DocumentError> {
         let node = self.required_node(id)?;
-        Ok(node.spec.geometry.as_ref().map(|geometry| {
-            let size = geometry.size();
-            Rect::from_size(size)
-        }))
+        Ok(node.spec.geometry.as_ref().map(Geometry::local_bounds))
     }
 
     /// Returns a geometry-only axis-aligned world bound. Effects are intentionally excluded.
@@ -1209,6 +1311,7 @@ impl Document {
             Geometry::Frame { .. } | Geometry::Rectangle { .. } => {
                 world.transform_rect(Rect::from_size(size))
             }
+            Geometry::Path(_) => world.transform_rect(geometry.local_bounds()),
         };
         if !bounds.is_finite() {
             return Err(DocumentError::NonFiniteBounds(id));
@@ -1499,6 +1602,7 @@ fn geometry_matches(spec: &NodeSpec) -> bool {
         }
         (NodeKind::Rectangle, Some(Geometry::Rectangle { size }))
         | (NodeKind::Ellipse, Some(Geometry::Ellipse { size })) => size_is_valid(*size),
+        (NodeKind::Path, Some(Geometry::Path(path))) => path.is_valid(),
         _ => false,
     }
 }

@@ -12,11 +12,12 @@ use thiserror::Error;
 use visual_authoring_core_math::{Affine2, Vec2};
 use visual_authoring_document::{
     Appearance, ColorRgba, CornerRadii, Document, DocumentError, DocumentSnapshot, Geometry,
-    GroupRestoration, GroupRestorationRun, NodeId, NodeKind, NodeSnapshot, NodeSpec, Stroke,
+    GroupRestoration, GroupRestorationRun, NodeId, NodeKind, NodeSnapshot, NodeSpec, PathAnchor,
+    PathAnchorId, PathGeometry, Stroke,
 };
 
 pub const DOCUMENT_FORMAT: &str = "visual-authoring-document";
-pub const CURRENT_VERSION: u32 = 2;
+pub const CURRENT_VERSION: u32 = 3;
 
 #[derive(Debug, Error)]
 pub enum SerializationError {
@@ -57,7 +58,7 @@ pub fn from_json(json: &str) -> Result<Document, SerializationError> {
         .and_then(serde_json::Value::as_u64)
         .ok_or(SerializationError::InvalidEnvelopeField("version"))?;
     match version {
-        1 | 2 => serde_json::from_value::<StoredEnvelopeV1>(value)?.into_document(),
+        1..=3 => serde_json::from_value::<StoredEnvelopeV1>(value)?.into_document(),
         unsupported => Err(SerializationError::UnsupportedVersion(unsupported)),
     }
 }
@@ -92,7 +93,7 @@ impl StoredEnvelopeV1 {
         if self.format != DOCUMENT_FORMAT {
             return Err(SerializationError::UnsupportedFormat(self.format));
         }
-        if self.version != 1 && self.version != CURRENT_VERSION {
+        if !matches!(self.version, 1..=3) {
             return Err(SerializationError::UnsupportedVersion(u64::from(
                 self.version,
             )));
@@ -265,10 +266,56 @@ impl StoredNodeV1 {
 #[serde(tag = "type", rename_all = "snake_case")]
 enum StoredNodeKindV1 {
     Document,
-    Frame { width: f64, height: f64 },
+    Frame {
+        width: f64,
+        height: f64,
+    },
     Group,
-    Rectangle { width: f64, height: f64 },
-    Ellipse { width: f64, height: f64 },
+    Rectangle {
+        width: f64,
+        height: f64,
+    },
+    Ellipse {
+        width: f64,
+        height: f64,
+    },
+    Path {
+        closed: bool,
+        anchors: Vec<StoredPathAnchorV3>,
+    },
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+struct StoredPathAnchorV3 {
+    id: PathAnchorId,
+    position: StoredPointV3,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    handle_in: Option<StoredPointV3>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    handle_out: Option<StoredPointV3>,
+}
+
+#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+struct StoredPointV3 {
+    x: f64,
+    y: f64,
+}
+
+impl From<Vec2> for StoredPointV3 {
+    fn from(point: Vec2) -> Self {
+        Self {
+            x: point.x,
+            y: point.y,
+        }
+    }
+}
+
+impl From<StoredPointV3> for Vec2 {
+    fn from(point: StoredPointV3) -> Self {
+        Self::new(point.x, point.y)
+    }
 }
 
 impl StoredNodeKindV1 {
@@ -288,6 +335,19 @@ impl StoredNodeKindV1 {
             (NodeKind::Ellipse, Some(Geometry::Ellipse { size })) => Ok(Self::Ellipse {
                 width: size.x,
                 height: size.y,
+            }),
+            (NodeKind::Path, Some(Geometry::Path(path))) => Ok(Self::Path {
+                closed: path.closed,
+                anchors: path
+                    .anchors
+                    .iter()
+                    .map(|anchor| StoredPathAnchorV3 {
+                        id: anchor.id,
+                        position: anchor.position.into(),
+                        handle_in: anchor.handle_in.map(Into::into),
+                        handle_out: anchor.handle_out.map(Into::into),
+                    })
+                    .collect(),
             }),
             _ => Err(invalid()),
         }
@@ -314,6 +374,21 @@ impl StoredNodeKindV1 {
                 Some(Geometry::Ellipse {
                     size: Vec2::new(width, height),
                 }),
+            ),
+            Self::Path { closed, anchors } => (
+                NodeKind::Path,
+                Some(Geometry::Path(PathGeometry {
+                    closed,
+                    anchors: anchors
+                        .into_iter()
+                        .map(|anchor| PathAnchor {
+                            id: anchor.id,
+                            position: anchor.position.into(),
+                            handle_in: anchor.handle_in.map(Into::into),
+                            handle_out: anchor.handle_out.map(Into::into),
+                        })
+                        .collect(),
+                })),
             ),
         }
     }
@@ -488,6 +563,97 @@ impl From<StoredAppearanceV1> for Appearance {
 mod tests {
     use super::*;
     use visual_authoring_document::{Command, HeadlessEditorCore};
+
+    #[test]
+    fn version_three_path_round_trip_preserves_anchor_ids_and_handles() {
+        let mut editor = HeadlessEditorCore::blank("Root");
+        let root = editor.document().root_id();
+        let path_id = NodeId::new();
+        let first = PathAnchorId::new();
+        let second = PathAnchorId::new();
+        let path = PathGeometry {
+            closed: false,
+            anchors: vec![
+                PathAnchor {
+                    id: first,
+                    position: Vec2::new(5.0, 10.0),
+                    handle_in: None,
+                    handle_out: Some(Vec2::new(15.0, 20.0)),
+                },
+                PathAnchor {
+                    id: second,
+                    position: Vec2::new(40.0, 50.0),
+                    handle_in: Some(Vec2::new(30.0, 35.0)),
+                    handle_out: None,
+                },
+            ],
+        };
+        editor
+            .dispatch(Command::CreateNode {
+                spec: NodeSpec::path(path_id, "Curve", path),
+                parent: root,
+                index: 0,
+            })
+            .unwrap();
+
+        let encoded = to_json_pretty(editor.document()).unwrap();
+        let value: serde_json::Value = serde_json::from_str(&encoded).unwrap();
+        assert_eq!(value["version"], 3);
+        let restored = from_json(&encoded).unwrap();
+        assert_eq!(restored, *editor.document());
+    }
+
+    #[test]
+    fn duplicate_path_anchor_ids_are_rejected_during_load() {
+        let mut editor = HeadlessEditorCore::blank("Root");
+        let root = editor.document().root_id();
+        let anchor_id = PathAnchorId::new();
+        editor
+            .dispatch(Command::CreateNode {
+                spec: NodeSpec::path(
+                    NodeId::new(),
+                    "Path",
+                    PathGeometry {
+                        closed: false,
+                        anchors: vec![
+                            PathAnchor::new(anchor_id, Vec2::ZERO),
+                            PathAnchor::new(PathAnchorId::new(), Vec2::new(10.0, 10.0)),
+                        ],
+                    },
+                ),
+                parent: root,
+                index: 0,
+            })
+            .unwrap();
+        let mut value: serde_json::Value =
+            serde_json::from_str(&to_json_pretty(editor.document()).unwrap()).unwrap();
+        let path = value["document"]["nodes"]
+            .as_array_mut()
+            .unwrap()
+            .iter_mut()
+            .find(|node| node["kind"]["type"] == "path")
+            .unwrap();
+        path["kind"]["anchors"][1]["id"] = path["kind"]["anchors"][0]["id"].clone();
+
+        assert!(matches!(
+            from_json(&value.to_string()),
+            Err(SerializationError::InvalidDocument(
+                DocumentError::InvalidGeometry(_)
+            ))
+        ));
+    }
+
+    #[test]
+    fn versions_one_and_two_remain_loadable_after_version_three_bump() {
+        let (document, ..) = sample_document();
+        let current: serde_json::Value =
+            serde_json::from_str(&to_json_pretty(&document).unwrap()).unwrap();
+        for legacy_version in [1_u64, 2] {
+            let mut legacy = current.clone();
+            legacy["version"] = legacy_version.into();
+            assert_eq!(from_json(&legacy.to_string()).unwrap(), document);
+        }
+    }
 
     fn sample_document() -> (Document, NodeId, NodeId, NodeId) {
         let root_id = NodeId::new();

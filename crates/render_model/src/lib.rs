@@ -725,6 +725,8 @@ fn primitive(geometry: Option<&Geometry>) -> Option<(PrimitiveKind, Vec2)> {
             Some((PrimitiveKind::Rectangle, *size))
         }
         Geometry::Ellipse { size } => Some((PrimitiveKind::Ellipse, *size)),
+        // Phase 2A establishes persistent path semantics before GPU encoding.
+        Geometry::Path(_) => None,
     }
 }
 
@@ -777,7 +779,8 @@ pub fn coalesce_ranges(slots: &[u32]) -> Vec<DirtySlotRange> {
 #[cfg(test)]
 mod tests {
     use visual_authoring_document::{
-        Appearance, ColorRgba, Command, CornerRadii, HeadlessEditorCore, NodeSpec, Stroke,
+        Appearance, ColorRgba, Command, CornerRadii, HeadlessEditorCore, NodeSpec, PathAnchor,
+        PathAnchorId, PathGeometry, Stroke,
     };
 
     use super::*;
@@ -829,6 +832,36 @@ mod tests {
             model.item(ellipse).unwrap().slot
         );
         assert_eq!(model.last_update().full_render_rebuild_count, 1);
+    }
+
+    #[test]
+    fn path_schema_is_explicitly_omitted_until_phase2a_gpu_support() {
+        let mut editor = HeadlessEditorCore::blank("render");
+        let root = editor.document().root_id();
+        let path_id = NodeId::new();
+        editor
+            .dispatch(Command::CreateNode {
+                spec: NodeSpec::path(
+                    path_id,
+                    "path",
+                    PathGeometry {
+                        closed: false,
+                        anchors: vec![
+                            PathAnchor::new(PathAnchorId::new(), Vec2::ZERO),
+                            PathAnchor::new(PathAnchorId::new(), Vec2::new(20.0, 10.0)),
+                        ],
+                    },
+                ),
+                parent: root,
+                index: 0,
+            })
+            .unwrap();
+        let scene = ComputedScene::build(editor.document(), editor.revision()).unwrap();
+        let model = RenderModel::build(editor.document(), &scene, editor.revision()).unwrap();
+
+        assert_eq!(model.item(path_id), None);
+        assert_eq!(model.item_count(), 0);
+        assert_eq!(model.gpu_omitted_count(), 0);
     }
 
     #[test]
