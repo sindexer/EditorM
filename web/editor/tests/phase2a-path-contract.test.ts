@@ -103,7 +103,8 @@ describe("Phase 2A path rendering contract", () => {
         : harness.indexOf("async function capture("),
     );
     expect(clickPoint).toContain("waitForInteractionIdle");
-    expect(clickPoint).not.toContain("afterPressExpression");
+    expect(clickPoint).toContain("afterPressExpression");
+    expect(clickPoint).toContain("pointer_press_settle_timeout");
 
     // Direct command dispatch crosses the interaction boundary, so it asserts quiescence first.
     for (const boundary of [

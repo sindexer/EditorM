@@ -479,7 +479,10 @@ async function waitForInteractionIdle(label, timeoutMs = 30000) {
 
 /// Presses and releases at a point, then waits for the interaction that press may have opened to
 /// finish. Every call site can therefore treat a click as complete when it returns.
-async function clickPoint(point, { modifiers = 0, clickCount = 1, label = "click" } = {}) {
+async function clickPoint(
+  point,
+  { modifiers = 0, clickCount = 1, label = "click", afterPressExpression = null } = {},
+) {
   await pageClient.send("Input.dispatchMouseEvent", {
     type: "mousePressed",
     x: point.center_x ?? point.x,
@@ -489,6 +492,12 @@ async function clickPoint(point, { modifiers = 0, clickCount = 1, label = "click
     clickCount,
     modifiers,
   });
+  // React's pointer-down handler awaits hit testing before it opens and captures an interaction.
+  // Do not release until that asynchronous press path has reached the expected state, otherwise
+  // pointer-up can arrive while no interaction exists and the transaction will be opened later.
+  if (afterPressExpression) {
+    await waitFor(afterPressExpression, 30000, "pointer_press_settle_timeout");
+  }
   await pageClient.send("Input.dispatchMouseEvent", {
     type: "mouseReleased",
     x: point.center_x ?? point.x,
@@ -788,20 +797,30 @@ try {
   const filledId = byName["Closed Filled"].id;
   const straightId = byName["Open Straight"].id;
   await send("selection", { mode: "clear" });
-  await clickPoint(await clientPointForWorld([180, -130]), { label: "click on the fill interior" });
+  await clickPoint(await clientPointForWorld([180, -130]), {
+    label: "click on the fill interior",
+    afterPressExpression:
+      "window.__PHASE0E_PROOF__?.history?.transaction_active === true && window.__PHASE0E_PROOF__?.interaction_active?.kind === 'move'",
+  });
   await waitFor("window.__PHASE0E_PROOF__?.selection_count === 1", 30000, "path_pick_timeout");
   const interiorPick = (await selectionIds())[0];
 
   await send("selection", { mode: "clear" });
   await clickPoint(await clientPointForWorld([95, -70]), {
     label: "click outside the outline, inside the bounding box",
+    afterPressExpression:
+      "window.__PHASE0E_PROOF__?.interaction_active?.kind === 'marquee'",
   });
   // A miss opens no interaction and changes no selection, so there is nothing to wait *for*:
   // quiescence has already been established by clickPoint before the selection is read.
   const outsidePick = await selectionIds();
 
   await send("selection", { mode: "clear" });
-  await clickPoint(await clientPointForWorld([-240, -220]), { label: "click on the stroke" });
+  await clickPoint(await clientPointForWorld([-240, -220]), {
+    label: "click on the stroke",
+    afterPressExpression:
+      "window.__PHASE0E_PROOF__?.history?.transaction_active === true && window.__PHASE0E_PROOF__?.interaction_active?.kind === 'move'",
+  });
   await waitFor("window.__PHASE0E_PROOF__?.selection_count === 1", 30000, "path_pick_timeout");
   const strokePick = (await selectionIds())[0];
 
