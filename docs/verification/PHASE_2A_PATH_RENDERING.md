@@ -4,11 +4,13 @@ Scope: connect the already-merged persistent Path schema to the real scene, hit 
 model, WASM boundary and WebGPU pipeline. No Pen tool, no anchor editing UI, no caps, joins,
 dashes or gradients.
 
-## What was verified in this container
+## Verification status
 
-This container has no GPU. Everything below that needs actual hardware is recorded as
-**UNVERIFIED**, with the command to run on a machine that has a GPU. Nothing here claims a
-hardware PASS.
+CPU, WASM, and software-GPU diagnostics were followed by a fresh actual-hardware run on Windows.
+Run `phase2a-20260825T142800Z-69ae0d0` tested committed source
+`69ae0d01e3d231729a022ecbec568bb3593acf6f` on Chrome 151.0.7922.174 and an NVIDIA GeForce GTX
+970. The tracked browser proof, pixel readback, screenshot, and metrics below are the executed
+evidence for that run; the earlier software run remains diagnostic only.
 
 | Item | Status | Evidence |
 | --- | --- | --- |
@@ -25,9 +27,9 @@ hardware PASS.
 | Gate 1B evidence unchanged by Phase 2A verification | PASS | `docs/verification/PHASE_1B_DIRECT_WASM_PROOF.json` unmodified; SHA-256 pinned in `web/editor/tests/phase1b-direct-wasm.test.ts` |
 | Render binary schema v3 + WGSL path pipeline published and consumed | PASS | `cargo test -p visual_authoring_renderer_wgpu`, `web/phase0d-preview` unit tests, `npm test` |
 | Path CPU performance at 10/100/1000 paths, split into initial tessellation / static frame / single edit / camera-only | PASS | `docs/PHASE_2A_PATH_METRICS.json` |
-| Actual Chrome + Dedicated Worker + WASM + actual WebGPU renders paths | UNVERIFIED (no GPU here) | run `npm.cmd run test:browser:phase2a:path-render` on the GPU machine |
-| WebGPU surface pixel readback for straight path, Bezier path, closed fill, stroke, background control | UNVERIFIED (no GPU here) | same command; writes `docs/verification/PHASE_2A_PIXEL_READBACK.json` |
-| Actual-GPU frame behaviour (draw calls, no triangle re-upload on camera frames) | UNVERIFIED (no GPU here) | same command; writes `docs/PHASE_2A_BROWSER_METRICS.json` |
+| Actual Chrome + Dedicated Worker + WASM + actual WebGPU renders paths | PASS (27/27 browser assertions) | `docs/verification/PHASE_2A_BROWSER_PROOF.json` |
+| WebGPU surface pixel readback for straight path, Bezier path, closed fill, stroke, background control | PASS (10/10 pixel assertions) | `docs/verification/PHASE_2A_PIXEL_READBACK.json`, `docs/verification/phase2a-paths.png` |
+| Actual-GPU frame behaviour (draw calls, no triangle re-upload on camera frames) | PASS | `docs/PHASE_2A_BROWSER_METRICS.json` |
 
 ## Commands
 
@@ -229,8 +231,8 @@ WASM in Node, so a harness-shaped defect cannot waste a hardware run. All 23 che
   with string anchor ids, `version: 3`), bounds survive `load_document`, and save → load → save is
   byte stable.
 
-What remains unproven without hardware is only the GPU half: whether those triangles actually
-appear on the WebGPU surface with the expected colours.
+At that checkpoint the GPU half remained unproven. The later Windows hardware run identified at
+the top of this record supplied that proof without rewriting the direct-WASM execution.
 
 ## Harness dry run in this container (diagnostic only, never evidence)
 
@@ -244,8 +246,9 @@ swap chain (`Could not find SharedImageBackingFactory ... WebGPUSwapChainTexture
 never finishes booting. The Phase 1B harness fails at exactly the same point in this container —
 see `PHASE_1B_BROWSER_SOFTWARE_RUN_FAILURE.json` — so this is an environment limit, not a defect
 in the Phase 2A harness. The diagnostic output is kept at
-`PHASE_2A_BROWSER_SOFTWARE_RUN_FAILURE.json` and is **not** evidence of anything about paths:
-gate status remains UNVERIFIED until the run happens on real GPU hardware.
+`PHASE_2A_BROWSER_SOFTWARE_RUN_FAILURE.json` and is **not** evidence of anything about paths. It
+did not change the status; the separate later actual-hardware run is the execution that produced
+the PASS evidence.
 
 ## Evidence separation
 
