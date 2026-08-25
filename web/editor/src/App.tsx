@@ -939,7 +939,7 @@ export function App() {
           gestures: draft.anchors,
         };
     if (!draft.created) publishPenDraft({ ...draft, created: true });
-    enqueuePen(() => engine.send("command", { command }).then(() => undefined));
+    enqueuePen(() => engine.send("update_transaction", { command }).then(() => undefined));
   };
 
   const finishPen = (closed: boolean, nextTool: Tool = "select") => {
@@ -958,7 +958,7 @@ export function App() {
     }
     enqueuePen(async () => {
       if (closed) {
-        await engine.send("command", {
+        await engine.send("update_transaction", {
           command: {
             kind: "set_path_from_pen",
             node_id: draft.nodeId,

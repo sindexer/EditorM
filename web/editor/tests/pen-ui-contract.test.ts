@@ -23,6 +23,8 @@ describe("Phase 2A Pen UI contract", () => {
 
   test("one Pen session is one atomic transaction", () => {
     expect(app).toContain('engine.send("begin_transaction")');
+    expect(app.match(/engine\.send\("update_transaction", \{ command \}\)/g)).toHaveLength(1);
+    expect(app).toContain('engine.send("update_transaction", {\n          command: {\n            kind: "set_path_from_pen"');
     expect(app).toContain('engine.send("commit_transaction")');
     expect(app).toContain('engine.send("rollback_transaction")');
     expect(app).toContain('event.key === "Enter" && penDraft.current');
@@ -35,4 +37,3 @@ describe("Phase 2A Pen UI contract", () => {
     expect(app).toContain("created: penDraft.current.created");
   });
 });
-
