@@ -100,8 +100,18 @@ class CdpClient {
   async connect() {
     this.socket = new WebSocket(this.url);
     await new Promise((resolve, reject) => {
-      this.socket.addEventListener("open", resolve, { once: true });
-      this.socket.addEventListener("error", reject, { once: true });
+      const timeout = setTimeout(
+        () => reject(new HarnessFailure("cdp_connect_timeout", `Timed out connecting to ${this.url}`)),
+        30000,
+      );
+      this.socket.addEventListener("open", () => {
+        clearTimeout(timeout);
+        resolve();
+      }, { once: true });
+      this.socket.addEventListener("error", (error) => {
+        clearTimeout(timeout);
+        reject(error);
+      }, { once: true });
     });
     this.socket.addEventListener("message", (event) => {
       const message = JSON.parse(event.data);
@@ -109,6 +119,7 @@ class CdpClient {
         const pending = this.pending.get(message.id);
         if (!pending) return;
         this.pending.delete(message.id);
+        clearTimeout(pending.timeout);
         if (message.error)
           pending.reject(
             new Error(`${message.error.code}: ${message.error.message}`),
@@ -119,12 +130,26 @@ class CdpClient {
       for (const listener of this.listeners.get(message.method) ?? [])
         listener(message.params);
     });
+    this.socket.addEventListener("close", () => {
+      for (const [id, pending] of this.pending) {
+        clearTimeout(pending.timeout);
+        pending.reject(new HarnessFailure("cdp_socket_closed", `CDP socket closed with request ${id} pending`));
+      }
+      this.pending.clear();
+    });
   }
 
-  send(method, params = {}) {
+  send(method, params = {}, timeoutMs = 30000) {
     const id = ++this.nextId;
     return new Promise((resolve, reject) => {
-      this.pending.set(id, { resolve, reject });
+      const timeout = setTimeout(() => {
+        this.pending.delete(id);
+        reject(new HarnessFailure("cdp_command_timeout", `Timed out waiting for CDP ${method}`, {
+          method,
+          timeout_ms: timeoutMs,
+        }));
+      }, timeoutMs);
+      this.pending.set(id, { resolve, reject, timeout });
       this.socket.send(JSON.stringify({ id, method, params }));
     });
   }
@@ -409,7 +434,15 @@ async function boundsForSelector(selector) {
 }
 
 
-async function clickPoint(point, { modifiers = 0, clickCount = 1 } = {}) {
+async function clickPoint(
+  point,
+  {
+    modifiers = 0,
+    clickCount = 1,
+    afterPressExpression = null,
+    afterReleaseExpression = null,
+  } = {},
+) {
   await pageClient.send("Input.dispatchMouseEvent", {
     type: "mousePressed",
     x: point.center_x ?? point.x,
@@ -419,6 +452,9 @@ async function clickPoint(point, { modifiers = 0, clickCount = 1 } = {}) {
     clickCount,
     modifiers,
   });
+  if (afterPressExpression) {
+    await waitFor(afterPressExpression, 30000, "pointer_press_settle_timeout");
+  }
   await pageClient.send("Input.dispatchMouseEvent", {
     type: "mouseReleased",
     x: point.center_x ?? point.x,
@@ -428,6 +464,9 @@ async function clickPoint(point, { modifiers = 0, clickCount = 1 } = {}) {
     clickCount,
     modifiers,
   });
+  if (afterReleaseExpression) {
+    await waitFor(afterReleaseExpression, 30000, "pointer_release_settle_timeout");
+  }
 }
 
 
@@ -714,17 +753,32 @@ try {
   const filledId = byName["Closed Filled"].id;
   const straightId = byName["Open Straight"].id;
   await send("selection", { mode: "clear" });
-  await clickPoint(await clientPointForWorld([180, -130]));
+  await clickPoint(await clientPointForWorld([180, -130]), {
+    afterPressExpression:
+      "window.__PHASE0E_PROOF__?.history?.transaction_active === true && window.__PHASE0E_PROOF__?.interaction_active?.kind === 'move'",
+    afterReleaseExpression:
+      "window.__PHASE0E_PROOF__?.history?.transaction_active === false && window.__PHASE0E_PROOF__?.interaction_active === null",
+  });
   await waitFor("window.__PHASE0E_PROOF__?.selection_count === 1", 30000, "path_pick_timeout");
   const interiorPick = (await selectionIds())[0];
 
   await send("selection", { mode: "clear" });
-  await clickPoint(await clientPointForWorld([95, -70]));
+  await clickPoint(await clientPointForWorld([95, -70]), {
+    afterPressExpression:
+      "window.__PHASE0E_PROOF__?.interaction_active?.kind === 'marquee'",
+    afterReleaseExpression:
+      "window.__PHASE0E_PROOF__?.interaction_active === null",
+  });
   await sleep(150);
   const outsidePick = await selectionIds();
 
   await send("selection", { mode: "clear" });
-  await clickPoint(await clientPointForWorld([-240, -220]));
+  await clickPoint(await clientPointForWorld([-240, -220]), {
+    afterPressExpression:
+      "window.__PHASE0E_PROOF__?.history?.transaction_active === true && window.__PHASE0E_PROOF__?.interaction_active?.kind === 'move'",
+    afterReleaseExpression:
+      "window.__PHASE0E_PROOF__?.history?.transaction_active === false && window.__PHASE0E_PROOF__?.interaction_active === null",
+  });
   await waitFor("window.__PHASE0E_PROOF__?.selection_count === 1", 30000, "path_pick_timeout");
   const strokePick = (await selectionIds())[0];
 
