@@ -70,6 +70,7 @@ function projectedNodes(response) {
 }
 
 const PATH_NODE = "6f2c3b4a-1d5e-4a7b-8c9d-0e1f2a3b4c5d";
+const PEN_PATH_NODE = "8b2c3d4e-5f60-4a7b-8c9d-0e1f2a3b4c5d";
 const ANCHORS = [
   { id: "6f2c3b4a-1d5e-4a7b-8c9d-0e1f2a3b4c01", position: [0, 0] },
   { id: "6f2c3b4a-1d5e-4a7b-8c9d-0e1f2a3b4c02", position: [160, 0] },
@@ -214,6 +215,57 @@ check(
   projectedNodes(call("get_ui_snapshot"))[PATH_NODE] === undefined &&
     removed.resources.path_instance_count === 4,
   removed.resources.path_instance_count,
+);
+
+// ------------------------------------------------------------------ typed Pen gesture transaction
+requireOk("pen_begin_transaction", call("begin_transaction"));
+const penCreated = requireOk(
+  "create_path_from_pen",
+  call("update_transaction", {
+    command: {
+      kind: "create_path_from_pen",
+      node_id: PEN_PATH_NODE,
+      parent_id: rootId,
+      index: 0,
+      name: "Pen Proof Path",
+      x: 240,
+      y: 180,
+      closed: false,
+      gestures: [
+        { id: ANCHORS[0].id, position: [0, 0], drag: [40, 30] },
+        { id: ANCHORS[1].id, position: [160, 0] },
+      ],
+    },
+  }),
+);
+check("pen_create_tessellates_once", penCreated.metrics.path_tessellations === 1, penCreated.metrics.path_tessellations);
+requireOk(
+  "set_path_from_pen",
+  call("update_transaction", {
+    command: {
+      kind: "set_path_from_pen",
+      node_id: PEN_PATH_NODE,
+      closed: true,
+      gestures: [
+        { id: ANCHORS[0].id, position: [0, 0], drag: [40, 30] },
+        { id: ANCHORS[1].id, position: [160, 0] },
+        { id: ANCHORS[2].id, position: [80, 120], drag: [110, 150] },
+      ],
+    },
+  }),
+);
+const penCommitted = requireOk("pen_commit_transaction", call("commit_transaction"));
+check(
+  "pen_path_is_projected_after_commit",
+  projectedNodes(call("get_ui_snapshot"))[PEN_PATH_NODE]?.kind === "path",
+  projectedNodes(call("get_ui_snapshot"))[PEN_PATH_NODE] ?? null,
+);
+const penUndone = requireOk("undo_pen_transaction", call("undo"));
+check(
+  "undo_removes_whole_pen_transaction",
+  projectedNodes(call("get_ui_snapshot"))[PEN_PATH_NODE] === undefined &&
+    penUndone.resources.path_instance_count === fixture.resources.path_instance_count,
+  penUndone.resources.path_instance_count,
 );
 
 // ------------------------------------------------------------------ negative cases
