@@ -4,7 +4,8 @@ These instructions apply to the entire repository.
 
 ## Authorization boundary
 
-- Phase 0E-R3 remains the approved baseline for Phase 0 evidence. Phase 1A and the Phase 1B implementation (multiple selection, alignment, distribution, snapping) merged to `main`; Gate 1B remains pending under `docs/PHASE_1B_AUTHORIZATION.md`. Phase 2 and later are not authorized.
+- Phase 0E-R3 remains the approved baseline for Phase 0 evidence. Phase 1A and Phase 1B merged to `main`; Gate 1B passed on source commit `330476b57ba4f16963f5160e24ceb82a21d66438` with the tracked evidence recorded by `docs/PHASE_1B_AUTHORIZATION.md` and `docs/verification/`.
+- Phase 2 is authorized by the merged `docs/PHASE_2_AUTHORIZATION.md` and must proceed strictly in its Phase 2A through Phase 2E order. The Phase 2A path schema checkpoint merged to `main` in PR #19. Do not begin Phase 2B until the authorized Phase 2A Pen/Bezier creation, runtime, renderer, browser, and required hardware evidence are complete and reviewed. Phase 3 and later remain unauthorized.
 - Preserve the Phase 1 through Phase 8 order in `docs/ROADMAP.md`; do not pull later requirements into an earlier phase.
 - Treat `CHECKSUMS.sha256` and the Phase 0 files that existed at approved commit `39085167a1b9d2ce1ba78060b3fee4d9327aaf27` as immutable history. Add a new ADR instead of rewriting ADR-001 through ADR-041.
 - Record every phase's scope in a `docs/PHASE_*_AUTHORIZATION.md` and its executed evidence under `docs/verification/`. State plainly which required evidence a task could not produce instead of omitting it.
