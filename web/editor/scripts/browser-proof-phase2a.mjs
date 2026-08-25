@@ -434,15 +434,52 @@ async function boundsForSelector(selector) {
 }
 
 
-async function clickPoint(
-  point,
-  {
-    modifiers = 0,
-    clickCount = 1,
-    afterPressExpression = null,
-    afterReleaseExpression = null,
-  } = {},
-) {
+/// Waits until the editor has no interaction in flight.
+///
+/// A pointer press on the canvas opens an interaction transaction, and the editor closes it
+/// asynchronously after the pointer is released: `finishInteraction` drains the drag queue, awaits
+/// `commit_transaction`, and only then returns the FSM to Idle. CDP resolving `mouseReleased` says
+/// nothing about that tail, so any request sent immediately after a click can land while the
+/// transaction is still open and be rejected — correctly — by the engine.
+///
+/// This is state-based, not time-based: it polls the live proof object and returns as soon as the
+/// editor is quiescent, so an already-idle editor costs one poll.
+async function waitForInteractionIdle(label, timeoutMs = 30000) {
+  const deadline = Date.now() + timeoutMs;
+  let state;
+  while (Date.now() < deadline) {
+    state = await evaluate(`(() => {
+      const proof = window.__PHASE0E_PROOF__ ?? {};
+      return {
+        fsm: proof.fsm ?? null,
+        transaction_active: proof.history?.transaction_active ?? null,
+        interaction_active: proof.interaction_active ?? null,
+        interaction_queue: proof.interaction_queue ?? null,
+        engine_sequence: proof.engine_sequence ?? null,
+        gpu_frame_sequence: proof.gpu_frame_sequence ?? null,
+        selection: proof.selection ?? null,
+      };
+    })()`).catch((error) => ({ evaluation_error: error.message }));
+    const idle =
+      (state?.fsm === "Idle" || state?.fsm === "NestedEditing") &&
+      state?.transaction_active === false &&
+      state?.interaction_active === null &&
+      state?.interaction_queue?.in_flight === false &&
+      state?.interaction_queue?.scheduled === false;
+    if (idle) return state;
+    // Polling interval only. The condition above, never elapsed time, decides when to proceed.
+    await sleep(25);
+  }
+  throw new HarnessFailure(
+    "interaction_quiescence_timeout",
+    `The editor did not return to an idle interaction state after ${label}`,
+    { step: label, timeout_ms: timeoutMs, last_state: state },
+  );
+}
+
+/// Presses and releases at a point, then waits for the interaction that press may have opened to
+/// finish. Every call site can therefore treat a click as complete when it returns.
+async function clickPoint(point, { modifiers = 0, clickCount = 1, label = "click" } = {}) {
   await pageClient.send("Input.dispatchMouseEvent", {
     type: "mousePressed",
     x: point.center_x ?? point.x,
@@ -464,9 +501,7 @@ async function clickPoint(
     clickCount,
     modifiers,
   });
-  if (afterReleaseExpression) {
-    await waitFor(afterReleaseExpression, 30000, "pointer_release_settle_timeout");
-  }
+  return waitForInteractionIdle(label);
 }
 
 
@@ -750,35 +785,26 @@ try {
   await capture(screenshots.paths);
 
   // --------------------------------------------------------------------------- real hit testing
+  // Each case is: clear the selection, click, let the interaction the click opened finish, then
+  // read the result. `clickPoint` returns only once the editor is idle again, so no request can
+  // race an open interaction transaction.
   const filledId = byName["Closed Filled"].id;
   const straightId = byName["Open Straight"].id;
   await send("selection", { mode: "clear" });
-  await clickPoint(await clientPointForWorld([180, -130]), {
-    afterPressExpression:
-      "window.__PHASE0E_PROOF__?.history?.transaction_active === true && window.__PHASE0E_PROOF__?.interaction_active?.kind === 'move'",
-    afterReleaseExpression:
-      "window.__PHASE0E_PROOF__?.history?.transaction_active === false && window.__PHASE0E_PROOF__?.interaction_active === null",
-  });
+  await clickPoint(await clientPointForWorld([180, -130]), { label: "click on the fill interior" });
   await waitFor("window.__PHASE0E_PROOF__?.selection_count === 1", 30000, "path_pick_timeout");
   const interiorPick = (await selectionIds())[0];
 
   await send("selection", { mode: "clear" });
   await clickPoint(await clientPointForWorld([95, -70]), {
-    afterPressExpression:
-      "window.__PHASE0E_PROOF__?.interaction_active?.kind === 'marquee'",
-    afterReleaseExpression:
-      "window.__PHASE0E_PROOF__?.interaction_active === null",
+    label: "click outside the outline, inside the bounding box",
   });
-  await sleep(150);
+  // A miss opens no interaction and changes no selection, so there is nothing to wait *for*:
+  // quiescence has already been established by clickPoint before the selection is read.
   const outsidePick = await selectionIds();
 
   await send("selection", { mode: "clear" });
-  await clickPoint(await clientPointForWorld([-240, -220]), {
-    afterPressExpression:
-      "window.__PHASE0E_PROOF__?.history?.transaction_active === true && window.__PHASE0E_PROOF__?.interaction_active?.kind === 'move'",
-    afterReleaseExpression:
-      "window.__PHASE0E_PROOF__?.history?.transaction_active === false && window.__PHASE0E_PROOF__?.interaction_active === null",
-  });
+  await clickPoint(await clientPointForWorld([-240, -220]), { label: "click on the stroke" });
   await waitFor("window.__PHASE0E_PROOF__?.selection_count === 1", 30000, "path_pick_timeout");
   const strokePick = (await selectionIds())[0];
 
@@ -790,6 +816,9 @@ try {
     { id: "6f2c3b4a-1d5e-4a7b-8c9d-0e1f2a3b4c02", position: [160, 0] },
     { id: "6f2c3b4a-1d5e-4a7b-8c9d-0e1f2a3b4c03", position: [80, 120] },
   ];
+  // The harness mixes real pointer interaction with direct command dispatch. Every crossing of
+  // that boundary asserts quiescence first, so a command can never land inside an interaction.
+  await waitForInteractionIdle("before dispatching create_path");
   const createdResponse = await send("command", {
     command: {
       kind: "create_path",
@@ -809,6 +838,7 @@ try {
   const tallerAnchors = anchors.map((anchor, index) =>
     index === 2 ? { ...anchor, position: [80, 260] } : anchor,
   );
+  await waitForInteractionIdle("before dispatching set_path_geometry");
   const editedResponse = await send("command", {
     command: {
       kind: "set_path_geometry",
@@ -819,8 +849,10 @@ try {
   });
   const editedBounds = (await nodeTable())[createdId]?.world_bounds ?? null;
 
+  await waitForInteractionIdle("before undo");
   const undoneResponse = await send("undo");
   const undoneBounds = (await nodeTable())[createdId]?.world_bounds ?? null;
+  await waitForInteractionIdle("before redo");
   const redoneResponse = await send("redo");
   const redoneBounds = (await nodeTable())[createdId]?.world_bounds ?? null;
   await send("undo");
@@ -830,6 +862,7 @@ try {
   // ------------------------------------------------------- save, load, and anchor identity
   // The document round trip runs through the same serialization the file format uses, so the
   // proof shows that a rendered path survives a save and load with its anchor identities intact.
+  await waitForInteractionIdle("before save_document");
   const saved = await send("save_document");
   const savedDocument = JSON.parse(saved.result.document_json);
   const savedPaths = savedDocument.document.nodes.filter(
@@ -841,6 +874,7 @@ try {
   const beforeReloadBounds = Object.fromEntries(
     pathNodes.map((node) => [node.name, node.world_bounds]),
   );
+  await waitForInteractionIdle("before load_document");
   const reloaded = await send("load_document", {
     document_json: saved.result.document_json,
   });
@@ -1159,6 +1193,8 @@ try {
   browserClient?.close();
   chromeProcess?.kill();
   preview?.server?.kill();
+  // Process cleanup only: give Chrome a moment to release the profile directory before deleting
+  // it. This is not synchronisation with the editor; every such wait is state-based.
   await sleep(300);
   await rm(profile, { recursive: true, force: true }).catch(() => {});
 }

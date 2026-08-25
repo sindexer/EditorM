@@ -139,6 +139,60 @@ fallback rebuilds = 0
 draw calls and uploaded vertex bytes recorded
 ```
 
+## First Windows hardware run: environment good, harness race found
+
+The first run on real hardware (GeForce, Maxwell, `browser-webgpu`) established that the
+environment and the product boundary are sound:
+
+```
+actual_webgpu = true          Dedicated Worker = true
+software_renderer = false     WASM initialized  = true
+GPU validation errors = 0     schema version    = 3
+fallback rebuilds = 0
+```
+
+It then stopped at the first hit-test click with:
+
+```
+EngineFailure: operation dispatch is not allowed while a transaction is active
+fsm = "Moving"   history.transaction_active = true   interaction_active.kind = "move"
+```
+
+**Classification: HARNESS.** The engine guard is correct and was not weakened. A pointer press on
+the canvas opens an interaction transaction, and `finishInteraction` in `web/editor/src/App.tsx`
+closes it *asynchronously* after the pointer is released: it drains the drag queue, awaits
+`commit_transaction`, and only then returns the FSM to Idle. CDP resolving `mouseReleased` says
+nothing about that tail, so the harness's next request landed while the transaction was still
+open. The editor does return to Idle; the harness simply did not wait for it.
+
+The fix is state-based synchronisation, never a fixed delay:
+
+- `waitForInteractionIdle(label)` polls the live proof object until `fsm` is Idle (or
+  NestedEditing), `history.transaction_active` is false, `interaction_active` is null, and the
+  interaction queue has nothing in flight or scheduled. An already-idle editor costs one poll.
+- `clickPoint` ends with that wait, so a click is complete when it returns.
+- Every crossing from real pointer input into direct command dispatch — `create_path`,
+  `set_path_geometry`, `undo`, `redo`, `save_document`, `load_document` — asserts quiescence first.
+- A timeout raises `interaction_quiescence_timeout` and records `fsm`, `transaction_active`,
+  `interaction_active`, `interaction_queue`, `engine_sequence`, `gpu_frame_sequence` and
+  `selection`.
+
+That last point is what makes the next failure classifiable without guessing: **if the editor
+returns to Idle and the harness moved too early, the harness is at fault; if the editor never
+returns to Idle, the timeout evidence shows a product interaction-completion bug** — a transaction
+leak — and the classification changes to PRODUCT.
+
+`web/editor/tests/phase2a-path-contract.test.ts` pins this contract: the helper must exist and
+consider every signal, `clickPoint` must use it, each command boundary must assert it, the
+dedicated failure code and its evidence fields must be present, and no `await sleep` in the proof
+body may exceed a polling interval.
+
+The Phase 1A and 1B harnesses were inspected for the same pattern. They are theoretically exposed
+to it, but every canvas click there is followed by a state condition (`selection_count === N`,
+`engine_sequence > n`, an FSM assertion) rather than an immediate dispatch, and both passed on real
+hardware. They are left untouched: changing verified Gate evidence harnesses without the hardware
+to re-verify them would trade a real asset for a theoretical improvement.
+
 ## Shipped WASM matches the committed source
 
 The tracked package under `web/editor/public/pkg/` is what a hardware run actually serves, so it

@@ -75,6 +75,78 @@ describe("Phase 2A path rendering contract", () => {
     }
   });
 
+  // The first Windows hardware run failed here, not in the product: a click opens an interaction
+  // transaction, and the editor closes it asynchronously after the pointer is released, so a
+  // request sent the moment CDP resolved mouseReleased was correctly rejected by the engine with
+  // "operation dispatch is not allowed while a transaction is active". These assertions keep the
+  // harness synchronising on state instead of on elapsed time.
+  test("the browser harness waits for interaction quiescence rather than sleeping", () => {
+    const harness = read("web/editor/scripts/browser-proof-phase2a.mjs");
+
+    // The helper exists and checks every signal that says an interaction is over.
+    expect(harness).toContain("async function waitForInteractionIdle(");
+    for (const signal of [
+      "proof.fsm",
+      "proof.history?.transaction_active",
+      "proof.interaction_active",
+      "interaction_queue?.in_flight",
+      "interaction_queue?.scheduled",
+    ]) {
+      expect(harness, `quiescence must consider ${signal}`).toContain(signal);
+    }
+
+    // A click is not complete until the interaction it opened is finished.
+    const clickPoint = harness.slice(
+      harness.indexOf("async function clickPoint("),
+      harness.indexOf("async function clickSelector(") > 0
+        ? harness.indexOf("async function clickSelector(")
+        : harness.indexOf("async function capture("),
+    );
+    expect(clickPoint).toContain("waitForInteractionIdle");
+
+    // Direct command dispatch crosses the interaction boundary, so it asserts quiescence first.
+    for (const boundary of [
+      "before dispatching create_path",
+      "before dispatching set_path_geometry",
+      "before undo",
+      "before redo",
+      "before save_document",
+      "before load_document",
+    ]) {
+      expect(harness, `missing idle boundary: ${boundary}`).toContain(boundary);
+    }
+
+    // A distinct failure code keeps the next failure classifiable as harness race vs product leak.
+    expect(harness).toContain("interaction_quiescence_timeout");
+    for (const detail of [
+      "fsm:",
+      "transaction_active:",
+      "interaction_active:",
+      "interaction_queue:",
+      "engine_sequence:",
+      "gpu_frame_sequence:",
+    ]) {
+      expect(harness, `timeout evidence must record ${detail}`).toContain(detail);
+    }
+
+    // Synchronisation is state-based: inside the proof body, sleep may only be a polling
+    // interval. The final `finally` block is process cleanup, not synchronisation, so it is
+    // excluded rather than exempted by a magic number.
+    const cleanupIndex = harness.lastIndexOf("} finally {");
+    expect(cleanupIndex).toBeGreaterThan(0);
+    const proofBody = harness.slice(0, cleanupIndex);
+    const sleepCalls = [...proofBody.matchAll(/await sleep\((\d+)\)/g)].map((match) =>
+      Number(match[1]),
+    );
+    expect(sleepCalls.length).toBeGreaterThan(0);
+    for (const milliseconds of sleepCalls) {
+      expect(
+        milliseconds,
+        `await sleep(${milliseconds}) is a fixed delay, not a polling interval`,
+      ).toBeLessThanOrEqual(100);
+    }
+  });
+
   test("a Phase 2A browser proof is never claimed without the artifact", () => {
     const proofPath = path.join(workspace, "docs/verification/PHASE_2A_BROWSER_PROOF.json");
     const record = read("docs/verification/PHASE_2A_PATH_RENDERING.md");
