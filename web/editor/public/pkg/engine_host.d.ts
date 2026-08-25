@@ -16,6 +16,8 @@ export class EngineHost {
     static renderBinarySchemaVersion(): number;
     takeDirtyInstances(): Uint8Array;
     takeFullInstances(): Uint8Array;
+    takePathInstances(): Uint8Array;
+    takePathVertices(): Uint8Array;
     takeRemovedSlots(): Uint32Array;
     takeVisibleSlots(): Uint32Array;
 }
@@ -33,6 +35,8 @@ export interface InitOutput {
     readonly enginehost_takeDirtyInstances: (a: number) => any;
     readonly enginehost_takeRemovedSlots: (a: number) => any;
     readonly enginehost_takeVisibleSlots: (a: number) => any;
+    readonly enginehost_takePathInstances: (a: number) => any;
+    readonly enginehost_takePathVertices: (a: number) => any;
     readonly __wbindgen_externrefs: WebAssembly.Table;
     readonly __wbindgen_malloc: (a: number, b: number) => number;
     readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;

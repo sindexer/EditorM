@@ -1,0 +1,317 @@
+{
+  "phase": "2A",
+  "gate_run_id": "phase2a-20260825T142800Z-69ae0d0",
+  "tested_source_commit": "69ae0d01e3d231729a022ecbec568bb3593acf6f",
+  "tested_branch": "feat/phase2a-path-rendering",
+  "proof_kind": "actual-hardware-webgpu-surface-readback",
+  "captured_at_utc": "2026-08-25T14:27:48.173Z",
+  "surface_base_format": "bgra8unorm",
+  "pipeline_view_format": "bgra8unorm-srgb",
+  "readback_view_format": "bgra8unorm-srgb",
+  "note": "Every sample is a WebGPU surface readback of document content. No SVG or Canvas2D pixel is asserted here, and paths are never drawn by React.",
+  "colour_tolerance": 70,
+  "expected_stroke_srgb": [
+    13,
+    18,
+    28
+  ],
+  "expected_triangle_fill_srgb": [
+    41,
+    140,
+    242
+  ],
+  "expected_curve_fill_srgb": [
+    250,
+    184,
+    46
+  ],
+  "cases": [
+    {
+      "case": "straight_path_stroke",
+      "world": [
+        -240,
+        -220
+      ],
+      "expected_srgb": [
+        13,
+        18,
+        28
+      ],
+      "expect_background": false,
+      "rgba": [
+        13,
+        18,
+        28,
+        255
+      ],
+      "background_rgba": [
+        53,
+        66,
+        80,
+        255
+      ],
+      "distance_to_expected": 0,
+      "distance_to_background": 81.2896057316063,
+      "surface_base_format": "bgra8unorm",
+      "readback_view_format": "bgra8unorm-srgb",
+      "matched": true
+    },
+    {
+      "case": "straight_path_background",
+      "world": [
+        -240,
+        -180
+      ],
+      "expected_srgb": null,
+      "expect_background": true,
+      "rgba": [
+        53,
+        66,
+        80,
+        255
+      ],
+      "background_rgba": [
+        53,
+        66,
+        80,
+        255
+      ],
+      "distance_to_expected": null,
+      "distance_to_background": 0,
+      "surface_base_format": "bgra8unorm",
+      "readback_view_format": "bgra8unorm-srgb",
+      "matched": true
+    },
+    {
+      "case": "bezier_path_curve",
+      "world": [
+        -300,
+        -99.375
+      ],
+      "expected_srgb": [
+        13,
+        18,
+        28
+      ],
+      "expect_background": false,
+      "rgba": [
+        13,
+        18,
+        28,
+        255
+      ],
+      "background_rgba": [
+        53,
+        66,
+        80,
+        255
+      ],
+      "distance_to_expected": 0,
+      "distance_to_background": 81.2896057316063,
+      "surface_base_format": "bgra8unorm",
+      "readback_view_format": "bgra8unorm-srgb",
+      "matched": true
+    },
+    {
+      "case": "bezier_path_chord_is_empty",
+      "world": [
+        -300,
+        -60
+      ],
+      "expected_srgb": null,
+      "expect_background": true,
+      "rgba": [
+        53,
+        66,
+        80,
+        255
+      ],
+      "background_rgba": [
+        53,
+        66,
+        80,
+        255
+      ],
+      "distance_to_expected": null,
+      "distance_to_background": 0,
+      "surface_base_format": "bgra8unorm",
+      "readback_view_format": "bgra8unorm-srgb",
+      "matched": true
+    },
+    {
+      "case": "closed_fill_interior",
+      "world": [
+        180,
+        -130
+      ],
+      "expected_srgb": [
+        41,
+        140,
+        242
+      ],
+      "expect_background": false,
+      "rgba": [
+        41,
+        140,
+        242,
+        255
+      ],
+      "background_rgba": [
+        53,
+        66,
+        80,
+        255
+      ],
+      "distance_to_expected": 0,
+      "distance_to_background": 178.50490189347744,
+      "surface_base_format": "bgra8unorm",
+      "readback_view_format": "bgra8unorm-srgb",
+      "matched": true
+    },
+    {
+      "case": "closed_fill_outside_bbox_corner",
+      "world": [
+        95,
+        -70
+      ],
+      "expected_srgb": null,
+      "expect_background": true,
+      "rgba": [
+        53,
+        66,
+        80,
+        255
+      ],
+      "background_rgba": [
+        53,
+        66,
+        80,
+        255
+      ],
+      "distance_to_expected": null,
+      "distance_to_background": 0,
+      "surface_base_format": "bgra8unorm",
+      "readback_view_format": "bgra8unorm-srgb",
+      "matched": true
+    },
+    {
+      "case": "closed_curve_stroke",
+      "world": [
+        180,
+        -20
+      ],
+      "expected_srgb": [
+        13,
+        18,
+        28
+      ],
+      "expect_background": false,
+      "rgba": [
+        13,
+        18,
+        28,
+        255
+      ],
+      "background_rgba": [
+        53,
+        66,
+        80,
+        255
+      ],
+      "distance_to_expected": 0,
+      "distance_to_background": 81.2896057316063,
+      "surface_base_format": "bgra8unorm",
+      "readback_view_format": "bgra8unorm-srgb",
+      "matched": true
+    },
+    {
+      "case": "closed_curve_fill",
+      "world": [
+        180,
+        80
+      ],
+      "expected_srgb": [
+        250,
+        184,
+        46
+      ],
+      "expect_background": false,
+      "rgba": [
+        250,
+        184,
+        46,
+        255
+      ],
+      "background_rgba": [
+        53,
+        66,
+        80,
+        255
+      ],
+      "distance_to_expected": 0,
+      "distance_to_background": 232.14004393899816,
+      "surface_base_format": "bgra8unorm",
+      "readback_view_format": "bgra8unorm-srgb",
+      "matched": true
+    },
+    {
+      "case": "background_control",
+      "world": [
+        -300,
+        100
+      ],
+      "rgba": [
+        53,
+        66,
+        80,
+        255
+      ],
+      "matched": true
+    },
+    {
+      "case": "closed_fill_interior_after_reload",
+      "world": [
+        180,
+        -130
+      ],
+      "expected_srgb": [
+        41,
+        140,
+        242
+      ],
+      "expect_background": false,
+      "rgba": [
+        41,
+        140,
+        242,
+        255
+      ],
+      "background_rgba": [
+        53,
+        66,
+        80,
+        255
+      ],
+      "distance_to_expected": 0,
+      "distance_to_background": 178.50490189347744,
+      "surface_base_format": "bgra8unorm",
+      "readback_view_format": "bgra8unorm-srgb",
+      "matched": true
+    }
+  ],
+  "assertions": {
+    "straight_path_visible": true,
+    "straight_path_background_control": true,
+    "bezier_path_visible_off_its_chord": true,
+    "bezier_chord_is_empty": true,
+    "closed_fill_interior_filled": true,
+    "closed_fill_respects_outline": true,
+    "closed_curve_stroke_visible": true,
+    "closed_curve_fill_visible": true,
+    "background_control_captured": true,
+    "closed_fill_survives_save_and_load": true
+  },
+  "assertion_count": 10,
+  "passed_assertion_count": 10,
+  "all_passed": true
+}

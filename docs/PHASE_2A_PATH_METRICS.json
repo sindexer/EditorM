@@ -1,0 +1,70 @@
+{
+  "all_passed": true,
+  "checks": {
+    "camera_only_retessellates_nothing": true,
+    "camera_only_uploads_no_triangles": true,
+    "no_full_render_rebuilds_on_edit": true,
+    "single_edit_retessellates_one_path": true,
+    "static_frame_retessellates_nothing": true
+  },
+  "measurements": [
+    {
+      "camera_only_frame_ms": 0.007197,
+      "camera_only_tessellations": 0,
+      "camera_only_uploaded_triangles": false,
+      "draw_batches": 1,
+      "fallback_rebuild_count": 0,
+      "initial_tessellation_ms": 1.0171309999999998,
+      "initial_tessellations": 10,
+      "initial_vertex_encode_ms": 0.192662,
+      "path_vertices": 9660,
+      "paths": 10,
+      "single_path_edit_full_render_rebuilds": 0,
+      "single_path_edit_ms": 0.094362,
+      "single_path_edit_tessellations": 1,
+      "static_frame_ms": 0.014803,
+      "static_frame_tessellations": 0
+    },
+    {
+      "camera_only_frame_ms": 0.028169,
+      "camera_only_tessellations": 0,
+      "camera_only_uploaded_triangles": false,
+      "draw_batches": 1,
+      "fallback_rebuild_count": 0,
+      "initial_tessellation_ms": 8.776989,
+      "initial_tessellations": 100,
+      "initial_vertex_encode_ms": 3.303322,
+      "path_vertices": 96600,
+      "paths": 100,
+      "single_path_edit_full_render_rebuilds": 0,
+      "single_path_edit_ms": 0.12675699999999998,
+      "single_path_edit_tessellations": 1,
+      "static_frame_ms": 0.082891,
+      "static_frame_tessellations": 0
+    },
+    {
+      "camera_only_frame_ms": 0.044255,
+      "camera_only_tessellations": 0,
+      "camera_only_uploaded_triangles": false,
+      "draw_batches": 6,
+      "fallback_rebuild_count": 0,
+      "initial_tessellation_ms": 89.922607,
+      "initial_tessellations": 1000,
+      "initial_vertex_encode_ms": 33.340933,
+      "path_vertices": 966000,
+      "paths": 1000,
+      "single_path_edit_full_render_rebuilds": 0,
+      "single_path_edit_ms": 0.393752,
+      "single_path_edit_tessellations": 1,
+      "static_frame_ms": 0.34826399999999996,
+      "static_frame_tessellations": 0
+    }
+  ],
+  "note": "CPU work only. GPU submission timing requires hardware and is proven in the browser harness.",
+  "phase": "2A",
+  "proof_kind": "cpu-path-pipeline-benchmark",
+  "viewport": [
+    1920.0,
+    1080.0
+  ]
+}

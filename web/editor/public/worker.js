@@ -27,6 +27,16 @@ function transferResponse(response) {
     payload.visibleSlots = data.buffer;
     transfer.push(data.buffer);
   }
+  if (response.binary?.path_instances) {
+    const data = host.takePathInstances();
+    payload.pathInstances = data.buffer;
+    transfer.push(data.buffer);
+  }
+  if (response.binary?.path_vertices) {
+    const data = host.takePathVertices();
+    payload.pathVertices = data.buffer;
+    transfer.push(data.buffer);
+  }
   self.postMessage({ type: "engine", response, payload }, transfer);
 }
 

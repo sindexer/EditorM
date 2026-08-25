@@ -10,9 +10,12 @@ use thiserror::Error;
 use visual_authoring_core_math::{Affine2, Rect, Vec2};
 use visual_authoring_document::{
     Appearance, Document, DocumentChange, DocumentChangeSet, Geometry, InvariantViolation, NodeId,
-    OrderSequence, SequenceWork, StructuralGroupChange,
+    OrderSequence, PathGeometry, SequenceWork, StructuralGroupChange,
 };
 use visual_authoring_spatial::{RTreeIndex, SpatialError, SpatialIndex};
+
+/// Minimum local-space pick radius for a path outline, so a hairline stroke stays selectable.
+const PATH_MINIMUM_PICK_RADIUS: f64 = 1.0;
 
 #[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
 pub struct DirtyCategories {
@@ -1404,10 +1407,12 @@ impl ComputedScene {
             return false;
         };
         let size = geometry.size();
-        if size.x <= 0.0 || size.y <= 0.0 {
+        let half_stroke = node.appearance().stroke.width * 0.5;
+        // A degenerate box has no pickable primitive area, but a path with a zero-height
+        // bounding box is still a strokable line, so the guard applies only to primitives.
+        if !matches!(geometry, Geometry::Path(_)) && (size.x <= 0.0 || size.y <= 0.0) {
             return false;
         }
-        let half_stroke = node.appearance().stroke.width * 0.5;
         match geometry {
             Geometry::Frame { .. } | Geometry::Rectangle { .. } => {
                 local.x >= -half_stroke
@@ -1416,8 +1421,7 @@ impl ComputedScene {
                     && local.y <= size.y + half_stroke
             }
             Geometry::Ellipse { .. } => ellipse_distance(local, size) <= half_stroke,
-            // Path hit-testing arrives with the Phase 2A editing/rendering checkpoint.
-            Geometry::Path(_) => false,
+            Geometry::Path(path) => path_hit(path, node.appearance(), local, half_stroke),
         }
     }
 
@@ -1540,6 +1544,26 @@ fn geometry_world_bounds(
         }
     };
     bounds.is_finite().then_some(Some(bounds)).ok_or(())
+}
+
+/// Exact path hit test against the same flattened outline the renderer draws.
+///
+/// A point counts as a hit when it is within half the stroke width of the outline, or when the
+/// path is filled and the point is inside it under the even-odd rule fixed in `core_math::path`.
+/// An unfilled or self-intersecting outline has no interior here for the same reason it has no
+/// filled pixels: Phase 2A refuses to claim a region it does not draw.
+fn path_hit(path: &PathGeometry, appearance: Appearance, local: Vec2, half_stroke: f64) -> bool {
+    let outline = path.flatten(path.flatten_tolerance());
+    if outline.is_empty() {
+        return false;
+    }
+    // A hairline path still needs a grabbable target, so the outline keeps a minimum pick radius
+    // expressed in local units, consistent with how primitives treat their own stroke.
+    let pick_radius = half_stroke.max(PATH_MINIMUM_PICK_RADIUS);
+    if outline.distance_to(local) <= pick_radius {
+        return true;
+    }
+    appearance.fill.a > 0.0 && outline.is_fillable() && outline.contains(local)
 }
 
 fn ellipse_distance(local: Vec2, size: Vec2) -> f64 {

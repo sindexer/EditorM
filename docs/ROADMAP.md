@@ -26,9 +26,11 @@ Status: Phase 1A and Phase 1B are implemented, merged, and verified. Gate 1B pas
 
 ## Phase 2 — Vector and text
 
-Status: authorization is defined in `docs/PHASE_2_AUTHORIZATION.md`; product implementation has not
-started. Phase 2A begins with the path schema and typed document and serialization contract before
-Pen/Bezier UI or rendering.
+Status: authorization is defined in `docs/PHASE_2_AUTHORIZATION.md`. Phase 2A is under way. The
+path schema and the typed document and serialization contract are merged; path rendering and hit
+testing follow in `docs/adr/ADR-048-path-tessellation-and-fill-rule.md`, with the verification
+record in `docs/verification/PHASE_2A_PATH_RENDERING.md`. Pen/Bezier UI and anchor editing have
+not started, and neither have extended stroke, gradients, text or boolean operations.
 
 - Pen and Bezier tools;
 - path editing;

@@ -11,6 +11,8 @@ import {
   DIRTY_STRIDE,
   INSTANCE_STRIDE,
   RENDER_BINARY_SCHEMA,
+  PATH_INSTANCE_STRIDE,
+  PATH_VERTEX_STRIDE,
   RENDER_BINARY_SCHEMA_VERSION,
   SHADER_SOURCE,
 } from "../src/render_contract.js";
@@ -67,14 +69,14 @@ test("high and low f32 camera split preserves a large finite coordinate", () => 
 });
 
 test("shared render schema fixes binary offsets, strides, and primitive values", () => {
-  assert.equal(RENDER_BINARY_SCHEMA_VERSION, 2);
+  assert.equal(RENDER_BINARY_SCHEMA_VERSION, 3);
   assert.equal(INSTANCE_STRIDE, 112);
   assert.equal(DIRTY_STRIDE, 116);
   assert.equal(RENDER_BINARY_SCHEMA.endianness, "little");
   assert.equal(RENDER_BINARY_SCHEMA.alpha_contract, "premultiplied-linear");
   assert.equal(RENDER_BINARY_SCHEMA.color_input, "srgb");
   assert.equal(RENDER_BINARY_SCHEMA.stroke_alignment, "center");
-  assert.deepEqual(RENDER_BINARY_SCHEMA.primitive, { rectangle: 0, ellipse: 1 });
+  assert.deepEqual(RENDER_BINARY_SCHEMA.primitive, { rectangle: 0, ellipse: 1, path: 2 });
   assert.deepEqual(RENDER_BINARY_SCHEMA.instance_fields, {
     linear: 0,
     translation_hi: 16,
@@ -88,6 +90,35 @@ test("shared render schema fixes binary offsets, strides, and primitive values",
     stroke_width: 96,
     padding: 100,
   });
+});
+
+test("schema version 3 publishes the path layout the path pipeline reads", () => {
+  assert.equal(PATH_INSTANCE_STRIDE, 80);
+  assert.equal(PATH_VERTEX_STRIDE, 32);
+  // The CPU hit test and the GPU triangles share this one fill rule.
+  assert.equal(RENDER_BINARY_SCHEMA.path_fill_rule, "even-odd");
+  assert.deepEqual(RENDER_BINARY_SCHEMA.path_vertex_kind, { fill: 0, stroke: 1 });
+  assert.deepEqual(RENDER_BINARY_SCHEMA.path_instance_fields, {
+    linear: 0,
+    translation_hi: 16,
+    translation_lo: 24,
+    fill_linear: 32,
+    stroke_linear: 48,
+    opacity: 64,
+    padding: 68,
+  });
+  assert.deepEqual(RENDER_BINARY_SCHEMA.path_vertex_fields, {
+    position: 0,
+    normal: 8,
+    coverage: 16,
+    kind: 20,
+    path_index: 24,
+    padding: 28,
+  });
+  assert.match(SHADER_SOURCE, /fn vs_path/);
+  assert.match(SHADER_SOURCE, /fn fs_path/);
+  // Paths antialias by expanding a feather in screen space, never by discarding fragments.
+  assert.doesNotMatch(SHADER_SOURCE, /discard/);
 });
 
 test("WGSL is geometry-aware and uses instanced analytic coverage", () => {

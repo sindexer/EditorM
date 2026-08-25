@@ -6,6 +6,10 @@
 
 use std::ops::{Add, Mul, Sub};
 
+pub mod path;
+
+pub use path::{triangulate_fill, FillTriangulationError, FlattenedPath, PathSegment};
+
 /// Default tolerance for deterministic floating-point assertions.
 pub const DEFAULT_EPSILON: f64 = 1.0e-9;
 
@@ -32,6 +36,20 @@ impl Vec2 {
     #[must_use]
     pub fn approx_eq(self, other: Self, epsilon: f64) -> bool {
         approx_eq_f64(self.x, other.x, epsilon) && approx_eq_f64(self.y, other.y, epsilon)
+    }
+}
+
+impl Vec2 {
+    /// Euclidean length.
+    #[must_use]
+    pub fn length(self) -> f64 {
+        self.x.hypot(self.y)
+    }
+
+    /// Largest absolute component, used for deviation bounds that must stay axis-independent.
+    #[must_use]
+    pub fn max_component_absolute(self) -> f64 {
+        self.x.abs().max(self.y.abs())
     }
 }
 

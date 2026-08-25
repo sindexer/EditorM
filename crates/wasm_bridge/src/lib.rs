@@ -11,10 +11,12 @@ use serde_json::{json, Value};
 use visual_authoring_core_math::{Affine2, Rect, Vec2};
 use visual_authoring_document::{
     Appearance, ColorRgba, Command, Document, DocumentChange, DocumentChangeSet, Geometry, NodeId,
-    NodeKind, NodeSpec, StructuralGroupChange,
+    NodeKind, NodeSpec, PathAnchor, PathAnchorId, PathGeometry, StructuralGroupChange,
 };
 use visual_authoring_render_model::{
-    CullingResult, PrimitiveKind, RenderDelta, RenderEncodingDiagnosticKind, RenderItem,
+    encode_path_instances, encode_path_vertices, CullingResult, DrawBatch, PrimitiveKind,
+    RenderDelta, RenderEncodingDiagnosticKind, RenderItem, PATH_INSTANCE_STRIDE_BYTES,
+    PATH_VERTEX_STRIDE_BYTES,
 };
 use visual_authoring_runtime::arrange::{translated, world_delta_to_local};
 use visual_authoring_runtime::fixtures::{build_fixture, fixture_node_id, FixtureKind};
@@ -26,9 +28,21 @@ use visual_authoring_runtime::{
 use wasm_bindgen::prelude::*;
 
 pub const PROTOCOL_VERSION: u32 = 1;
-pub const RENDER_BINARY_SCHEMA_VERSION: u32 = 2;
+pub const RENDER_BINARY_SCHEMA_VERSION: u32 = 3;
 const INSTANCE_STRIDE_BYTES: usize = 112;
 const DIRTY_RECORD_STRIDE_BYTES: usize = 4 + INSTANCE_STRIDE_BYTES;
+
+/// One anchor of a path command. Handles are absolute points in the node's local space, exactly
+/// as the persistent schema stores them.
+#[derive(Clone, Debug, Deserialize)]
+pub struct PathAnchorRequest {
+    id: String,
+    position: [f64; 2],
+    #[serde(default)]
+    handle_in: Option<[f64; 2]>,
+    #[serde(default)]
+    handle_out: Option<[f64; 2]>,
+}
 
 #[derive(Debug, Deserialize)]
 struct RequestEnvelope {
@@ -155,6 +169,23 @@ enum CommandRequest {
         color: [f64; 4],
         width: f64,
     },
+    /// Creates a persistent path node. This is the command path a Pen tool would eventually use;
+    /// Phase 2A exposes it for proofs only and ships no Pen UI.
+    CreatePath {
+        node_id: String,
+        parent_id: String,
+        index: usize,
+        name: String,
+        x: f64,
+        y: f64,
+        closed: bool,
+        anchors: Vec<PathAnchorRequest>,
+    },
+    SetPathGeometry {
+        node_id: String,
+        closed: bool,
+        anchors: Vec<PathAnchorRequest>,
+    },
     CreateShape {
         node_id: String,
         parent_id: String,
@@ -277,6 +308,10 @@ struct RequestWorkMetrics {
     allocation_growth_count: u64,
     document_full_clones: u64,
     document_nodes_touched: u64,
+    path_tessellations: u64,
+    path_vertices_tessellated: u64,
+    path_vertices_uploaded: u64,
+    path_vertex_upload_bytes: u64,
     ui_full_snapshots: u64,
     ui_nodes_serialized: u64,
     ui_child_ids_serialized: u64,
@@ -299,10 +334,14 @@ struct PendingBinary {
     dirty_instances: Vec<u8>,
     removed_slots: Vec<u32>,
     visible_slots: Vec<u32>,
+    path_instances: Vec<u8>,
+    path_vertices: Vec<u8>,
     has_full_instances: bool,
     has_dirty_instances: bool,
     has_removed_slots: bool,
     has_visible_slots: bool,
+    has_path_instances: bool,
+    has_path_vertices: bool,
 }
 
 #[derive(Clone, Debug)]
@@ -343,6 +382,8 @@ pub struct EngineHost {
     last_culling: CullingResult,
     last_delta: DeltaReport,
     fallback_rebuild_count: u64,
+    /// Path vertex revision the browser already holds, so unchanged triangles are never re-sent.
+    uploaded_path_vertex_revision: Option<u64>,
     last_error: Option<HostFailure>,
     engine_sequence: u64,
     request_metrics: RequestWorkMetrics,
@@ -446,6 +487,16 @@ impl EngineHost {
     pub fn take_visible_slots(&mut self) -> Uint32Array {
         Uint32Array::from(std::mem::take(&mut self.pending.visible_slots).as_slice())
     }
+
+    #[wasm_bindgen(js_name = takePathInstances)]
+    pub fn take_path_instances(&mut self) -> Uint8Array {
+        Uint8Array::from(std::mem::take(&mut self.pending.path_instances).as_slice())
+    }
+
+    #[wasm_bindgen(js_name = takePathVertices)]
+    pub fn take_path_vertices(&mut self) -> Uint8Array {
+        Uint8Array::from(std::mem::take(&mut self.pending.path_vertices).as_slice())
+    }
 }
 
 impl EngineHost {
@@ -464,6 +515,7 @@ impl EngineHost {
             last_culling: CullingResult::default(),
             last_delta: DeltaReport::default(),
             fallback_rebuild_count: 0,
+            uploaded_path_vertex_revision: None,
             last_error: None,
             engine_sequence: 0,
             request_metrics: RequestWorkMetrics::default(),
@@ -1285,6 +1337,8 @@ impl EngineHost {
             scene.sibling_search_steps + stats.sibling_search_steps;
         self.request_metrics.full_render_model_scans += stats.full_render_model_scans;
         self.request_metrics.allocation_growth_count += stats.allocation_growth_count;
+        self.request_metrics.path_tessellations += stats.path_tessellations;
+        self.request_metrics.path_vertices_tessellated += stats.path_vertices_tessellated;
     }
 
     fn track_sync(&mut self, scene: &SceneSyncStatus, render: &RenderSyncStatus) {
@@ -1367,6 +1421,7 @@ impl EngineHost {
         self.request_metrics.gpu_encode_attempted += encoded.attempted;
         self.request_metrics.gpu_encode_omitted += encoded.omitted;
         self.request_metrics.instance_upload_bytes += self.pending.full_instances.len() as u64;
+        self.prepare_path_buffers();
         self.refresh_visibility()?;
         self.last_delta = DeltaReport {
             full: true,
@@ -1390,6 +1445,7 @@ impl EngineHost {
         self.request_metrics.gpu_encode_omitted += encoded.omitted;
         self.request_metrics.instance_upload_bytes +=
             (delta.dirty_slots.len() * INSTANCE_STRIDE_BYTES) as u64;
+        self.prepare_path_buffers();
         self.refresh_visibility()?;
         self.last_delta = DeltaReport {
             full: false,
@@ -1401,6 +1457,31 @@ impl EngineHost {
             render_full_rebuilds: delta.stats.full_render_rebuild_count,
         };
         Ok(())
+    }
+
+    /// Encodes the path GPU buffers for one frame.
+    ///
+    /// Instances are cheap and follow every model change; triangles are re-sent only when the
+    /// render model's path vertex revision moves, so camera and colour frames send nothing.
+    fn prepare_path_buffers(&mut self) {
+        let model = self.runtime.render_model();
+        let revision = model.path_vertex_revision();
+        let has_paths = model.path_item_count() > 0;
+        if !has_paths && self.uploaded_path_vertex_revision.is_none() {
+            return;
+        }
+        self.pending.path_instances = encode_path_instances(model);
+        self.pending.has_path_instances = true;
+        if self.uploaded_path_vertex_revision == Some(revision) {
+            return;
+        }
+        let vertices = encode_path_vertices(model);
+        self.request_metrics.path_vertices_uploaded +=
+            (vertices.len() / PATH_VERTEX_STRIDE_BYTES) as u64;
+        self.request_metrics.path_vertex_upload_bytes += vertices.len() as u64;
+        self.pending.path_vertices = vertices;
+        self.pending.has_path_vertices = true;
+        self.uploaded_path_vertex_revision = Some(revision);
     }
 
     fn prepare_visibility_frame(&mut self) -> Result<(), HostFailure> {
@@ -1519,6 +1600,17 @@ impl EngineHost {
                 "gpu_omitted_items": counters.gpu_omitted_items,
                 "allocated_slots": counters.allocated_slots,
                 "free_slots": counters.free_slots,
+                "path_instance_stride_bytes": PATH_INSTANCE_STRIDE_BYTES,
+                "path_vertex_stride_bytes": PATH_VERTEX_STRIDE_BYTES,
+                "path_instance_count": self.runtime.render_model().path_item_count(),
+                "path_vertex_count": self.runtime.render_model().path_vertex_count(),
+                "path_vertex_revision": self.runtime.render_model().path_vertex_revision(),
+                "draw_batches": self
+                    .last_culling
+                    .draw_batches
+                    .iter()
+                    .map(draw_batch_json)
+                    .collect::<Vec<_>>(),
             },
             "render_encoding": {
                 "gpu_omitted_items": counters.gpu_omitted_items,
@@ -1529,6 +1621,8 @@ impl EngineHost {
                 "dirty_instances": self.pending.has_dirty_instances,
                 "removed_slots": self.pending.has_removed_slots,
                 "visible_slots": self.pending.has_visible_slots,
+                "path_instances": self.pending.has_path_instances,
+                "path_vertices": self.pending.has_path_vertices,
             },
             "metrics": {
                 "cpu_update_ms": cpu_update_ms.max(0.0),
@@ -1576,6 +1670,10 @@ impl EngineHost {
                 "instance_upload_bytes": work.instance_upload_bytes,
                 "visible_slot_upload_bytes": work.visible_slot_upload_bytes,
                 "allocation_growth_count": work.allocation_growth_count,
+                "path_tessellations": work.path_tessellations,
+                "path_vertices_tessellated": work.path_vertices_tessellated,
+                "path_vertices_uploaded": work.path_vertices_uploaded,
+                "path_vertex_upload_bytes": work.path_vertex_upload_bytes,
                 "document_full_clones": work.document_full_clones,
                 "document_nodes_touched": work.document_nodes_touched,
                 "ui_full_snapshots": work.ui_full_snapshots,
@@ -1704,6 +1802,34 @@ impl CommandRequest {
                 };
                 Ok(Command::SetAppearance { target, appearance })
             }
+            Self::CreatePath {
+                node_id,
+                parent_id,
+                index,
+                name,
+                x,
+                y,
+                closed,
+                anchors,
+            } => {
+                require_finite(&[x, y], "path translation")?;
+                let geometry = path_geometry_for(closed, &anchors)?;
+                let mut spec = NodeSpec::path(parse_node_id(&node_id)?, name, geometry);
+                spec.local_transform = Affine2::translation(Vec2::new(x, y));
+                Ok(Command::CreateNode {
+                    spec,
+                    parent: parse_node_id(&parent_id)?,
+                    index,
+                })
+            }
+            Self::SetPathGeometry {
+                node_id,
+                closed,
+                anchors,
+            } => Ok(Command::SetGeometry {
+                target: parse_node_id(&node_id)?,
+                geometry: Geometry::Path(path_geometry_for(closed, &anchors)?),
+            }),
             Self::CreateShape {
                 node_id,
                 parent_id,
@@ -1844,6 +1970,35 @@ fn require_positive_size(width: f64, height: f64) -> Result<(), HostFailure> {
     }
 }
 
+/// Builds persistent path geometry from a request.
+///
+/// Only the shape of the request is checked here — anchor count, duplicate identity and finite
+/// coordinates are the Document's invariants, so an invalid path fails inside the command and
+/// leaves the document and history untouched.
+fn path_geometry_for(
+    closed: bool,
+    anchors: &[PathAnchorRequest],
+) -> Result<PathGeometry, HostFailure> {
+    let mut parsed = Vec::with_capacity(anchors.len());
+    for anchor in anchors {
+        let id = PathAnchorId::from_uuid(uuid::Uuid::parse_str(&anchor.id).map_err(|error| {
+            HostFailure::new(
+                "invalid_command",
+                format!("path anchor id {} is invalid: {error}", anchor.id),
+            )
+        })?);
+        let mut parsed_anchor =
+            PathAnchor::new(id, Vec2::new(anchor.position[0], anchor.position[1]));
+        parsed_anchor.handle_in = anchor.handle_in.map(|point| Vec2::new(point[0], point[1]));
+        parsed_anchor.handle_out = anchor.handle_out.map(|point| Vec2::new(point[0], point[1]));
+        parsed.push(parsed_anchor);
+    }
+    Ok(PathGeometry {
+        closed,
+        anchors: parsed,
+    })
+}
+
 fn geometry_for(shape: &str, width: f64, height: f64) -> Result<Geometry, HostFailure> {
     let size = Vec2::new(width, height);
     match shape {
@@ -1901,6 +2056,27 @@ const fn union_rect(left: Rect, right: Rect) -> Rect {
     }
 }
 
+fn draw_batch_json(batch: &DrawBatch) -> Value {
+    match *batch {
+        DrawBatch::Primitives {
+            first_visible,
+            count,
+        } => json!({
+            "kind": "primitives",
+            "first_visible": first_visible,
+            "count": count,
+        }),
+        DrawBatch::Paths {
+            first_vertex,
+            vertex_count,
+        } => json!({
+            "kind": "paths",
+            "first_vertex": first_vertex,
+            "vertex_count": vertex_count,
+        }),
+    }
+}
+
 fn parse_fixture(value: &str) -> Result<FixtureKind, HostFailure> {
     match value.to_ascii_lowercase().as_str() {
         "preview" | "demo" => Ok(FixtureKind::Preview),
@@ -1909,6 +2085,7 @@ fn parse_fixture(value: &str) -> Result<FixtureKind, HostFailure> {
         "bench-b" | "b" | "10k" => Ok(FixtureKind::BenchB),
         "bench-c" | "c" | "100k" => Ok(FixtureKind::BenchC),
         "bench-d" | "d" | "deep" => Ok(FixtureKind::BenchD),
+        "path-a" | "paths" | "phase-2a" => Ok(FixtureKind::PathA),
         _ => Err(HostFailure::new(
             "unknown_fixture",
             format!("unknown fixture {value}"),
@@ -2077,19 +2254,25 @@ fn now_ms() -> f64 {
 }
 
 #[cfg(test)]
-mod tests {
+mod tests_support {
     use super::*;
 
-    fn request(request_id: &str, body: Value) -> String {
+    pub fn request(request_id: &str, body: Value) -> String {
         let mut object = body.as_object().cloned().expect("request is an object");
         object.insert("protocol_version".to_owned(), json!(PROTOCOL_VERSION));
         object.insert("request_id".to_owned(), json!(request_id));
         serde_json::to_string(&object).unwrap()
     }
 
-    fn response(host: &mut EngineHost, request: String) -> Value {
+    pub fn response(host: &mut EngineHost, request: String) -> Value {
         serde_json::from_str(&host.handle_json(&request)).unwrap()
     }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::tests_support::{request, response};
+    use super::*;
 
     #[test]
     fn initialization_returns_correlated_worker_state_and_binary_frame() {
@@ -3340,5 +3523,250 @@ mod tests {
             undo["projection"]["upserts"][0]["appearance"]["stroke"]["width"],
             1.0
         );
+    }
+}
+
+#[cfg(test)]
+mod path_tests {
+    use super::tests_support::{request, response};
+    use super::*;
+
+    fn load_path_fixture(host: &mut EngineHost) -> Value {
+        response(
+            host,
+            request(
+                "path-fixture",
+                json!({ "type": "load_fixture", "fixture": "path-a" }),
+            ),
+        )
+    }
+
+    #[test]
+    fn the_path_fixture_crosses_the_boundary_as_triangles_and_ordered_batches() {
+        let mut host = EngineHost::new_inner().unwrap();
+        let frame = load_path_fixture(&mut host);
+        assert!(frame["ok"].as_bool().unwrap(), "{frame}");
+        assert_eq!(frame["fixture"], "PATH-A");
+        assert_eq!(frame["render_binary_schema_version"], 3);
+
+        let resources = &frame["resources"];
+        assert_eq!(resources["path_instance_stride_bytes"], 80);
+        assert_eq!(resources["path_vertex_stride_bytes"], 32);
+        assert_eq!(resources["path_instance_count"], 4);
+        let vertex_count = resources["path_vertex_count"].as_u64().unwrap();
+        assert!(vertex_count > 0, "the fixture tessellates to triangles");
+
+        assert!(frame["binary"]["path_instances"].as_bool().unwrap());
+        assert!(frame["binary"]["path_vertices"].as_bool().unwrap());
+        assert_eq!(
+            host.pending.path_instances.len(),
+            4 * PATH_INSTANCE_STRIDE_BYTES
+        );
+        assert_eq!(
+            host.pending.path_vertices.len() as u64,
+            vertex_count * PATH_VERTEX_STRIDE_BYTES as u64
+        );
+        // Every triangle is a multiple of three vertices.
+        assert_eq!(vertex_count % 3, 0);
+
+        // The fixture is all paths, so the frame carries one path batch and no primitive batch.
+        let batches = resources["draw_batches"].as_array().unwrap();
+        assert!(!batches.is_empty());
+        assert!(batches.iter().all(|batch| batch["kind"] == "paths"));
+        let covered: u64 = batches
+            .iter()
+            .map(|batch| batch["vertex_count"].as_u64().unwrap())
+            .sum();
+        assert_eq!(covered, vertex_count);
+    }
+
+    #[test]
+    fn a_camera_only_frame_re_sends_no_path_triangles() {
+        let mut host = EngineHost::new_inner().unwrap();
+        load_path_fixture(&mut host);
+        let camera = response(
+            &mut host,
+            request(
+                "pan",
+                json!({ "type": "camera", "camera": { "kind": "pan", "dx": 24.0, "dy": 12.0 } }),
+            ),
+        );
+        assert!(camera["ok"].as_bool().unwrap(), "{camera}");
+        assert!(!camera["binary"]["path_vertices"].as_bool().unwrap());
+        assert_eq!(camera["metrics"]["path_vertices_uploaded"], 0);
+        assert_eq!(camera["metrics"]["path_tessellations"], 0);
+        assert!(host.pending.path_vertices.is_empty());
+    }
+
+    #[test]
+    fn creating_and_editing_a_path_uploads_only_the_changed_geometry() {
+        let mut host = EngineHost::new_inner().unwrap();
+        let root = host.runtime.document().root_id().to_string();
+        let node_id = "11111111-1111-4111-8111-111111111111";
+        let created = response(
+            &mut host,
+            request(
+                "create-path",
+                json!({
+                    "type": "command",
+                    "command": {
+                        "kind": "create_path",
+                        "node_id": node_id,
+                        "parent_id": root,
+                        "index": 0,
+                        "name": "Proof Path",
+                        "x": 0.0,
+                        "y": 0.0,
+                        "closed": true,
+                        "anchors": [
+                            { "id": "22222222-2222-4222-8222-222222222222", "position": [0.0, 0.0] },
+                            { "id": "33333333-3333-4333-8333-333333333333", "position": [120.0, 0.0] },
+                            { "id": "44444444-4444-4444-8444-444444444444", "position": [60.0, 90.0] }
+                        ]
+                    }
+                }),
+            ),
+        );
+        assert!(created["ok"].as_bool().unwrap(), "{created}");
+        assert_eq!(created["metrics"]["path_tessellations"], 1);
+        assert_eq!(created["resources"]["path_instance_count"], 1);
+        let created_vertices = created["resources"]["path_vertex_count"].as_u64().unwrap();
+        assert!(created_vertices > 0);
+
+        let edited = response(
+            &mut host,
+            request(
+                "edit-path",
+                json!({
+                    "type": "command",
+                    "command": {
+                        "kind": "set_path_geometry",
+                        "node_id": node_id,
+                        "closed": true,
+                        "anchors": [
+                            { "id": "22222222-2222-4222-8222-222222222222", "position": [0.0, 0.0] },
+                            { "id": "33333333-3333-4333-8333-333333333333", "position": [120.0, 0.0] },
+                            { "id": "44444444-4444-4444-8444-444444444444", "position": [60.0, 200.0] }
+                        ]
+                    }
+                }),
+            ),
+        );
+        assert!(edited["ok"].as_bool().unwrap(), "{edited}");
+        assert_eq!(edited["metrics"]["path_tessellations"], 1);
+        assert_eq!(edited["render_delta"]["render_full_rebuilds"], 0);
+        assert_eq!(edited["metrics"]["fallback_rebuild_count"], 0);
+
+        let undone = response(&mut host, request("undo", json!({ "type": "undo" })));
+        assert!(undone["ok"].as_bool().unwrap(), "{undone}");
+        assert_eq!(
+            undone["resources"]["path_vertex_count"].as_u64().unwrap(),
+            created_vertices,
+            "undo restores the original triangles"
+        );
+        let redone = response(&mut host, request("redo", json!({ "type": "redo" })));
+        assert!(redone["ok"].as_bool().unwrap(), "{redone}");
+        assert_eq!(redone["resources"]["path_instance_count"], 1);
+    }
+
+    #[test]
+    fn invalid_path_commands_fail_without_touching_the_document_or_history() {
+        let mut host = EngineHost::new_inner().unwrap();
+        let root = host.runtime.document().root_id().to_string();
+        let before_revision = host.runtime.document_revision();
+        let before_history = host.runtime.history_state();
+
+        let invalid = [
+            // A closed path needs at least three anchors.
+            json!([
+                { "id": "22222222-2222-4222-8222-222222222222", "position": [0.0, 0.0] },
+                { "id": "33333333-3333-4333-8333-333333333333", "position": [10.0, 0.0] }
+            ]),
+            // Duplicate anchor identity.
+            json!([
+                { "id": "22222222-2222-4222-8222-222222222222", "position": [0.0, 0.0] },
+                { "id": "22222222-2222-4222-8222-222222222222", "position": [10.0, 0.0] },
+                { "id": "33333333-3333-4333-8333-333333333333", "position": [5.0, 9.0] }
+            ]),
+            // An anchor identity that is not a UUID.
+            json!([
+                { "id": "not-a-uuid", "position": [0.0, 0.0] },
+                { "id": "33333333-3333-4333-8333-333333333333", "position": [10.0, 0.0] },
+                { "id": "44444444-4444-4444-8444-444444444444", "position": [5.0, 9.0] }
+            ]),
+        ];
+        for (index, anchors) in invalid.into_iter().enumerate() {
+            let failure = response(
+                &mut host,
+                request(
+                    "bad-path",
+                    json!({
+                        "type": "command",
+                        "command": {
+                            "kind": "create_path",
+                            "node_id": "55555555-5555-4555-8555-555555555555",
+                            "parent_id": root,
+                            "index": 0,
+                            "name": "Invalid",
+                            "x": 0.0,
+                            "y": 0.0,
+                            "closed": true,
+                            "anchors": anchors
+                        }
+                    }),
+                ),
+            );
+            assert!(
+                !failure["ok"].as_bool().unwrap(),
+                "invalid path {index} must be rejected: {failure}"
+            );
+            assert_eq!(host.runtime.document_revision(), before_revision);
+            assert_eq!(host.runtime.history_state(), before_history);
+            assert!(host.pending.path_vertices.is_empty());
+            assert!(!failure["binary"]["path_vertices"].as_bool().unwrap());
+        }
+    }
+
+    #[test]
+    fn a_non_finite_coordinate_cannot_even_be_expressed_on_the_wire() {
+        // JSON has no infinity or NaN literal, and an overflowing exponent is a parse error, so
+        // a non-finite anchor never reaches the command layer through this boundary. The command
+        // layer rejects non-finite geometry regardless; see the runtime path tests.
+        let overflow = serde_json::from_str::<Value>(r#"{ "position": [5.0, 1e999] }"#);
+        assert!(overflow.is_err(), "{overflow:?}");
+    }
+
+    #[test]
+    fn a_path_geometry_on_a_rectangle_node_is_rejected() {
+        let mut host = EngineHost::new_inner().unwrap();
+        let rectangle = host
+            .runtime
+            .document()
+            .nodes()
+            .find(|node| node.kind() == NodeKind::Rectangle)
+            .expect("the preview fixture has a rectangle")
+            .id()
+            .to_string();
+        let before = host.runtime.document().snapshot();
+        let failure = response(
+            &mut host,
+            request(
+                "wrong-kind",
+                json!({
+                    "type": "command",
+                    "command": {
+                        "kind": "set_path_geometry",
+                        "node_id": rectangle,
+                        "closed": false,
+                        "anchors": [
+                            { "id": "22222222-2222-4222-8222-222222222222", "position": [0.0, 0.0] },
+                            { "id": "33333333-3333-4333-8333-333333333333", "position": [10.0, 0.0] }
+                        ]
+                    }
+                }),
+            ),
+        );
+        assert!(!failure["ok"].as_bool().unwrap(), "{failure}");
+        assert_eq!(host.runtime.document().snapshot(), before);
     }
 }

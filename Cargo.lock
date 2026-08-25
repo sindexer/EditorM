@@ -1244,6 +1244,7 @@ dependencies = [
  "js-sys",
  "serde",
  "serde_json",
+ "uuid",
  "visual_authoring_core_math",
  "visual_authoring_document",
  "visual_authoring_render_model",

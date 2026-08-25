@@ -1,6 +1,19 @@
 //! Backend-neutral, rebuildable render representation with stable instance slots.
 
+pub mod path_gpu;
+pub mod path_tessellation;
+
+pub use path_gpu::{
+    encode_path_instance, encode_path_instances, encode_path_vertex, encode_path_vertices,
+    PATH_INSTANCE_STRIDE_BYTES, PATH_VERTEX_STRIDE_BYTES,
+};
+pub use path_tessellation::{
+    tessellate, PathTessellation, PathTessellationKey, PathVertex, PATH_VERTEX_KIND_FILL,
+    PATH_VERTEX_KIND_STROKE,
+};
+
 use std::collections::{BTreeMap, BTreeSet};
+use std::sync::Arc;
 
 use thiserror::Error;
 use visual_authoring_core_math::{Affine2, Rect, Vec2};
@@ -13,6 +26,9 @@ use visual_authoring_scene::{ComputedScene, SceneError};
 pub enum PrimitiveKind {
     Rectangle,
     Ellipse,
+    /// A tessellated path. Path items carry triangles instead of an analytic primitive, so they
+    /// are submitted through the path pipeline and never through the instanced quad draw.
+    Path,
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -32,6 +48,10 @@ pub struct RenderItem {
     pub node_id: NodeId,
     pub slot: u32,
     pub primitive: PrimitiveKind,
+    /// Derived triangles for a path item; `None` for analytic primitives.
+    pub path: Option<Arc<PathTessellation>>,
+    /// Compact index into the path instance array, assigned only to path items.
+    pub path_index: Option<u32>,
     pub size: Vec2,
     pub world_transform: Option<Affine2>,
     pub world_bounds: Option<Rect>,
@@ -63,6 +83,11 @@ pub struct DirtySlotRange {
 
 #[derive(Clone, Debug, Default, Eq, PartialEq)]
 pub struct RenderUpdateStats {
+    /// Paths whose triangles were rebuilt in this update. Reusing a cached tessellation costs
+    /// nothing here, so a camera move or a colour change reports zero.
+    pub path_tessellations: u64,
+    /// Vertices produced by those rebuilds.
+    pub path_vertices_tessellated: u64,
     pub dirty_items: u64,
     pub inserted_items: u64,
     pub removed_items: u64,
@@ -92,10 +117,32 @@ pub struct RenderDelta {
     pub stats: RenderUpdateStats,
 }
 
+/// One ordered unit of GPU work for a frame.
+///
+/// Batches keep paths and analytic primitives in the same painter's order: the renderer walks
+/// this list bottom to top and switches pipelines only where the scene order actually changes
+/// kind, so a document without paths still submits exactly one instanced draw.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum DrawBatch {
+    /// A run of `count` entries of `slots_bottom_to_top`, starting at `first_visible`.
+    Primitives { first_visible: u32, count: u32 },
+    /// A run of path triangles, as a half-open vertex range of the path vertex buffer.
+    Paths {
+        first_vertex: u32,
+        vertex_count: u32,
+    },
+}
+
 #[derive(Clone, Debug, Default, Eq, PartialEq)]
 pub struct CullingResult {
     pub ids_top_to_bottom: Vec<NodeId>,
+    /// Instanced primitive slots, bottom to top. Path items never appear here: they are drawn by
+    /// the path pipeline from their own compact index space.
     pub slots_bottom_to_top: Vec<u32>,
+    /// Compact path instance indices that survived culling, bottom to top.
+    pub visible_path_indices: Vec<u32>,
+    /// Pipeline-switching draw order, bottom to top.
+    pub draw_batches: Vec<DrawBatch>,
     pub spatial_candidates: usize,
     pub exact_visible: usize,
     pub culled: usize,
@@ -126,6 +173,13 @@ pub enum RenderModelError {
 #[derive(Clone, Debug)]
 pub struct RenderModel {
     slots: Vec<Option<RenderItem>>,
+    path_cache: PathCache,
+    path_order: Vec<NodeId>,
+    /// First vertex of each path in the path vertex buffer, parallel to `path_order`.
+    path_vertex_offsets: Vec<u32>,
+    path_vertex_total: u32,
+    path_vertex_revision: u64,
+    path_layout_dirty: bool,
     by_id: BTreeMap<NodeId, u32>,
     free_slots: Vec<u32>,
     render_revision: u64,
@@ -150,6 +204,12 @@ impl RenderModel {
         }
         let mut model = Self {
             slots: Vec::new(),
+            path_cache: PathCache::default(),
+            path_order: Vec::new(),
+            path_vertex_offsets: Vec::new(),
+            path_vertex_total: 0,
+            path_vertex_revision: 0,
+            path_layout_dirty: false,
             by_id: BTreeMap::new(),
             free_slots: Vec::new(),
             render_revision: revision,
@@ -167,7 +227,13 @@ impl RenderModel {
             ..RenderUpdateStats::default()
         };
         for node in document.nodes() {
-            let prepared = prepare_item(document, scene, node.id())?;
+            let prepared = prepare_item(
+                document,
+                scene,
+                node.id(),
+                &mut model.path_cache,
+                &mut stats,
+            )?;
             stats.scene_nodes_visited += 1;
             stats.render_items_planned += 1;
             model.commit_prepared(node.id(), prepared, &mut stats, &mut Vec::new());
@@ -175,6 +241,7 @@ impl RenderModel {
         stats.dirty_items = model.by_id.len() as u64;
         stats.dirty_slot_count = model.by_id.len() as u64;
         stats.dirty_range_count = u64::from(!model.by_id.is_empty());
+        model.refresh_path_layout();
         model.finish_stats(stats);
         Ok(model)
     }
@@ -358,7 +425,7 @@ impl RenderModel {
             if document.node(id).is_none() {
                 continue;
             }
-            let prepared = prepare_item(document, scene, id)?;
+            let prepared = prepare_item(document, scene, id, &mut self.path_cache, &mut stats)?;
             stats.document_nodes_scanned += 1;
             stats.scene_nodes_visited += 1;
             stats.render_items_planned += 1;
@@ -389,6 +456,7 @@ impl RenderModel {
         stats.dirty_items = dirty_slots.len() as u64;
         stats.dirty_slot_count = dirty_slots.len() as u64;
         stats.dirty_range_count = dirty_ranges.len() as u64;
+        self.refresh_path_layout();
         self.render_revision = change_set.revision().after;
         self.finish_stats(stats.clone());
         Ok(RenderDelta {
@@ -428,15 +496,57 @@ impl RenderModel {
                 true
             })
             .collect::<Vec<_>>();
-        let slots_bottom_to_top = ids_top_to_bottom
-            .iter()
-            .rev()
-            .filter_map(|id| self.by_id.get(id).copied())
-            .collect::<Vec<_>>();
+        let mut slots_bottom_to_top = Vec::with_capacity(ids_top_to_bottom.len());
+        let mut visible_path_indices = Vec::new();
+        let mut draw_batches: Vec<DrawBatch> = Vec::new();
+        for id in ids_top_to_bottom.iter().rev() {
+            let Some(item) = self.item(*id) else {
+                continue;
+            };
+            match item.path_index {
+                Some(path_index) => {
+                    let Some((first_vertex, vertex_count)) = self.path_vertex_range(path_index)
+                    else {
+                        continue;
+                    };
+                    visible_path_indices.push(path_index);
+                    if vertex_count == 0 {
+                        continue;
+                    }
+                    match draw_batches.last_mut() {
+                        // Paths that are adjacent in the buffer and adjacent in paint order
+                        // collapse into a single draw call.
+                        Some(DrawBatch::Paths {
+                            first_vertex: batch_first,
+                            vertex_count: batch_count,
+                        }) if *batch_first + *batch_count == first_vertex => {
+                            *batch_count += vertex_count;
+                        }
+                        _ => draw_batches.push(DrawBatch::Paths {
+                            first_vertex,
+                            vertex_count,
+                        }),
+                    }
+                }
+                None => {
+                    let first_visible = slots_bottom_to_top.len() as u32;
+                    slots_bottom_to_top.push(item.slot);
+                    match draw_batches.last_mut() {
+                        Some(DrawBatch::Primitives { count, .. }) => *count += 1,
+                        _ => draw_batches.push(DrawBatch::Primitives {
+                            first_visible,
+                            count: 1,
+                        }),
+                    }
+                }
+            }
+        }
         let exact_visible = ids_top_to_bottom.len();
         Ok(CullingResult {
             ids_top_to_bottom,
             slots_bottom_to_top,
+            visible_path_indices,
+            draw_batches,
             spatial_candidates: query.candidate_count(),
             exact_visible,
             culled: self.renderable_count().saturating_sub(exact_visible),
@@ -448,6 +558,103 @@ impl RenderModel {
             sibling_search_steps: query.sibling_search_steps(),
             full_render_model_scans: 0,
         })
+    }
+
+    /// Compact, stable index of a path item inside the path instance array.
+    ///
+    /// Primitives never enter this list, so a document of rectangles pays nothing for path
+    /// support.
+    fn assign_path_index(&mut self, id: NodeId, is_path: bool) -> Option<u32> {
+        let existing = self.path_order.iter().position(|entry| *entry == id);
+        match (is_path, existing) {
+            (true, Some(index)) => Some(index as u32),
+            (true, None) => {
+                self.path_order.push(id);
+                self.path_layout_dirty = true;
+                Some((self.path_order.len() - 1) as u32)
+            }
+            (false, Some(index)) => {
+                self.forget_path_at(index);
+                None
+            }
+            (false, None) => None,
+        }
+    }
+
+    /// Removes a path from the compact order and renumbers the items after it.
+    fn forget_path_at(&mut self, index: usize) {
+        let id = self.path_order.remove(index);
+        self.path_cache.forget(id);
+        self.path_layout_dirty = true;
+        for (position, node) in self.path_order.iter().enumerate().skip(index) {
+            if let Some(slot) = self.by_id.get(node) {
+                if let Some(Some(item)) = self.slots.get_mut(*slot as usize) {
+                    item.path_index = Some(position as u32);
+                }
+            }
+        }
+    }
+
+    /// Path items in their compact instance order.
+    pub fn path_items(&self) -> impl Iterator<Item = &RenderItem> {
+        self.path_order.iter().filter_map(|id| self.item(*id))
+    }
+
+    #[must_use]
+    pub fn path_item_count(&self) -> usize {
+        self.path_order.len()
+    }
+
+    /// Total tessellated vertices currently held by path items.
+    #[must_use]
+    pub fn path_vertex_count(&self) -> usize {
+        self.path_vertex_total as usize
+    }
+
+    /// Monotonic revision of the path vertex buffer layout.
+    ///
+    /// The number changes only when a path's triangles change, so a consumer that uploads path
+    /// vertices can skip the upload entirely while the camera moves or a colour changes.
+    #[must_use]
+    pub const fn path_vertex_revision(&self) -> u64 {
+        self.path_vertex_revision
+    }
+
+    /// Half-open vertex range of one path inside the path vertex buffer.
+    #[must_use]
+    pub fn path_vertex_range(&self, path_index: u32) -> Option<(u32, u32)> {
+        let first = *self.path_vertex_offsets.get(path_index as usize)?;
+        let count = self
+            .path_order
+            .get(path_index as usize)
+            .and_then(|id| self.item(*id))
+            .and_then(|item| item.path.as_ref())
+            .map_or(0, |tessellation| tessellation.vertex_count() as u32);
+        Some((first, count))
+    }
+
+    /// Recomputes path vertex offsets after the compact path order or any tessellation changed.
+    fn refresh_path_layout(&mut self) {
+        if !self.path_layout_dirty {
+            return;
+        }
+        self.path_layout_dirty = false;
+        self.path_vertex_offsets.clear();
+        self.path_vertex_offsets.reserve(self.path_order.len());
+        let mut offset = 0_u32;
+        for id in &self.path_order {
+            self.path_vertex_offsets.push(offset);
+            let vertices = self
+                .by_id
+                .get(id)
+                .and_then(|slot| self.slots.get(*slot as usize))
+                .and_then(|slot| slot.as_ref())
+                .and_then(|item| item.path.as_ref())
+                .map_or(0, |tessellation| tessellation.vertex_count() as u32);
+            offset = offset.saturating_add(vertices);
+        }
+        self.path_vertex_total = offset;
+        self.path_vertex_revision = self.path_vertex_revision.saturating_add(1);
     }
 
     fn commit_prepared(
@@ -496,6 +703,9 @@ impl RenderModel {
             node_id: id,
             slot,
             primitive: prepared.primitive,
+            path: prepared.path.clone(),
+            // Assigned below, once the item is known to belong to the compact path order.
+            path_index: None,
             size: prepared.size,
             world_transform: prepared.world_transform,
             world_bounds: prepared.world_bounds,
@@ -508,8 +718,18 @@ impl RenderModel {
             gpu_encodable: prepared.gpu_encodable,
             encoding_diagnostic: prepared.encoding_diagnostic,
         };
+        let mut next = next;
+        next.path_index = self.assign_path_index(id, next.path.is_some());
         let changed = self.slots[slot as usize].as_ref() != Some(&next);
         if changed {
+            let previous_path = self.slots[slot as usize]
+                .as_ref()
+                .and_then(|item| item.path.as_ref());
+            self.path_layout_dirty |= match (previous_path, next.path.as_ref()) {
+                (Some(before), Some(after)) => !Arc::ptr_eq(before, after),
+                (None, None) => false,
+                _ => true,
+            };
             if let Some(old) = self.slots[slot as usize].take() {
                 self.account_remove(&old);
             }
@@ -522,6 +742,9 @@ impl RenderModel {
 
     fn remove(&mut self, id: NodeId) -> Option<u32> {
         let slot = self.by_id.remove(&id)?;
+        if let Some(index) = self.path_order.iter().position(|entry| *entry == id) {
+            self.forget_path_at(index);
+        }
         if let Some(old) = self.slots[slot as usize].take() {
             self.account_remove(&old);
         }
@@ -567,13 +790,16 @@ impl RenderModel {
         self.cumulative.sibling_search_steps += update.sibling_search_steps;
         self.cumulative.full_render_model_scans += update.full_render_model_scans;
         self.cumulative.allocation_growth_count += update.allocation_growth_count;
+        self.cumulative.path_tessellations += update.path_tessellations;
+        self.cumulative.path_vertices_tessellated += update.path_vertices_tessellated;
         self.cumulative.render_revision = update.render_revision;
     }
 }
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Debug)]
 struct PreparedItem {
     primitive: PrimitiveKind,
+    path: Option<Arc<PathTessellation>>,
     size: Vec2,
     world_transform: Option<Affine2>,
     world_bounds: Option<Rect>,
@@ -591,6 +817,8 @@ fn prepare_item(
     document: &Document,
     scene: &ComputedScene,
     id: NodeId,
+    cache: &mut PathCache,
+    stats: &mut RenderUpdateStats,
 ) -> Result<Option<PreparedItem>, RenderModelError> {
     let node = document
         .node(id)
@@ -603,6 +831,14 @@ fn prepare_item(
         .ok_or(RenderModelError::MissingSceneNode(id))?;
     let world_transform = scene_node.world_transform();
     let appearance = node.appearance();
+    // The triangles are needed before renderability is known, so they are produced once here and
+    // handed to the item; the cache still counts one tessellation per changed path.
+    let path = match node.geometry() {
+        Some(Geometry::Path(path)) => {
+            Some(cache.tessellation(id, PathTessellationKey::new(path, appearance), stats))
+        }
+        _ => None,
+    };
     let fill_linear = linear_color(appearance.fill);
     let stroke_linear = linear_color(appearance.stroke.color);
     let corner_radii = [
@@ -611,13 +847,19 @@ fn prepare_item(
         appearance.corner_radii.bottom_right,
         appearance.corner_radii.bottom_left,
     ];
+    // A primitive with a degenerate box draws nothing, but a path is a stroked outline: a
+    // straight horizontal line has zero height and is still drawn, so paths are judged by their
+    // triangles instead of by their bounding box.
+    let has_area = match primitive {
+        PrimitiveKind::Path => path.as_ref().is_some_and(|path| !path.is_empty()),
+        PrimitiveKind::Rectangle | PrimitiveKind::Ellipse => size.x > 0.0 && size.y > 0.0,
+    };
     let renderable = scene_node.attached()
         && scene_node.effective_visible()
         && scene_node.invalid().is_none()
         && world_transform.is_some()
         && scene_node.own_world_bounds().is_some()
-        && size.x > 0.0
-        && size.y > 0.0;
+        && has_area;
     let encoding_diagnostic = if renderable {
         encoding_diagnostic(
             world_transform.expect("renderable item has a world transform"),
@@ -633,6 +875,7 @@ fn prepare_item(
     };
     Ok(Some(PreparedItem {
         primitive,
+        path,
         size,
         world_transform,
         world_bounds: scene_node.own_world_bounds(),
@@ -725,8 +968,45 @@ fn primitive(geometry: Option<&Geometry>) -> Option<(PrimitiveKind, Vec2)> {
             Some((PrimitiveKind::Rectangle, *size))
         }
         Geometry::Ellipse { size } => Some((PrimitiveKind::Ellipse, *size)),
-        // Phase 2A establishes persistent path semantics before GPU encoding.
-        Geometry::Path(_) => None,
+        // A path reports the size of its exact bounds so culling, diagnostics, and renderability
+        // read it the same way as a primitive; its silhouette comes from the tessellation.
+        Geometry::Path(path) => {
+            let bounds = path.bounds()?;
+            Some((
+                PrimitiveKind::Path,
+                Vec2::new(bounds.width(), bounds.height()),
+            ))
+        }
+    }
+}
+
+/// Derived tessellations, keyed by node and rebuilt only when a path's silhouette inputs change.
+#[derive(Clone, Debug, Default)]
+struct PathCache {
+    entries: BTreeMap<NodeId, (PathTessellationKey, Arc<PathTessellation>)>,
+}
+
+impl PathCache {
+    fn tessellation(
+        &mut self,
+        id: NodeId,
+        key: PathTessellationKey,
+        stats: &mut RenderUpdateStats,
+    ) -> Arc<PathTessellation> {
+        if let Some((cached_key, cached)) = self.entries.get(&id) {
+            if *cached_key == key {
+                return Arc::clone(cached);
+            }
+        }
+        let tessellation = tessellate(&key);
+        stats.path_tessellations += 1;
+        stats.path_vertices_tessellated += tessellation.vertex_count() as u64;
+        self.entries.insert(id, (key, Arc::clone(&tessellation)));
+        tessellation
+    }
+
+    fn forget(&mut self, id: NodeId) {
+        self.entries.remove(&id);
     }
 }
 
@@ -835,23 +1115,29 @@ mod tests {
     }
 
     #[test]
-    fn path_schema_is_explicitly_omitted_until_phase2a_gpu_support() {
+    fn a_path_becomes_a_tessellated_render_item() {
         let mut editor = HeadlessEditorCore::blank("render");
         let root = editor.document().root_id();
         let path_id = NodeId::new();
+        let mut spec = NodeSpec::path(
+            path_id,
+            "path",
+            PathGeometry {
+                closed: false,
+                anchors: vec![
+                    PathAnchor::new(PathAnchorId::new(), Vec2::ZERO),
+                    PathAnchor::new(PathAnchorId::new(), Vec2::new(20.0, 10.0)),
+                ],
+            },
+        );
+        // A path with no stroke and no enclosed area has nothing to draw, so give it a stroke.
+        spec.appearance.stroke = Stroke {
+            color: ColorRgba::new(0.0, 0.0, 0.0, 1.0),
+            width: 2.0,
+        };
         editor
             .dispatch(Command::CreateNode {
-                spec: NodeSpec::path(
-                    path_id,
-                    "path",
-                    PathGeometry {
-                        closed: false,
-                        anchors: vec![
-                            PathAnchor::new(PathAnchorId::new(), Vec2::ZERO),
-                            PathAnchor::new(PathAnchorId::new(), Vec2::new(20.0, 10.0)),
-                        ],
-                    },
-                ),
+                spec,
                 parent: root,
                 index: 0,
             })
@@ -859,9 +1145,25 @@ mod tests {
         let scene = ComputedScene::build(editor.document(), editor.revision()).unwrap();
         let model = RenderModel::build(editor.document(), &scene, editor.revision()).unwrap();
 
-        assert_eq!(model.item(path_id), None);
-        assert_eq!(model.item_count(), 0);
+        let item = model.item(path_id).expect("the path is a render item");
+        assert_eq!(item.primitive, PrimitiveKind::Path);
+        assert_eq!(item.path_index, Some(0));
+        assert!(item.renderable);
+        assert!(item.gpu_encodable);
+        let tessellation = item.path.as_ref().expect("a path item carries triangles");
+        assert!(tessellation.vertex_count() > 0);
+        assert_eq!(
+            tessellation.fill_vertex_count, 0,
+            "an open path is not filled"
+        );
+        assert_eq!(model.item_count(), 1);
+        assert_eq!(model.path_item_count(), 1);
         assert_eq!(model.gpu_omitted_count(), 0);
+        assert_eq!(
+            model.last_update().path_tessellations,
+            1,
+            "building the model tessellates the path exactly once"
+        );
     }
 
     #[test]

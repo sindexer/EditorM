@@ -1,0 +1,245 @@
+{
+  "phase": "2A",
+  "gate_run_id": "phase2a-20260825T142800Z-69ae0d0",
+  "tested_source_commit": "69ae0d01e3d231729a022ecbec568bb3593acf6f",
+  "tested_branch": "feat/phase2a-path-rendering",
+  "captured_at_utc": "2026-08-25T14:27:48.177Z",
+  "fixture": "PATH-A",
+  "path_instance_count": 4,
+  "path_vertex_count": 4281,
+  "draw_batches": [
+    {
+      "first_vertex": 0,
+      "kind": "paths",
+      "vertex_count": 4281
+    }
+  ],
+  "fixture_frame_metrics": {
+    "allocation_growth_count": 1,
+    "cpu_update_ms": 3,
+    "culling_candidates": 4,
+    "document_full_clones": 0,
+    "document_nodes": 5,
+    "document_nodes_scanned": 5,
+    "document_nodes_touched": 0,
+    "document_sequence_allocated_bytes": 256,
+    "document_sequence_dense_index_rewrites": 0,
+    "document_sequence_entries_copied": 4,
+    "document_sequence_entries_examined": 4,
+    "document_sequence_entries_moved_or_shifted": 4,
+    "document_sequence_fallback_or_rebuild_count": 0,
+    "document_sequence_full_copies": 0,
+    "document_sequence_full_scans": 0,
+    "document_sequence_maximum_depth": 3,
+    "document_sequence_nodes_allocated": 4,
+    "document_sequence_rank_order_comparisons": 0,
+    "document_sequence_tree_rebalances": 0,
+    "fallback_rebuild_count": 0,
+    "full_render_model_scans": 2,
+    "gpu_encode_attempted": 4,
+    "gpu_encode_omitted": 0,
+    "indexed_nodes": 4,
+    "instance_upload_bytes": 448,
+    "invalid_derived_nodes": 0,
+    "order_nodes_visited": 24,
+    "path_tessellations": 4,
+    "path_vertex_upload_bytes": 136992,
+    "path_vertices_tessellated": 4281,
+    "path_vertices_uploaded": 4281,
+    "render_items_cloned": 0,
+    "render_items_planned": 5,
+    "render_items_read": 4,
+    "render_items_written": 4,
+    "scene_nodes_visited": 5,
+    "scene_sequence_allocated_bytes": 256,
+    "scene_sequence_dense_index_rewrites": 0,
+    "scene_sequence_entries_copied": 4,
+    "scene_sequence_entries_examined": 4,
+    "scene_sequence_entries_moved_or_shifted": 4,
+    "scene_sequence_fallback_or_rebuild_count": 0,
+    "scene_sequence_full_copies": 0,
+    "scene_sequence_full_scans": 0,
+    "scene_sequence_maximum_depth": 3,
+    "scene_sequence_nodes_allocated": 4,
+    "scene_sequence_rank_order_comparisons": 0,
+    "scene_sequence_tree_rebalances": 0,
+    "sibling_search_steps": 0,
+    "ui_child_ids_serialized": 4,
+    "ui_delta_nodes": 0,
+    "ui_full_snapshots": 1,
+    "ui_nodes_serialized": 5,
+    "ui_projection_payload_bytes": 2754,
+    "ui_structural_operations": 0,
+    "visible_items": 4,
+    "visible_slot_upload_bytes": 0
+  },
+  "single_path_edit": {
+    "path_tessellations": 1,
+    "path_vertices_uploaded": 4302,
+    "render_full_rebuilds": 0,
+    "fallback_rebuild_count": 0
+  },
+  "camera_only_frame": {
+    "path_tessellations": 0,
+    "path_vertices_uploaded": 0,
+    "path_vertex_upload_bytes": 0,
+    "path_vertices_sent": false,
+    "gpu_draw_calls": 1,
+    "gpu_batches": 1,
+    "gpu_path_vertices_uploaded": 0,
+    "gpu_path_vertex_upload_bytes": 0,
+    "gpu_draw_calls_before_camera_frame": 1
+  },
+  "document_round_trip": {
+    "saved_path_count": 4,
+    "saved_anchor_ids": [
+      [
+        "00000000-0000-0000-0000-000000002a01",
+        "00000000-0000-0000-0000-000000002a02"
+      ],
+      [
+        "00000000-0000-0000-0000-000000002a03",
+        "00000000-0000-0000-0000-000000002a04"
+      ],
+      [
+        "00000000-0000-0000-0000-000000002a05",
+        "00000000-0000-0000-0000-000000002a06",
+        "00000000-0000-0000-0000-000000002a07"
+      ],
+      [
+        "00000000-0000-0000-0000-000000002a08",
+        "00000000-0000-0000-0000-000000002a09",
+        "00000000-0000-0000-0000-000000002a0a",
+        "00000000-0000-0000-0000-000000002a0b"
+      ]
+    ],
+    "resaved_anchor_ids": [
+      [
+        "00000000-0000-0000-0000-000000002a01",
+        "00000000-0000-0000-0000-000000002a02"
+      ],
+      [
+        "00000000-0000-0000-0000-000000002a03",
+        "00000000-0000-0000-0000-000000002a04"
+      ],
+      [
+        "00000000-0000-0000-0000-000000002a05",
+        "00000000-0000-0000-0000-000000002a06",
+        "00000000-0000-0000-0000-000000002a07"
+      ],
+      [
+        "00000000-0000-0000-0000-000000002a08",
+        "00000000-0000-0000-0000-000000002a09",
+        "00000000-0000-0000-0000-000000002a0a",
+        "00000000-0000-0000-0000-000000002a0b"
+      ]
+    ],
+    "bounds_before_reload": {
+      "Open Straight": {
+        "max": [
+          -117,
+          -217
+        ],
+        "min": [
+          -363,
+          -223
+        ]
+      },
+      "Open Cubic": {
+        "max": [
+          -117,
+          -16.58548115672619
+        ],
+        "min": [
+          -363,
+          -103.4145188432738
+        ]
+      },
+      "Closed Filled": {
+        "max": [
+          280,
+          -50
+        ],
+        "min": [
+          80,
+          -220
+        ]
+      },
+      "Closed Stroked Cubic": {
+        "max": [
+          284,
+          184
+        ],
+        "min": [
+          76,
+          -24
+        ]
+      }
+    },
+    "bounds_after_reload": {
+      "Open Straight": {
+        "max": [
+          -117,
+          -217
+        ],
+        "min": [
+          -363,
+          -223
+        ]
+      },
+      "Open Cubic": {
+        "max": [
+          -117,
+          -16.58548115672619
+        ],
+        "min": [
+          -363,
+          -103.4145188432738
+        ]
+      },
+      "Closed Filled": {
+        "max": [
+          280,
+          -50
+        ],
+        "min": [
+          80,
+          -220
+        ]
+      },
+      "Closed Stroked Cubic": {
+        "max": [
+          284,
+          184
+        ],
+        "min": [
+          76,
+          -24
+        ]
+      }
+    },
+    "reloaded_ok": true
+  },
+  "gpu": {
+    "draw_calls": 1,
+    "batches": 1,
+    "submitted_instances": 0,
+    "buffer_count": 5,
+    "buffer_bytes": 138664,
+    "upload_calls": 1,
+    "frame_upload_bytes": 32,
+    "render_submit_ms": 1.100000023841858,
+    "frame_ms": 1.100000023841858,
+    "validation_errors": 0,
+    "frame_sequence": 40,
+    "gpu_encode_attempted": 0,
+    "gpu_encode_omitted": 0,
+    "instance_upload_bytes": 0,
+    "visible_slot_upload_bytes": 0,
+    "allocation_growth_count": 12,
+    "path_instance_upload_bytes": 0,
+    "path_vertex_upload_bytes": 0,
+    "path_vertices_uploaded": 0
+  },
+  "note": "Path CPU scaling at 10/100/1000 paths is measured by cargo run -p visual_authoring_runtime --bin phase2a_path_bench; this artifact records the actual-GPU frame behaviour."
+}

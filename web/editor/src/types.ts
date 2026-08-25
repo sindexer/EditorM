@@ -78,17 +78,31 @@ export interface EngineResponse {
     gpu_omitted_items: number;
     allocated_slots: number;
     free_slots: number;
+    path_instance_stride_bytes?: number;
+    path_vertex_stride_bytes?: number;
+    path_instance_count?: number;
+    path_vertex_count?: number;
+    path_vertex_revision?: number;
+    draw_batches?: DrawBatch[];
   };
   render_encoding: { gpu_omitted_items: number; diagnostics: unknown[] };
   binary: Record<string, boolean>;
   metrics: Record<string, number>;
 }
 
+// One ordered unit of GPU work. Paths and analytic primitives keep their scene order by
+// alternating batches rather than by drawing all of one kind first.
+export type DrawBatch =
+  | { kind: "primitives"; first_visible: number; count: number }
+  | { kind: "paths"; first_vertex: number; vertex_count: number };
+
 export interface BinaryPayload {
   fullInstances?: ArrayBuffer;
   dirtyInstances?: ArrayBuffer;
   removedSlots?: ArrayBuffer;
   visibleSlots?: ArrayBuffer;
+  pathInstances?: ArrayBuffer;
+  pathVertices?: ArrayBuffer;
 }
 
 export interface UiCounters {

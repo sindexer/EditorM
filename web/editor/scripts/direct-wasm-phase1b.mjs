@@ -16,7 +16,14 @@ const webRoot = path.resolve(scriptRoot, "..");
 const workspace = path.resolve(webRoot, "../..");
 const gluePath = path.join(webRoot, "public", "pkg", "engine_host.js");
 const wasmPath = path.join(webRoot, "public", "pkg", "engine_host_bg.wasm");
-const outputPath = path.join(workspace, "docs", "verification", "PHASE_1B_DIRECT_WASM_PROOF.json");
+// Regression execution and evidence generation are separate concerns. Running this script
+// verifies the shipped WASM against the Phase 1B request surface and writes nothing; the stored
+// Phase 1B proof is a historical artifact of the Gate 1B run and is overwritten only when the
+// gate itself asks for it with an explicit --output path.
+const outputArgument = process.argv.find((argument) => argument.startsWith("--output="));
+const outputPath = outputArgument
+  ? path.resolve(workspace, outputArgument.slice("--output=".length))
+  : null;
 const startedAt = new Date().toISOString();
 const gateEvidence = {
   gate_run_id: process.env.PHASE1B_GATE_RUN_ID ?? null,
@@ -255,7 +262,12 @@ const report = {
   all_passed: checks.every((entry) => entry.passed),
 };
 
-await fs.writeFile(outputPath, `${JSON.stringify(report, null, 2)}\n`, "utf8");
+if (outputPath) {
+  await fs.writeFile(outputPath, `${JSON.stringify(report, null, 2)}\n`, "utf8");
+  console.log(`PHASE_1B_DIRECT_WASM_WRITTEN=${path.relative(workspace, outputPath).split(path.sep).join("/")}`);
+} else {
+  console.log("PHASE_1B_DIRECT_WASM_MODE=verification-only (no artifact written)");
+}
 console.log(`PHASE_1B_DIRECT_WASM_JSON=${JSON.stringify(report)}`);
 if (!report.all_passed) {
   console.error("Phase 1B direct WASM proof failed");
