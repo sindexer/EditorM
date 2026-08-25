@@ -489,9 +489,6 @@ async function clickPoint(point, { modifiers = 0, clickCount = 1, label = "click
     clickCount,
     modifiers,
   });
-  if (afterPressExpression) {
-    await waitFor(afterPressExpression, 30000, "pointer_press_settle_timeout");
-  }
   await pageClient.send("Input.dispatchMouseEvent", {
     type: "mouseReleased",
     x: point.center_x ?? point.x,
