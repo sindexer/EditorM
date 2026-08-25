@@ -1,0 +1,716 @@
+{
+  "phase": "2A",
+  "gate_run_id": "phase2a-20260825T142800Z-69ae0d0",
+  "tested_source_commit": "69ae0d01e3d231729a022ecbec568bb3593acf6f",
+  "tested_branch": "feat/phase2a-path-rendering",
+  "proof_kind": "actual-hardware-browser",
+  "captured_at_utc": "2026-08-25T14:27:48.182Z",
+  "browser": "Chrome/151.0.7922.174",
+  "browser_mode": "actual Chrome; no mock; no Canvas2D fallback",
+  "execution": {
+    "command": "npm run test:browser:phase2a:path-render",
+    "started_at_utc": "2026-08-25T14:27:44.013Z",
+    "finished_at_utc": "2026-08-25T14:27:48.182Z",
+    "software_gpu_allowed": false,
+    "chrome_sandbox_disabled": false
+  },
+  "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/151.0.0.0 Safari/537.36",
+  "chrome_process_id": 22356,
+  "chrome_profile": "C:\\Users\\thdwl\\AppData\\Local\\Temp\\phase2a-chrome-6488-1787668064013",
+  "gpu": {
+    "adapter": "maxwell",
+    "backend": "browser-webgpu (implementation backend not exposed by Web API)",
+    "software_renderer": false,
+    "surface_base_format": "bgra8unorm",
+    "pipeline_view_format": "bgra8unorm-srgb",
+    "readback_view_format": "bgra8unorm-srgb",
+    "active_device": {
+      "vendorId": 4318,
+      "deviceId": 5058,
+      "subSysId": 913970264,
+      "revision": 161,
+      "vendorString": "",
+      "deviceString": "NVIDIA GeForce GTX 970",
+      "driverVendor": "NVIDIA",
+      "driverVersion": "32.0.15.8157"
+    }
+  },
+  "preview": {
+    "url": "http://127.0.0.1:1462/",
+    "health": {
+      "ok": true,
+      "status": 200,
+      "body": {
+        "ok": true,
+        "phase": "0E"
+      }
+    },
+    "assets": {
+      "/index.html": {
+        "status": 200,
+        "content_type": "text/html; charset=utf-8"
+      },
+      "/worker.js": {
+        "status": 200,
+        "content_type": "text/javascript; charset=utf-8"
+      },
+      "/pkg/engine_host.js": {
+        "status": 200,
+        "content_type": "text/javascript; charset=utf-8"
+      },
+      "/pkg/engine_host_bg.wasm": {
+        "status": 200,
+        "content_type": "application/wasm"
+      }
+    },
+    "stdout": "Phase 0E editor: http://127.0.0.1:1462/\n",
+    "stderr": ""
+  },
+  "initial": {
+    "phase": "0E",
+    "ready": true,
+    "actual_webgpu": true,
+    "adapter": "maxwell",
+    "backend": "browser-webgpu (implementation backend not exposed by Web API)",
+    "surface_base_format": "bgra8unorm",
+    "pipeline_view_format": "bgra8unorm-srgb",
+    "readback_view_format": "bgra8unorm-srgb",
+    "worker_runtime_owner": "dedicated-worker",
+    "wasm_initialized": true,
+    "heartbeat": 1,
+    "engine_sequence": 5,
+    "gpu_frame_sequence": 5,
+    "overlay_sequence": 5,
+    "revisions": {
+      "document": 1,
+      "render": 1,
+      "scene": 1
+    },
+    "fixture": "EDITOR",
+    "metrics": {
+      "allocation_growth_count": 0,
+      "cpu_update_ms": 0,
+      "culling_candidates": 1,
+      "document_full_clones": 0,
+      "document_nodes": 2,
+      "document_nodes_scanned": 0,
+      "document_nodes_touched": 0,
+      "document_sequence_allocated_bytes": 0,
+      "document_sequence_dense_index_rewrites": 0,
+      "document_sequence_entries_copied": 0,
+      "document_sequence_entries_examined": 0,
+      "document_sequence_entries_moved_or_shifted": 0,
+      "document_sequence_fallback_or_rebuild_count": 0,
+      "document_sequence_full_copies": 0,
+      "document_sequence_full_scans": 0,
+      "document_sequence_maximum_depth": 0,
+      "document_sequence_nodes_allocated": 0,
+      "document_sequence_rank_order_comparisons": 0,
+      "document_sequence_tree_rebalances": 0,
+      "fallback_rebuild_count": 0,
+      "full_render_model_scans": 0,
+      "gpu_encode_attempted": 0,
+      "gpu_encode_omitted": 0,
+      "indexed_nodes": 1,
+      "instance_upload_bytes": 0,
+      "invalid_derived_nodes": 0,
+      "order_nodes_visited": 0,
+      "path_tessellations": 0,
+      "path_vertex_upload_bytes": 0,
+      "path_vertices_tessellated": 0,
+      "path_vertices_uploaded": 0,
+      "render_items_cloned": 0,
+      "render_items_planned": 0,
+      "render_items_read": 1,
+      "render_items_written": 0,
+      "scene_nodes_visited": 0,
+      "scene_sequence_allocated_bytes": 0,
+      "scene_sequence_dense_index_rewrites": 0,
+      "scene_sequence_entries_copied": 0,
+      "scene_sequence_entries_examined": 0,
+      "scene_sequence_entries_moved_or_shifted": 0,
+      "scene_sequence_fallback_or_rebuild_count": 0,
+      "scene_sequence_full_copies": 0,
+      "scene_sequence_full_scans": 0,
+      "scene_sequence_maximum_depth": 0,
+      "scene_sequence_nodes_allocated": 0,
+      "scene_sequence_rank_order_comparisons": 0,
+      "scene_sequence_tree_rebalances": 0,
+      "sibling_search_steps": 0,
+      "ui_child_ids_serialized": 0,
+      "ui_delta_nodes": 0,
+      "ui_full_snapshots": 0,
+      "ui_nodes_serialized": 0,
+      "ui_projection_payload_bytes": 0,
+      "ui_structural_operations": 0,
+      "visible_items": 1,
+      "visible_slot_upload_bytes": 4
+    },
+    "gpu": {
+      "draw_calls": 1,
+      "batches": 1,
+      "submitted_instances": 1,
+      "buffer_count": 5,
+      "buffer_bytes": 376,
+      "upload_calls": 2,
+      "frame_upload_bytes": 36,
+      "render_submit_ms": 1.800000011920929,
+      "frame_ms": 1.800000011920929,
+      "validation_errors": 0,
+      "frame_sequence": 5,
+      "gpu_encode_attempted": 0,
+      "gpu_encode_omitted": 0,
+      "instance_upload_bytes": 0,
+      "visible_slot_upload_bytes": 4,
+      "allocation_growth_count": 6,
+      "path_instance_upload_bytes": 0,
+      "path_vertex_upload_bytes": 0,
+      "path_vertices_uploaded": 0
+    },
+    "ui": {
+      "projectionFullSnapshots": 2,
+      "projectionDeltaNodes": 0,
+      "layersFullSerializes": 2,
+      "hierarchyRebuilds": 2,
+      "hierarchyNodesVisited": 5,
+      "hierarchyFullRebuilds": 2,
+      "projectionStructuralOperations": 0,
+      "layersFlattenedNodesVisited": 19,
+      "mountedRows": 2,
+      "pointerRawIntents": 0,
+      "pointerRequestsSent": 0,
+      "pointerRequestsCoalesced": 0,
+      "sequenceEntriesExamined": 14,
+      "sequenceEntriesCopied": 14,
+      "sequenceEntriesMovedOrShifted": 8,
+      "sequenceRankOrderComparisons": 0,
+      "sequenceNodesAllocated": 8,
+      "sequenceAllocatedBytes": 640,
+      "sequenceTreeRebalances": 0,
+      "sequenceMaximumDepth": 2,
+      "sequenceFallbackOrRebuildCount": 0,
+      "sequenceFullScans": 0,
+      "sequenceFullCopies": 0,
+      "sequenceDenseIndexRewrites": 0
+    },
+    "selection": [],
+    "response_gpu_overlay_sequence_match": true,
+    "fsm": "Idle",
+    "tool": "select",
+    "nested_edit_root": null,
+    "console_errors": 0,
+    "fallback_rebuild_count": 0,
+    "gpu_validation_errors": 0,
+    "history": {
+      "redo_depth": 0,
+      "transaction_active": false,
+      "undo_depth": 0
+    },
+    "camera": {
+      "center": [
+        0,
+        0
+      ],
+      "dpr": 1,
+      "viewport": [
+        1040,
+        863
+      ],
+      "zoom": 0.4997397188964081
+    },
+    "projection_nodes": 2,
+    "projection_schema_version": 2,
+    "primary_node": null,
+    "render_delta": {
+      "dirty_ranges": 0,
+      "dirty_slots": 0,
+      "full": false,
+      "removed_slots": 0,
+      "render_full_rebuilds": 0,
+      "scene_full_rebuilds": 0,
+      "upload_bytes": 0
+    },
+    "render_binary_schema_version": 3,
+    "resources": {
+      "allocated_slots": 1,
+      "dirty_record_stride_bytes": 116,
+      "draw_batches": [
+        {
+          "count": 1,
+          "first_visible": 0,
+          "kind": "primitives"
+        }
+      ],
+      "free_slots": 0,
+      "gpu_encodable_items": 1,
+      "gpu_omitted_items": 0,
+      "instance_capacity": 1,
+      "instance_stride_bytes": 112,
+      "path_instance_count": 0,
+      "path_instance_stride_bytes": 80,
+      "path_vertex_count": 0,
+      "path_vertex_revision": 0,
+      "path_vertex_stride_bytes": 32,
+      "renderable_items": 1,
+      "total_render_items": 1
+    },
+    "binary": {
+      "dirty_instances": false,
+      "full_instances": false,
+      "path_instances": false,
+      "path_vertices": false,
+      "removed_slots": false,
+      "visible_slots": true
+    },
+    "interaction_active": null,
+    "selection_count": 0,
+    "snap_enabled": true,
+    "snap_guides": 0,
+    "marquee_active": false,
+    "interaction_queue": {
+      "generation": 0,
+      "in_flight": false,
+      "scheduled": false,
+      "latest": false
+    }
+  },
+  "fixture": {
+    "name": "PATH-A",
+    "paths": [
+      {
+        "id": "00000000-0000-0000-0000-000000000002",
+        "name": "Open Straight",
+        "world_bounds": {
+          "max": [
+            -117,
+            -217
+          ],
+          "min": [
+            -363,
+            -223
+          ]
+        }
+      },
+      {
+        "id": "00000000-0000-0000-0000-000000000003",
+        "name": "Open Cubic",
+        "world_bounds": {
+          "max": [
+            -117,
+            -16.58548115672619
+          ],
+          "min": [
+            -363,
+            -103.4145188432738
+          ]
+        }
+      },
+      {
+        "id": "00000000-0000-0000-0000-000000000004",
+        "name": "Closed Filled",
+        "world_bounds": {
+          "max": [
+            280,
+            -50
+          ],
+          "min": [
+            80,
+            -220
+          ]
+        }
+      },
+      {
+        "id": "00000000-0000-0000-0000-000000000005",
+        "name": "Closed Stroked Cubic",
+        "world_bounds": {
+          "max": [
+            284,
+            184
+          ],
+          "min": [
+            76,
+            -24
+          ]
+        }
+      }
+    ],
+    "resources": {
+      "allocated_slots": 4,
+      "dirty_record_stride_bytes": 116,
+      "draw_batches": [
+        {
+          "first_vertex": 0,
+          "kind": "paths",
+          "vertex_count": 4281
+        }
+      ],
+      "free_slots": 0,
+      "gpu_encodable_items": 4,
+      "gpu_omitted_items": 0,
+      "instance_capacity": 4,
+      "instance_stride_bytes": 112,
+      "path_instance_count": 4,
+      "path_instance_stride_bytes": 80,
+      "path_vertex_count": 4281,
+      "path_vertex_revision": 1,
+      "path_vertex_stride_bytes": 32,
+      "renderable_items": 4,
+      "total_render_items": 4
+    },
+    "binary": {
+      "dirty_instances": false,
+      "full_instances": true,
+      "path_instances": true,
+      "path_vertices": true,
+      "removed_slots": false,
+      "visible_slots": true
+    }
+  },
+  "hit_testing": {
+    "filled_interior_pick": "00000000-0000-0000-0000-000000000004",
+    "filled_interior_expected": "00000000-0000-0000-0000-000000000004",
+    "outside_outline_pick": [],
+    "stroke_pick": "00000000-0000-0000-0000-000000000002",
+    "stroke_expected": "00000000-0000-0000-0000-000000000002"
+  },
+  "editing": {
+    "created_bounds": {
+      "max": [
+        -140,
+        340
+      ],
+      "min": [
+        -300,
+        220
+      ]
+    },
+    "edited_bounds": {
+      "max": [
+        -140,
+        480
+      ],
+      "min": [
+        -300,
+        220
+      ]
+    },
+    "undone_bounds": {
+      "max": [
+        -140,
+        340
+      ],
+      "min": [
+        -300,
+        220
+      ]
+    },
+    "redone_bounds": {
+      "max": [
+        -140,
+        480
+      ],
+      "min": [
+        -300,
+        220
+      ]
+    },
+    "removed_from_projection": true
+  },
+  "camera_only_frame": {
+    "path_tessellations": 0,
+    "path_vertices_uploaded": 0,
+    "path_vertex_upload_bytes": 0,
+    "path_vertices_sent": false,
+    "gpu_draw_calls": 1,
+    "gpu_batches": 1,
+    "gpu_path_vertices_uploaded": 0,
+    "gpu_path_vertex_upload_bytes": 0,
+    "gpu_draw_calls_before_camera_frame": 1
+  },
+  "document_round_trip": {
+    "saved_path_count": 4,
+    "saved_anchor_ids": [
+      [
+        "00000000-0000-0000-0000-000000002a01",
+        "00000000-0000-0000-0000-000000002a02"
+      ],
+      [
+        "00000000-0000-0000-0000-000000002a03",
+        "00000000-0000-0000-0000-000000002a04"
+      ],
+      [
+        "00000000-0000-0000-0000-000000002a05",
+        "00000000-0000-0000-0000-000000002a06",
+        "00000000-0000-0000-0000-000000002a07"
+      ],
+      [
+        "00000000-0000-0000-0000-000000002a08",
+        "00000000-0000-0000-0000-000000002a09",
+        "00000000-0000-0000-0000-000000002a0a",
+        "00000000-0000-0000-0000-000000002a0b"
+      ]
+    ],
+    "resaved_anchor_ids": [
+      [
+        "00000000-0000-0000-0000-000000002a01",
+        "00000000-0000-0000-0000-000000002a02"
+      ],
+      [
+        "00000000-0000-0000-0000-000000002a03",
+        "00000000-0000-0000-0000-000000002a04"
+      ],
+      [
+        "00000000-0000-0000-0000-000000002a05",
+        "00000000-0000-0000-0000-000000002a06",
+        "00000000-0000-0000-0000-000000002a07"
+      ],
+      [
+        "00000000-0000-0000-0000-000000002a08",
+        "00000000-0000-0000-0000-000000002a09",
+        "00000000-0000-0000-0000-000000002a0a",
+        "00000000-0000-0000-0000-000000002a0b"
+      ]
+    ],
+    "bounds_before_reload": {
+      "Open Straight": {
+        "max": [
+          -117,
+          -217
+        ],
+        "min": [
+          -363,
+          -223
+        ]
+      },
+      "Open Cubic": {
+        "max": [
+          -117,
+          -16.58548115672619
+        ],
+        "min": [
+          -363,
+          -103.4145188432738
+        ]
+      },
+      "Closed Filled": {
+        "max": [
+          280,
+          -50
+        ],
+        "min": [
+          80,
+          -220
+        ]
+      },
+      "Closed Stroked Cubic": {
+        "max": [
+          284,
+          184
+        ],
+        "min": [
+          76,
+          -24
+        ]
+      }
+    },
+    "bounds_after_reload": {
+      "Open Straight": {
+        "max": [
+          -117,
+          -217
+        ],
+        "min": [
+          -363,
+          -223
+        ]
+      },
+      "Open Cubic": {
+        "max": [
+          -117,
+          -16.58548115672619
+        ],
+        "min": [
+          -363,
+          -103.4145188432738
+        ]
+      },
+      "Closed Filled": {
+        "max": [
+          280,
+          -50
+        ],
+        "min": [
+          80,
+          -220
+        ]
+      },
+      "Closed Stroked Cubic": {
+        "max": [
+          284,
+          184
+        ],
+        "min": [
+          76,
+          -24
+        ]
+      }
+    },
+    "reloaded_ok": true
+  },
+  "pixel_readback_artifact": "docs/verification/PHASE_2A_PIXEL_READBACK.json",
+  "performance_artifact": "docs/PHASE_2A_BROWSER_METRICS.json",
+  "screenshots": {
+    "paths": {
+      "path": "docs/verification/phase2a-paths.png",
+      "bytes": 59254,
+      "modified_utc": "2026-08-25T14:27:47.761Z"
+    }
+  },
+  "console_errors": [],
+  "chrome_stderr_tail": "\r\nDevTools listening on ws://127.0.0.1:1469/devtools/browser/3b11849c-2418-4db8-9b4c-a0a226f77456\r\n",
+  "max_fallback_rebuild_count_seen": 0,
+  "fallback_checkpoints": [
+    {
+      "engine_sequence": 5,
+      "fixture": "EDITOR",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 7,
+      "fixture": "PATH-A",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 9,
+      "fixture": "PATH-A",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 9,
+      "fixture": "PATH-A",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 9,
+      "fixture": "PATH-A",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 9,
+      "fixture": "PATH-A",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 9,
+      "fixture": "PATH-A",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 9,
+      "fixture": "PATH-A",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 9,
+      "fixture": "PATH-A",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 9,
+      "fixture": "PATH-A",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 9,
+      "fixture": "PATH-A",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 10,
+      "fixture": "PATH-A",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 14,
+      "fixture": "PATH-A",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 15,
+      "fixture": "PATH-A",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 17,
+      "fixture": "PATH-A",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 18,
+      "fixture": "PATH-A",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 22,
+      "fixture": "PATH-A",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 38,
+      "fixture": "PATH-A",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 39,
+      "fixture": "PATH-A",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 39,
+      "fixture": "PATH-A",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 40,
+      "fixture": "PATH-A",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 40,
+      "fixture": "PATH-A",
+      "fallback_rebuild_count": 0
+    }
+  ],
+  "checks": {
+    "server_health": true,
+    "asset_http_and_wasm_mime": true,
+    "new_chrome_process": true,
+    "temporary_chrome_profile": true,
+    "navigator_gpu": true,
+    "hardware_gpu_adapter": true,
+    "dedicated_worker_wasm": true,
+    "render_binary_schema_v3": true,
+    "fixture_projects_four_paths": true,
+    "paths_reach_the_gpu_as_triangles": true,
+    "ordered_path_draw_batches": true,
+    "actual_pixel_readback": true,
+    "filled_interior_is_pickable": true,
+    "outline_only_region_is_not_pickable": true,
+    "stroke_is_pickable": true,
+    "create_path_command_round_trip": true,
+    "edit_path_tessellates_only_that_path": true,
+    "undo_restores_path_geometry": true,
+    "redo_reapplies_path_geometry": true,
+    "undo_removes_the_created_path": true,
+    "camera_only_uploads_no_triangles": true,
+    "save_load_preserves_path_identity": true,
+    "reloaded_path_still_renders": true,
+    "console_errors_zero": true,
+    "gpu_validation_errors_zero": true,
+    "fallback_rebuild_zero": true,
+    "latest_sequences_match": true
+  },
+  "assertion_count": 27,
+  "passed_assertion_count": 27,
+  "all_passed": true
+}
