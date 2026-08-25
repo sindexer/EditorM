@@ -11,6 +11,16 @@ param(
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
 
+function ConvertTo-EvidenceTimestamp([object]$Value) {
+    if ($Value -is [DateTimeOffset]) { return $Value }
+    if ($Value -is [DateTime]) { return [DateTimeOffset]::new($Value) }
+    return [DateTimeOffset]::Parse(
+        [string]$Value,
+        [Globalization.CultureInfo]::InvariantCulture,
+        [Globalization.DateTimeStyles]::RoundtripKind
+    )
+}
+
 if ([string]::IsNullOrWhiteSpace($RepositoryRoot)) {
     $RepositoryRoot = Split-Path -Parent $PSScriptRoot
 }
@@ -48,6 +58,7 @@ catch {
 if ($proof.proof_kind -ne "actual-hardware-browser") { throw "Evidence is not an actual-hardware browser proof" }
 $phaseProperty = $proof.PSObject.Properties["phase"]
 $isPhase1A = $null -ne $phaseProperty -and [string]$phaseProperty.Value -eq "1A"
+$isPhase2A = $null -ne $phaseProperty -and [string]$phaseProperty.Value -eq "2A"
 
 if ($isPhase1A) {
     if ($proof.initial.actual_webgpu -ne $true -or $proof.checks.actual_adapter_and_device -ne $true) {
@@ -96,9 +107,69 @@ if ($isPhase1A) {
     $device = [string]$proof.gpu.active_device.deviceString
     $driverVendor = [string]$proof.gpu.active_device.driverVendor
     $driverVersion = [string]$proof.gpu.active_device.driverVersion
-    $capturedAt = [DateTimeOffset]::Parse([string]$proof.captured_at_utc)
-    $startedAt = [DateTimeOffset]::Parse([string]$proof.execution.started_at_utc)
-    $finishedAt = [DateTimeOffset]::Parse([string]$proof.execution.finished_at_utc)
+    $capturedAt = ConvertTo-EvidenceTimestamp $proof.captured_at_utc
+    $startedAt = ConvertTo-EvidenceTimestamp $proof.execution.started_at_utc
+    $finishedAt = ConvertTo-EvidenceTimestamp $proof.execution.finished_at_utc
+    $command = [string]$proof.execution.command
+}
+elseif ($isPhase2A) {
+    if ($proof.initial.actual_webgpu -ne $true -or
+        $proof.gpu.software_renderer -ne $false) {
+        throw "Phase 2A evidence does not prove actual WebGPU hardware use"
+    }
+    if ($proof.gpu.backend -notmatch "browser-webgpu") { throw "Phase 2A evidence backend is not browser WebGPU" }
+    if ($proof.browser_mode -notmatch "no mock" -or $proof.browser_mode -notmatch "no Canvas2D fallback") {
+        throw "Phase 2A evidence does not explicitly exclude mock and Canvas2D fallback"
+    }
+    if ($proof.initial.worker_runtime_owner -ne "dedicated-worker" -or
+        $proof.initial.wasm_initialized -ne $true -or
+        [int]$proof.initial.render_binary_schema_version -ne 3) {
+        throw "Phase 2A evidence does not prove the Dedicated Worker, WASM, and schema-v3 runtime"
+    }
+    if ($proof.max_fallback_rebuild_count_seen -ne 0 -or
+        $proof.checks.fallback_rebuild_zero -ne $true -or
+        $proof.checks.gpu_validation_errors_zero -ne $true) {
+        throw "Phase 2A evidence reports a GPU validation error, fallback, or rebuild"
+    }
+    if ($proof.all_passed -ne $true -or [int]$proof.assertion_count -ne 27 -or
+        [int]$proof.passed_assertion_count -ne [int]$proof.assertion_count) {
+        throw "Phase 2A hardware proof did not pass all 27 checks"
+    }
+    foreach ($check in @(
+        "hardware_gpu_adapter",
+        "actual_pixel_readback",
+        "filled_interior_is_pickable",
+        "outline_only_region_is_not_pickable",
+        "stroke_is_pickable",
+        "create_path_command_round_trip",
+        "edit_path_tessellates_only_that_path",
+        "undo_restores_path_geometry",
+        "redo_reapplies_path_geometry",
+        "save_load_preserves_path_identity",
+        "reloaded_path_still_renders"
+    )) {
+        $property = $proof.checks.PSObject.Properties[$check]
+        if ($null -eq $property -or $property.Value -ne $true) {
+            throw "Phase 2A hardware proof assertion failed or is missing: $check"
+        }
+    }
+    if ([string]$proof.tested_source_commit -notmatch "^[0-9a-f]{40}$" -or
+        [string]::IsNullOrWhiteSpace([string]$proof.tested_branch) -or
+        [string]::IsNullOrWhiteSpace([string]$proof.gate_run_id)) {
+        throw "Phase 2A evidence is missing its tested source identity"
+    }
+    $null = & git -C $repoRoot cat-file -e "$($proof.tested_source_commit)^{commit}" 2>$null
+    if ($LASTEXITCODE -ne 0) { throw "Phase 2A tested source commit is not present in the repository" }
+    $null = & git -C $repoRoot merge-base --is-ancestor $proof.tested_source_commit HEAD 2>$null
+    if ($LASTEXITCODE -ne 0) { throw "Phase 2A tested source commit is not an ancestor of the evidence commit" }
+
+    $adapter = [string]$proof.gpu.adapter
+    $device = [string]$proof.gpu.active_device.deviceString
+    $driverVendor = [string]$proof.gpu.active_device.driverVendor
+    $driverVersion = [string]$proof.gpu.active_device.driverVersion
+    $capturedAt = ConvertTo-EvidenceTimestamp $proof.captured_at_utc
+    $startedAt = ConvertTo-EvidenceTimestamp $proof.execution.started_at_utc
+    $finishedAt = ConvertTo-EvidenceTimestamp $proof.execution.finished_at_utc
     $command = [string]$proof.execution.command
 }
 else {
@@ -114,9 +185,9 @@ else {
     $device = [string]$proof.hardware.active_device.deviceString
     $driverVendor = [string]$proof.hardware.active_device.driverVendor
     $driverVersion = [string]$proof.hardware.active_device.driverVersion
-    $capturedAt = [DateTimeOffset]::Parse([string]$proof.captured_at_utc)
-    $startedAt = [DateTimeOffset]::Parse([string]$proof.r3_complexity_matrix.started_at_utc)
-    $finishedAt = [DateTimeOffset]::Parse([string]$proof.r3_complexity_matrix.finished_at_utc)
+    $capturedAt = ConvertTo-EvidenceTimestamp $proof.captured_at_utc
+    $startedAt = ConvertTo-EvidenceTimestamp $proof.r3_complexity_matrix.started_at_utc
+    $finishedAt = ConvertTo-EvidenceTimestamp $proof.r3_complexity_matrix.finished_at_utc
     $command = [string]$proof.r3_complexity_matrix.command
 }
 
@@ -187,6 +258,26 @@ if ($isPhase1A) {
         throw "Phase 1A affine render/hit-test/overlay parity evidence is incomplete"
     }
 }
+elseif ($isPhase2A) {
+    if ($pixelProof.proof_kind -ne "actual-hardware-webgpu-surface-readback" -or
+        $pixelProof.all_passed -ne $true -or [int]$pixelProof.assertion_count -ne 10 -or
+        [int]$pixelProof.passed_assertion_count -ne [int]$pixelProof.assertion_count) {
+        throw "Phase 2A pixel artifact is not a passing 10-check actual-WebGPU surface readback"
+    }
+    if ([string]$pixelProof.gate_run_id -ne [string]$proof.gate_run_id -or
+        [string]$pixelProof.tested_source_commit -ne [string]$proof.tested_source_commit -or
+        [string]$pixelProof.tested_branch -ne [string]$proof.tested_branch) {
+        throw "Phase 2A browser and pixel artifacts do not identify the same execution"
+    }
+    if ([string]$pixelProof.surface_base_format -ne [string]$proof.gpu.surface_base_format -or
+        [string]$pixelProof.pipeline_view_format -ne [string]$proof.gpu.pipeline_view_format -or
+        [string]$pixelProof.readback_view_format -ne [string]$proof.gpu.readback_view_format) {
+        throw "Phase 2A pixel proof render/readback formats do not match the browser proof"
+    }
+    foreach ($assertion in $pixelProof.assertions.PSObject.Properties) {
+        if ($assertion.Value -ne $true) { throw "Phase 2A pixel assertion failed: $($assertion.Name)" }
+    }
+}
 elseif ($pixelProof.kind -ne "actual-webgpu-texture-readback" -or $pixelProof.all_passed -ne $true) {
     throw "Pixel readback artifact is not a passing actual-WebGPU readback"
 }
@@ -194,7 +285,7 @@ elseif ($pixelProof.kind -ne "actual-webgpu-texture-readback" -or $pixelProof.al
 [pscustomobject]@{
     evidence_path = $relative
     evidence_sha256 = $actualHash
-    phase = if ($isPhase1A) { "1A" } else { "legacy" }
+    phase = if ($isPhase1A) { "1A" } elseif ($isPhase2A) { "2A" } else { "legacy" }
     captured_at_utc = $capturedAt.ToUniversalTime().ToString("o")
     command = $command
     actual_webgpu = $true
