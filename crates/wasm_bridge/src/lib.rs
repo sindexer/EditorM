@@ -10,8 +10,9 @@ use serde::Deserialize;
 use serde_json::{json, Value};
 use visual_authoring_core_math::{Affine2, Rect, Vec2};
 use visual_authoring_document::{
-    Appearance, ColorRgba, Command, Document, DocumentChange, DocumentChangeSet, Geometry, NodeId,
-    NodeKind, NodeSpec, PathAnchor, PathAnchorId, PathGeometry, StructuralGroupChange,
+    Appearance, ColorRgba, Command, CommandError, DashPattern, Document, DocumentChange,
+    DocumentChangeSet, EditorError, Geometry, NodeId, NodeKind, NodeSpec, PathAnchor, PathAnchorId,
+    PathGeometry, PathHandle, PathSegmentKind, StrokeCap, StrokeJoin, StructuralGroupChange,
 };
 use visual_authoring_render_model::{
     encode_path_instances, encode_path_vertices, CullingResult, DrawBatch, PrimitiveKind,
@@ -52,6 +53,36 @@ pub struct PenGestureAnchorRequest {
     position: [f64; 2],
     #[serde(default)]
     drag: Option<[f64; 2]>,
+}
+
+#[derive(Clone, Copy, Debug, Deserialize)]
+#[serde(rename_all = "snake_case")]
+enum PathHandleRequest {
+    Incoming,
+    Outgoing,
+}
+
+#[derive(Clone, Copy, Debug, Deserialize)]
+#[serde(rename_all = "snake_case")]
+enum PathSegmentKindRequest {
+    Straight,
+    Cubic,
+}
+
+#[derive(Clone, Copy, Debug, Deserialize)]
+#[serde(rename_all = "snake_case")]
+enum StrokeCapRequest {
+    Butt,
+    Round,
+    Square,
+}
+
+#[derive(Clone, Copy, Debug, Deserialize)]
+#[serde(rename_all = "snake_case")]
+enum StrokeJoinRequest {
+    Miter,
+    Round,
+    Bevel,
 }
 
 #[derive(Debug, Deserialize)]
@@ -178,6 +209,14 @@ enum CommandRequest {
         node_id: String,
         color: [f64; 4],
         width: f64,
+        #[serde(default)]
+        cap: Option<StrokeCapRequest>,
+        #[serde(default)]
+        join: Option<StrokeJoinRequest>,
+        #[serde(default)]
+        miter_limit: Option<f64>,
+        #[serde(default)]
+        dash_pattern: Option<Vec<f64>>,
     },
     /// Creates a persistent path node. This is the command path a Pen tool would eventually use;
     /// Phase 2A exposes it for proofs only and ships no Pen UI.
@@ -210,6 +249,38 @@ enum CommandRequest {
         node_id: String,
         closed: bool,
         gestures: Vec<PenGestureAnchorRequest>,
+    },
+    MovePathAnchor {
+        node_id: String,
+        anchor_id: String,
+        position: [f64; 2],
+    },
+    SetPathHandle {
+        node_id: String,
+        anchor_id: String,
+        handle: PathHandleRequest,
+        position: Option<[f64; 2]>,
+    },
+    InsertPathAnchor {
+        node_id: String,
+        start_anchor_id: String,
+        end_anchor_id: String,
+        anchor_id: String,
+        parameter: f64,
+    },
+    DeletePathAnchor {
+        node_id: String,
+        anchor_id: String,
+    },
+    SetPathClosed {
+        node_id: String,
+        closed: bool,
+    },
+    SetPathSegmentKind {
+        node_id: String,
+        start_anchor_id: String,
+        end_anchor_id: String,
+        segment_kind: PathSegmentKindRequest,
     },
     CreateShape {
         node_id: String,
@@ -386,7 +457,15 @@ impl HostFailure {
 
 impl From<RuntimeError> for HostFailure {
     fn from(error: RuntimeError) -> Self {
-        Self::new("runtime_error", error.to_string())
+        let code = if matches!(
+            &error,
+            RuntimeError::Editor(EditorError::Command(CommandError::PathEdit(_)))
+        ) {
+            "path_edit_error"
+        } else {
+            "runtime_error"
+        };
+        Self::new(code, error.to_string())
     }
 }
 
@@ -1817,16 +1896,47 @@ impl CommandRequest {
                 node_id,
                 color,
                 width,
+                cap,
+                join,
+                miter_limit,
+                dash_pattern,
             } => {
                 require_non_negative(&[width], "stroke width")?;
+                if let Some(miter_limit) = miter_limit {
+                    if !miter_limit.is_finite() || miter_limit < 1.0 {
+                        return Err(HostFailure::new(
+                            "invalid_command",
+                            "stroke miter limit must be finite and at least 1",
+                        ));
+                    }
+                }
                 let target = parse_node_id(&node_id)?;
                 let mut appearance = current_appearance(document, target)?;
                 appearance.stroke = visual_authoring_document::Stroke {
                     color: parse_color(color)?,
                     width,
-                    ..appearance.stroke
+                    cap: cap.map_or(appearance.stroke.cap, |cap| match cap {
+                        StrokeCapRequest::Butt => StrokeCap::Butt,
+                        StrokeCapRequest::Round => StrokeCap::Round,
+                        StrokeCapRequest::Square => StrokeCap::Square,
+                    }),
+                    join: join.map_or(appearance.stroke.join, |join| match join {
+                        StrokeJoinRequest::Miter => StrokeJoin::Miter,
+                        StrokeJoinRequest::Round => StrokeJoin::Round,
+                        StrokeJoinRequest::Bevel => StrokeJoin::Bevel,
+                    }),
+                    miter_limit: miter_limit.unwrap_or(appearance.stroke.miter_limit),
+                    dash_pattern: match dash_pattern {
+                        Some(pattern) => DashPattern::new(&pattern).map_err(|error| {
+                            HostFailure::new("invalid_command", error.to_string())
+                        })?,
+                        None => appearance.stroke.dash_pattern,
+                    },
                 };
-                Ok(Command::SetAppearance { target, appearance })
+                Ok(Command::SetStroke {
+                    target,
+                    stroke: appearance.stroke,
+                })
             }
             Self::CreatePath {
                 node_id,
@@ -1883,6 +1993,72 @@ impl CommandRequest {
             } => Ok(Command::SetGeometry {
                 target: parse_node_id(&node_id)?,
                 geometry: Geometry::Path(path_geometry_from_pen(closed, &gestures)?),
+            }),
+            Self::MovePathAnchor {
+                node_id,
+                anchor_id,
+                position,
+            } => {
+                require_finite(&position, "path anchor position")?;
+                Ok(Command::MovePathAnchor {
+                    target: parse_node_id(&node_id)?,
+                    anchor: parse_path_anchor_id(&anchor_id)?,
+                    position: Vec2::new(position[0], position[1]),
+                })
+            }
+            Self::SetPathHandle {
+                node_id,
+                anchor_id,
+                handle,
+                position,
+            } => {
+                if let Some(position) = position {
+                    require_finite(&position, "path handle position")?;
+                }
+                Ok(Command::SetPathHandle {
+                    target: parse_node_id(&node_id)?,
+                    anchor: parse_path_anchor_id(&anchor_id)?,
+                    handle: match handle {
+                        PathHandleRequest::Incoming => PathHandle::Incoming,
+                        PathHandleRequest::Outgoing => PathHandle::Outgoing,
+                    },
+                    position: position.map(|point| Vec2::new(point[0], point[1])),
+                })
+            }
+            Self::InsertPathAnchor {
+                node_id,
+                start_anchor_id,
+                end_anchor_id,
+                anchor_id,
+                parameter,
+            } => Ok(Command::InsertPathAnchor {
+                target: parse_node_id(&node_id)?,
+                start: parse_path_anchor_id(&start_anchor_id)?,
+                end: parse_path_anchor_id(&end_anchor_id)?,
+                anchor: parse_path_anchor_id(&anchor_id)?,
+                parameter,
+            }),
+            Self::DeletePathAnchor { node_id, anchor_id } => Ok(Command::DeletePathAnchor {
+                target: parse_node_id(&node_id)?,
+                anchor: parse_path_anchor_id(&anchor_id)?,
+            }),
+            Self::SetPathClosed { node_id, closed } => Ok(Command::SetPathClosed {
+                target: parse_node_id(&node_id)?,
+                closed,
+            }),
+            Self::SetPathSegmentKind {
+                node_id,
+                start_anchor_id,
+                end_anchor_id,
+                segment_kind,
+            } => Ok(Command::SetPathSegmentKind {
+                target: parse_node_id(&node_id)?,
+                start: parse_path_anchor_id(&start_anchor_id)?,
+                end: parse_path_anchor_id(&end_anchor_id)?,
+                kind: match segment_kind {
+                    PathSegmentKindRequest::Straight => PathSegmentKind::Straight,
+                    PathSegmentKindRequest::Cubic => PathSegmentKind::Cubic,
+                },
             }),
             Self::CreateShape {
                 node_id,
@@ -1999,6 +2175,17 @@ fn parse_node_id(value: &str) -> Result<NodeId, HostFailure> {
             format!("{value} is not a valid stable NodeId"),
         )
     })
+}
+
+fn parse_path_anchor_id(value: &str) -> Result<PathAnchorId, HostFailure> {
+    uuid::Uuid::parse_str(value)
+        .map(PathAnchorId::from_uuid)
+        .map_err(|error| {
+            HostFailure::new(
+                "invalid_command",
+                format!("path anchor id {value} is invalid: {error}"),
+            )
+        })
 }
 
 fn require_finite(values: &[f64], label: &str) -> Result<(), HostFailure> {
@@ -3746,6 +3933,159 @@ mod path_tests {
         let redone = response(&mut host, request("redo", json!({ "type": "redo" })));
         assert!(redone["ok"].as_bool().unwrap(), "{redone}");
         assert_eq!(redone["resources"]["path_instance_count"], 1);
+    }
+
+    #[test]
+    fn phase2b_path_commands_cross_wasm_with_stable_ids_and_typed_failures() {
+        let mut host = EngineHost::new_inner().unwrap();
+        let root = host.runtime.document().root_id().to_string();
+        let node = "10101010-1010-4010-8010-101010101010";
+        let anchors = [
+            "20202020-2020-4020-8020-202020202020",
+            "30303030-3030-4030-8030-303030303030",
+            "40404040-4040-4040-8040-404040404040",
+            "50505050-5050-4050-8050-505050505050",
+        ];
+        let inserted = "60606060-6060-4060-8060-606060606060";
+        let created = response(
+            &mut host,
+            request(
+                "phase2b-create",
+                json!({
+                    "type": "command",
+                    "command": {
+                        "kind": "create_path",
+                        "node_id": node,
+                        "parent_id": root,
+                        "index": 0,
+                        "name": "Editable path",
+                        "x": 0.0,
+                        "y": 0.0,
+                        "closed": false,
+                        "anchors": [
+                            { "id": anchors[0], "position": [0.0, 0.0] },
+                            { "id": anchors[1], "position": [100.0, 0.0] },
+                            { "id": anchors[2], "position": [120.0, 100.0] },
+                            { "id": anchors[3], "position": [0.0, 100.0] }
+                        ]
+                    }
+                }),
+            ),
+        );
+        assert!(created["ok"].as_bool().unwrap(), "{created}");
+
+        let commands = [
+            json!({
+                "kind": "move_path_anchor", "node_id": node,
+                "anchor_id": anchors[0], "position": [10.0, 20.0]
+            }),
+            json!({
+                "kind": "set_path_handle", "node_id": node,
+                "anchor_id": anchors[1], "handle": "incoming", "position": [75.0, 25.0]
+            }),
+            json!({
+                "kind": "set_path_segment_kind", "node_id": node,
+                "start_anchor_id": anchors[1], "end_anchor_id": anchors[2],
+                "segment_kind": "cubic"
+            }),
+            json!({
+                "kind": "insert_path_anchor", "node_id": node,
+                "start_anchor_id": anchors[0], "end_anchor_id": anchors[1],
+                "anchor_id": inserted, "parameter": 0.4
+            }),
+            json!({
+                "kind": "delete_path_anchor", "node_id": node, "anchor_id": anchors[3]
+            }),
+            json!({ "kind": "set_path_closed", "node_id": node, "closed": true }),
+            json!({
+                "kind": "set_stroke", "node_id": node,
+                "color": [0.1, 0.2, 0.3, 0.9], "width": 4.0,
+                "cap": "round", "join": "bevel", "miter_limit": 7.0,
+                "dash_pattern": [8.0, 3.0, 1.0]
+            }),
+        ];
+        for (index, command) in commands.into_iter().enumerate() {
+            let edited = response(
+                &mut host,
+                request(
+                    &format!("phase2b-edit-{index}"),
+                    json!({ "type": "command", "command": command }),
+                ),
+            );
+            assert!(edited["ok"].as_bool().unwrap(), "{edited}");
+            assert_eq!(edited["render_delta"]["render_full_rebuilds"], 0);
+            assert_eq!(edited["metrics"]["fallback_rebuild_count"], 0);
+        }
+
+        let saved = response(
+            &mut host,
+            request("phase2b-save", json!({ "type": "save_document" })),
+        );
+        let stored: Value =
+            serde_json::from_str(saved["result"]["document_json"].as_str().unwrap()).unwrap();
+        let stored_node = stored["document"]["nodes"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|candidate| candidate["id"] == node)
+            .unwrap();
+        let stored_ids = stored_node["kind"]["anchors"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|anchor| anchor["id"].as_str().unwrap())
+            .collect::<Vec<_>>();
+        assert_eq!(
+            stored_ids,
+            vec![anchors[0], inserted, anchors[1], anchors[2]]
+        );
+        assert_eq!(stored_node["kind"]["closed"], true);
+        let stroke = &stored_node["appearance"]["stroke"];
+        assert_eq!(stroke["cap"], "round");
+        assert_eq!(stroke["join"], "bevel");
+        assert_eq!(stroke["miter_limit"], 7.0);
+        assert_eq!(stroke["dash_pattern"], json!([8.0, 3.0, 1.0]));
+
+        let invalid_stroke_revision = host.runtime.document_revision();
+        let invalid_stroke = response(
+            &mut host,
+            request(
+                "phase2b-invalid-stroke",
+                json!({
+                    "type": "command",
+                    "command": {
+                        "kind": "set_stroke", "node_id": node,
+                        "color": [0.0, 0.0, 0.0, 1.0], "width": 2.0,
+                        "miter_limit": 0.5, "dash_pattern": [0.0, 0.0]
+                    }
+                }),
+            ),
+        );
+        assert!(!invalid_stroke["ok"].as_bool().unwrap());
+        assert_eq!(invalid_stroke["error"]["code"], "invalid_command");
+        assert_eq!(host.runtime.document_revision(), invalid_stroke_revision);
+
+        let before_revision = host.runtime.document_revision();
+        let before_history = host.runtime.history_state();
+        let failed = response(
+            &mut host,
+            request(
+                "phase2b-stale-segment",
+                json!({
+                    "type": "command",
+                    "command": {
+                        "kind": "set_path_segment_kind", "node_id": node,
+                        "start_anchor_id": anchors[0], "end_anchor_id": anchors[2],
+                        "segment_kind": "straight"
+                    }
+                }),
+            ),
+        );
+        assert!(!failed["ok"].as_bool().unwrap());
+        assert_eq!(failed["error"]["code"], "path_edit_error");
+        assert_eq!(host.runtime.document_revision(), before_revision);
+        assert_eq!(host.runtime.history_state(), before_history);
+        assert!(!failed["binary"]["path_vertices"].as_bool().unwrap());
     }
 
     #[test]
