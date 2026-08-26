@@ -335,11 +335,95 @@ impl CornerRadii {
     }
 }
 
-/// Phase 1A supports a single, explicitly centered solid stroke alignment.
+pub const MAX_DASH_ENTRIES: usize = 64;
+
+#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
+pub enum StrokeCap {
+    #[default]
+    Butt,
+    Round,
+    Square,
+}
+
+#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
+pub enum StrokeJoin {
+    #[default]
+    Miter,
+    Round,
+    Bevel,
+}
+
+#[derive(Clone, Copy, Debug, Error, Eq, PartialEq)]
+pub enum DashPatternError {
+    #[error("dash pattern has {actual} entries; at most {maximum} are allowed")]
+    TooMany { actual: usize, maximum: usize },
+    #[error("dash pattern entries must be finite and non-negative")]
+    InvalidLength,
+    #[error("a non-empty dash pattern must contain at least one positive length")]
+    AllZero,
+}
+
+/// Bounded persistent dash sequence. Author order is preserved exactly.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct DashPattern {
+    lengths: [f64; MAX_DASH_ENTRIES],
+    len: u8,
+}
+
+impl DashPattern {
+    pub fn new(lengths: &[f64]) -> Result<Self, DashPatternError> {
+        if lengths.len() > MAX_DASH_ENTRIES {
+            return Err(DashPatternError::TooMany {
+                actual: lengths.len(),
+                maximum: MAX_DASH_ENTRIES,
+            });
+        }
+        if lengths
+            .iter()
+            .any(|length| !length.is_finite() || *length < 0.0)
+        {
+            return Err(DashPatternError::InvalidLength);
+        }
+        if !lengths.is_empty() && !lengths.iter().any(|length| *length > 0.0) {
+            return Err(DashPatternError::AllZero);
+        }
+        let mut stored = [0.0; MAX_DASH_ENTRIES];
+        stored[..lengths.len()].copy_from_slice(lengths);
+        Ok(Self {
+            lengths: stored,
+            len: lengths.len() as u8,
+        })
+    }
+
+    #[must_use]
+    pub fn as_slice(&self) -> &[f64] {
+        &self.lengths[..usize::from(self.len)]
+    }
+
+    #[must_use]
+    pub const fn is_empty(&self) -> bool {
+        self.len == 0
+    }
+}
+
+impl Default for DashPattern {
+    fn default() -> Self {
+        Self {
+            lengths: [0.0; MAX_DASH_ENTRIES],
+            len: 0,
+        }
+    }
+}
+
+/// Center-aligned stroke with the Phase 2B extended stroke contract.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct Stroke {
     pub color: ColorRgba,
     pub width: f64,
+    pub cap: StrokeCap,
+    pub join: StrokeJoin,
+    pub miter_limit: f64,
+    pub dash_pattern: DashPattern,
 }
 
 impl Default for Stroke {
@@ -347,6 +431,10 @@ impl Default for Stroke {
         Self {
             color: ColorRgba::new(0.08, 0.11, 0.16, 1.0),
             width: 0.0,
+            cap: StrokeCap::Butt,
+            join: StrokeJoin::Miter,
+            miter_limit: 4.0,
+            dash_pattern: DashPattern::default(),
         }
     }
 }
@@ -1694,6 +1782,8 @@ fn appearance_is_valid(appearance: Appearance) -> bool {
         && appearance.stroke.color.is_valid()
         && appearance.stroke.width.is_finite()
         && appearance.stroke.width >= 0.0
+        && appearance.stroke.miter_limit.is_finite()
+        && appearance.stroke.miter_limit >= 1.0
 }
 
 /// Smallest box containing both inputs.
@@ -1720,6 +1810,47 @@ mod tests {
     fn generated_ids_are_unique_and_map_friendly() {
         let ids: BTreeSet<_> = (0..1_000).map(|_| NodeId::new()).collect();
         assert_eq!(ids.len(), 1_000);
+    }
+
+    #[test]
+    fn dash_pattern_is_bounded_validated_and_order_preserving() {
+        let pattern = DashPattern::new(&[6.0, 2.0, 0.0, 4.0]).unwrap();
+        assert_eq!(pattern.as_slice(), &[6.0, 2.0, 0.0, 4.0]);
+        assert!(DashPattern::default().is_empty());
+        assert_eq!(
+            DashPattern::new(&vec![1.0; MAX_DASH_ENTRIES + 1]),
+            Err(DashPatternError::TooMany {
+                actual: MAX_DASH_ENTRIES + 1,
+                maximum: MAX_DASH_ENTRIES,
+            })
+        );
+        assert_eq!(
+            DashPattern::new(&[-1.0]),
+            Err(DashPatternError::InvalidLength)
+        );
+        assert_eq!(
+            DashPattern::new(&[f64::INFINITY]),
+            Err(DashPatternError::InvalidLength)
+        );
+        assert_eq!(
+            DashPattern::new(&[0.0, 0.0]),
+            Err(DashPatternError::AllZero)
+        );
+    }
+
+    #[test]
+    fn invalid_miter_limit_is_rejected_atomically() {
+        let mut document = Document::new("Root");
+        let before = document.clone();
+        let id = NodeId::new();
+        let mut spec = NodeSpec::rectangle(id, "Invalid stroke", Vec2::new(20.0, 10.0));
+        spec.appearance.stroke.miter_limit = 0.5;
+
+        assert_eq!(
+            document.register_node(spec),
+            Err(DocumentError::InvalidAppearance(id))
+        );
+        assert_eq!(document, before);
     }
 
     #[test]

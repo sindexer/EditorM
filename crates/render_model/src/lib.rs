@@ -1134,6 +1134,7 @@ mod tests {
         spec.appearance.stroke = Stroke {
             color: ColorRgba::new(0.0, 0.0, 0.0, 1.0),
             width: 2.0,
+            ..Stroke::default()
         };
         editor
             .dispatch(Command::CreateNode {
@@ -1417,6 +1418,7 @@ mod tests {
                     stroke: Stroke {
                         color: ColorRgba::new(0.0, 1.0, 0.0, 0.5),
                         width: 3.0,
+                        ..Stroke::default()
                     },
                 },
             })

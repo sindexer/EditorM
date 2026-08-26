@@ -249,8 +249,8 @@ pub(crate) enum ReversibleEffect {
     },
     SetAppearance {
         target: NodeId,
-        before: Appearance,
-        after: Appearance,
+        before: Box<Appearance>,
+        after: Box<Appearance>,
     },
     SetMetadata {
         target: NodeId,
@@ -427,7 +427,7 @@ impl ReversibleEffect {
                 document.set_geometry(*target, after.clone())?;
             }
             Self::SetAppearance { target, after, .. } => {
-                document.set_appearance(*target, *after)?;
+                document.set_appearance(*target, **after)?;
             }
             Self::SetMetadata { target, after, .. } => {
                 document.set_metadata(*target, after.clone())?;
@@ -483,7 +483,7 @@ impl ReversibleEffect {
                 document.set_geometry(*target, before.clone())?;
             }
             Self::SetAppearance { target, before, .. } => {
-                document.set_appearance(*target, *before)?;
+                document.set_appearance(*target, **before)?;
             }
             Self::SetMetadata { target, before, .. } => {
                 document.set_metadata(*target, before.clone())?;
@@ -791,8 +791,8 @@ pub(crate) fn execute_command(
                 vec![target],
                 ReversibleEffect::SetAppearance {
                     target,
-                    before,
-                    after: appearance,
+                    before: Box::new(before),
+                    after: Box::new(appearance),
                 },
             )
         }

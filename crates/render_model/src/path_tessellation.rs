@@ -267,6 +267,7 @@ mod tests {
             stroke: Stroke {
                 color: ColorRgba::new(0.0, 0.0, 0.0, 1.0),
                 width: stroke_width,
+                ..Stroke::default()
             },
             ..Appearance::default()
         }

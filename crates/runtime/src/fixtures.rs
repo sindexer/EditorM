@@ -81,6 +81,7 @@ fn path_proof() -> Result<Document, DocumentError> {
         stroke: Stroke {
             color: stroke_color,
             width,
+            ..Stroke::default()
         },
         ..Appearance::default()
     };
@@ -166,6 +167,7 @@ fn path_proof() -> Result<Document, DocumentError> {
         stroke: Stroke {
             color: stroke_color,
             width: 8.0,
+            ..Stroke::default()
         },
         ..Appearance::default()
     };

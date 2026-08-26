@@ -1824,6 +1824,7 @@ impl CommandRequest {
                 appearance.stroke = visual_authoring_document::Stroke {
                     color: parse_color(color)?,
                     width,
+                    ..appearance.stroke
                 };
                 Ok(Command::SetAppearance { target, appearance })
             }
