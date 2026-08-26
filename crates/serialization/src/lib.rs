@@ -11,13 +11,13 @@ use serde::{Deserialize, Serialize};
 use thiserror::Error;
 use visual_authoring_core_math::{Affine2, Vec2};
 use visual_authoring_document::{
-    Appearance, ColorRgba, CornerRadii, Document, DocumentError, DocumentSnapshot, Geometry,
-    GroupRestoration, GroupRestorationRun, NodeId, NodeKind, NodeSnapshot, NodeSpec, PathAnchor,
-    PathAnchorId, PathGeometry, Stroke,
+    Appearance, ColorRgba, CornerRadii, DashPattern, DashPatternError, Document, DocumentError,
+    DocumentSnapshot, Geometry, GroupRestoration, GroupRestorationRun, NodeId, NodeKind,
+    NodeSnapshot, NodeSpec, PathAnchor, PathAnchorId, PathGeometry, Stroke, StrokeCap, StrokeJoin,
 };
 
 pub const DOCUMENT_FORMAT: &str = "visual-authoring-document";
-pub const CURRENT_VERSION: u32 = 3;
+pub const CURRENT_VERSION: u32 = 4;
 
 #[derive(Debug, Error)]
 pub enum SerializationError {
@@ -31,6 +31,8 @@ pub enum SerializationError {
     UnsupportedVersion(u64),
     #[error("document data is invalid: {0}")]
     InvalidDocument(#[from] DocumentError),
+    #[error("invalid stroke dash pattern: {0}")]
+    InvalidDashPattern(#[from] DashPatternError),
 }
 
 /// Serializes a validated semantic document using the current versioned schema.
@@ -58,7 +60,7 @@ pub fn from_json(json: &str) -> Result<Document, SerializationError> {
         .and_then(serde_json::Value::as_u64)
         .ok_or(SerializationError::InvalidEnvelopeField("version"))?;
     match version {
-        1..=3 => serde_json::from_value::<StoredEnvelopeV1>(value)?.into_document(),
+        1..=4 => serde_json::from_value::<StoredEnvelopeV1>(value)?.into_document(),
         unsupported => Err(SerializationError::UnsupportedVersion(unsupported)),
     }
 }
@@ -93,7 +95,7 @@ impl StoredEnvelopeV1 {
         if self.format != DOCUMENT_FORMAT {
             return Err(SerializationError::UnsupportedFormat(self.format));
         }
-        if !matches!(self.version, 1..=3) {
+        if !matches!(self.version, 1..=4) {
             return Err(SerializationError::UnsupportedVersion(u64::from(
                 self.version,
             )));
@@ -104,7 +106,7 @@ impl StoredEnvelopeV1 {
             .nodes
             .into_iter()
             .map(StoredNodeV1::into_snapshot)
-            .collect();
+            .collect::<Result<Vec<_>, _>>()?;
         Ok(Document::from_snapshot(DocumentSnapshot {
             root_id: self.document.root_id,
             nodes,
@@ -241,9 +243,9 @@ impl TryFrom<NodeSnapshot> for StoredNodeV1 {
 }
 
 impl StoredNodeV1 {
-    fn into_snapshot(self) -> NodeSnapshot {
+    fn into_snapshot(self) -> Result<NodeSnapshot, SerializationError> {
         let (kind, geometry) = self.kind.into_domain();
-        NodeSnapshot {
+        Ok(NodeSnapshot {
             spec: NodeSpec {
                 id: self.id,
                 name: self.name,
@@ -252,13 +254,13 @@ impl StoredNodeV1 {
                 visible: self.visible,
                 locked: self.locked,
                 geometry,
-                appearance: self.appearance.into(),
+                appearance: self.appearance.try_into()?,
                 metadata: self.metadata,
             },
             parent: self.parent,
             children: self.children,
             group_restoration: self.internal_group_restoration.map(Into::into),
-        }
+        })
     }
 }
 
@@ -431,7 +433,7 @@ impl From<StoredAffine2V1> for Affine2 {
     }
 }
 
-#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 struct StoredAppearanceV1 {
     opacity: f64,
@@ -506,11 +508,41 @@ impl From<StoredCornerRadiiV2> for CornerRadii {
     }
 }
 
-#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 struct StoredStrokeV2 {
     color: StoredColorV2,
     width: f64,
+    #[serde(default)]
+    cap: StoredStrokeCapV4,
+    #[serde(default)]
+    join: StoredStrokeJoinV4,
+    #[serde(default = "default_miter_limit")]
+    miter_limit: f64,
+    #[serde(default)]
+    dash_pattern: Vec<f64>,
+}
+
+#[derive(Clone, Copy, Debug, Default, Deserialize, Serialize)]
+#[serde(rename_all = "snake_case")]
+enum StoredStrokeCapV4 {
+    #[default]
+    Butt,
+    Round,
+    Square,
+}
+
+#[derive(Clone, Copy, Debug, Default, Deserialize, Serialize)]
+#[serde(rename_all = "snake_case")]
+enum StoredStrokeJoinV4 {
+    #[default]
+    Miter,
+    Round,
+    Bevel,
+}
+
+const fn default_miter_limit() -> f64 {
+    4.0
 }
 
 impl Default for StoredStrokeV2 {
@@ -524,16 +556,42 @@ impl From<Stroke> for StoredStrokeV2 {
         Self {
             color: stroke.color.into(),
             width: stroke.width,
+            cap: match stroke.cap {
+                StrokeCap::Butt => StoredStrokeCapV4::Butt,
+                StrokeCap::Round => StoredStrokeCapV4::Round,
+                StrokeCap::Square => StoredStrokeCapV4::Square,
+            },
+            join: match stroke.join {
+                StrokeJoin::Miter => StoredStrokeJoinV4::Miter,
+                StrokeJoin::Round => StoredStrokeJoinV4::Round,
+                StrokeJoin::Bevel => StoredStrokeJoinV4::Bevel,
+            },
+            miter_limit: stroke.miter_limit,
+            dash_pattern: stroke.dash_pattern.as_slice().to_vec(),
         }
     }
 }
 
-impl From<StoredStrokeV2> for Stroke {
-    fn from(stroke: StoredStrokeV2) -> Self {
-        Self {
+impl TryFrom<StoredStrokeV2> for Stroke {
+    type Error = SerializationError;
+
+    fn try_from(stroke: StoredStrokeV2) -> Result<Self, Self::Error> {
+        Ok(Self {
             color: stroke.color.into(),
             width: stroke.width,
-        }
+            cap: match stroke.cap {
+                StoredStrokeCapV4::Butt => StrokeCap::Butt,
+                StoredStrokeCapV4::Round => StrokeCap::Round,
+                StoredStrokeCapV4::Square => StrokeCap::Square,
+            },
+            join: match stroke.join {
+                StoredStrokeJoinV4::Miter => StrokeJoin::Miter,
+                StoredStrokeJoinV4::Round => StrokeJoin::Round,
+                StoredStrokeJoinV4::Bevel => StrokeJoin::Bevel,
+            },
+            miter_limit: stroke.miter_limit,
+            dash_pattern: DashPattern::new(&stroke.dash_pattern)?,
+        })
     }
 }
 
@@ -548,14 +606,16 @@ impl From<Appearance> for StoredAppearanceV1 {
     }
 }
 
-impl From<StoredAppearanceV1> for Appearance {
-    fn from(appearance: StoredAppearanceV1) -> Self {
-        Self {
+impl TryFrom<StoredAppearanceV1> for Appearance {
+    type Error = SerializationError;
+
+    fn try_from(appearance: StoredAppearanceV1) -> Result<Self, Self::Error> {
+        Ok(Self {
             fill: appearance.fill.into(),
             opacity: appearance.opacity,
             corner_radii: appearance.corner_radii.into(),
-            stroke: appearance.stroke.into(),
-        }
+            stroke: appearance.stroke.try_into()?,
+        })
     }
 }
 
@@ -565,7 +625,7 @@ mod tests {
     use visual_authoring_document::{Command, HeadlessEditorCore};
 
     #[test]
-    fn version_three_path_round_trip_preserves_anchor_ids_and_handles() {
+    fn current_path_round_trip_preserves_anchor_ids_and_handles() {
         let mut editor = HeadlessEditorCore::blank("Root");
         let root = editor.document().root_id();
         let path_id = NodeId::new();
@@ -598,7 +658,7 @@ mod tests {
 
         let encoded = to_json_pretty(editor.document()).unwrap();
         let value: serde_json::Value = serde_json::from_str(&encoded).unwrap();
-        assert_eq!(value["version"], 3);
+        assert_eq!(value["version"], CURRENT_VERSION);
         let restored = from_json(&encoded).unwrap();
         assert_eq!(restored, *editor.document());
     }
@@ -697,11 +757,11 @@ mod tests {
     }
 
     #[test]
-    fn versions_one_and_two_remain_loadable_after_version_three_bump() {
+    fn versions_one_through_three_remain_loadable_after_version_four_bump() {
         let (document, ..) = sample_document();
         let current: serde_json::Value =
             serde_json::from_str(&to_json_pretty(&document).unwrap()).unwrap();
-        for legacy_version in [1_u64, 2] {
+        for legacy_version in [1_u64, 2, 3] {
             let mut legacy = current.clone();
             legacy["version"] = legacy_version.into();
             assert_eq!(from_json(&legacy.to_string()).unwrap(), document);
@@ -854,7 +914,7 @@ mod tests {
         let first_id = NodeId::new();
         let second_id = NodeId::new();
         let identity = StoredAffine2V1::from(Affine2::IDENTITY);
-        let appearance = Appearance {
+        let appearance: StoredAppearanceV1 = Appearance {
             opacity: 1.0,
             ..Appearance::default()
         }
@@ -868,7 +928,7 @@ mod tests {
             local_transform: identity,
             visible: true,
             locked: false,
-            appearance,
+            appearance: appearance.clone(),
             metadata: BTreeMap::new(),
             internal_group_restoration: None,
         };
@@ -887,7 +947,7 @@ mod tests {
                         local_transform: identity,
                         visible: true,
                         locked: false,
-                        appearance,
+                        appearance: appearance.clone(),
                         metadata: BTreeMap::new(),
                         internal_group_restoration: None,
                     },
@@ -1080,6 +1140,7 @@ mod tests {
             stroke: Stroke {
                 color: ColorRgba::new(0.1, 0.2, 0.3, 0.75),
                 width: 6.0,
+                ..Stroke::default()
             },
         };
         editor
@@ -1110,5 +1171,82 @@ mod tests {
         assert_eq!(migrated_appearance.fill, ColorRgba::default());
         assert_eq!(migrated_appearance.corner_radii, CornerRadii::default());
         assert_eq!(migrated_appearance.stroke, Stroke::default());
+    }
+
+    #[test]
+    fn phase2b_extended_stroke_round_trips_and_version_three_migrates_defaults() {
+        let (document, _frame_id, rectangle_id, _ellipse_id) = sample_document();
+        let mut editor = HeadlessEditorCore::new(document).unwrap();
+        let stroke = Stroke {
+            color: ColorRgba::new(0.2, 0.4, 0.6, 0.8),
+            width: 7.5,
+            cap: StrokeCap::Square,
+            join: StrokeJoin::Bevel,
+            miter_limit: 9.0,
+            dash_pattern: DashPattern::new(&[8.0, 3.0, 0.0, 2.0]).unwrap(),
+        };
+        let mut appearance = editor.document().node(rectangle_id).unwrap().appearance();
+        appearance.stroke = stroke;
+        editor
+            .dispatch(Command::SetAppearance {
+                target: rectangle_id,
+                appearance,
+            })
+            .unwrap();
+
+        let json = to_json_pretty(editor.document()).unwrap();
+        let restored = from_json(&json).unwrap();
+        assert_eq!(
+            restored.node(rectangle_id).unwrap().appearance().stroke,
+            stroke
+        );
+
+        let mut legacy: serde_json::Value = serde_json::from_str(&json).unwrap();
+        legacy["version"] = 3_u64.into();
+        for node in legacy["document"]["nodes"].as_array_mut().unwrap() {
+            let stored = node["appearance"]["stroke"].as_object_mut().unwrap();
+            stored.remove("cap");
+            stored.remove("join");
+            stored.remove("miter_limit");
+            stored.remove("dash_pattern");
+        }
+        let migrated = from_json(&legacy.to_string()).unwrap();
+        let migrated_stroke = migrated.node(rectangle_id).unwrap().appearance().stroke;
+        assert_eq!(migrated_stroke.cap, StrokeCap::Butt);
+        assert_eq!(migrated_stroke.join, StrokeJoin::Miter);
+        assert_eq!(migrated_stroke.miter_limit, 4.0);
+        assert!(migrated_stroke.dash_pattern.is_empty());
+
+        let saved: serde_json::Value =
+            serde_json::from_str(&to_json_pretty(&migrated).unwrap()).unwrap();
+        assert_eq!(saved["version"], CURRENT_VERSION);
+    }
+
+    #[test]
+    fn malformed_dash_patterns_are_rejected_without_fallback() {
+        let (document, ..) = sample_document();
+        let mut value: serde_json::Value =
+            serde_json::from_str(&to_json_pretty(&document).unwrap()).unwrap();
+        value["document"]["nodes"][0]["appearance"]["stroke"]["dash_pattern"] =
+            serde_json::json!([0.0, 0.0]);
+        assert!(matches!(
+            from_json(&value.to_string()),
+            Err(SerializationError::InvalidDashPattern(
+                DashPatternError::AllZero
+            ))
+        ));
+
+        value["document"]["nodes"][0]["appearance"]["stroke"]["dash_pattern"] =
+            serde_json::Value::Array(
+                (0..=visual_authoring_document::MAX_DASH_ENTRIES)
+                    .map(|_| serde_json::json!(1.0))
+                    .collect(),
+            );
+        assert!(matches!(
+            from_json(&value.to_string()),
+            Err(SerializationError::InvalidDashPattern(
+                DashPatternError::TooMany { .. }
+            ))
+        ));
     }
 }

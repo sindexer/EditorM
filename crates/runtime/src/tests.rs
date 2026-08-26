@@ -1431,6 +1431,7 @@ fn stroked(width: f64) -> Appearance {
         stroke: Stroke {
             color: ColorRgba::new(0.0, 0.0, 0.0, 1.0),
             width,
+            ..Stroke::default()
         },
         ..Appearance::default()
     }
