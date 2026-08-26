@@ -1,22 +1,22 @@
 {
   "phase": "2A",
-  "gate_run_id": "phase2a-20260825T142800Z-69ae0d0",
-  "tested_source_commit": "69ae0d01e3d231729a022ecbec568bb3593acf6f",
-  "tested_branch": "feat/phase2a-path-rendering",
+  "gate_run_id": "phase2a-pen-20260826-03",
+  "tested_source_commit": "8a2400153a6a44696785ee29ae105066324bb78b",
+  "tested_branch": "codex/phase2a-pen-bezier-ui",
   "proof_kind": "actual-hardware-browser",
-  "captured_at_utc": "2026-08-25T14:27:48.182Z",
+  "captured_at_utc": "2026-08-26T00:44:45.872Z",
   "browser": "Chrome/151.0.7922.174",
   "browser_mode": "actual Chrome; no mock; no Canvas2D fallback",
   "execution": {
     "command": "npm run test:browser:phase2a:path-render",
-    "started_at_utc": "2026-08-25T14:27:44.013Z",
-    "finished_at_utc": "2026-08-25T14:27:48.182Z",
+    "started_at_utc": "2026-08-26T00:44:40.993Z",
+    "finished_at_utc": "2026-08-26T00:44:45.872Z",
     "software_gpu_allowed": false,
     "chrome_sandbox_disabled": false
   },
   "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/151.0.0.0 Safari/537.36",
-  "chrome_process_id": 22356,
-  "chrome_profile": "C:\\Users\\thdwl\\AppData\\Local\\Temp\\phase2a-chrome-6488-1787668064013",
+  "chrome_process_id": 9560,
+  "chrome_profile": "C:\\Users\\thdwl\\AppData\\Local\\Temp\\phase2a-chrome-5336-1787705080993",
   "gpu": {
     "adapter": "maxwell",
     "backend": "browser-webgpu (implementation backend not exposed by Web API)",
@@ -36,7 +36,7 @@
     }
   },
   "preview": {
-    "url": "http://127.0.0.1:1462/",
+    "url": "http://127.0.0.1:4215/",
     "health": {
       "ok": true,
       "status": 200,
@@ -63,7 +63,7 @@
         "content_type": "application/wasm"
       }
     },
-    "stdout": "Phase 0E editor: http://127.0.0.1:1462/\n",
+    "stdout": "Phase 0E editor: http://127.0.0.1:4215/\n",
     "stderr": ""
   },
   "initial": {
@@ -154,8 +154,8 @@
       "buffer_bytes": 376,
       "upload_calls": 2,
       "frame_upload_bytes": 36,
-      "render_submit_ms": 1.800000011920929,
-      "frame_ms": 1.800000011920929,
+      "render_submit_ms": 2.600000023841858,
+      "frame_ms": 2.600000023841858,
       "validation_errors": 0,
       "frame_sequence": 5,
       "gpu_encode_attempted": 0,
@@ -272,7 +272,8 @@
       "in_flight": false,
       "scheduled": false,
       "latest": false
-    }
+    },
+    "pen_draft": null
   },
   "fixture": {
     "name": "PATH-A",
@@ -415,6 +416,77 @@
       ]
     },
     "removed_from_projection": true
+  },
+  "pen_dom_workflow": {
+    "created_id": "d58f59ad-83dd-4c16-9ffa-3a1e14125d8a",
+    "created_node": {
+      "appearance": {
+        "corner_radii": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "fill": [
+          0.2,
+          0.58,
+          0.96,
+          1
+        ],
+        "stroke": {
+          "color": [
+            0.08,
+            0.11,
+            0.16,
+            1
+          ],
+          "width": 0
+        }
+      },
+      "children": [],
+      "geometry": {
+        "height": 133.77398300170898,
+        "width": 140.18333333333334
+      },
+      "id": "d58f59ad-83dd-4c16-9ffa-3a1e14125d8a",
+      "kind": "path",
+      "local_transform": [
+        1,
+        0,
+        0,
+        1,
+        -144.6375,
+        -106.74391447703044
+      ],
+      "locked": false,
+      "name": "Path",
+      "opacity": 1,
+      "parent_id": "00000000-0000-0000-0000-000000000001",
+      "visible": true,
+      "world_bounds": {
+        "max": [
+          -4.4541666666666515,
+          27.03006852467854
+        ],
+        "min": [
+          -144.6375,
+          -106.74391447703044
+        ]
+      },
+      "world_transform": [
+        1,
+        0,
+        0,
+        1,
+        -144.6375,
+        -106.74391447703044
+      ]
+    },
+    "drag_preview_visible": true,
+    "layer_visible": true,
+    "removed_by_undo": true,
+    "restored_by_redo": true,
+    "rollback_clean": true
   },
   "camera_only_frame": {
     "path_tessellations": 0,
@@ -562,12 +634,12 @@
   "screenshots": {
     "paths": {
       "path": "docs/verification/phase2a-paths.png",
-      "bytes": 59254,
-      "modified_utc": "2026-08-25T14:27:47.761Z"
+      "bytes": 59496,
+      "modified_utc": "2026-08-26T00:44:44.938Z"
     }
   },
   "console_errors": [],
-  "chrome_stderr_tail": "\r\nDevTools listening on ws://127.0.0.1:1469/devtools/browser/3b11849c-2418-4db8-9b4c-a0a226f77456\r\n",
+  "chrome_stderr_tail": "\r\nDevTools listening on ws://127.0.0.1:4220/devtools/browser/7457d1a6-71fa-4fa0-807f-3a65c920ab82\r\n[9560:14024:0826/094445.474:ERROR:google_apis\\gcm\\engine\\registration_request.cc:291] Registration response error message: DEPRECATED_ENDPOINT\r\n",
   "max_fallback_rebuild_count_seen": 0,
   "fallback_checkpoints": [
     {
@@ -656,27 +728,42 @@
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 38,
+      "engine_sequence": 29,
       "fixture": "PATH-A",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 39,
+      "engine_sequence": 31,
       "fixture": "PATH-A",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 39,
+      "engine_sequence": 34,
       "fixture": "PATH-A",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 40,
+      "engine_sequence": 53,
       "fixture": "PATH-A",
       "fallback_rebuild_count": 0
     },
     {
-      "engine_sequence": 40,
+      "engine_sequence": 54,
+      "fixture": "PATH-A",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 54,
+      "fixture": "PATH-A",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 55,
+      "fixture": "PATH-A",
+      "fallback_rebuild_count": 0
+    },
+    {
+      "engine_sequence": 55,
       "fixture": "PATH-A",
       "fallback_rebuild_count": 0
     }
@@ -697,6 +784,12 @@
     "filled_interior_is_pickable": true,
     "outline_only_region_is_not_pickable": true,
     "stroke_is_pickable": true,
+    "pen_tool_dom_activation": true,
+    "pen_anchor_dom_pointer_input": true,
+    "pen_drag_handle_dom_preview": true,
+    "pen_commit_creates_path_layer": true,
+    "pen_transaction_undo_redo": true,
+    "pen_escape_rolls_back": true,
     "create_path_command_round_trip": true,
     "edit_path_tessellates_only_that_path": true,
     "undo_restores_path_geometry": true,
@@ -710,7 +803,7 @@
     "fallback_rebuild_zero": true,
     "latest_sequences_match": true
   },
-  "assertion_count": 27,
-  "passed_assertion_count": 27,
+  "assertion_count": 33,
+  "passed_assertion_count": 33,
   "all_passed": true
 }

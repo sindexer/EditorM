@@ -495,6 +495,14 @@ impl ReversibleEffect {
     pub(crate) fn try_coalesce(&mut self, newer: Self) -> Option<Self> {
         match (self, newer) {
             (
+                Self::InsertNode { spec, .. },
+                Self::SetGeometry {
+                    target,
+                    after: newer_after,
+                    ..
+                },
+            ) if spec.id == target => spec.geometry = Some(newer_after),
+            (
                 Self::SetLocalTransform { target, after, .. },
                 Self::SetLocalTransform {
                     target: newer_target,

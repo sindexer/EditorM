@@ -137,7 +137,8 @@ button:disabled { cursor: not-allowed; color: var(--ui-label-assistive) !importa
 .canvas-shell { position: relative; min-height: 0; overflow: hidden; touch-action: none; background: #090e14; }
 .canvas-shell.tool-hand { cursor: grab; }
 .canvas-shell.tool-hand:active { cursor: grabbing; }
-.canvas-shell.tool-rectangle, .canvas-shell.tool-ellipse { cursor: crosshair; }
+.canvas-shell.tool-rectangle, .canvas-shell.tool-ellipse, .canvas-shell.tool-pen { cursor: crosshair; }
+.graphics-toolbox { display: inline-flex; align-items: center; gap: 3px; padding: 2px 5px; border: 1px solid var(--ui-border); border-radius: 7px; background: var(--ui-surface-raised); }
 .webgpu-canvas { display: block; width: 100%; height: 100%; }
 .selection-overlay { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
 .selection-outline { fill: rgba(0, 102, 255, 0.04); stroke: var(--ui-primary); stroke-width: 1.5; vector-effect: non-scaling-stroke; }
@@ -147,6 +148,9 @@ button:disabled { cursor: not-allowed; color: var(--ui-label-assistive) !importa
 .selection-outline.secondary { fill: rgba(0, 102, 255, 0.02); stroke-width: 1; stroke-dasharray: 3 2; }
 .selection-union { fill: none; stroke: var(--ui-primary); stroke-width: 1; stroke-dasharray: 4 3; vector-effect: non-scaling-stroke; }
 .marquee-rect { fill: rgba(0, 102, 255, 0.1); stroke: var(--ui-primary); stroke-width: 1; }
+.pen-anchor { fill: #fff; stroke: var(--ui-primary); stroke-width: 2; }
+.pen-drag-line { stroke: var(--ui-primary); stroke-width: 1; stroke-dasharray: 3 2; }
+.pen-drag-point { fill: var(--ui-primary); stroke: #fff; stroke-width: 1; }
 .snap-guide { stroke: #ff2d55; stroke-width: 1; shape-rendering: crispEdges; }
 .arrange-bar { display: flex; align-items: center; gap: 2px; margin-left: 12px; }
 .arrange-button {

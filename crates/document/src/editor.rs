@@ -990,6 +990,45 @@ mod tests {
     }
 
     #[test]
+    fn geometry_updates_of_a_new_node_fold_into_the_insert_history_effect() {
+        let mut editor = HeadlessEditorCore::blank("Root");
+        let root = editor.document().root_id();
+        let node = NodeId::new();
+        editor.begin_transaction().unwrap();
+        editor
+            .update_transaction(Command::CreateNode {
+                spec: NodeSpec::rectangle(node, "Drawn", Vec2::new(10.0, 10.0)),
+                parent: root,
+                index: 0,
+            })
+            .unwrap();
+        editor
+            .update_transaction(Command::SetGeometry {
+                target: node,
+                geometry: Geometry::Rectangle {
+                    size: Vec2::new(80.0, 60.0),
+                },
+            })
+            .unwrap();
+        assert!(editor.commit_transaction().unwrap());
+
+        let undone = editor.undo().unwrap().unwrap();
+        assert!(matches!(
+            undone.changes(),
+            [DocumentChange::NodesRemoved { root: removed, .. }] if *removed == node
+        ));
+        assert!(editor.document().node(node).is_none());
+
+        editor.redo().unwrap().unwrap();
+        assert_eq!(
+            editor.document().node(node).unwrap().geometry(),
+            Some(&Geometry::Rectangle {
+                size: Vec2::new(80.0, 60.0),
+            })
+        );
+    }
+
+    #[test]
     fn transaction_rollback_restores_exact_semantic_state() {
         let mut editor = HeadlessEditorCore::blank("Root");
         let root = editor.document().root_id();

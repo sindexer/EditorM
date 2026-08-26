@@ -44,6 +44,16 @@ pub struct PathAnchorRequest {
     handle_out: Option<[f64; 2]>,
 }
 
+/// One Pen interaction gesture. The browser reports only the anchor and optional drag endpoint;
+/// Rust owns the conversion to persistent symmetric Bezier handles.
+#[derive(Clone, Debug, Deserialize)]
+pub struct PenGestureAnchorRequest {
+    id: String,
+    position: [f64; 2],
+    #[serde(default)]
+    drag: Option<[f64; 2]>,
+}
+
 #[derive(Debug, Deserialize)]
 struct RequestEnvelope {
     protocol_version: u32,
@@ -181,10 +191,25 @@ enum CommandRequest {
         closed: bool,
         anchors: Vec<PathAnchorRequest>,
     },
+    CreatePathFromPen {
+        node_id: String,
+        parent_id: String,
+        index: usize,
+        name: String,
+        x: f64,
+        y: f64,
+        closed: bool,
+        gestures: Vec<PenGestureAnchorRequest>,
+    },
     SetPathGeometry {
         node_id: String,
         closed: bool,
         anchors: Vec<PathAnchorRequest>,
+    },
+    SetPathFromPen {
+        node_id: String,
+        closed: bool,
+        gestures: Vec<PenGestureAnchorRequest>,
     },
     CreateShape {
         node_id: String,
@@ -1822,6 +1847,26 @@ impl CommandRequest {
                     index,
                 })
             }
+            Self::CreatePathFromPen {
+                node_id,
+                parent_id,
+                index,
+                name,
+                x,
+                y,
+                closed,
+                gestures,
+            } => {
+                require_finite(&[x, y], "path translation")?;
+                let geometry = path_geometry_from_pen(closed, &gestures)?;
+                let mut spec = NodeSpec::path(parse_node_id(&node_id)?, name, geometry);
+                spec.local_transform = Affine2::translation(Vec2::new(x, y));
+                Ok(Command::CreateNode {
+                    spec,
+                    parent: parse_node_id(&parent_id)?,
+                    index,
+                })
+            }
             Self::SetPathGeometry {
                 node_id,
                 closed,
@@ -1829,6 +1874,14 @@ impl CommandRequest {
             } => Ok(Command::SetGeometry {
                 target: parse_node_id(&node_id)?,
                 geometry: Geometry::Path(path_geometry_for(closed, &anchors)?),
+            }),
+            Self::SetPathFromPen {
+                node_id,
+                closed,
+                gestures,
+            } => Ok(Command::SetGeometry {
+                target: parse_node_id(&node_id)?,
+                geometry: Geometry::Path(path_geometry_from_pen(closed, &gestures)?),
             }),
             Self::CreateShape {
                 node_id,
@@ -1997,6 +2050,31 @@ fn path_geometry_for(
         closed,
         anchors: parsed,
     })
+}
+
+fn path_geometry_from_pen(
+    closed: bool,
+    gestures: &[PenGestureAnchorRequest],
+) -> Result<PathGeometry, HostFailure> {
+    let mut anchors = Vec::with_capacity(gestures.len());
+    for gesture in gestures {
+        let id = PathAnchorId::from_uuid(uuid::Uuid::parse_str(&gesture.id).map_err(|error| {
+            HostFailure::new(
+                "invalid_command",
+                format!("path anchor id {} is invalid: {error}", gesture.id),
+            )
+        })?);
+        let position = Vec2::new(gesture.position[0], gesture.position[1]);
+        let mut anchor = PathAnchor::new(id, position);
+        if let Some(drag) = gesture.drag {
+            let handle_out = Vec2::new(drag[0], drag[1]);
+            let delta = handle_out - position;
+            anchor.handle_in = Some(position - delta);
+            anchor.handle_out = Some(handle_out);
+        }
+        anchors.push(anchor);
+    }
+    Ok(PathGeometry { closed, anchors })
 }
 
 fn geometry_for(shape: &str, width: f64, height: f64) -> Result<Geometry, HostFailure> {
@@ -3667,6 +3745,108 @@ mod path_tests {
         let redone = response(&mut host, request("redo", json!({ "type": "redo" })));
         assert!(redone["ok"].as_bool().unwrap(), "{redone}");
         assert_eq!(redone["resources"]["path_instance_count"], 1);
+    }
+
+    #[test]
+    fn pen_gestures_become_symmetric_handles_only_inside_rust() {
+        let mut host = EngineHost::new_inner().unwrap();
+        let root = host.runtime.document().root_id().to_string();
+        let node_id = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
+        let created = response(
+            &mut host,
+            request(
+                "create-from-pen",
+                json!({
+                    "type": "command",
+                    "command": {
+                        "kind": "create_path_from_pen",
+                        "node_id": node_id,
+                        "parent_id": root,
+                        "index": 0,
+                        "name": "Pen Path",
+                        "x": 100.0,
+                        "y": 200.0,
+                        "closed": false,
+                        "gestures": [
+                            { "id": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb", "position": [0.0, 0.0] },
+                            {
+                                "id": "cccccccc-cccc-4ccc-8ccc-cccccccccccc",
+                                "position": [40.0, 60.0],
+                                "drag": [60.0, 50.0]
+                            }
+                        ]
+                    }
+                }),
+            ),
+        );
+        assert!(created["ok"].as_bool().unwrap(), "{created}");
+        assert_eq!(created["resources"]["path_instance_count"], 1);
+
+        let saved = response(
+            &mut host,
+            request("save-pen", json!({ "type": "save_document" })),
+        );
+        let document: serde_json::Value =
+            serde_json::from_str(saved["result"]["document_json"].as_str().unwrap()).unwrap();
+        let node = document["document"]["nodes"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|node| node["id"] == node_id)
+            .unwrap();
+        let anchor = &node["kind"]["anchors"][1];
+        assert_eq!(anchor["id"], "cccccccc-cccc-4ccc-8ccc-cccccccccccc");
+        assert_eq!(anchor["handle_in"], json!({ "x": 20.0, "y": 70.0 }));
+        assert_eq!(anchor["handle_out"], json!({ "x": 60.0, "y": 50.0 }));
+    }
+
+    #[test]
+    fn invalid_pen_gesture_fails_atomically() {
+        let mut host = EngineHost::new_inner().unwrap();
+        let root = host.runtime.document().root_id().to_string();
+        let before_revision = host.runtime.document_revision();
+        let before_children = host
+            .runtime
+            .document()
+            .node(host.runtime.document().root_id())
+            .unwrap()
+            .children()
+            .len();
+        let failed = response(
+            &mut host,
+            request(
+                "invalid-pen",
+                json!({
+                    "type": "command",
+                    "command": {
+                        "kind": "create_path_from_pen",
+                        "node_id": "dddddddd-dddd-4ddd-8ddd-dddddddddddd",
+                        "parent_id": root,
+                        "index": 0,
+                        "name": "Invalid Pen Path",
+                        "x": 0.0,
+                        "y": 0.0,
+                        "closed": false,
+                        "gestures": [
+                            { "id": "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee", "position": [0.0, 0.0] }
+                        ]
+                    }
+                }),
+            ),
+        );
+        assert!(!failed["ok"].as_bool().unwrap());
+        assert_eq!(failed["error"]["code"], "runtime_error");
+        assert!(!failed["error"]["message"].as_str().unwrap().is_empty());
+        assert_eq!(host.runtime.document_revision(), before_revision);
+        assert_eq!(
+            host.runtime
+                .document()
+                .node(host.runtime.document().root_id())
+                .unwrap()
+                .children()
+                .len(),
+            before_children
+        );
     }
 
     #[test]

@@ -13,6 +13,7 @@ import {
   MousePointer2,
   PanelLeftClose,
   PanelRightClose,
+  PenTool,
   Redo2,
   RotateCw,
   Scan,
@@ -49,6 +50,7 @@ import {
   type ViewportRect,
 } from "./selectionGeometry";
 import type { EngineResponse, ProjectionNode } from "./types";
+import { appendPenAnchor, dragPenAnchor, isCloseTarget, type PenDraft, type Point } from "./penGeometry";
 
 declare global {
   interface Window {
@@ -61,7 +63,7 @@ declare global {
   }
 }
 
-type Tool = "select" | "hand" | "frame" | "rectangle" | "ellipse";
+type Tool = "select" | "hand" | "frame" | "rectangle" | "ellipse" | "pen";
 type FsmState =
   | "Idle"
   | "Hovering"
@@ -73,6 +75,7 @@ type FsmState =
   | "CreatingRectangle"
   | "CreatingEllipse"
   | "CreatingFrame"
+  | "CreatingPath"
   | "MarqueeSelecting"
   | "NestedEditing";
 
@@ -98,6 +101,7 @@ const tools: Array<{ id: Tool; label: string; shortcut: string; icon: LucideIcon
   { id: "frame", label: "Frame", shortcut: "F", icon: Scan },
   { id: "rectangle", label: "Rectangle", shortcut: "R", icon: Square },
   { id: "ellipse", label: "Ellipse", shortcut: "O", icon: Circle },
+  { id: "pen", label: "Pen", shortcut: "P", icon: PenTool },
 ];
 
 const arrangeOperations: Array<{ id: string; label: string; kind: "align" | "distribute" }> = [
@@ -762,6 +766,9 @@ export function App() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const shellRef = useRef<HTMLDivElement>(null);
   const interaction = useRef<Interaction | null>(null);
+  const penDraft = useRef<PenDraft | null>(null);
+  const penPointer = useRef<{ pointerId: number; anchorIndex: number; start: Point } | null>(null);
+  const penQueue = useRef<Promise<void>>(Promise.resolve());
   const dragQueue = useRef<{
     generation: number;
     inFlight: boolean;
@@ -782,6 +789,7 @@ export function App() {
   const [marquee, setMarquee] = useState<ViewportRect | null>(null);
   const [guides, setGuides] = useState<SnapGuideProjection[]>([]);
   const [snapEnabled, setSnapEnabled] = useState(true);
+  const [penDraftVersion, setPenDraftVersion] = useState(0);
 
   const fail = useCallback((reason: unknown) => {
     const message = reason instanceof Error ? `${"code" in reason ? `${String((reason as EngineFailure).code)}: ` : ""}${reason.message}` : String(reason);
@@ -863,8 +871,13 @@ export function App() {
         scheduled: Boolean(dragQueue.current.scheduled),
         latest: Boolean(dragQueue.current.latest),
       },
+      pen_draft: penDraft.current ? {
+        node_id: penDraft.current.nodeId,
+        anchor_count: penDraft.current.anchors.length,
+        created: penDraft.current.created,
+      } : null,
     });
-  }, [engine, response, version, heartbeatTick, fsm, tool, editRoot, error, snapEnabled, guides, marquee]);
+  }, [engine, response, version, heartbeatTick, fsm, tool, editRoot, error, snapEnabled, guides, marquee, penDraftVersion]);
 
   const currentNode = engine.projection.primary ? engine.projection.nodes.get(engine.projection.primary) : undefined;
   const worldToViewport = useCallback((point: [number, number]): [number, number] => {
@@ -883,6 +896,95 @@ export function App() {
       (point[1] - camera.viewport[1] / 2) / camera.zoom + camera.center[1],
     ];
   }, [response]);
+
+  const publishPenDraft = (next: PenDraft | null) => {
+    penDraft.current = next;
+    setPenDraftVersion((current) => current + 1);
+  };
+
+  const enqueuePen = (operation: () => Promise<void>) => {
+    penQueue.current = penQueue.current.then(operation).catch(async (reason) => {
+      fail(reason);
+      try {
+        await engine.send("rollback_transaction");
+      } catch {
+        // Preserve the first typed failure; rollback is best-effort after a rejected command.
+      }
+      penPointer.current = null;
+      publishPenDraft(null);
+      setFsm(editRoot ? "NestedEditing" : "Idle");
+      setTool("select");
+    });
+    return penQueue.current;
+  };
+
+  const persistPenDraft = (draft: PenDraft) => {
+    if (draft.anchors.length < 2) return;
+    const command = draft.created
+      ? {
+          kind: "set_path_from_pen",
+          node_id: draft.nodeId,
+          closed: false,
+          gestures: draft.anchors,
+        }
+      : {
+          kind: "create_path_from_pen",
+          node_id: draft.nodeId,
+          parent_id: draft.parentId,
+          index: engine.projection.nodes.get(draft.parentId)?.children.length ?? 0,
+          name: "Path",
+          x: draft.origin[0],
+          y: draft.origin[1],
+          closed: false,
+          gestures: draft.anchors,
+        };
+    if (!draft.created) publishPenDraft({ ...draft, created: true });
+    enqueuePen(() => engine.send("update_transaction", { command }).then(() => undefined));
+  };
+
+  const finishPen = (closed: boolean, nextTool: Tool = "select") => {
+    const draft = penDraft.current;
+    penPointer.current = null;
+    if (!draft) {
+      setTool(nextTool);
+      return;
+    }
+    publishPenDraft(null);
+    setFsm(editRoot ? "NestedEditing" : "Idle");
+    setTool(nextTool);
+    if (draft.anchors.length < 2 || !draft.created) {
+      enqueuePen(() => engine.send("rollback_transaction").then(() => undefined));
+      return;
+    }
+    enqueuePen(async () => {
+      if (closed) {
+        await engine.send("update_transaction", {
+          command: {
+            kind: "set_path_from_pen",
+            node_id: draft.nodeId,
+            closed: true,
+            gestures: draft.anchors,
+          },
+        });
+      }
+      await engine.send("commit_transaction");
+      await engine.send("selection", { target: draft.nodeId, mode: "replace" });
+    });
+  };
+
+  const cancelPen = () => {
+    if (!penDraft.current) return Promise.resolve();
+    penPointer.current = null;
+    publishPenDraft(null);
+    setFsm(editRoot ? "NestedEditing" : "Idle");
+    setTool("select");
+    return enqueuePen(() => engine.send("rollback_transaction").then(() => undefined));
+  };
+
+  const activateTool = (nextTool: Tool) => {
+    if (penDraft.current && nextTool !== "pen") finishPen(false, nextTool);
+    else setTool(nextTool);
+  };
 
   const scheduleDrag = useCallback((operation: () => Promise<void>) => {
     engine.projection.counters.pointerRawIntents += 1;
@@ -999,6 +1101,38 @@ export function App() {
     const captureTarget = event.currentTarget;
     const pointerId = event.pointerId;
     try {
+      if (tool === "pen") {
+        const world = viewportToWorld(point);
+        const current = penDraft.current;
+        if (current && isCloseTarget(current, world, response?.camera.zoom ?? 1)) {
+          finishPen(true);
+          return;
+        }
+        const root = editRoot ?? engine.projection.rootId;
+        if (!root) return;
+        let next = current;
+        if (!next) {
+          next = {
+            nodeId: crypto.randomUUID(),
+            parentId: root,
+            origin: world,
+            anchors: [{ id: crypto.randomUUID(), position: [0, 0] }],
+            created: false,
+          };
+          enqueuePen(() => engine.send("begin_transaction").then(() => undefined));
+        } else {
+          next = appendPenAnchor(next, world, crypto.randomUUID());
+        }
+        publishPenDraft(next);
+        penPointer.current = {
+          pointerId,
+          anchorIndex: next.anchors.length - 1,
+          start: point,
+        };
+        captureTarget.setPointerCapture(pointerId);
+        setFsm("CreatingPath");
+        return;
+      }
       const handleKind = (event.target as HTMLElement).dataset.testid;
       if (handleKind === "resize-handle" || handleKind === "rotate-handle") {
         await beginHandleAt(pointerId, event.clientX, event.clientY, handleKind === "resize-handle" ? "resize" : "rotate");
@@ -1073,6 +1207,14 @@ export function App() {
   };
 
   const onCanvasPointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
+    const activePen = penPointer.current;
+    if (activePen && activePen.pointerId === event.pointerId && penDraft.current) {
+      const point = pointerPosition(event);
+      if (Math.hypot(point[0] - activePen.start[0], point[1] - activePen.start[1]) >= 3) {
+        publishPenDraft(dragPenAnchor(penDraft.current, activePen.anchorIndex, viewportToWorld(point)));
+      }
+      return;
+    }
     const active = interaction.current;
     if (!active || active.pointerId !== event.pointerId) return;
     const point = pointerPosition(event);
@@ -1159,6 +1301,15 @@ export function App() {
   };
 
   const finishInteraction = async (event: ReactPointerEvent<HTMLDivElement>) => {
+    const activePen = penPointer.current;
+    if (activePen && activePen.pointerId === event.pointerId) {
+      penPointer.current = null;
+      if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+        event.currentTarget.releasePointerCapture(event.pointerId);
+      }
+      if (penDraft.current) persistPenDraft(penDraft.current);
+      return;
+    }
     const active = interaction.current;
     if (!active || active.pointerId !== event.pointerId) return;
     interaction.current = null;
@@ -1277,7 +1428,13 @@ export function App() {
       const target = event.target as HTMLElement | null;
       if (target?.matches("input, textarea, select")) return;
       const modifier = event.ctrlKey || event.metaKey;
-      if (event.key === "Escape" && interaction.current) {
+      if (event.key === "Escape" && penDraft.current) {
+        event.preventDefault();
+        void cancelPen();
+      } else if (event.key === "Enter" && penDraft.current) {
+        event.preventDefault();
+        finishPen(false);
+      } else if (event.key === "Escape" && interaction.current) {
         event.preventDefault();
         void cancelInteraction().catch(fail);
       } else if (modifier && event.key.toLowerCase() === "z") {
@@ -1291,7 +1448,7 @@ export function App() {
         void selectAllInRoot();
       } else if (!modifier) {
         const shortcut = tools.find((entry) => entry.shortcut.toLowerCase() === event.key.toLowerCase());
-        if (shortcut) setTool(shortcut.id);
+        if (shortcut) activateTool(shortcut.id);
       }
     };
     window.addEventListener("keydown", keydown);
@@ -1310,6 +1467,24 @@ export function App() {
     return { points, handle, rotate: [topMid[0], topMid[1] - 24] as [number, number] };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentNode, response, worldToViewport, engine, version]);
+
+  const penOverlay = useMemo(() => {
+    const draft = penDraft.current;
+    if (!draft) return [];
+    return draft.anchors.map((anchor) => ({
+      id: anchor.id,
+      anchor: worldToViewport([
+        draft.origin[0] + anchor.position[0],
+        draft.origin[1] + anchor.position[1],
+      ]),
+      drag: anchor.drag ? worldToViewport([
+        draft.origin[0] + anchor.drag[0],
+        draft.origin[1] + anchor.drag[1],
+      ]) : null,
+    }));
+    // penDraftVersion publishes ref changes to this render-only interaction overlay.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [penDraftVersion, worldToViewport]);
 
   const loadFixture = (fixture: string) => {
     setEditRoot(null);
@@ -1393,8 +1568,8 @@ export function App() {
       <div className="workspace">
         <aside className="left-column">
           <nav className="tool-rail" aria-label="Editor tools">
-            {tools.map((entry) => (
-              <IconButton key={entry.id} icon={entry.icon} label={`${entry.label} (${entry.shortcut})`} active={tool === entry.id} onClick={() => setTool(entry.id)} testId={`tool-${entry.id}`} />
+            {tools.filter((entry) => entry.id === "select" || entry.id === "hand").map((entry) => (
+              <IconButton key={entry.id} icon={entry.icon} label={`${entry.label} (${entry.shortcut})`} active={tool === entry.id} onClick={() => activateTool(entry.id)} testId={`tool-${entry.id}`} />
             ))}
           </nav>
           <LayersPanel engine={engine} response={response} version={version} onError={fail} editRoot={editRoot} setEditRoot={(id) => { setEditRoot(id); setFsm(id ? "NestedEditing" : "Idle"); }} />
@@ -1403,6 +1578,11 @@ export function App() {
         <section className="canvas-column" aria-label="Canvas workspace">
           <div className="canvas-toolbar">
             <span className="tool-state"><MousePointer2 size={14} /> {tool} · {fsm}</span>
+            <div className="graphics-toolbox" role="group" aria-label="Graphics tools">
+              {tools.filter((entry) => !["select", "hand"].includes(entry.id)).map((entry) => (
+                <IconButton key={entry.id} icon={entry.icon} label={`${entry.label} (${entry.shortcut})`} active={tool === entry.id} onClick={() => activateTool(entry.id)} testId={`tool-${entry.id}`} />
+              ))}
+            </div>
             {editRoot ? <span className="nested-breadcrumb">Root / {engine.projection.nodes.get(editRoot)?.name}</span> : null}
             <div className="arrange-bar" role="group" aria-label="Align and distribute">
               {arrangeOperations.map((operation) => (
@@ -1444,7 +1624,8 @@ export function App() {
             onPointerMove={onCanvasPointerMove}
             onPointerUp={(event) => void finishInteraction(event)}
             onPointerCancel={(event) => {
-              void cancelInteraction().catch(fail);
+              if (penDraft.current) void cancelPen();
+              else void cancelInteraction().catch(fail);
               if (event.currentTarget.hasPointerCapture(event.pointerId)) {
                 event.currentTarget.releasePointerCapture(event.pointerId);
               }
@@ -1508,6 +1689,15 @@ export function App() {
                   data-testid="marquee"
                 />
               ) : null}
+              {penOverlay.map((entry, index) => (
+                <g key={entry.id} data-testid={`pen-anchor-${index}`}>
+                  {entry.drag ? (
+                    <line x1={entry.anchor[0]} y1={entry.anchor[1]} x2={entry.drag[0]} y2={entry.drag[1]} className="pen-drag-line" />
+                  ) : null}
+                  <circle cx={entry.anchor[0]} cy={entry.anchor[1]} r={index === 0 && penOverlay.length >= 3 ? 6 : 4} className="pen-anchor" />
+                  {entry.drag ? <circle cx={entry.drag[0]} cy={entry.drag[1]} r="3" className="pen-drag-point" /> : null}
+                </g>
+              ))}
               {overlay ? (
                 <g>
                   <polygon points={overlay.points.map((point) => point.join(",")).join(" ")} className="selection-outline" />
