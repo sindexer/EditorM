@@ -131,9 +131,9 @@ elseif ($isPhase2A) {
         $proof.checks.gpu_validation_errors_zero -ne $true) {
         throw "Phase 2A evidence reports a GPU validation error, fallback, or rebuild"
     }
-    if ($proof.all_passed -ne $true -or [int]$proof.assertion_count -ne 27 -or
+    if ($proof.all_passed -ne $true -or [int]$proof.assertion_count -ne 33 -or
         [int]$proof.passed_assertion_count -ne [int]$proof.assertion_count) {
-        throw "Phase 2A hardware proof did not pass all 27 checks"
+        throw "Phase 2A hardware proof did not pass all 33 checks"
     }
     foreach ($check in @(
         "hardware_gpu_adapter",
@@ -141,6 +141,12 @@ elseif ($isPhase2A) {
         "filled_interior_is_pickable",
         "outline_only_region_is_not_pickable",
         "stroke_is_pickable",
+        "pen_tool_dom_activation",
+        "pen_anchor_dom_pointer_input",
+        "pen_drag_handle_dom_preview",
+        "pen_commit_creates_path_layer",
+        "pen_transaction_undo_redo",
+        "pen_escape_rolls_back",
         "create_path_command_round_trip",
         "edit_path_tessellates_only_that_path",
         "undo_restores_path_geometry",

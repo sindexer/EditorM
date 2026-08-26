@@ -510,6 +510,51 @@ async function clickPoint(
   return waitForInteractionIdle(label);
 }
 
+async function pressAndRelease(point, { afterPressExpression, afterReleaseExpression, label }) {
+  await pageClient.send("Input.dispatchMouseEvent", {
+    type: "mousePressed",
+    x: point.center_x ?? point.x,
+    y: point.center_y ?? point.y,
+    button: "left",
+    buttons: 1,
+    clickCount: 1,
+  });
+  if (afterPressExpression) {
+    await waitFor(afterPressExpression, 30000, `${label}_press_timeout`);
+  }
+  await pageClient.send("Input.dispatchMouseEvent", {
+    type: "mouseReleased",
+    x: point.center_x ?? point.x,
+    y: point.center_y ?? point.y,
+    button: "left",
+    buttons: 0,
+    clickCount: 1,
+  });
+  if (afterReleaseExpression) {
+    await waitFor(afterReleaseExpression, 30000, `${label}_release_timeout`);
+  }
+}
+
+async function dragPoint(start, end, { afterPressExpression, afterReleaseExpression, label }) {
+  await pageClient.send("Input.dispatchMouseEvent", {
+    type: "mousePressed", x: start.x, y: start.y, button: "left", buttons: 1, clickCount: 1,
+  });
+  if (afterPressExpression) await waitFor(afterPressExpression, 30000, `${label}_press_timeout`);
+  await pageClient.send("Input.dispatchMouseEvent", {
+    type: "mouseMoved", x: end.x, y: end.y, button: "left", buttons: 1,
+  });
+  await waitFor("document.querySelectorAll('.pen-drag-line').length === 1", 30000, `${label}_drag_timeout`);
+  await pageClient.send("Input.dispatchMouseEvent", {
+    type: "mouseReleased", x: end.x, y: end.y, button: "left", buttons: 0, clickCount: 1,
+  });
+  if (afterReleaseExpression) await waitFor(afterReleaseExpression, 30000, `${label}_release_timeout`);
+}
+
+async function pressKey(key, code = key) {
+  await pageClient.send("Input.dispatchKeyEvent", { type: "keyDown", key, code });
+  await pageClient.send("Input.dispatchKeyEvent", { type: "keyUp", key, code });
+}
+
 
 
 
@@ -824,6 +869,64 @@ try {
   await waitFor("window.__PHASE0E_PROOF__?.selection_count === 1", 30000, "path_pick_timeout");
   const strokePick = (await selectionIds())[0];
 
+  // ---------------------------------------------------------- Pen DOM gesture transaction
+  // This is intentionally driven only through the rendered controls and pointer/keyboard input.
+  // The browser sends transient gestures; Rust owns conversion to persistent Bezier handles.
+  await send("selection", { mode: "clear" });
+  await clickPoint(await boundsForSelector('[data-testid="tool-pen"]'), { label: "activate Pen tool" });
+  await waitFor("document.querySelector('[data-testid=\"tool-pen\"]')?.getAttribute('aria-pressed') === 'true'");
+  const penA = await clientPointForWorld([360, 210]);
+  const penB = await clientPointForWorld([500, 210]);
+  const penC = await clientPointForWorld([430, 330]);
+  await pressAndRelease(penA, {
+    label: "pen first anchor",
+    afterPressExpression: "window.__PHASE0E_PROOF__?.pen_draft?.anchor_count === 1 && window.__PHASE0E_PROOF__?.history?.transaction_active === true",
+    afterReleaseExpression: "window.__PHASE0E_PROOF__?.pen_draft?.anchor_count === 1",
+  });
+  await pressAndRelease(penB, {
+    label: "pen second anchor",
+    afterPressExpression: "window.__PHASE0E_PROOF__?.pen_draft?.anchor_count === 2",
+    afterReleaseExpression: "window.__PHASE0E_PROOF__?.pen_draft?.created === true",
+  });
+  await dragPoint(penC, { x: penC.x + 42, y: penC.y + 28 }, {
+    label: "pen Bezier anchor",
+    afterPressExpression: "window.__PHASE0E_PROOF__?.pen_draft?.anchor_count === 3",
+    afterReleaseExpression: "window.__PHASE0E_PROOF__?.pen_draft?.created === true",
+  });
+  const penDragPreviewVisible = await evaluate(
+    "document.querySelectorAll('.pen-drag-line').length === 1 && document.querySelectorAll('.pen-drag-point').length === 1",
+  );
+  await pressKey("Enter", "Enter");
+  const penIdle = await waitForInteractionIdle("committing Pen path");
+  const penCreatedId = penIdle.selection?.[0] ?? null;
+  const penCreatedNode = penCreatedId ? (await nodeTable())[penCreatedId] ?? null : null;
+  const penLayerVisible = penCreatedId
+    ? await evaluate(`Boolean(document.querySelector('[data-node-id="${penCreatedId}"]'))`)
+    : false;
+  const penUndoSequence = (await getProof()).engine_sequence;
+  await clickPoint(await boundsForSelector('[data-testid="undo"]'), { label: "undo Pen path" });
+  await waitFor(`window.__PHASE0E_PROOF__?.engine_sequence > ${penUndoSequence}`);
+  const penRemovedByUndo = penCreatedId ? (await nodeTable())[penCreatedId] === undefined : false;
+  const penRedoSequence = (await getProof()).engine_sequence;
+  await clickPoint(await boundsForSelector('[data-testid="redo"]'), { label: "redo Pen path" });
+  await waitFor(`window.__PHASE0E_PROOF__?.engine_sequence > ${penRedoSequence}`);
+  const penRestoredByRedo = penCreatedId ? (await nodeTable())[penCreatedId]?.kind === "path" : false;
+  const penCleanupSequence = (await getProof()).engine_sequence;
+  await clickPoint(await boundsForSelector('[data-testid="undo"]'), { label: "remove Pen proof path" });
+  await waitFor(`window.__PHASE0E_PROOF__?.engine_sequence > ${penCleanupSequence}`);
+  await clickPoint(await boundsForSelector('[data-testid="tool-pen"]'), { label: "reactivate Pen tool" });
+  const penRollbackPoint = await clientPointForWorld([560, 340]);
+  await pressAndRelease(penRollbackPoint, {
+    label: "pen rollback draft",
+    afterPressExpression: "window.__PHASE0E_PROOF__?.pen_draft?.anchor_count === 1",
+    afterReleaseExpression: "window.__PHASE0E_PROOF__?.pen_draft?.anchor_count === 1",
+  });
+  await pressKey("Escape", "Escape");
+  await waitForInteractionIdle("rolling back Pen draft");
+  const penRollbackClean = await evaluate(
+    "window.__PHASE0E_PROOF__?.pen_draft === null && document.querySelectorAll('.pen-anchor').length === 0",
+  );
+
   // ------------------------------------------------ create, edit, undo and redo a path end to end
   const rootId = Object.values(await nodeTable()).find((node) => node.kind === "document")?.id;
   const createdId = "6f2c3b4a-1d5e-4a7b-8c9d-0e1f2a3b4c5d";
@@ -1025,6 +1128,12 @@ try {
     filled_interior_is_pickable: interiorPick === filledId,
     outline_only_region_is_not_pickable: outsidePick.length === 0,
     stroke_is_pickable: strokePick === straightId,
+    pen_tool_dom_activation: Boolean(penCreatedId),
+    pen_anchor_dom_pointer_input: penCreatedNode?.kind === "path",
+    pen_drag_handle_dom_preview: penDragPreviewVisible === true,
+    pen_commit_creates_path_layer: penCreatedNode?.kind === "path" && penLayerVisible,
+    pen_transaction_undo_redo: penRemovedByUndo && penRestoredByRedo,
+    pen_escape_rolls_back: penRollbackClean === true,
     create_path_command_round_trip:
       createdResponse.ok === true &&
       createdVertexCount > 0 &&
@@ -1142,6 +1251,15 @@ try {
       undone_bounds: undoneBounds,
       redone_bounds: redoneBounds,
       removed_from_projection: removedFromProjection,
+    },
+    pen_dom_workflow: {
+      created_id: penCreatedId,
+      created_node: penCreatedNode,
+      drag_preview_visible: penDragPreviewVisible,
+      layer_visible: penLayerVisible,
+      removed_by_undo: penRemovedByUndo,
+      restored_by_redo: penRestoredByRedo,
+      rollback_clean: penRollbackClean,
     },
     camera_only_frame: metrics.camera_only_frame,
     document_round_trip: metrics.document_round_trip,
