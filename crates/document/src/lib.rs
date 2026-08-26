@@ -16,7 +16,9 @@ pub use change::{
     ChangeMergeError, DocumentChange, DocumentChangeSet, DocumentRevision, NodePlacement,
     PersistentProperty, StructuralGroupChange,
 };
-pub use command::{Command, CommandError, CommandOutcome};
+pub use command::{
+    Command, CommandError, CommandOutcome, PathEditError, PathHandle, PathSegmentKind,
+};
 pub use editor::{EditorError, HeadlessEditorCore, HistoryState, Selection, SelectionError};
 pub use order_sequence::{OrderSequence, SequenceWork};
 
@@ -89,6 +91,12 @@ impl PathAnchorId {
 impl Default for PathAnchorId {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+impl fmt::Display for PathAnchorId {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        self.0.fmt(formatter)
     }
 }
 

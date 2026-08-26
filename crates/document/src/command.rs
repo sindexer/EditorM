@@ -2,13 +2,55 @@ use std::cell::Cell;
 use std::collections::{BTreeSet, HashMap};
 
 use thiserror::Error;
-use visual_authoring_core_math::Affine2;
+use visual_authoring_core_math::{Affine2, Vec2};
 
 use crate::{
     Appearance, Document, DocumentChange, DocumentChangeSet, DocumentError, Geometry,
     GroupRestoration, GroupRestorationRun, Metadata, NodeId, NodeKind, NodePlacement, NodeSnapshot,
-    NodeSpec, PersistentProperty, StructuralGroupChange,
+    NodeSpec, PathAnchor, PathAnchorId, PathGeometry, PersistentProperty, Stroke,
+    StructuralGroupChange,
 };
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum PathHandle {
+    Incoming,
+    Outgoing,
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum PathSegmentKind {
+    Straight,
+    Cubic,
+}
+
+#[derive(Clone, Debug, Error, PartialEq)]
+pub enum PathEditError {
+    #[error("path anchor {anchor} does not exist in node {target}")]
+    MissingAnchor {
+        target: NodeId,
+        anchor: PathAnchorId,
+    },
+    #[error("path anchor {anchor} already exists in node {target}")]
+    DuplicateAnchor {
+        target: NodeId,
+        anchor: PathAnchorId,
+    },
+    #[error("anchors {start} and {end} do not form a directed segment in node {target}")]
+    NonAdjacentSegment {
+        target: NodeId,
+        start: PathAnchorId,
+        end: PathAnchorId,
+    },
+    #[error("path split parameter must be finite and strictly inside (0, 1)")]
+    InvalidSplitParameter,
+    #[error("deleting anchor {anchor} would leave too few anchors in node {target}")]
+    TooFewAnchors {
+        target: NodeId,
+        anchor: PathAnchorId,
+    },
+    #[error("closing path node {target} requires at least three anchors; found {actual}")]
+    ClosingRequiresThree { target: NodeId, actual: usize },
+}
 
 /// Explicit, deterministic persistent-edit request.
 #[derive(Clone, Debug, PartialEq)]
@@ -69,6 +111,42 @@ pub enum Command {
         target: NodeId,
         geometry: Geometry,
     },
+    MovePathAnchor {
+        target: NodeId,
+        anchor: PathAnchorId,
+        position: Vec2,
+    },
+    SetPathHandle {
+        target: NodeId,
+        anchor: PathAnchorId,
+        handle: PathHandle,
+        position: Option<Vec2>,
+    },
+    InsertPathAnchor {
+        target: NodeId,
+        start: PathAnchorId,
+        end: PathAnchorId,
+        anchor: PathAnchorId,
+        parameter: f64,
+    },
+    DeletePathAnchor {
+        target: NodeId,
+        anchor: PathAnchorId,
+    },
+    SetPathClosed {
+        target: NodeId,
+        closed: bool,
+    },
+    SetPathSegmentKind {
+        target: NodeId,
+        start: PathAnchorId,
+        end: PathAnchorId,
+        kind: PathSegmentKind,
+    },
+    SetStroke {
+        target: NodeId,
+        stroke: Stroke,
+    },
     SetAppearance {
         target: NodeId,
         appearance: Appearance,
@@ -97,6 +175,13 @@ impl Command {
             Self::SetVisible { .. } => "set_visible",
             Self::SetLocked { .. } => "set_locked",
             Self::SetGeometry { .. } => "set_geometry",
+            Self::MovePathAnchor { .. } => "move_path_anchor",
+            Self::SetPathHandle { .. } => "set_path_handle",
+            Self::InsertPathAnchor { .. } => "insert_path_anchor",
+            Self::DeletePathAnchor { .. } => "delete_path_anchor",
+            Self::SetPathClosed { .. } => "set_path_closed",
+            Self::SetPathSegmentKind { .. } => "set_path_segment_kind",
+            Self::SetStroke { .. } => "set_stroke",
             Self::SetAppearance { .. } => "set_appearance",
             Self::SetMetadata { .. } => "set_metadata",
         }
@@ -117,6 +202,8 @@ pub enum CommandError {
     },
     #[error("invalid group operation: {0}")]
     InvalidGroup(&'static str),
+    #[error(transparent)]
+    PathEdit(#[from] PathEditError),
 }
 
 /// Observable result of one command application.
@@ -370,7 +457,7 @@ impl ReversibleEffect {
                 after,
             } => DocumentChange::AppearanceChanged {
                 node: *target,
-                bounds_changed: before.stroke.width != after.stroke.width,
+                bounds_changed: before.stroke != after.stroke,
             },
             Self::SetMetadata { target, .. } => DocumentChange::PersistentPropertyChanged {
                 node: *target,
@@ -780,6 +867,144 @@ pub(crate) fn execute_command(
                 },
             )
         }
+        Command::MovePathAnchor {
+            target,
+            anchor,
+            position,
+        } => edit_path(document, target, "move_path_anchor", move |path| {
+            let index = anchor_index(path, target, anchor)?;
+            let delta = position - path.anchors[index].position;
+            path.anchors[index].position = position;
+            path.anchors[index].handle_in =
+                path.anchors[index].handle_in.map(|handle| handle + delta);
+            path.anchors[index].handle_out =
+                path.anchors[index].handle_out.map(|handle| handle + delta);
+            Ok(())
+        }),
+        Command::SetPathHandle {
+            target,
+            anchor,
+            handle,
+            position,
+        } => edit_path(document, target, "set_path_handle", move |path| {
+            let index = anchor_index(path, target, anchor)?;
+            match handle {
+                PathHandle::Incoming => path.anchors[index].handle_in = position,
+                PathHandle::Outgoing => path.anchors[index].handle_out = position,
+            }
+            Ok(())
+        }),
+        Command::InsertPathAnchor {
+            target,
+            start,
+            end,
+            anchor,
+            parameter,
+        } => edit_path(document, target, "insert_path_anchor", move |path| {
+            if !parameter.is_finite() || parameter <= 0.0 || parameter >= 1.0 {
+                return Err(PathEditError::InvalidSplitParameter.into());
+            }
+            if path.anchors.iter().any(|candidate| candidate.id == anchor) {
+                return Err(PathEditError::DuplicateAnchor { target, anchor }.into());
+            }
+            let (start_index, end_index) = segment_indices(path, target, start, end)?;
+            let first = path.anchors[start_index].clone();
+            let last = path.anchors[end_index].clone();
+            let cubic = first.handle_out.is_some() || last.handle_in.is_some();
+            let p0 = first.position;
+            let p1 = first.handle_out.unwrap_or(p0);
+            let p3 = last.position;
+            let p2 = last.handle_in.unwrap_or(p3);
+            let q0 = lerp(p0, p1, parameter);
+            let q1 = lerp(p1, p2, parameter);
+            let q2 = lerp(p2, p3, parameter);
+            let r0 = lerp(q0, q1, parameter);
+            let r1 = lerp(q1, q2, parameter);
+            let split = lerp(r0, r1, parameter);
+            if cubic {
+                path.anchors[start_index].handle_out = Some(q0);
+                path.anchors[end_index].handle_in = Some(q2);
+            }
+            let mut inserted = PathAnchor::new(anchor, split);
+            if cubic {
+                inserted.handle_in = Some(r0);
+                inserted.handle_out = Some(r1);
+            }
+            let insertion_index = if end_index == 0 {
+                path.anchors.len()
+            } else {
+                end_index
+            };
+            path.anchors.insert(insertion_index, inserted);
+            Ok(())
+        }),
+        Command::DeletePathAnchor { target, anchor } => {
+            edit_path(document, target, "delete_path_anchor", move |path| {
+                let index = anchor_index(path, target, anchor)?;
+                let minimum = if path.closed { 3 } else { 2 };
+                if path.anchors.len() <= minimum {
+                    return Err(PathEditError::TooFewAnchors { target, anchor }.into());
+                }
+                path.anchors.remove(index);
+                Ok(())
+            })
+        }
+        Command::SetPathClosed { target, closed } => {
+            edit_path(document, target, "set_path_closed", move |path| {
+                if closed && path.anchors.len() < 3 {
+                    return Err(PathEditError::ClosingRequiresThree {
+                        target,
+                        actual: path.anchors.len(),
+                    }
+                    .into());
+                }
+                path.closed = closed;
+                Ok(())
+            })
+        }
+        Command::SetPathSegmentKind {
+            target,
+            start,
+            end,
+            kind,
+        } => edit_path(document, target, "set_path_segment_kind", move |path| {
+            let (start_index, end_index) = segment_indices(path, target, start, end)?;
+            match kind {
+                PathSegmentKind::Straight => {
+                    path.anchors[start_index].handle_out = None;
+                    path.anchors[end_index].handle_in = None;
+                }
+                PathSegmentKind::Cubic => {
+                    let p0 = path.anchors[start_index].position;
+                    let p3 = path.anchors[end_index].position;
+                    if path.anchors[start_index].handle_out.is_none()
+                        && path.anchors[end_index].handle_in.is_none()
+                    {
+                        path.anchors[start_index].handle_out = Some(lerp(p0, p3, 1.0 / 3.0));
+                        path.anchors[end_index].handle_in = Some(lerp(p0, p3, 2.0 / 3.0));
+                    }
+                }
+            }
+            Ok(())
+        }),
+        Command::SetStroke { target, stroke } => {
+            ensure_editable(document, target)?;
+            let mut after = document.required_node(target)?.appearance();
+            after.stroke = stroke;
+            let before = document.required_node(target)?.appearance();
+            if before == after {
+                return Ok(unchanged(vec![target]));
+            }
+            document.set_appearance(target, after)?;
+            changed(
+                vec![target],
+                ReversibleEffect::SetAppearance {
+                    target,
+                    before: Box::new(before),
+                    after: Box::new(after),
+                },
+            )
+        }
         Command::SetAppearance { target, appearance } => {
             ensure_editable(document, target)?;
             let before = document.required_node(target)?.appearance();
@@ -1121,6 +1346,79 @@ fn reparent(
     }
 }
 
+fn edit_path(
+    document: &mut Document,
+    target: NodeId,
+    operation: &'static str,
+    edit: impl FnOnce(&mut PathGeometry) -> Result<(), CommandError>,
+) -> Result<Execution, CommandError> {
+    ensure_editable(document, target)?;
+    let node = document.required_node(target)?;
+    let before = node
+        .geometry()
+        .cloned()
+        .ok_or(CommandError::UnsupportedOperation {
+            operation,
+            target,
+            kind: node.kind(),
+        })?;
+    let mut after = match &before {
+        Geometry::Path(path) => path.clone(),
+        _ => {
+            return Err(CommandError::UnsupportedOperation {
+                operation,
+                target,
+                kind: node.kind(),
+            });
+        }
+    };
+    edit(&mut after)?;
+    let after = Geometry::Path(after);
+    if before == after {
+        return Ok(unchanged(vec![target]));
+    }
+    document.set_geometry(target, after.clone())?;
+    changed(
+        vec![target],
+        ReversibleEffect::SetGeometry {
+            target,
+            before,
+            after,
+        },
+    )
+}
+
+fn anchor_index(
+    path: &PathGeometry,
+    target: NodeId,
+    anchor: PathAnchorId,
+) -> Result<usize, PathEditError> {
+    path.anchors
+        .iter()
+        .position(|candidate| candidate.id == anchor)
+        .ok_or(PathEditError::MissingAnchor { target, anchor })
+}
+
+fn segment_indices(
+    path: &PathGeometry,
+    target: NodeId,
+    start: PathAnchorId,
+    end: PathAnchorId,
+) -> Result<(usize, usize), PathEditError> {
+    let start_index = anchor_index(path, target, start)?;
+    let end_index = anchor_index(path, target, end)?;
+    let is_next = end_index == start_index + 1;
+    let is_closing = path.closed && start_index + 1 == path.anchors.len() && end_index == 0;
+    if !is_next && !is_closing {
+        return Err(PathEditError::NonAdjacentSegment { target, start, end });
+    }
+    Ok((start_index, end_index))
+}
+
+fn lerp(start: Vec2, end: Vec2, parameter: f64) -> Vec2 {
+    start + (end - start) * parameter
+}
+
 fn changed(affected: Vec<NodeId>, effect: ReversibleEffect) -> Result<Execution, CommandError> {
     Ok(Execution {
         outcome: CommandOutcome::with_change(affected),
@@ -1132,6 +1430,281 @@ fn unchanged(affected: Vec<NodeId>) -> Execution {
     Execution {
         outcome: CommandOutcome::unchanged(affected),
         effect: None,
+    }
+}
+
+#[cfg(test)]
+#[allow(clippy::items_after_test_module)]
+mod path_edit_tests {
+    use super::*;
+    use crate::{DashPattern, EditorError, HeadlessEditorCore, StrokeCap, StrokeJoin};
+
+    fn editor_with_path() -> (HeadlessEditorCore, NodeId, [PathAnchorId; 4]) {
+        let mut editor = HeadlessEditorCore::blank("Root");
+        let target = NodeId::new();
+        let ids = [
+            PathAnchorId::new(),
+            PathAnchorId::new(),
+            PathAnchorId::new(),
+            PathAnchorId::new(),
+        ];
+        let mut anchors = vec![
+            PathAnchor::new(ids[0], Vec2::new(0.0, 0.0)),
+            PathAnchor::new(ids[1], Vec2::new(90.0, 30.0)),
+            PathAnchor::new(ids[2], Vec2::new(140.0, 100.0)),
+            PathAnchor::new(ids[3], Vec2::new(20.0, 120.0)),
+        ];
+        anchors[0].handle_out = Some(Vec2::new(25.0, -30.0));
+        anchors[1].handle_in = Some(Vec2::new(65.0, 60.0));
+        let root = editor.document().root_id();
+        editor
+            .dispatch(Command::CreateNode {
+                spec: NodeSpec::path(
+                    target,
+                    "Editable path",
+                    PathGeometry {
+                        closed: false,
+                        anchors,
+                    },
+                ),
+                parent: root,
+                index: 0,
+            })
+            .unwrap();
+        (editor, target, ids)
+    }
+
+    fn path(editor: &HeadlessEditorCore, target: NodeId) -> PathGeometry {
+        match editor.document().node(target).unwrap().geometry().unwrap() {
+            Geometry::Path(path) => path.clone(),
+            _ => panic!("fixture must remain a path"),
+        }
+    }
+
+    fn prove_exact_undo_redo(editor: &mut HeadlessEditorCore, command: Command) {
+        let before = editor.document().clone();
+        let outcome = editor.dispatch(command).unwrap();
+        assert!(outcome.changed());
+        let after = editor.document().clone();
+        editor.undo().unwrap();
+        assert_eq!(*editor.document(), before);
+        editor.redo().unwrap();
+        assert_eq!(*editor.document(), after);
+    }
+
+    #[test]
+    fn every_phase2b_path_command_is_one_exact_undoable_operation() {
+        let (mut editor, target, ids) = editor_with_path();
+        prove_exact_undo_redo(
+            &mut editor,
+            Command::MovePathAnchor {
+                target,
+                anchor: ids[0],
+                position: Vec2::new(10.0, 15.0),
+            },
+        );
+        assert_eq!(
+            path(&editor, target).anchors[0].handle_out,
+            Some(Vec2::new(35.0, -15.0))
+        );
+        prove_exact_undo_redo(
+            &mut editor,
+            Command::SetPathHandle {
+                target,
+                anchor: ids[2],
+                handle: PathHandle::Incoming,
+                position: Some(Vec2::new(120.0, 70.0)),
+            },
+        );
+        prove_exact_undo_redo(
+            &mut editor,
+            Command::SetPathSegmentKind {
+                target,
+                start: ids[2],
+                end: ids[3],
+                kind: PathSegmentKind::Cubic,
+            },
+        );
+        let inserted = PathAnchorId::new();
+        prove_exact_undo_redo(
+            &mut editor,
+            Command::InsertPathAnchor {
+                target,
+                start: ids[0],
+                end: ids[1],
+                anchor: inserted,
+                parameter: 0.4,
+            },
+        );
+        prove_exact_undo_redo(
+            &mut editor,
+            Command::DeletePathAnchor {
+                target,
+                anchor: ids[3],
+            },
+        );
+        prove_exact_undo_redo(
+            &mut editor,
+            Command::SetPathClosed {
+                target,
+                closed: true,
+            },
+        );
+        prove_exact_undo_redo(
+            &mut editor,
+            Command::SetStroke {
+                target,
+                stroke: Stroke {
+                    width: 5.0,
+                    cap: StrokeCap::Round,
+                    join: StrokeJoin::Bevel,
+                    miter_limit: 6.0,
+                    dash_pattern: DashPattern::new(&[7.0, 2.0]).unwrap(),
+                    ..Stroke::default()
+                },
+            },
+        );
+    }
+
+    #[test]
+    fn de_casteljau_insertion_preserves_the_curve_and_surviving_ids() {
+        let (mut editor, target, ids) = editor_with_path();
+        let before = path(&editor, target);
+        let original = before.segments().next().unwrap();
+        let inserted = PathAnchorId::new();
+        let split = 0.37;
+        editor
+            .dispatch(Command::InsertPathAnchor {
+                target,
+                start: ids[0],
+                end: ids[1],
+                anchor: inserted,
+                parameter: split,
+            })
+            .unwrap();
+        let after = path(&editor, target);
+        assert_eq!(
+            after
+                .anchors
+                .iter()
+                .map(|anchor| anchor.id)
+                .collect::<Vec<_>>(),
+            vec![ids[0], inserted, ids[1], ids[2], ids[3]]
+        );
+        let segments = after.segments().take(2).collect::<Vec<_>>();
+        for step in 0..=100 {
+            let parameter = f64::from(step) / 100.0;
+            let preserved = if parameter <= split {
+                segments[0].evaluate(parameter / split)
+            } else {
+                segments[1].evaluate((parameter - split) / (1.0 - split))
+            };
+            assert!(original.evaluate(parameter).approx_eq(preserved, 1.0e-9));
+        }
+    }
+
+    #[test]
+    fn stale_invalid_and_non_adjacent_path_requests_are_failure_atomic() {
+        let (mut editor, target, ids) = editor_with_path();
+        let missing = PathAnchorId::new();
+        let invalid = [
+            (
+                Command::MovePathAnchor {
+                    target,
+                    anchor: missing,
+                    position: Vec2::ZERO,
+                },
+                PathEditError::MissingAnchor {
+                    target,
+                    anchor: missing,
+                },
+            ),
+            (
+                Command::SetPathSegmentKind {
+                    target,
+                    start: ids[0],
+                    end: ids[2],
+                    kind: PathSegmentKind::Straight,
+                },
+                PathEditError::NonAdjacentSegment {
+                    target,
+                    start: ids[0],
+                    end: ids[2],
+                },
+            ),
+            (
+                Command::InsertPathAnchor {
+                    target,
+                    start: ids[0],
+                    end: ids[1],
+                    anchor: ids[2],
+                    parameter: 0.5,
+                },
+                PathEditError::DuplicateAnchor {
+                    target,
+                    anchor: ids[2],
+                },
+            ),
+            (
+                Command::InsertPathAnchor {
+                    target,
+                    start: ids[0],
+                    end: ids[1],
+                    anchor: missing,
+                    parameter: 0.0,
+                },
+                PathEditError::InvalidSplitParameter,
+            ),
+        ];
+        for (command, expected) in invalid {
+            let before = editor.document().clone();
+            let history = editor.history_state();
+            assert_eq!(
+                editor.dispatch(command),
+                Err(EditorError::Command(CommandError::PathEdit(expected)))
+            );
+            assert_eq!(*editor.document(), before);
+            assert_eq!(editor.history_state(), history);
+        }
+
+        let two_anchor = PathGeometry {
+            closed: false,
+            anchors: path(&editor, target).anchors[..2].to_vec(),
+        };
+        editor
+            .dispatch(Command::SetGeometry {
+                target,
+                geometry: Geometry::Path(two_anchor),
+            })
+            .unwrap();
+        for (command, expected) in [
+            (
+                Command::DeletePathAnchor {
+                    target,
+                    anchor: ids[0],
+                },
+                PathEditError::TooFewAnchors {
+                    target,
+                    anchor: ids[0],
+                },
+            ),
+            (
+                Command::SetPathClosed {
+                    target,
+                    closed: true,
+                },
+                PathEditError::ClosingRequiresThree { target, actual: 2 },
+            ),
+        ] {
+            let before = editor.document().clone();
+            let history = editor.history_state();
+            assert_eq!(
+                editor.dispatch(command),
+                Err(EditorError::Command(CommandError::PathEdit(expected)))
+            );
+            assert_eq!(*editor.document(), before);
+            assert_eq!(editor.history_state(), history);
+        }
     }
 }
 
