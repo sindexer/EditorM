@@ -875,9 +875,10 @@ try {
   await send("selection", { mode: "clear" });
   await clickPoint(await boundsForSelector('[data-testid="tool-pen"]'), { label: "activate Pen tool" });
   await waitFor("document.querySelector('[data-testid=\"tool-pen\"]')?.getAttribute('aria-pressed') === 'true'");
-  const penA = await clientPointForWorld([360, 210]);
-  const penB = await clientPointForWorld([500, 210]);
-  const penC = await clientPointForWorld([430, 330]);
+  const penCanvas = await boundsForSelector('[data-testid="canvas-shell"]');
+  const penA = { x: penCanvas.x + penCanvas.width * 0.35, y: penCanvas.y + penCanvas.height * 0.35 };
+  const penB = { x: penCanvas.x + penCanvas.width * 0.55, y: penCanvas.y + penCanvas.height * 0.35 };
+  const penC = { x: penCanvas.x + penCanvas.width * 0.45, y: penCanvas.y + penCanvas.height * 0.58 };
   await pressAndRelease(penA, {
     label: "pen first anchor",
     afterPressExpression: "window.__PHASE0E_PROOF__?.pen_draft?.anchor_count === 1 && window.__PHASE0E_PROOF__?.history?.transaction_active === true",
@@ -915,7 +916,10 @@ try {
   await clickPoint(await boundsForSelector('[data-testid="undo"]'), { label: "remove Pen proof path" });
   await waitFor(`window.__PHASE0E_PROOF__?.engine_sequence > ${penCleanupSequence}`);
   await clickPoint(await boundsForSelector('[data-testid="tool-pen"]'), { label: "reactivate Pen tool" });
-  const penRollbackPoint = await clientPointForWorld([560, 340]);
+  const penRollbackPoint = {
+    x: penCanvas.x + penCanvas.width * 0.65,
+    y: penCanvas.y + penCanvas.height * 0.62,
+  };
   await pressAndRelease(penRollbackPoint, {
     label: "pen rollback draft",
     afterPressExpression: "window.__PHASE0E_PROOF__?.pen_draft?.anchor_count === 1",
