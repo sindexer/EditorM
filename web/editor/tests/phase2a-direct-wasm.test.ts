@@ -32,6 +32,7 @@ const requiredChecks = [
   "set_path_from_pen",
   "pen_commit_transaction",
   "pen_path_is_projected_after_commit",
+  "undo_pen_transaction_uses_no_fallback_rebuild",
   "undo_removes_whole_pen_transaction",
   "closed_path_needs_three_anchors",
   "duplicate_anchor_identity_rejected",

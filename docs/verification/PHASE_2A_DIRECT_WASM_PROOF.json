@@ -3,13 +3,13 @@
   "proof_kind": "actual-wasm-direct-node",
   "gpu_evidence": false,
   "browser_evidence": false,
-  "started_at": "2026-08-25T16:01:38.002Z",
-  "finished_at": "2026-08-25T16:01:38.081Z",
+  "started_at": "2026-08-26T00:43:43.661Z",
+  "finished_at": "2026-08-26T00:43:43.731Z",
   "node_version": "v24.19.0",
   "platform": "win32-x64",
   "wasm_path": "web/editor/public/pkg/engine_host_bg.wasm",
-  "wasm_bytes": 1556849,
-  "wasm_sha256": "4f5ba90e804fb15ba26fe3197d00bb067423feede048b1e9a6c8d10b5681dc21",
+  "wasm_bytes": 1556983,
+  "wasm_sha256": "05e7357d969923eb22e48297e6c68e586398a2c7c5e27b69d66a893dd6159d4a",
   "protocol_version": 1,
   "render_binary_schema_version": 3,
   "engine_sequence": 30,
@@ -440,6 +440,11 @@
       "detail": null
     },
     {
+      "name": "undo_pen_transaction_uses_no_fallback_rebuild",
+      "passed": true,
+      "detail": 0
+    },
+    {
       "name": "undo_removes_whole_pen_transaction",
       "passed": true,
       "detail": 4
@@ -561,7 +566,7 @@
       }
     }
   ],
-  "checks_passed": 50,
-  "checks_total": 50,
+  "checks_passed": 51,
+  "checks_total": 51,
   "all_passed": true
 }

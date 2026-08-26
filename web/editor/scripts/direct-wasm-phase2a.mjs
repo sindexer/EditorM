@@ -262,6 +262,11 @@ check(
 );
 const penUndone = requireOk("undo_pen_transaction", call("undo"));
 check(
+  "undo_pen_transaction_uses_no_fallback_rebuild",
+  penUndone.metrics.fallback_rebuild_count === 0,
+  penUndone.metrics.fallback_rebuild_count,
+);
+check(
   "undo_removes_whole_pen_transaction",
   projectedNodes(call("get_ui_snapshot"))[PEN_PATH_NODE] === undefined &&
     penUndone.resources.path_instance_count === fixture.resources.path_instance_count,
